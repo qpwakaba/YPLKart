@@ -1,0 +1,361 @@
+enable_this_plugin: true
+enable_permission:
+  kart_ride: true
+  kart_drift: true
+  cmd_menu: true
+  cmd_entry: true
+  cmd_exit: true
+  cmd_character: true
+  cmd_kart: true
+  cmd_leave: true
+  cmd_ranking: true
+  cmd_item: true
+  cmd_other_menu: true
+  cmd_other_entry: true
+  cmd_other_exit: true
+  cmd_other_character: true
+  cmd_other_kart: true
+  cmd_other_leave: true
+  cmd_other_ranking: true
+  cmd_other_item: true
+  use_item: true
+  interact_object: true
+enable_op_permission:
+  kart_remove: true
+  cmd_circuit: true
+  cmd_display: true
+  cmd_reload: true
+  cmd_itemboxtool: true
+enable_scoreboard: true
+disabled_worlds:
+- testworld
+- testworld2
+settings:
+  number_of_laps: 3
+  start_block_id: '41:0'
+  goal_block_id: '42:0'
+  dirt_block_id: '12:0'
+  item_slot: 2
+item:
+  tier1: 30
+  tier2: 60
+  tier3: 80
+  dash_board:
+    effect_level: 5
+    effect_second: 3
+  mushroom:
+    tier: 1
+    max_stack_size: 3
+    effect_level: 3
+    effect_second: 1
+    multiple:
+      tier: 3
+      drop_amount: 3
+  powerfull_mushroom:
+    tier: 3
+    max_stack_size: 1
+    effect_level: 4
+    effect_second: 4
+    multiple:
+      tier: 0
+      drop_amount: 2
+  banana:
+    tier: 1
+    max_stack_size: 5
+    effect_level: 2
+    effect_second: 3
+    multiple:
+      tier: 2
+      drop_amount: 3
+  fakeitembox:
+    tier: 1
+    max_stack_size: 1
+    hit_damage: 6
+    multiple:
+      tier: 0
+      drop_amount: 2
+  turtle:
+    tier: 1
+    max_stack_size: 3
+    hit_damage: 6
+    multiple:
+      tier: 2
+      drop_amount: 3
+  redturtle:
+    tier: 2
+    max_stack_size: 3
+    hit_damage: 6
+    multiple:
+      tier: 3
+      drop_amount: 3
+  thornedturtle:
+    tier: 4
+    max_stack_size: 1
+    hit_damage: 20
+    moving_damage: 6
+    multiple:
+      tier: 0
+      drop_amount: 2
+  gesso:
+    tier: 3
+    max_stack_size: 1
+    effect_level: 1
+    effect_second: 5
+    multiple:
+      tier: 0
+      drop_amount: 2
+  thunder:
+    tier: 4
+    hit_damage: 6
+    max_stack_size: 1
+    effect_level: 2
+    effect_second: 3
+    multiple:
+      tier: 0
+      drop_amount: 2
+  star:
+    tier: 4
+    hit_damage: 2
+    max_stack_size: 1
+    walk_speed: 0.9
+    effect_second: 6
+    multiple:
+      tier: 0
+      drop_amount: 2
+  teresa:
+    tier: 2
+    max_stack_size: 1
+    effect_second: 4
+    multiple:
+      tier: 0
+      drop_amount: 2
+  killer:
+    tier: 4
+    max_stack_size: 1
+    effect_second: 10
+    moving_damage: 6
+    multiple:
+      tier: 0
+      drop_amount: 2
+jobs:
+  human:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: 0
+    max_health: 20
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  creeper:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: 5
+    max_health: 10
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  zombie:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 2
+    item_adjust_negative_effect_level: 1
+    item_adjust_attack_damage: 2
+    max_health: 30
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 8
+  skeleton:
+    item_adjust_max_slot: 1
+    item_adjust_max_stack_size: 1
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: 0
+    max_health: 14
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  spider:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 1
+    item_adjust_positive_effect_level: 1
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: -1
+    max_health: 4
+    walk_speed: 0.7
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  enderman:
+    item_adjust_max_slot: 1
+    item_adjust_max_stack_size: 1
+    item_adjust_positive_effect_second: 1
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: 5
+    max_health: 20
+    walk_speed: 0.5
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  witch:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 2
+    item_adjust_positive_effect_level: 1
+    item_adjust_negative_effect_second: -1
+    item_adjust_negative_effect_level: -1
+    item_adjust_attack_damage: 0
+    max_health: 12
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  pig:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: -1
+    max_health: 10
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  squid:
+    item_adjust_max_slot: 1
+    item_adjust_max_stack_size: 1
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: -1
+    max_health: 6
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 5
+  villager:
+    item_adjust_max_slot: 0
+    item_adjust_max_stack_size: 0
+    item_adjust_positive_effect_second: 0
+    item_adjust_positive_effect_level: 0
+    item_adjust_negative_effect_second: 0
+    item_adjust_negative_effect_level: 0
+    item_adjust_attack_damage: -1
+    max_health: 10
+    walk_speed: 0.6
+    death_penalty:
+      anti_reskill_second: 4
+      walk_speed: 0.1
+      penalty_second: 0
+karts:
+  custom_kart1:
+    name: 'Standard'
+    weight: 1.0
+    max_speed: 200
+    acceleration: 1.0
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
+  custom_kart2:
+    name: 'Survival'
+    weight: 1.2
+    max_speed: 150
+    acceleration: 1.2
+    speed_decrease_on_dirt: 1.5
+    climbable_height: 1.0
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
+  custom_kart3:
+    name: 'Fast'
+    weight: 0.5
+    max_speed: 300
+    acceleration: 0.7
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 7.0
+    on_drift_speed_decrease: 1.5
+  custom_kart4:
+    name: 'Tricky'
+    weight: 0.7
+    max_speed: 250
+    acceleration: 0.8
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 6.0
+    on_drift_speed_decrease: 2.0
+  custom_kart5:
+    name: 'CustomKart'
+    weight: 1.0
+    max_speed: 200
+    acceleration: 1.0
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
+  custom_kart6:
+    name: 'CustomKart'
+    weight: 1.0
+    max_speed: 200
+    acceleration: 1.0
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
+  custom_kart7:
+    name: 'CustomKart'
+    weight: 1.0
+    max_speed: 200
+    acceleration: 1.0
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
+  custom_kart8:
+    name: 'CustomKart'
+    weight: 1.0
+    max_speed: 200
+    acceleration: 1.0
+    speed_decrease_on_dirt: 0.6
+    climbable_height: 0.5
+    default_cornering_power: 1.0
+    on_drift_cornering_power: 5.0
+    on_drift_speed_decrease: 2.0
