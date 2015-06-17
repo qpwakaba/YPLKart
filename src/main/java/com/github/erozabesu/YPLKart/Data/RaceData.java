@@ -211,7 +211,7 @@ public final class RaceData{
 	public static void addRunningRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 
-			String path = circuitname + ".laptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId();
+			String path = circuitname + ".laptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId().toString();
 			if(!config.contains(path)){
 				config.set(path, laptime);
 				saveConfigFile();
@@ -230,7 +230,7 @@ public final class RaceData{
 	public static void addKartRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 
-			String path = circuitname + ".kartlaptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId();
+			String path = circuitname + ".kartlaptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId().toString();
 			if(!config.contains(path)){
 				config.set(path, laptime);
 				saveConfigFile();

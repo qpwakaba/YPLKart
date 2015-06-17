@@ -208,7 +208,6 @@ public class Race {
 
 	public void setGoal(){
 		this.goal = true;
-		RaceManager.leave(getPlayer());
 		getPlayer().setWalkSpeed(0.2F);
 		getPlayer().setMaxHealth(20);
 		getPlayer().setHealth(20);
@@ -224,10 +223,12 @@ public class Race {
 		new SendExpandedTitle(getPlayer(), 7, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer().size() + "位  " + currentmillisecond/1000 + "秒", 10, 140, 10, ChatColor.GREEN, true);
 
-		if(getKart() != null)
+		if(getKart() == null)
 			RaceData.addRunningRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 		else
 			RaceData.addKartRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
+
+		RaceManager.leave(getPlayer());
 
 		Util.broadcastMessage(getPlayer().getName() + "さん#Yellow" + String.valueOf(RaceManager.getGoalPlayer().size()) + "位#Greenでゴール！ #WhiteTime : #Yellow" + currentmillisecond/1000 + "#White秒");
 		setPoint(getPassedCheckPoint().size() + (RaceManager.getEntryPlayer().size())*10);
