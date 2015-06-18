@@ -601,7 +601,7 @@ public class EventItem extends RaceManager implements Listener{
 
 		Util.setItemDecrease(p);
 
-		FallingBlock turtle = p.getWorld().spawnFallingBlock(p.getLocation(), Material.HUGE_MUSHROOM_1, (byte) 5);
+		FallingBlock turtle = p.getWorld().spawnFallingBlock(p.getEyeLocation(), Material.HUGE_MUSHROOM_1, (byte) 5);
 		turtle.setCustomName(EnumItem.RedTurtle.getName());
 		turtle.setCustomNameVisible(false);
 		turtle.setDropItem(false);
@@ -633,7 +633,7 @@ public class EventItem extends RaceManager implements Listener{
 
 		Util.setItemDecrease(p);
 
-		FallingBlock turtle = p.getWorld().spawnFallingBlock(p.getLocation(), Material.HUGE_MUSHROOM_1, (byte) 6);
+		FallingBlock turtle = p.getWorld().spawnFallingBlock(p.getEyeLocation(), Material.HUGE_MUSHROOM_1, (byte) 6);
 		turtle.setCustomName(EnumItem.ThornedTurtle.getName());
 		turtle.setCustomNameVisible(false);
 		turtle.setDropItem(false);
