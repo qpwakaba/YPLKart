@@ -53,6 +53,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 public class EventItem extends RaceManager implements Listener{
 
@@ -314,7 +315,7 @@ public class EventItem extends RaceManager implements Listener{
 	}
 
 	@EventHandler
-	public void onStepBoostRail(PlayerMoveEvent e){
+	public void onStepSpeedBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		if(!isEntry(e.getPlayer()))return;
 
@@ -342,6 +343,13 @@ public class EventItem extends RaceManager implements Listener{
 				p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
 				boostRailCool.put(p, true);
 			}
+		}
+
+		if (Util.getStepBlock(p.getLocation()).equalsIgnoreCase(Settings.DirtBlock)){
+			double x = p.getVelocity().multiply(0.5).getX();
+			double y = 0;
+			double z = p.getVelocity().multiply(0.5).getZ();
+			p.setVelocity(new Vector(x,y,z));
 		}
 	}
 
