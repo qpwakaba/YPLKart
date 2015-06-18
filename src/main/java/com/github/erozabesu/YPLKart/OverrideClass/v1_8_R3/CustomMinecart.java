@@ -539,7 +539,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 				Vector v = Util.getVectorLocationToLocation(other.getBukkitEntity().getLocation(), this.getBukkitEntity().getLocation()).setY(0);
 
 				this.speedStack = this.speedStack - collisionpower < 0 ? 0 : this.speedStack - collisionpower;
-				other.getBukkitEntity().setVelocity(other.getBukkitEntity().getVelocity().add(v.multiply(collisionpower*0.02)));
+				other.getBukkitEntity().setVelocity(other.getBukkitEntity().getVelocity().add(v.multiply(collisionpower*0.01)));
 
 				org.bukkit.entity.Entity damager = getPassenger(this).getBukkitEntity();
 				Util.addDamage(other.getBukkitEntity(), damager,(int)(collisionpower*0.04*2));
