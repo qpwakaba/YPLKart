@@ -150,8 +150,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 6
+      walk_speed: 0.1
   creeper:
     item_adjust_max_slot: 0
     item_adjust_max_stack_size: 0
@@ -164,8 +164,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 6
+      walk_speed: 0.1
   zombie:
     item_adjust_max_slot: 0
     item_adjust_max_stack_size: 0
@@ -178,8 +178,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 10
+      walk_speed: 0.1
   skeleton:
     item_adjust_max_slot: 1
     item_adjust_max_stack_size: 1
@@ -192,8 +192,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 7
+      walk_speed: 0.1
   spider:
     item_adjust_max_slot: 0
     item_adjust_max_stack_size: 0
@@ -206,8 +206,8 @@ jobs:
     walk_speed: 0.7
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 7
+      walk_speed: 0.1
   enderman:
     item_adjust_max_slot: 1
     item_adjust_max_stack_size: 1
@@ -220,8 +220,8 @@ jobs:
     walk_speed: 0.5
     death_penalty:
       anti_reskill_second: 3
-      walk_speed: 0.1
       penalty_second: 5
+      walk_speed: 0.1
   witch:
     item_adjust_max_slot: 0
     item_adjust_max_stack_size: 0
@@ -234,8 +234,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 4
-      walk_speed: 0.1
       penalty_second: 7
+      walk_speed: 0.1
   pig:
     item_adjust_max_slot: -1
     item_adjust_max_stack_size: 0
@@ -248,8 +248,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 2
-      walk_speed: 0.1
       penalty_second: 10
+      walk_speed: 0.1
   squid:
     item_adjust_max_slot: 1
     item_adjust_max_stack_size: 1
@@ -262,8 +262,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 4
-      walk_speed: 0.1
       penalty_second: 6
+      walk_speed: 0.1
   villager:
     item_adjust_max_slot: 0
     item_adjust_max_stack_size: 0
@@ -276,8 +276,8 @@ jobs:
     walk_speed: 0.6
     death_penalty:
       anti_reskill_second: 1
-      walk_speed: 0.1
       penalty_second: 0
+      walk_speed: 0.1
 karts:
   custom_kart1:
     name: Standard

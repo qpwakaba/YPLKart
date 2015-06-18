@@ -121,7 +121,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 	public boolean e(EntityHuman human)
 	{
 		if(this.display)
-			return false;
+			human.mount(this);
 		if ((this.passenger != null) && ((this.passenger instanceof EntityHuman)) && (this.passenger != human)) {
 			return true;
 		}
