@@ -141,7 +141,7 @@ public class CMD implements CommandExecutor{
 				this.cmd.character();
 			//else if(args[0].equalsIgnoreCase("characterreset"))
 			//	this.cmd.characterreset();
-			else if(args[0].equalsIgnoreCase("ride"))
+			else if(args[0].equalsIgnoreCase("kart"))
 				this.cmd.ride();
 			else if(args[0].equalsIgnoreCase("leave"))
 				this.cmd.leave();
