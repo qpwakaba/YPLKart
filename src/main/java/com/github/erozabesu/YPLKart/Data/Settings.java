@@ -157,16 +157,16 @@ public final class Settings{
 	public static int KillerMultipleTier = 0;
 	public static int KillerMultipleDropAmount = 2;
 
-	public static double[] HumanClassSetting = 		{0,0,0,0,0,0,0,20,0.6,4,0.1,5};
-	public static double[] CreeperClassSetting = 	{0,0,0,0,0,0,2,14,0.6,4,0.1,5};
-	public static double[] ZombieClassSetting = 	{0,0,0,0,2,1,2,30,0.6,4,0.1,8};
-	public static double[] SkeletonClassSetting = 	{1,1,0,0,0,0,0,14,0.6,4,0.1,5};
-	public static double[] SpiderClassSetting = 	{0,0,1,1,0,0,-1,4,0.7,4,0.1,5};
-	public static double[] EndermanClassSetting = 	{1,1,1,0,0,0,5,20,0.5,4,0.1,5};
-	public static double[] WitchClassSetting = 		{0,0,2,1,-1,-1,0,12,0.6,4,0.1,5};
-	public static double[] PigClassSetting = 		{0,0,0,0,0,0,-1,10,0.6,4,0.1,5};
-	public static double[] SquidClassSetting = 		{1,1,0,0,0,0,-1,6,0.6,4,0.1,5};
-	public static double[] VillagerClassSetting = 	{0,0,0,0,0,0,-1,10,0.6,4,0.1,0};
+	public static double[] HumanClassSetting = 		{0,0,0,0,0,0,0,20,0.6,3,0.1,6};
+	public static double[] CreeperClassSetting = 	{0,0,0,0,0,0,2,14,0.6,3,0.1,6};
+	public static double[] ZombieClassSetting = 	{0,0,0,0,2,1,2,35,0.6,3,0.1,10};
+	public static double[] SkeletonClassSetting = 	{1,1,0,0,0,0,0,14,0.6,3,0.1,7};
+	public static double[] SpiderClassSetting = 	{0,0,1,1,0,0,-1,4,0.7,3,0.1,7};
+	public static double[] EndermanClassSetting = 	{1,1,1,1,0,0,15,25,0.5,3,0.1,5};
+	public static double[] WitchClassSetting = 		{0,0,1,0,-1,0,-2,10,0.6,4,0.1,7};
+	public static double[] PigClassSetting = 		{-1,0,0,-1,1,1,-4,6,0.6,2,0.1,10};
+	public static double[] SquidClassSetting = 		{1,1,0,0,0,0,-1,6,0.6,4,0.1,6};
+	public static double[] VillagerClassSetting = 	{0,0,0,0,1,0,-4,15,0.6,1,0.1,0};
 
 	public static String KartName1 = "Standard";
 	public static String KartName2 = "Survival";
@@ -177,14 +177,14 @@ public final class Settings{
 	public static String KartName7 = "CustomKart";
 	public static String KartName8 = "CustomKart";
 
-	public static double[] KartSetting1 = 	{1.0,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting2 = 	{1.2,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting3 = 	{0.5,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting4 = 	{0.7,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting5 = 	{1.0,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting6 = 	{1.0,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting7 = 	{1.0,200,1.0,0.6,0.5,1.0,5.0,2.0};
-	public static double[] KartSetting8 = 	{1.0,200,1.0,0.6,0.5,1.0,5.0,2.0};
+	public static double[] KartSetting1 = 	{1.0,250.0,1.0,0.5,5.0,1.0,5.5,2.0};
+	public static double[] KartSetting2 = 	{1.5,220.0,1.0,0.5,1.0,1.0,6.5,2.0};
+	public static double[] KartSetting3 = 	{0.8,180.0,4.0,0.5,5.0,1.0,5.5,2.0};
+	public static double[] KartSetting4 = 	{0.5,300.0,0.7,0.5,7.0,1.5,6.5,2.0};
+	public static double[] KartSetting5 = 	{1.0,200.0,1.5,0.5,5.0,1.7,6.5,5.0};
+	public static double[] KartSetting6 = 	{0.5,300.0,2.5,0.5,5.0,1.0,4.0,2.5};
+	public static double[] KartSetting7 = 	{4.0,200.0,0.7,1.0,3.0,1.5,5.5,1.5};
+	public static double[] KartSetting8 = 	{1.0,200.0,0.8,0.5,6.0,1.0,5.0,2.0};
 
 	public static Boolean isEnable(World w){
 		if(EnableThisPlugin)
