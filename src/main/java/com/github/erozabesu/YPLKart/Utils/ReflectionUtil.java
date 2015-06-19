@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
 public class ReflectionUtil{
 	public static String getBukkitVersion(){
@@ -90,6 +91,15 @@ public class ReflectionUtil{
 	public static Object getCraftWorld(World w){
 		try {
 			return (getCraftClass("CraftWorld")).getMethod("getHandle").invoke(w);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Object getCraftItemStack(ItemStack item){
+		try {
+			return getCraftClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

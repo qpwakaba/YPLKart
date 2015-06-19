@@ -11,8 +11,9 @@ import main.java.com.github.erozabesu.YPLKart.Task.PlayerLookingUpdateTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class PacketUtil extends ReflectionUtil{
 	/*プレイヤーの見た目を選択キャラクターに偽装するタスクを起動します
@@ -49,7 +50,7 @@ public class PacketUtil extends ReflectionUtil{
 			Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
 			Method d = craftentity.getClass().getMethod("d", int.class);
 
-			Entity bukkitentity = (Entity) getBukkitEntity.invoke(craftentity);
+			LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
 			bukkitentity.setCustomName(p.getName());
 			bukkitentity.setCustomNameVisible(true);
 
@@ -58,18 +59,32 @@ public class PacketUtil extends ReflectionUtil{
 
 			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
 			Object spawnentitypacket = getSpawnEntityLivingPacket(craftentity);
+			Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
+			Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p.getEquipment().getHelmet());
+			Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p.getEquipment().getChestplate());
+			Object leggingspacket = p.getEquipment().getLeggings() == null ? null : getEquipmentPacket(p, 2, p.getEquipment().getLeggings());
+			Object bootspacket = p.getEquipment().getBoots() == null ? null : getEquipmentPacket(p, 1, p.getEquipment().getBoots());
 
 			if(target == null){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					if(other.getUniqueId() == p.getUniqueId())continue;
 					sendPacket(other, entitydestroypacket);
 					sendPacket(other, spawnentitypacket);
+					if(handpacket != null)sendPacket(other, handpacket);
+					if(helmetpacket != null)sendPacket(other, helmetpacket);
+					if(chectpacket != null)sendPacket(other, chectpacket);
+					if(leggingspacket != null)sendPacket(other, leggingspacket);
+					if(bootspacket != null)sendPacket(other, bootspacket);
 				}
 			}else{
 				sendPacket(target, entitydestroypacket);
 				sendPacket(target, spawnentitypacket);
+				if(handpacket != null)sendPacket(target, handpacket);
+				if(helmetpacket != null)sendPacket(target, helmetpacket);
+				if(chectpacket != null)sendPacket(target, chectpacket);
+				if(leggingspacket != null)sendPacket(target, leggingspacket);
+				if(bootspacket != null)sendPacket(target, bootspacket);
 			}
-
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -77,13 +92,30 @@ public class PacketUtil extends ReflectionUtil{
 
 	public static void returnPlayer(final Player p){
 		try {
+			Object craftentity = getCraftEntity(p);
+
 			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
-			Object spawnnamedentitypacket = getSpawnNamedEntityPacket(ReflectionUtil.getCraftEntity(p));
+			Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
+			Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
+			Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p.getEquipment().getHelmet());
+			Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p.getEquipment().getChestplate());
+			Object leggingspacket = p.getEquipment().getLeggings() == null ? null : getEquipmentPacket(p, 2, p.getEquipment().getLeggings());
+			Object bootspacket = p.getEquipment().getBoots() == null ? null : getEquipmentPacket(p, 1, p.getEquipment().getBoots());
+
+			Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
+			LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
+			bukkitentity.setCustomName(p.getName());
+			bukkitentity.setCustomNameVisible(true);
 
 			for(Player other : Bukkit.getOnlinePlayers()){
 				if(other.getUniqueId() == p.getUniqueId())continue;
 				sendPacket(other, entitydestroypacket);
 				sendPacket(other, spawnnamedentitypacket);
+				if(handpacket != null)sendPacket(other, handpacket);
+				if(helmetpacket != null)sendPacket(other, helmetpacket);
+				if(chectpacket != null)sendPacket(other, chectpacket);
+				if(leggingspacket != null)sendPacket(other, leggingspacket);
+				if(bootspacket != null)sendPacket(other, bootspacket);
 			}
 		} catch (Exception e){
 			e.printStackTrace();
@@ -139,6 +171,15 @@ public class PacketUtil extends ReflectionUtil{
 				return;
 			}
 		}
+	}
+
+	// itemslot: 0-hand / 4-head / 3-chest / 2-leggings / 1-boots
+	private static Object getEquipmentPacket(Player p, int itemslot, ItemStack equipment) throws Exception{
+		Class<?> packetclass = getBukkitClass("PacketPlayOutEntityEquipment");
+		Class<?> itemstackclass = getBukkitClass("ItemStack");
+		Object packet = packetclass.getConstructor(int.class, int.class, itemstackclass).newInstance(p.getEntityId(), itemslot, getCraftItemStack(equipment));
+
+		return packet;
 	}
 
 	private static Object getTitlePacket(String text, ChatColor color, boolean issubtitle) throws Exception{
