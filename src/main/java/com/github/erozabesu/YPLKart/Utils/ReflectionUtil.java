@@ -32,8 +32,13 @@ public class ReflectionUtil{
 		return null;
 	}
 
-	public static Class<?> getCraftClass(String s) throws Exception{
-		return Class.forName(getCraftPackageName() + "." + s);
+	public static Class<?> getCraftClass(String s){
+		try {
+			return Class.forName(getCraftPackageName() + "." + s);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static Class<?> getYPLKartClass(String s){
@@ -45,14 +50,13 @@ public class ReflectionUtil{
 		return null;
 	}
 
-	public static Field getField(Object instance, String name) throws Exception {
-		//Field field = instance.getClass().getDeclaredField(name);
+	public static Field getField(Object instance, String name){
 		for(Field f : instance.getClass().getFields()){
 			if(!f.getName().equalsIgnoreCase(name))continue;
 			f.setAccessible(true);
 			return f;
 		}
-		return null/*.get(instance)*/;
+		return null;
 	}
 
 	public static Field getField(Class<?> clazz, String name){
@@ -64,16 +68,31 @@ public class ReflectionUtil{
 		return null;
 	}
 
-	public static Object getCraftEntity(Entity entity) throws Exception{
-		return entity.getClass().getMethod("getHandle").invoke(entity);
+	public static Object getCraftEntity(Entity entity){
+		try {
+			return entity.getClass().getMethod("getHandle").invoke(entity);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public static Object getCraftEntityClass(World w, String classname) throws Exception{
+	public static Object getCraftEntityClass(World w, String classname){
 		Class<?> entityclass = getBukkitClass(classname);
-		return entityclass.getConstructor(getBukkitClass("World")).newInstance(getCraftWorld(w));
+		try {
+			return entityclass.getConstructor(getBukkitClass("World")).newInstance(getCraftWorld(w));
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public static Object getCraftWorld(World w) throws Exception{
-		return (getCraftClass("CraftWorld")).getMethod("getHandle").invoke(w);
+	public static Object getCraftWorld(World w){
+		try {
+			return (getCraftClass("CraftWorld")).getMethod("getHandle").invoke(w);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

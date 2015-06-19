@@ -15,6 +15,114 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class PacketUtil extends ReflectionUtil{
+	/*プレイヤーの見た目を選択キャラクターに偽装するタスクを起動します
+	 *タスクを起動するタイミングは基本的にプレイヤーを描画し直さなければならない場合だと思われます
+	 *・キャラクター選択をしたとき
+	 *・サーバーに参加したとき
+	 *・リスポーンしたとき
+	 *・テレポートしたとき
+	 *・乗り物に搭乗したとき
+	 * わざわざタスクを起動している理由ですが
+	 * 見た目を偽装されたプレイヤーとの距離が140ブロック程度離れた後、再び140ブロック以内に近づいた際に見た目がプレイヤーに戻ってしまうためです。
+	 * タスクでは140ブロック以内に新規に進入したプレイヤーを監視しパケットを再送しています。
+	 */
+	public static void runPlayerLookingUpdate(Player p){
+		RaceManager.getRace(p).setPlayerLookingUpdateTask(
+			new PlayerLookingUpdateTask(p.getUniqueId().toString(), RaceManager.getRace(p).getCharacter()).runTaskTimer(YPLKart.getInstance(), 0, 5)
+		);
+	}
+
+	public static void disguise(Player p, Player target, EnumCharacter job){
+		if(job == null){
+			return;
+		}
+		if(job.getCraftClassName().equalsIgnoreCase(EnumCharacter.Human.getCraftClassName())){
+			returnPlayer(p);
+			return;
+		}
+		try {
+			Object craftentity = getCraftEntityClass(p.getWorld(), job.getCraftClassName());
+
+			Location loc = p.getLocation();
+
+			Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
+			Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+			Method d = craftentity.getClass().getMethod("d", int.class);
+
+			Entity bukkitentity = (Entity) getBukkitEntity.invoke(craftentity);
+			bukkitentity.setCustomName(p.getName());
+			bukkitentity.setCustomNameVisible(true);
+
+			setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
+			d.invoke(craftentity, p.getEntityId());
+
+			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
+			Object spawnentitypacket = getSpawnEntityLivingPacket(craftentity);
+
+			if(target == null){
+				for(Player other : Bukkit.getOnlinePlayers()){
+					if(other.getUniqueId() == p.getUniqueId())continue;
+					sendPacket(other, entitydestroypacket);
+					sendPacket(other, spawnentitypacket);
+				}
+			}else{
+				sendPacket(target, entitydestroypacket);
+				sendPacket(target, spawnentitypacket);
+			}
+
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public static void returnPlayer(final Player p){
+		try {
+			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
+			Object spawnnamedentitypacket = getSpawnNamedEntityPacket(ReflectionUtil.getCraftEntity(p));
+
+			for(Player other : Bukkit.getOnlinePlayers()){
+				if(other.getUniqueId() == p.getUniqueId())continue;
+				sendPacket(other, entitydestroypacket);
+				sendPacket(other, spawnnamedentitypacket);
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, ChatColor color, boolean issubtitle){
+		try {
+			Object titlesendpacket = getTitlePacket(text, color, issubtitle);
+			Object titlelengthpacket = getTitleLengthPacket(fadein, length, fadeout);
+
+			sendPacket(p, titlesendpacket);
+			sendPacket(p, titlelengthpacket);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	//PlayerDeathEventで呼び出すとリスポーンウィンドウをスキップできます
+	public static void skipRespawnScreen(Player p){
+		try {
+			Object playerConnection = getPlayerConnection(p);
+			for (Method m : playerConnection.getClass().getMethods()) {
+				if (m.getName().equalsIgnoreCase("a")){
+					for(Class<?> c : m.getParameterTypes()){
+						if(c.getName().contains("PacketPlayInClientCommand")){
+							m.invoke(playerConnection, getClientCommandPacket());
+							return;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
 	private static Field getPlayerConnectionField(Player p) throws Exception{
 		return getField(ReflectionUtil.getCraftEntity(p), "playerConnection");
 	}
@@ -113,132 +221,7 @@ public class PacketUtil extends ReflectionUtil{
 		return con;
 	}
 
-	public static void runPlayerLookingUpdate(Player p){
-		RaceManager.getRace(p).setPlayerLookingUpdateTask(
-			new PlayerLookingUpdateTask(p.getUniqueId().toString(), RaceManager.getRace(p).getCharacter()).runTaskTimer(YPLKart.getInstance(), 0, 5)
-		);
-	}
-
-	public static void resendDisguisePacket(Player p){
-		disguise(p, null, RaceManager.getRace(p).getCharacter());
-
-		for(Player other : Bukkit.getOnlinePlayers()){
-			if(!other.getUniqueId().toString().equalsIgnoreCase(p.getUniqueId().toString()))
-				if(RaceManager.getRace(other).getCharacter() != null)
-					disguise(other, p, RaceManager.getRace(other).getCharacter());
-		}
-	}
-
-	public static void resendOtherPlayerPacket(Player p){
-		for(Player other : Bukkit.getOnlinePlayers()){
-			if(!other.getUniqueId().toString().equalsIgnoreCase(p.getUniqueId().toString()))
-				if(RaceManager.getRace(other).getCharacter() != null)
-					disguise(other, p, RaceManager.getRace(other).getCharacter());
-		}
-	}
-
-	public static void disguise(Player p, Player target, EnumCharacter job){
-		if(job == null){
-			return;
-		}
-		if(job.getCraftClassName().equalsIgnoreCase(EnumCharacter.Human.getCraftClassName())){
-			returnPlayer(p);
-			return;
-		}
-		try {
-			Object craftentity = getCraftEntityClass(p.getWorld(), job.getCraftClassName());
-
-			Location loc = p.getLocation();
-
-			Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
-			Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
-			Method d = craftentity.getClass().getMethod("d", int.class);
-
-			Entity bukkitentity = (Entity) getBukkitEntity.invoke(craftentity);
-			bukkitentity.setCustomName(p.getName());
-			bukkitentity.setCustomNameVisible(true);
-
-			setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
-			d.invoke(craftentity, p.getEntityId());
-
-			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
-			Object spawnentitypacket = getSpawnEntityLivingPacket(craftentity);
-
-			if(target == null){
-				for(Player other : Bukkit.getOnlinePlayers()){
-					if(other.getUniqueId() == p.getUniqueId())continue;
-					sendPacket(other, entitydestroypacket);
-					sendPacket(other, spawnentitypacket);
-				}
-			}else{
-				sendPacket(target, entitydestroypacket);
-				sendPacket(target, spawnentitypacket);
-			}
-
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	public static void death(Player p){
-		try {
-			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
-
-			for(Player other : Bukkit.getOnlinePlayers()){
-				if(other.getUniqueId() == p.getUniqueId())continue;
-				sendPacket(other, entitydestroypacket);
-			}
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	public static void returnPlayer(final Player p){
-		try {
-			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
-			Object spawnnamedentitypacket = getSpawnNamedEntityPacket(ReflectionUtil.getCraftEntity(p));
-
-			for(Player other : Bukkit.getOnlinePlayers()){
-				if(other.getUniqueId() == p.getUniqueId())continue;
-				sendPacket(other, entitydestroypacket);
-				sendPacket(other, spawnnamedentitypacket);
-			}
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, ChatColor color, boolean issubtitle){
-		try {
-			Object titlesendpacket = getTitlePacket(text, color, issubtitle);
-			Object titlelengthpacket = getTitleLengthPacket(fadein, length, fadeout);
-
-			sendPacket(p, titlesendpacket);
-			sendPacket(p, titlelengthpacket);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	public static void skipRespawnScreen(Player p){
-		try {
-			Object playerConnection = getPlayerConnection(p);
-			for (Method m : playerConnection.getClass().getMethods()) {
-				if (m.getName().equalsIgnoreCase("a")){
-					for(Class<?> c : m.getParameterTypes()){
-						if(c.getName().contains("PacketPlayInClientCommand")){
-							m.invoke(playerConnection, getClientCommandPacket());
-							return;
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void attachEntity(Entity vehicle, Entity passenger, Player target){
+	/*public static void attachEntity(Entity vehicle, Entity passenger, Player target){
 		try {
 			Object nmsPassenger = getCraftEntity(passenger);
 			Object nmsVehicle = getCraftEntity(vehicle);
@@ -259,7 +242,24 @@ public class PacketUtil extends ReflectionUtil{
 		}
 	}
 
-	/*
+	public static void resendDisguisePacket(Player p){
+		disguise(p, null, RaceManager.getRace(p).getCharacter());
+
+		for(Player other : Bukkit.getOnlinePlayers()){
+			if(!other.getUniqueId().toString().equalsIgnoreCase(p.getUniqueId().toString()))
+				if(RaceManager.getRace(other).getCharacter() != null)
+					disguise(other, p, RaceManager.getRace(other).getCharacter());
+		}
+	}
+
+	public static void resendOtherPlayerPacket(Player p){
+		for(Player other : Bukkit.getOnlinePlayers()){
+			if(!other.getUniqueId().toString().equalsIgnoreCase(p.getUniqueId().toString()))
+				if(RaceManager.getRace(other).getCharacter() != null)
+					disguise(other, p, RaceManager.getRace(other).getCharacter());
+		}
+	}
+
 	public static void disguiseUnLivingEntity(Entity e, Player target, String disguiseEntityClass, int disguiseEntityID){
 		try {
 			Object craftentity = getCraftEntityClass(e, disguiseEntityClass);
