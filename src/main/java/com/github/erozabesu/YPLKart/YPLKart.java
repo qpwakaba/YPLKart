@@ -28,13 +28,6 @@ public class YPLKart extends JavaPlugin{
 	public static FileConfiguration Config;
 	public static File ConfigFile;
 
-	//ゴール時にラップタイム表示　死亡回数
-	//ボム兵追加：バナナ+時限爆弾
-	//スター中偽アイテムボックスひっかかった
-	//チェックポイント検索範囲狭い
-	//addDamageで0～6.0の範囲外の体力を設定している？
-	//負荷軽減
-
 	@Override
 	public void onEnable(){
 		pl = this;

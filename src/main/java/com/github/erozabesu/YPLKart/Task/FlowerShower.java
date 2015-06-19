@@ -28,7 +28,7 @@ public class FlowerShower extends BukkitRunnable{
 
 		Location l = p.getLocation();
 		if(life % 4 == 0){
-			for(int i = 0;i < 20;i++){
+			for(int i = 0;i < 10;i++){
 				Particle.sendToLocation("REDSTONE", l, Util.getRandom(20), Util.getRandom(20), Util.getRandom(20), 1, 20);
 			}
 		}

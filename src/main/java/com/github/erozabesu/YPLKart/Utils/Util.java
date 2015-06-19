@@ -514,7 +514,7 @@ public class Util extends ReflectionUtil{
 		FireworkEffect effect3 = FireworkEffect.builder().withColor(Color.RED).withFade(Color.PURPLE).with(Type.CREEPER).build();
 		FireworkEffect effect4 = FireworkEffect.builder().withColor(Color.AQUA).withFade(Color.BLUE).with(Type.BURST).build();
 
-		for(int i = 0; i <= 5; i++){
+		for(int i = 0; i <= 2; i++){
 			try {
 				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect);
 				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect2);

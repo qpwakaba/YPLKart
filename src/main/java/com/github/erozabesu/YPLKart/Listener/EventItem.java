@@ -53,7 +53,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 public class EventItem extends RaceManager implements Listener{
 
@@ -345,12 +344,12 @@ public class EventItem extends RaceManager implements Listener{
 			}
 		}
 
-		if (Util.getStepBlock(p.getLocation()).equalsIgnoreCase(Settings.DirtBlock)){
-			double x = p.getVelocity().multiply(0.5).getX();
-			double y = 0;
-			double z = p.getVelocity().multiply(0.5).getZ();
+		/*if (Util.getStepBlock(p.getLocation()).equalsIgnoreCase(Settings.DirtBlock)){
+			double x = p.getVelocity().clone().multiply(0.5).getX();
+			double z = p.getVelocity().clone().multiply(0.5).getZ();
+			double y = p.getVelocity().clone().getY();
 			p.setVelocity(new Vector(x,y,z));
-		}
+		}*/
 	}
 
 	@EventHandler
