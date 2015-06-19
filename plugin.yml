@@ -1,6 +1,6 @@
 name: YPLKart
 main: main.java.com.github.erozabesu.YPLKart.YPLKart
-version: 1.0.3
+version: 1.0.4
 commands:
   ka:
     description: Basic command.Display command reference.
