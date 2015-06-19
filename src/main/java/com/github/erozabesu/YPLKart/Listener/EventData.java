@@ -59,7 +59,7 @@ public class EventData extends RaceManager implements Listener {
 	//カートに乗っている間はコマンド以外の手段では搭乗解除不可
 	//leaveはゴール時、コマンド実行時のみ
 	@EventHandler
-	public void exitVehicle(VehicleExitEvent e){
+	public void onVehicleExit(VehicleExitEvent e){
 		if(!(e.getExited() instanceof Player))return;
 		if(!Settings.isEnable(e.getExited().getWorld()))return;
 		if(!RaceManager.isCustomMinecart(e.getVehicle()))return;
@@ -71,17 +71,19 @@ public class EventData extends RaceManager implements Listener {
 		}
 	}
 
-	//搭乗に成功した場合データ登録
+	//搭乗に成功した場合データ登録+パケット再送
 	@EventHandler
-	public void enterKart(VehicleEnterEvent e){
+	public void onVehicleEnter(VehicleEnterEvent e){
 		if(!Settings.isEnable(e.getEntered().getWorld()))return;
 		if(!(e.getEntered() instanceof Player))return;
-		if(!RaceManager.isCustomMinecart(e.getVehicle()))return;
 
-		EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
-		if(kart == null)return;
+		PacketUtil.runPlayerLookingUpdate((Player) e.getEntered());
+		if(RaceManager.isCustomMinecart(e.getVehicle())){
+			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
+			if(kart == null)return;
 
-		RaceManager.ride((Player) e.getEntered(), kart);
+			RaceManager.ride((Player) e.getEntered(), kart);
+		}
 	}
 
 	//カートを右クリック
