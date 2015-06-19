@@ -39,6 +39,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class EventData extends RaceManager implements Listener {
@@ -53,6 +54,12 @@ public class EventData extends RaceManager implements Listener {
 	public void onChunkLoad(ChunkLoadEvent e){
 		if(!Settings.isEnable(e.getWorld()))return;
 		DisplayKartData.respawnKart(e.getChunk());
+	}
+
+	@EventHandler
+	public void onWorldLoad(WorldLoadEvent e){
+		if(!Settings.isEnable(e.getWorld()))return;
+		DisplayKartData.respawnKart(e.getWorld());
 	}
 
 	//ドリフト

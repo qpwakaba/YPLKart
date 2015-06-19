@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -69,7 +70,7 @@ public final class DisplayKartData{
 
 	public static void respawnKart(Chunk chunk){
 		for(String key : config.getKeys(false)){
-			if(chunk != getLocation(key).getChunk())continue;
+			if(!chunk.toString().equalsIgnoreCase(getLocation(key).getChunk().toString()))continue;
 			boolean flag = true;
 			for(Entity e : chunk.getEntities()){
 				if(e.getCustomName() == null)continue;
@@ -85,6 +86,25 @@ public final class DisplayKartData{
 		}
 	}
 
+	public static void respawnKart(World w){
+		for(String key : config.getKeys(false)){
+			if(w.getName().equalsIgnoreCase(getWorld(key))){
+				boolean flag = true;
+				for(Entity e : getLocation(key).getChunk().getEntities()){
+					if(e.getCustomName() == null)continue;
+					if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(key)){
+						flag = false;
+						break;
+					}
+				}
+				if(flag){
+					Minecart cart = RaceManager.createDisplayMinecart(getLocation(key), EnumKarts.Kart1, key);
+					cart.setDisplayBlock(new MaterialData(getType(key), getData(key)));
+				}
+			}
+		}
+	}
+
 	public static Material getType(String uuid){
 		if(config.getString(uuid + ".type") == null)return Material.STONE;
 		if(Material.getMaterial(config.getString(uuid + ".type")) == null)return Material.STONE;
@@ -94,6 +114,12 @@ public final class DisplayKartData{
 
 	public static byte getData(String uuid){
 		return (byte) config.getInt(uuid + ".data", (byte)0);
+	}
+
+	public static String getWorld(String uuid){
+		if(!config.contains(uuid))return null;
+
+		return config.getString(uuid + ".world");
 	}
 
 	public static Location getLocation(String uuid){

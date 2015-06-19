@@ -248,7 +248,7 @@ public class RaceManager {
 	public static boolean isCustomMinecart(Entity e){
 		if(e instanceof Minecart)
 			if(e.getCustomName() != null)
-				if(EnumKarts.getKartArrayList().contains(ChatColor.stripColor(e.getCustomName())))
+				if(EnumKarts.getKartArrayList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
 					return true;
 		return false;
 	}
@@ -328,6 +328,7 @@ public class RaceManager {
 
 			return cart;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

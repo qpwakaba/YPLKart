@@ -14,6 +14,7 @@ import main.java.com.github.erozabesu.YPLKart.Utils.PacketUtil;
 import main.java.com.github.erozabesu.YPLKart.Utils.Util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,6 +44,10 @@ public class YPLKart extends JavaPlugin{
 		RaceManager.runRankingUpdateTask();
 		RaceManager.runDetectRaceEndTask();
 		RaceManager.runLapTimeUpdateTask();
+
+		for(World w : Bukkit.getWorlds()){
+			DisplayKartData.respawnKart(w);
+		}
 
 		Util.sendMessage(null, "v." + getDescription().getVersion() + " Loaded Config");
 		Util.sendMessage(null, "v." + getDescription().getVersion() + " Plugin has been Enabled");
