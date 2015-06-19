@@ -223,9 +223,17 @@ public class EventData extends RaceManager implements Listener {
 	public void onQuit(PlayerQuitEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
 
-		RaceManager.removeCustomMinecart(e.getPlayer());
-		e.getPlayer().setWalkSpeed(0.2F);
-		Scoreboards.clearBoard(e.getPlayer());
+		Player p = e.getPlayer();
+
+		RaceManager.removeCustomMinecart(p);
+		p.setWalkSpeed(0.2F);
+		Scoreboards.clearBoard(p);
+
+		//ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
+		//ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
+		if(p.getVehicle() != null)
+			if(RaceManager.isCustomDisplayMinecart(p.getVehicle()))
+				p.leaveVehicle();
 	}
 
 	@EventHandler

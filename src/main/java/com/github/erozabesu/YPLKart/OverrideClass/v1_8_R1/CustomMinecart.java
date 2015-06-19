@@ -115,6 +115,11 @@ public class CustomMinecart extends EntityMinecartRideable{
 		return EnumKarts.getKartfromString(this.kart.getName()).getDriftSpeedDecrease();
 	}
 
+	@Override
+	public void O(){
+		die();
+	}
+
 	//マインカートが搭乗可能な状態だった場合搭乗させる
 	@Override
 	public boolean e(EntityHuman human)
@@ -132,6 +137,10 @@ public class CustomMinecart extends EntityMinecartRideable{
 		}
 
 		return true;
+	}
+
+	@Override
+	public void K(){
 	}
 
 	//LivingUpdate
@@ -156,7 +165,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 		//ヴォイドに落下
 		if (this.locY < -64.0D) {
 //TODO CraftBukkit
-			O();//Entity.O(){die();}
+			this.O();//Entity.O(){die();}
 		}
 
 		this.lastX = this.locX;

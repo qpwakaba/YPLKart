@@ -105,6 +105,14 @@ public final class DisplayKartData{
 		}
 	}
 
+	public static List<String> getList(){
+		List<String> list = new ArrayList<String>();
+		for(String key : config.getKeys(false)){
+			list.add(key);
+		}
+		return list;
+	}
+
 	public static Material getType(String uuid){
 		if(config.getString(uuid + ".type") == null)return Material.STONE;
 		if(Material.getMaterial(config.getString(uuid + ".type")) == null)return Material.STONE;

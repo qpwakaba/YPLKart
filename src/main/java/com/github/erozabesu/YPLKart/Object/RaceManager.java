@@ -253,6 +253,14 @@ public class RaceManager {
 		return false;
 	}
 
+	public static boolean isCustomDisplayMinecart(Entity e){
+		if(e instanceof Minecart)
+			if(e.getCustomName() != null)
+				if(DisplayKartData.getList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
+					return true;
+		return false;
+	}
+
 	public static boolean isCustomWitherSkull(Entity e, String circuitname){
 		if(!(e instanceof WitherSkull))return false;
 		if(e.getCustomName() == null)return false;
