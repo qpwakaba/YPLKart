@@ -298,7 +298,7 @@ public class RaceManager {
 		try {
 			Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
 			Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-			Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class, float.class).newInstance(craftWorld, kart, l.getYaw());
+			Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class, Location.class, boolean.class).newInstance(craftWorld, kart, l, false);
 			final Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
 
 			customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(), l.getY()+1, l.getZ());
@@ -318,7 +318,7 @@ public class RaceManager {
 		try {
 			Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
 			Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-			Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class, Location.class).newInstance(craftWorld, kart, l);
+			Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class, Location.class, boolean.class).newInstance(craftWorld, kart, l, true);
 			final Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
 
 			customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(), l.getY()+1, l.getZ());

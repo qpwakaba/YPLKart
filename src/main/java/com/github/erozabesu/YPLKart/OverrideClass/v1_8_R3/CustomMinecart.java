@@ -57,24 +57,20 @@ public class CustomMinecart extends EntityMinecartRideable{
 	private double killerY = 0;
 	private double killerZ = 0;
 
-	public CustomMinecart(World w, EnumKarts kart, float yaw){
+	public CustomMinecart(World w, EnumKarts kart, Location l, boolean display){
 		super(w);
 		this.kart = kart;
-		this.display = false;
+		this.display = display;
 //TODO CraftBukkit
 		this.S = getClimbableHeight();
-		this.yaw = yaw;
-		setYawPitch(yaw + 90F, 0F);
-	}
-
-	public CustomMinecart(World w, EnumKarts kart, Location l){
-		super(w);
-		this.kart = kart;
-		this.display = true;
 		this.yaw = l.getYaw();
-		this.pitch = -l.getPitch();
-		setYawPitch(yaw + 90F, this.pitch);
 
+		if(!display)
+			setYawPitch(this.yaw + 90F, 0F);
+		else{
+			this.pitch = -l.getPitch();
+			setYawPitch(this.yaw + 90F, this.pitch);
+		}
 	}
 
 	public EnumKarts getKart(){
