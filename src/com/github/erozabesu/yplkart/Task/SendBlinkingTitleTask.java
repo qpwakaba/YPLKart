@@ -6,14 +6,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
-public class SendBlinkingTitle extends BukkitRunnable{
+public class SendBlinkingTitleTask extends BukkitRunnable{
 	int life = 0;
 	int maxlife = 0;
 	Player p;
 	String text;
 	ChatColor color;
 
-	public SendBlinkingTitle(Player p, int maxlife, String text, ChatColor color){
+	public SendBlinkingTitleTask(Player p, int maxlife, String text, ChatColor color){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;

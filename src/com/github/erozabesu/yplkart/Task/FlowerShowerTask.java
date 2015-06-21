@@ -7,12 +7,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.github.erozabesu.yplkart.Utils.Particle;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class FlowerShower extends BukkitRunnable{
+public class FlowerShowerTask extends BukkitRunnable{
 	int life = 0;
 	int maxlife = 0;
 	Player p;
 
-	public FlowerShower(Player p, int maxlife){
+	public FlowerShowerTask(Player p, int maxlife){
 		this.p = p;
 		this.maxlife = maxlife*20;
 	}

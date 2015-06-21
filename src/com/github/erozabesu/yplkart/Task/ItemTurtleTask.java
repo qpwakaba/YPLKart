@@ -10,7 +10,7 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class ItemTurtle extends BukkitRunnable{
+public class ItemTurtleTask extends BukkitRunnable{
 	Entity projectile;
 	Vector vector;
 	double x;
@@ -23,7 +23,7 @@ public class ItemTurtle extends BukkitRunnable{
 	final double verticalonhover = 0.00;
 	final double verticalonwall = 0.5;
 
-	public ItemTurtle(Player shooter, Entity projectile, Location next, int life){
+	public ItemTurtleTask(Player shooter, Entity projectile, Location next, int life){
 		this.shooter = shooter;
 		this.projectile = projectile;
 		this.hitdamage = Settings.TurtleHitDamage + RaceManager.getRace(shooter).getCharacter().getItemAdjustAttackDamage();

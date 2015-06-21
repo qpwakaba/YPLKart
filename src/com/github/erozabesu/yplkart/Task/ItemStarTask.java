@@ -13,14 +13,14 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class ItemStar extends BukkitRunnable{
+public class ItemStarTask extends BukkitRunnable{
 	Player p;
 	int life = 0;
 	int effectsecond;
 	int hitdamage;
-	private static HashMap<Player, ItemStar> boostTask = new HashMap<Player, ItemStar>();
+	private static HashMap<Player, ItemStarTask> boostTask = new HashMap<Player, ItemStarTask>();
 
-	public ItemStar(Player p){
+	public ItemStarTask(Player p){
 		this.p = p;
 		this.effectsecond = (Settings.StarEffectSecond + RaceManager.getRace(p).getCharacter().getItemAdjustPositiveEffectSecond()) * 20;
 		this.hitdamage = Settings.StarHitDamage + RaceManager.getRace(p).getCharacter().getItemAdjustAttackDamage();

@@ -18,13 +18,13 @@ public enum Permission {
 	cmd_ride(					YPLKart.plname + ".cmd.kart", 					Settings.EnablePermissionCMDRide, 				Settings.EnablePermissionCMDOtherRide),
 	cmd_leave(					YPLKart.plname + ".cmd.leave", 					Settings.EnablePermissionCMDLeave, 				Settings.EnablePermissionCMDOtherLeave),
 	cmd_character(				YPLKart.plname + ".cmd.character",				Settings.EnablePermissionCMDCharacter, 			Settings.EnablePermissionCMDOtherCharacter),
-	//cmd_characterreset(			YPLKart.plname + ".cmd.characterreset",			Settings.EnablePermissionCMDCharacterReset,		Settings.EnablePermissionCMDOtherCharacterReset),
+	//cmd_characterreset(		YPLKart.plname + ".cmd.characterreset",			Settings.EnablePermissionCMDCharacterReset,		Settings.EnablePermissionCMDOtherCharacterReset),
 	cmd_ranking(				YPLKart.plname + ".cmd.ranking",				Settings.EnablePermissionCMDRanking,			Settings.EnablePermissionCMDOtherRanking),
 
 	op_cmd_circuit(				YPLKart.plname + ".op.cmd.circuit", 			Settings.EnableOPPermissionCMDCircuit, 			Settings.EnableOPPermissionCMDCircuit),
 	op_cmd_display(				YPLKart.plname + ".op.cmd.display", 			Settings.EnableOPPermissionCMDDisplay,			Settings.EnableOPPermissionCMDDisplay),
 	op_cmd_reload(				YPLKart.plname + ".op.cmd.reload", 				Settings.EnableOPPermissionCMDReload, 			Settings.EnableOPPermissionCMDReload),
-	//op_cmd_checkpointtool(		YPLKart.plname + ".op.cmd.checkpointtool", 		Settings.EnableOPPermissionCMDCheckPointTool, 	Settings.EnableOPPermissionCMDCheckPointTool),
+	//op_cmd_checkpointtool(	YPLKart.plname + ".op.cmd.checkpointtool", 		Settings.EnableOPPermissionCMDCheckPointTool, 	Settings.EnableOPPermissionCMDCheckPointTool),
 	op_cmd_itemboxtool(			YPLKart.plname + ".op.cmd.itemboxtool", 		Settings.EnableOPPermissionCMDItemBoxTool, 		Settings.EnableOPPermissionCMDItemBoxTool),
 
 	itemcmd_mushroom(			YPLKart.plname + ".itemcmd.mushroom", 			Settings.EnablePermissionCMDItem, 				Settings.EnablePermissionCMDOtherItem),

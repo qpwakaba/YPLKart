@@ -13,7 +13,7 @@ import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class ItemDyedTurtle extends BukkitRunnable{
+public class ItemDyedTurtleTask extends BukkitRunnable{
 	int life = 0;
 
 	Entity projectile;
@@ -35,7 +35,7 @@ public class ItemDyedTurtle extends BukkitRunnable{
 	ArrayList<String> shooterpassedcheckpoint = new ArrayList<String>();
 	ArrayList<String> turtlepassedcheckpoint = new ArrayList<String>();
 
-	public ItemDyedTurtle(Player shooter, Player target, Entity projectile, boolean isthornedturtle, boolean targetreverse){
+	public ItemDyedTurtleTask(Player shooter, Player target, Entity projectile, boolean isthornedturtle, boolean targetreverse){
 		this.projectile = projectile;
 		this.target = target;
 

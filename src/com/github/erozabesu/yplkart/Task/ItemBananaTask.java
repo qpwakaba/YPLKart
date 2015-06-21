@@ -10,11 +10,11 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 
-public class ItemBanana extends BukkitRunnable{
+public class ItemBananaTask extends BukkitRunnable{
 	Entity banana;
 	Location l;
 
-	public ItemBanana(Entity banana, Location l){
+	public ItemBananaTask(Entity banana, Location l){
 		this.banana = banana;
 		this.l = l;
 		RaceManager.addJammerEntity(banana);

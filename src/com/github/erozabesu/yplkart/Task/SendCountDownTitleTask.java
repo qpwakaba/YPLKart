@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
-public class SendCountDownTitle extends BukkitRunnable{
+public class SendCountDownTitleTask extends BukkitRunnable{
 	int life = 0;
 	int maxlife = 0;
 	Player p;
@@ -15,7 +15,7 @@ public class SendCountDownTitle extends BukkitRunnable{
 	ChatColor color;
 	ChatColor subcolor;
 
-	public SendCountDownTitle(Player p, int maxlife, String text, ChatColor color, ChatColor subcolor){
+	public SendCountDownTitleTask(Player p, int maxlife, String text, ChatColor color, ChatColor subcolor){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;

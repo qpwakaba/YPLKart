@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
-public class SendExpandedTitle extends BukkitRunnable{
+public class SendExpandedTitleTask extends BukkitRunnable{
 	int life = 0;
 	int maxlife = 0;
 	Player p;
@@ -16,7 +16,7 @@ public class SendExpandedTitle extends BukkitRunnable{
 	ChatColor color;
 	boolean issubtitle;
 
-	public SendExpandedTitle(Player p, int maxlife, String text, String expandcharacter, int characterposition, ChatColor color, boolean issubtitle){
+	public SendExpandedTitleTask(Player p, int maxlife, String text, String expandcharacter, int characterposition, ChatColor color, boolean issubtitle){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;
