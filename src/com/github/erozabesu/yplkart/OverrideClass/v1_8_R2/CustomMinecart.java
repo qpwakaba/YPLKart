@@ -58,64 +58,43 @@ public class CustomMinecart extends EntityMinecartRideable{
 	private double killerY = 0;
 	private double killerZ = 0;
 
+	/*
+	 * 予めカートのパラメータを格納しておくことで余計な処理を省くことができるが
+	 * ka reloadコマンドで設定の変更を行っても反映されない
+	 *
+	 * 動的にカートのパラメータを取得すればka reload処理後に反映されるが
+	 * ラグ発生の原因を少しでも取り除くため前者で定義する
+	 */
+	private double maxSpeedStack;
+	private double acceleration;
+	private double speedOnDirt;
+	private float climbableHeight;
+	private float corneringPower;
+	private float corneringPowerDrift;
+	private double speedDecreaseDrift;
+
 	public CustomMinecart(World w, EnumKarts kart, Location l, boolean display){
 		super(w);
 		this.kart = kart;
 		this.display = display;
-//TODO CraftBukkit
-		this.S = getClimbableHeight();
 		this.yaw = l.getYaw();
 
-		if(!display)
+		if(!display){
 			setYawPitch(this.yaw + 90F, 0F);
-		else{
+			return;
+		}else{
 			this.pitch = -l.getPitch();
 			setYawPitch(this.yaw + 90F, this.pitch);
 		}
-	}
 
-	public EnumKarts getKart(){
-		return this.kart;
-	}
-
-	public double getMaxSpeedStack(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getMaxSpeed();
-	}
-
-	public double getAcceleration(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getAcceleration();
-	}
-
-	public double getSpeedOnDirt(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getSpeedOnDirt();
-	}
-
-	public float getClimbableHeight(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getClimbableHeight();
-	}
-
-	public float getDefaultCorneringPower(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getDefaultCorneringPower();
-	}
-
-	public float getDriftCorneringPower(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getDriftCorneringPower();
-	}
-
-	public double getDriftSpeedDecrease(){
-		if(EnumKarts.getKartfromString(this.kart.getName()) == null)return 0;
-		return EnumKarts.getKartfromString(this.kart.getName()).getDriftSpeedDecrease();
-	}
-
-	@Override
-	public void O(){
-		die();
+		this.maxSpeedStack = EnumKarts.getKartfromString(this.kart.getName()).getMaxSpeed();
+		this.acceleration = EnumKarts.getKartfromString(this.kart.getName()).getAcceleration();
+		this.speedOnDirt = EnumKarts.getKartfromString(this.kart.getName()).getSpeedOnDirt();
+//TODO CraftBukkit
+		this.S = this.climbableHeight = EnumKarts.getKartfromString(this.kart.getName()).getClimbableHeight();
+		this.corneringPower = EnumKarts.getKartfromString(this.kart.getName()).getDefaultCorneringPower();
+		this.corneringPowerDrift = EnumKarts.getKartfromString(this.kart.getName()).getDriftCorneringPower();
+		this.speedDecreaseDrift = EnumKarts.getKartfromString(this.kart.getName()).getDriftSpeedDecrease();
 	}
 
 	//マインカートが搭乗可能な状態だった場合搭乗させる
@@ -137,15 +116,12 @@ public class CustomMinecart extends EntityMinecartRideable{
 		return true;
 	}
 
-	@Override
-	public void K(){
-	}
-
 	//LivingUpdate
 	@Override
 	public void t_()
 	{
 		if (this.world.isClientSide) {
+//TODO CraftBukkit
 			this.O();
 			return;
 		}
@@ -157,6 +133,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 		float prevPitch = this.pitch;
 
 		if (getType() > 0) {
+//TODO CraftBukkit
 			j(getType() - 1);
 		}
 
@@ -164,182 +141,55 @@ public class CustomMinecart extends EntityMinecartRideable{
 			setDamage(getDamage() - 1.0F);
 		}
 
-		//ヴォイドに落下
 		if (this.locY < -64.0D) {
+//TODO CraftBukkit
 			this.O();//Entity.O(){die();}
 		}
 
-		//ポータル通過
-			/*if ((!this.world.isClientSide) && ((this.world instanceof WorldServer))) {
-				this.world.methodProfiler.a("portal");
-				MinecraftServer minecraftserver = ((WorldServer)this.world).getMinecraftServer();
+		this.lastX = this.locX;
+		this.lastY = this.locY;
+		this.lastZ = this.locZ;
 
-				int i = L();
-				if (this.ak)
-				{
-					if ((this.vehicle == null) && (this.al++ >= i)) {
-						this.al = i;
-						this.portalCooldown = aq();
-						byte b0;
-						if (this.world.worldProvider.getDimension() == -1)
-							b0 = 0;
-						else {
-							b0 = -1;
-						}
+		if(this.display){
+			this.motX = 0;
+			this.motY = 0;
+			this.motZ = 0;
+			setYawPitch(this.yaw, this.pitch);
+			return;
+		}
+		this.motY -= 0.03999999910593033D;
 
-						c(b0);
-					}
+//TODO CraftBukkit
+		n();
+//TODO CraftBukkit
+		checkBlockCollisions();
 
-					this.ak = false;
-				}
-				else {
-					if (this.al > 0) {
-						this.al -= 4;
-					}
-
-					if (this.al < 0) {
-						this.al = 0;
-					}
-				}
-
-				if (this.portalCooldown > 0) {
-					this.portalCooldown -= 1;
-				}
-
-				this.world.methodProfiler.b();
-			}*/
-		//endポータル通過
-
-		//読み込みチャンク外
-		/*if (this.world.isClientSide) {
-			if (this.d > 0) {
-				double d0 = this.locX + (this.e - this.locX) / this.d;
-				double d1 = this.locY + (this.f - this.locY) / this.d;
-				double d2 = this.locZ + (this.g - this.locZ) / this.d;
-				double d3 = MathHelper.g(this.h - this.yaw);
-
-				this.yaw = ((float)(this.yaw + d3 / this.d));
-				//this.pitch = ((float)(this.pitch + (this.i - this.pitch) / this.d));
-				this.d -= 1;
-				setPosition(d0, d1, d2);
-				setYawPitch(this.yaw, this.pitch);
-			} else {
-				setPosition(this.locX, this.locY, this.locZ);
-				setYawPitch(this.yaw, this.pitch);
+		Iterator iterator = this.world.getEntities(this, getBoundingBox().grow(0.2000000029802322D, 0.0D, 0.2000000029802322D)).iterator();
+		while (iterator.hasNext()) {
+			Entity entity = (Entity)iterator.next();
+//TODO CraftBukkit
+			if ((entity != this.passenger) && (entity.ae()) && ((entity instanceof EntityMinecartAbstract))) {
+				entity.collide(this);
 			}
-		}*/
-		//end読み込みチャンク外
-		//読み込みチャンク内
-		//else {
-			this.lastX = this.locX;
-			this.lastY = this.locY;
-			this.lastZ = this.locZ;
+		}
 
-			if(this.display){
-				this.motX = 0;
-				this.motY = 0;
-				this.motZ = 0;
-				setYawPitch(this.yaw, this.pitch);
-				return;
-			}
-			this.motY -= 0.03999999910593033D;
-		//start:カートの下のブロックがレールかどうか+motの反映
-			/*int j = MathHelper.floor(this.locX);
-			int i = MathHelper.floor(this.locY);
-			int k = MathHelper.floor(this.locZ);
-
-			if (BlockMinecartTrackAbstract.e(this.world, new BlockPosition(j, i - 1, k))) {
-				i--;
+		if ((this.passenger != null) && (this.passenger.dead)) {
+			if (this.passenger.vehicle == this) {
+				this.passenger.vehicle = null;
 			}
 
-			BlockPosition blockposition = new BlockPosition(j, i, k);
-			IBlockData iblockdata = this.world.getType(blockposition);
+			this.passenger = null;
+		}
 
-			//カートがレール上にある場合
-			if (BlockMinecartTrackAbstract.d(iblockdata)) {
-				//レール用のmotをセットする
-				a(blockposition, iblockdata);
-
-				//パワードアクティベーターレールの場合騎乗者を降ろす
-				if (iblockdata.getBlock() == Blocks.ACTIVATOR_RAIL)
-					a(j, i, k, ((Boolean)iblockdata.get(BlockPoweredRail.POWERED)).booleanValue());
+		if (this.passenger != null) {
+			if (this.passenger.vehicle == this) {
+				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.COW_WALK, 1.0F, 0.05F+((float)this.speedStack/200));
+				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.GHAST_FIREBALL, 0.01F+((float)this.speedStack/400), 1.0F);
+				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.FIZZ, 0.01F+((float)this.speedStack/400), 0.5F);
 			}
-			//カートがレール上にない場合
-			else {
-				n();
-			}*/
-		//end:カートの下のブロックがレールかどうか+motの反映
-
-			n();
-
-			checkBlockCollisions();
-
-		//start:Yaw, Pitchの算出、反映
-			/*this.pitch = 0.0F;
-			double d4 = this.lastX - this.locX;
-			double d5 = this.lastZ - this.locZ;
-
-			if (d4 * d4 + d5 * d5 > 0.001D) {
-				this.yaw = ((float)(MathHelper.b(d5, d4) * 180.0D / 3.141592653589793D));
-				if (this.a) {
-					this.yaw += 180.0F;
-				}
-			}
-
-			double d6 = MathHelper.g(this.yaw - this.lastYaw);
-
-			if ((d6 < -170.0D) || (d6 >= 170.0D)) {
-				this.yaw += 180.0F;
-				this.a = (!this.a);
-			}
-
-			setYawPitch(this.yaw, this.pitch);*/
-		//end:Yaw, Pitchの算出、反映
-
-		//start:BukkitEventの呼び出し
-			/*org.bukkit.World bworld = this.world.getWorld();
-			Location from = new Location(bworld, prevX, prevY, prevZ, prevYaw, prevPitch);
-			Location to = new Location(bworld, this.locX, this.locY, this.locZ, this.yaw, this.pitch);
-			Vehicle vehicle = (Vehicle)getBukkitEntity();
-
-			this.world.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(vehicle));
-
-			if (!from.equals(to)) {
-				this.world.getServer().getPluginManager().callEvent(new VehicleMoveEvent(vehicle, from, to));
-			}*/
-		//end:BukkitEventの呼び出し
-
-		//start:コリジョン
-			Iterator iterator = this.world.getEntities(this, getBoundingBox().grow(0.2000000029802322D, 0.0D, 0.2000000029802322D)).iterator();
-			while (iterator.hasNext()) {
-				Entity entity = (Entity)iterator.next();
-
-				if ((entity != this.passenger) && (entity.ae()) && ((entity instanceof EntityMinecartAbstract))) {
-					entity.collide(this);
-				}
-			}
-		//end:コリジョン
-
-		//start:騎乗者死亡時に変数初期化
-			if ((this.passenger != null) && (this.passenger.dead)) {
-				if (this.passenger.vehicle == this) {
-					this.passenger.vehicle = null;
-				}
-
-				this.passenger = null;
-			}
-		//end:騎乗者死亡時に変数初期化
-
-			if (this.passenger != null) {
-				if (this.passenger.vehicle == this) {
-					((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.COW_WALK, 1.0F, 0.05F+((float)this.speedStack/200));
-					((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.GHAST_FIREBALL, 0.01F+((float)this.speedStack/400), 1.0F);
-					((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.FIZZ, 0.01F+((float)this.speedStack/400), 0.5F);
-				}
-			}
-
-			W();
-		//}
+		}
+//TODO CraftBukkit
+		W();
 	}
 
 	@Override
@@ -348,6 +198,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 			if(this.passenger instanceof EntityHuman){
 				setMotion((EntityHuman) this.passenger);
 			}else{
+//TODO CraftBukkit
 				double d0 = m();
 
 				this.motX = MathHelper.a(this.motX, -d0, d0);
@@ -374,7 +225,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 		this.lastMotionSpeed = calcMotionSpeed(this.motX, this.motZ) * this.kart.getWeight();
 
 		if(RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller()){
-			this.speedStack = getMaxSpeedStack();
+			this.speedStack = this.maxSpeedStack;
 			Player p = (Player)human.getBukkitEntity();
 			//this.noclip = true;
 			this.S = 5;
@@ -428,12 +279,14 @@ public class CustomMinecart extends EntityMinecartRideable{
 			//this.killerY = v.getY();
 			this.killerZ = v.getZ();
 		}else{
-			this.S = getClimbableHeight();
+//TODO CraftBukkit
+			this.S = this.climbableHeight;
 			float sideMotion = human.aZ * 0.0F;//横方向への移動速度(+-0.98固定)
 			float forwardMotion = human.ba;//縦方向への移動速度(+-3.92固定)
 
 			this.killerX = 0;
 			this.killerZ = 0;
+//TODO CraftBukkit
 			this.noclip = false;
 			calcSpeedStack(human);
 
@@ -442,14 +295,15 @@ public class CustomMinecart extends EntityMinecartRideable{
 				forwardMotion += this.speedStack/400;
 			}else if(forwardMotion < 0){
 				if(isDirtBlock())
-					forwardMotion *= getSpeedOnDirt() * 0.1;
+					forwardMotion *= this.speedOnDirt * 0.1;
 				else
 					forwardMotion *= 0.1;
 			}
 
 			//コーナリング性能
 			if(Permission.hasPermission((Player)human.getBukkitEntity(), Permission.kart_drift, true)){
-				this.yaw = human.isSneaking() ? this.yaw - human.aZ * getDriftCorneringPower() : this.yaw - human.aZ * getDefaultCorneringPower();
+//TODO CraftBukkit
+				this.yaw = human.isSneaking() ? this.yaw - human.aZ * this.corneringPowerDrift : this.yaw - human.aZ * this.corneringPower;
 				if(human.isSneaking()){
 					if(100 < this.speedStack){
 						Location current = this.bukkitEntity.getLocation();
@@ -460,7 +314,8 @@ public class CustomMinecart extends EntityMinecartRideable{
 					}
 				}
 			}else{
-				this.yaw = this.yaw - human.aZ * getDefaultCorneringPower();
+//TODO CraftBukkit
+				this.yaw = this.yaw - human.aZ * this.corneringPower;
 			}
 
 			Location current = this.bukkitEntity.getLocation().add(0,0.5,0);
@@ -471,26 +326,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 			setYawPitch(this.yaw, /*(float) (-this.speedStack/10)*/0);
 
-			/*float groundFriction = 0.91F;
-
-			if (this.onGround) {
-				groundFriction = this.world.getType(new BlockPosition(MathHelper.floor(this.locX), MathHelper.floor(getBoundingBox().b) - 1, MathHelper.floor(this.locZ))).getBlock().frictionFactor * 0.91F;
-			}*/
-
-			//トロッコは0.546固定のため無駄な計算はしない
-			//0.546^3=0.1627714なので、F6は固定で1となる
-			/*float groundFriction = 0.546F;
-			float f6 = 0.1627714F / (groundFriction * groundFriction * groundFriction);
-
-			float f3;
-			if (this.onGround)
-				//EntityHuman.bI()はGenericAttributes.d(移動速度)を返す
-				f3 = human.bI() * f6;
-			else {
-				f3 = human.aM;
-			}*/
-
-
+//TODO CraftBukkit
 			calcMotion(forwardMotion, sideMotion, /*f3*/human.bI()/2.0F);
 		}
 		//はしご、つたのようなよじ登れるブロックに立っている場合
@@ -512,7 +348,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 		if ((this.positionChanged) && (isClambableBlock())) {
 			this.motY = 0.2D+this.speedStack/300;
 		}
-
+//TODO CraftBukkit
 		if ((this.world.isClientSide) && ((!this.world.isLoaded(new BlockPosition((int)this.locX, 0, (int)this.locZ))) || (!this.world.getChunkAtWorldCoords(new BlockPosition((int)this.locX, 0, (int)this.locZ)).o()))) {
 			if (this.locY > 0.0D)
 			this.motY = -0.1D;
@@ -535,12 +371,12 @@ public class CustomMinecart extends EntityMinecartRideable{
 	public void calcSpeedStack(EntityHuman human){
 		Player p = (Player)human.getBukkitEntity();
 		if(RaceManager.getRace(p).getStepDashBoard()){
-			this.speedStack = getMaxSpeedStack() + 100 * Settings.BoostRailEffectLevel + RaceManager.getRace(p).getCharacter().getItemAdjustPositiveEffectLevel() * 50;
+			this.speedStack = this.maxSpeedStack + 100 * Settings.BoostRailEffectLevel + RaceManager.getRace(p).getCharacter().getItemAdjustPositiveEffectLevel() * 50;
 			return;
 		}
 		for(PotionEffect potion : p.getActivePotionEffects()){
 			if(potion.getType().getName().equalsIgnoreCase("SPEED")){
-				this.speedStack = getMaxSpeedStack() + potion.getAmplifier() * 10;
+				this.speedStack = this.maxSpeedStack + potion.getAmplifier() * 10;
 				return;
 			}else if(potion.getType().getName().equalsIgnoreCase("SLOW")){
 				if(this.speedStack < potion.getAmplifier())
@@ -550,26 +386,28 @@ public class CustomMinecart extends EntityMinecartRideable{
 				return;
 			}
 		}
+//TODO CraftBukkit
 		if(0 < human.ba){//forward
 			if(!isDirtBlock()){
-				if(this.speedStack < getMaxSpeedStack()){
-					this.speedStack += getAcceleration();
+				if(this.speedStack < this.maxSpeedStack){
+					this.speedStack += this.acceleration;
 				}else{
 					//キノコ等で急加速した場合一時的にmaxSpeedStackを超えるため
-					this.speedStack = getMaxSpeedStack();
+					this.speedStack = this.maxSpeedStack;
 				}
 			}else{
 				this.speedStack -= RaceManager.getRace(p).getKart().getSpeedOnDirt();
 			}
 
 			if(human.isSneaking()){
-				this.speedStack -= getDriftSpeedDecrease();
+				this.speedStack -= this.speedDecreaseDrift;
 				((Player)human.getBukkitEntity()).playSound(human.getBukkitEntity().getLocation(), Sound.FIREWORK_BLAST, 1.0F, 7.0F);
 			}
+//TODO CraftBukkit
 		}else if(0 == human.ba)//stop
 			if(0 < this.speedStack)
 				this.speedStack -= 4;
-
+//TODO CraftBukkit
 		if(human.ba < 0)//backward
 			if(0 < this.speedStack){
 				this.speedStack -= 10;
@@ -608,6 +446,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 	public boolean isClambableBlock() {
 		int i = MathHelper.floor(this.locX);
+//TODO CraftBukkit
 		int j = MathHelper.floor(getBoundingBox().b);
 		int k = MathHelper.floor(this.locZ);
 		Block block = this.world.getType(new BlockPosition(i, j, k)).getBlock();
@@ -627,6 +466,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 	}
 
 	public boolean damageEntity(DamageSource damagesource, float f) {
+//TODO CraftBukkit
 		if ((!this.world.isClientSide) && (!this.dead)) {
 			if(!(damagesource.getEntity() instanceof EntityHuman))return false;
 
@@ -655,6 +495,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 	@Override
 	public void collide(Entity entity)
 	{
+//TODO CraftBukkit
 		if ((!this.world.isClientSide) &&
 			(!entity.noclip) && (!this.noclip) &&
 			(entity != this.passenger))
