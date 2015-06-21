@@ -262,6 +262,26 @@ public class CMDAbstractBlock extends CMDAbstract{
 	}
 
 	@Override
+	void ranking() {
+		//ka ranking {player name} 	{circuit name}
+		//ka ranking all 			{circuit name}
+		if(!Util.isOnline(args[1]))
+			return;
+		Player other = Bukkit.getPlayer(args[1]);
+
+		if(this.length == 3){
+			if(!RaceData.getCircuitList().contains(args[2])){
+				messageInvalidCircuit(other, args[2]);
+				return;
+			}
+
+			RaceManager.ranking(other, args[2]);
+		}else{
+			Util.sendMessage(null, "===========================================\n" + referenceRankingOther + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
+		}
+	}
+
+	@Override
 	void reload() {
 		Settings.reloadConfig();
 		Util.sendMessage(null, "コンフィグをリロードしました");
@@ -302,11 +322,5 @@ public class CMDAbstractBlock extends CMDAbstract{
 			}
 		}else{
 		}
-	}
-
-	@Override
-	void ranking() {
-		// TODO 自動生成されたメソッド・スタブ
-
 	}
 }

@@ -314,6 +314,47 @@ public class CMDAbstractConsole extends CMDAbstract{
 	}
 
 	@Override
+	void ranking() {
+		//ka ranking {circuit name}
+		//ka ranking list
+		if (this.length == 2){
+			if(args[1].equalsIgnoreCase("list")){
+				RaceData.listCricuit(null);
+			}else{
+				if(!RaceData.getCircuitList().contains(args[1])){
+					messageInvalidCircuit(null, args[1]);
+					return;
+				}
+
+				RaceManager.ranking(null, args[1]);
+			}
+		//ka ranking {player name} 	{circuit name}
+		//ka ranking all 			{circuit name}
+		}else if(this.length == 3){
+			if(!RaceData.getCircuitList().contains(args[2])){
+				messageInvalidCircuit(null, args[2]);
+				return;
+			}
+			if(args[1].equalsIgnoreCase("all")){
+				for(Player p : Bukkit.getOnlinePlayers()){
+					RaceManager.ranking(p, args[2]);
+				}
+				messageRankingAll(null, args[2]);
+			}else{
+				if(!Util.isOnline(args[1])){
+					messageNoPlayer(null);
+					return;
+				}
+				Player other = Bukkit.getPlayer(args[1]);
+				RaceManager.ranking(other, args[2]);
+				messageRankingOther(null, other, args[2]);
+			}
+		}else{
+			Util.sendMessage(null, "===========================================\n" + referenceRankingOther + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
+		}
+	}
+
+	@Override
 	void reload() {
 		Settings.reloadConfig();
 		Util.sendMessage(null, "コンフィグをリロードしました");
@@ -363,11 +404,5 @@ public class CMDAbstractConsole extends CMDAbstract{
 		}else{
 			Util.sendMessage(null, "===========================================\n" + referenceAddItemOther + "\n" + "#GoldItem List :\n" + "#White" + itemlist);
 		}
-	}
-
-	@Override
-	void ranking() {
-		// TODO 自動生成されたメソッド・スタブ
-
 	}
 }
