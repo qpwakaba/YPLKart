@@ -475,17 +475,6 @@ public class EventItem extends RaceManager implements Listener{
 		e.getItemDrop().remove();
 	}
 
-	@EventHandler
-	public void onSuffocated(EntityDamageEvent e){
-		if(!Settings.isEnable(e.getEntity().getWorld()))return;
-		if(!(e.getEntity() instanceof Player))return;
-		Player p = (Player) e.getEntity();
-		if(!isEntry(p))return;
-
-		if(getRace(p).getUsingKiller())
-			e.setCancelled(true);
-	}
-
 	public void itemTeresa(Player user){
 		ArrayList<Player> entry = getEntryPlayer();
 		if(entry.size() <= 1){

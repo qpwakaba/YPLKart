@@ -27,6 +27,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -298,6 +300,25 @@ public class EventData extends RaceManager implements Listener {
 
 		//if(p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))return;
 		//r.recoveryInventory();
+	}
+
+	//キラー使用中の窒素ダメージを無効
+	//カート搭乗中の落下ダメージを無効
+	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent e){
+		if(!Settings.isEnable(e.getEntity().getWorld()))return;
+		if(!(e.getEntity() instanceof Player))return;
+		Player p = (Player) e.getEntity();
+		if(!isEntry(p))return;
+
+		if(getRace(p).getUsingKiller()){
+			e.setCancelled(true);
+			return;
+		}
+		if(e.getCause() == DamageCause.FALL)
+			if(p.getVehicle() != null)
+				if(RaceManager.isCustomMinecart(p.getVehicle()))
+					e.setCancelled(true);
 	}
 
 	@EventHandler
