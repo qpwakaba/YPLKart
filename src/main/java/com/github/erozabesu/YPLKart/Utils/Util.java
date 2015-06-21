@@ -305,19 +305,21 @@ public class Util extends ReflectionUtil{
 			else
 				broadcastMessageNoHeader(damaged.getName() + " is dead");
 
-			final Race r = RaceManager.getRace(p);
-			new SendBlinkingTitle((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
+			if(RaceManager.isEntry(p)){
+				final Race r = RaceManager.getRace(p);
+				new SendBlinkingTitle((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
 
-			p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
-			p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
-			p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-			Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-				public void run(){
-					p.setWalkSpeed(r.getCharacter().getWalkSpeed());
-					p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-					p.setSprinting(true);
-				}
-			}, r.getCharacter().getDeathPenaltySecond() * 20);
+				p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
+				p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
+				p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+				Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+					public void run(){
+						p.setWalkSpeed(r.getCharacter().getWalkSpeed());
+						p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+						p.setSprinting(true);
+					}
+				}, r.getCharacter().getDeathPenaltySecond() * 20);
+			}
 		}
 	}
 
