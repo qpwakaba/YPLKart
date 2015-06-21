@@ -404,7 +404,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 		for(PotionEffect potion : p.getActivePotionEffects()){
 			if(potion.getType().getName().equalsIgnoreCase("SPEED")){
-				this.speedStack = getMaxSpeedStack() + potion.getAmplifier() * 15;
+				this.speedStack = getMaxSpeedStack() + potion.getAmplifier() * 10;
 				return;
 			}else if(potion.getType().getName().equalsIgnoreCase("SLOW")){
 				if(this.speedStack < potion.getAmplifier())
