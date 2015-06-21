@@ -151,7 +151,8 @@ public class Util extends ReflectionUtil{
 		while(i.hasNext()){
 			temp = i.next();
 			if(e != null)
-				if(e.getLocation().distance(l) < temp.getLocation().distance(l))continue;
+				if(e.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
+					if(e.getLocation().distance(l) < temp.getLocation().distance(l))continue;
 			e = temp;
 		}
 
@@ -167,7 +168,8 @@ public class Util extends ReflectionUtil{
 		while(i.hasNext()){
 			temp = i.next();
 			if(p != null)
-				if(p.getLocation().distance(l) < temp.getLocation().distance(l))continue;
+				if(p.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
+					if(p.getLocation().distance(l) < temp.getLocation().distance(l))continue;
 			p = temp;
 		}
 

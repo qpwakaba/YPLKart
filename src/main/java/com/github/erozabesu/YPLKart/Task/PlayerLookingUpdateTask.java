@@ -22,6 +22,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 		Player p = Bukkit.getPlayer(UUID.fromString(this.id));
 		for(Player other : Bukkit.getOnlinePlayers()){
 			if(other.getUniqueId().toString().equalsIgnoreCase(id))continue;
+			if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
 			if(p.getLocation().distance(other.getLocation())>120)continue;
 
 			PacketUtil.disguise(p, other, this.job);
@@ -46,6 +47,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 
 		for(Player other : Bukkit.getOnlinePlayers()){
 			if(other.getUniqueId().toString().equalsIgnoreCase(this.id))continue;
+			if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
 			if(p.getLocation().distance(other.getLocation())>120)continue;
 
 			//範囲内の送信した事がないプレイヤーにパケットを送る
