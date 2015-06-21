@@ -1,6 +1,5 @@
 package main.java.com.github.erozabesu.YPLKart.Cmd;
 
-import main.java.com.github.erozabesu.YPLKart.Scoreboards;
 import main.java.com.github.erozabesu.YPLKart.Data.RaceData;
 import main.java.com.github.erozabesu.YPLKart.Data.Settings;
 import main.java.com.github.erozabesu.YPLKart.Enum.EnumCharacter;
@@ -265,9 +264,6 @@ public class CMDAbstractBlock extends CMDAbstract{
 	@Override
 	void reload() {
 		Settings.reloadConfig();
-		for (Player p : RaceManager.getEntryPlayer()) {
-			Scoreboards.reloadBoard(p);
-		}
 		Util.sendMessage(null, "コンフィグをリロードしました");
 	}
 

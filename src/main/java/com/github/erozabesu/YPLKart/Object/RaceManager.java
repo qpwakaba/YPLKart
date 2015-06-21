@@ -81,7 +81,7 @@ public class RaceManager {
 		else character(p, r.getCharacter());
 
 		EnumItem.removeAllKeyItems(p);
-		Scoreboards.createBoard(p);
+		Scoreboards.entryCircuit(p);
 		removeCustomMinecart(p);
 
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
@@ -103,11 +103,12 @@ public class RaceManager {
 	}
 
 	public static void exit(Player p){
+		Scoreboards.exitCircuit(p);
+
 		Race r = getRace(p);
 		r.setEntry("");
 
 		EnumItem.removeAllKeyItems(p);
-		Scoreboards.clearBoard(p);
 		Util.sendMessage(p, "エントリーを取り消しました");
 	}
 
@@ -491,7 +492,7 @@ public class RaceManager {
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-	public static void runRankingUpdateTask() {
+	/*public static void runRankingUpdateTask() {
 		YPLKart.getInstance().getServer().getScheduler()
 				.runTaskTimer(YPLKart.getInstance(), new Runnable() {
 					public void run() {
@@ -508,7 +509,7 @@ public class RaceManager {
 						}
 					}
 				}, 0, 4);
-	}
+	}*/
 
 	public static void runLapTimeUpdateTask() {
 		YPLKart.getInstance().getServer().getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {

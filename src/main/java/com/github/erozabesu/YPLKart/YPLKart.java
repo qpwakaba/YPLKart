@@ -41,7 +41,7 @@ public class YPLKart extends JavaPlugin{
 		new RaceData(this);
 		new DisplayKartData(this);
 
-		RaceManager.runRankingUpdateTask();
+		//RaceManager.runRankingUpdateTask();
 		RaceManager.runDetectRaceEndTask();
 		RaceManager.runLapTimeUpdateTask();
 
@@ -55,10 +55,8 @@ public class YPLKart extends JavaPlugin{
 
 	@Override
 	public void onDisable(){
+		Scoreboards.clearBoard();
 		for(Player p : Bukkit.getOnlinePlayers()){
-			if(Settings.EnableScoreboard){
-				Scoreboards.clearBoard(p);
-			}
 			if(RaceManager.isEntry(p)){
 				p.setWalkSpeed(0.2F);
 				p.setMaxHealth(20D);

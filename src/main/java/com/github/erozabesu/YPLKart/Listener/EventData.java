@@ -207,6 +207,7 @@ public class EventData extends RaceManager implements Listener {
 				PacketUtil.runPlayerLookingUpdate(p);
 
 				if(isEntry(p)){
+					Scoreboards.showBoard(p);
 					p.setWalkSpeed(getRace(p).getCharacter().getWalkSpeed());
 					if(getRace(p).getKart() != null)
 						try {

@@ -1,6 +1,5 @@
 package main.java.com.github.erozabesu.YPLKart.Cmd;
 
-import main.java.com.github.erozabesu.YPLKart.Scoreboards;
 import main.java.com.github.erozabesu.YPLKart.Data.RaceData;
 import main.java.com.github.erozabesu.YPLKart.Data.Settings;
 import main.java.com.github.erozabesu.YPLKart.Enum.EnumCharacter;
@@ -484,9 +483,6 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_reload, false, false))return;
 
 		Settings.reloadConfig();
-		for (Player p : RaceManager.getEntryPlayer()) {
-			Scoreboards.reloadBoard(p);
-		}
 		Util.sendMessage(this.p, "コンフィグをリロードしました");
 	}
 

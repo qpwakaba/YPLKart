@@ -3,6 +3,7 @@ package main.java.com.github.erozabesu.YPLKart.Object;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import main.java.com.github.erozabesu.YPLKart.Scoreboards;
 import main.java.com.github.erozabesu.YPLKart.YPLKart;
 import main.java.com.github.erozabesu.YPLKart.Data.RaceData;
 import main.java.com.github.erozabesu.YPLKart.Data.Settings;
@@ -296,6 +297,7 @@ public class Race {
 		if(getPassedCheckPoint().contains(value))return;
 		getPassedCheckPoint().add(value);
 		setPoint(getPassedCheckPoint().size());
+		Scoreboards.setPoint(getPlayer());
 	}
 
 	public void setPoint(int value){
