@@ -70,6 +70,7 @@ public final class DisplayKartData{
 
 	public static void respawnKart(Chunk chunk){
 		for(String key : config.getKeys(false)){
+			if(!chunk.getWorld().getName().equalsIgnoreCase(getWorld(key)))continue;
 			if(!chunk.toString().equalsIgnoreCase(getLocation(key).getChunk().toString()))continue;
 			boolean flag = true;
 			for(Entity e : chunk.getEntities()){
