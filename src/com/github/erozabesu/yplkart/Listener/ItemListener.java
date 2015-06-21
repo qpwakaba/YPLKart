@@ -47,11 +47,11 @@ import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.Permission;
 import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Object.RaceManager;
-import com.github.erozabesu.yplkart.Task.ItemBanana;
-import com.github.erozabesu.yplkart.Task.ItemDyedTurtle;
-import com.github.erozabesu.yplkart.Task.ItemStar;
-import com.github.erozabesu.yplkart.Task.ItemTurtle;
-import com.github.erozabesu.yplkart.Task.SendCountDownTitle;
+import com.github.erozabesu.yplkart.Task.ItemBananaTask;
+import com.github.erozabesu.yplkart.Task.ItemDyedTurtleTask;
+import com.github.erozabesu.yplkart.Task.ItemStarTask;
+import com.github.erozabesu.yplkart.Task.ItemTurtleTask;
+import com.github.erozabesu.yplkart.Task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class ItemListener extends RaceManager implements Listener{
@@ -154,7 +154,7 @@ public class ItemListener extends RaceManager implements Listener{
 					b.setCustomNameVisible(false);
 					b.setDropItem(false);
 
-					new ItemBanana(b, l).runTaskTimer(pl, 0, 1);
+					new ItemBananaTask(b, l).runTaskTimer(pl, 0, 1);
 					p.getWorld().playSound(p.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
 				}
 			}else if(EnumItem.FakeItembox.isSimilar(p.getItemInHand())){
@@ -174,7 +174,7 @@ public class ItemListener extends RaceManager implements Listener{
 			}else if(EnumItem.Star.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
 				if(Permission.hasPermission(p, Permission.use_star, false))
-					new ItemStar(p).runTaskTimer(pl, 0, 1);
+					new ItemStarTask(p).runTaskTimer(pl, 0, 1);
 			}else if(EnumItem.Teresa.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
 				if(Permission.hasPermission(p, Permission.use_teresa, false))
@@ -580,7 +580,7 @@ public class ItemListener extends RaceManager implements Listener{
 		b.setCustomNameVisible(false);
 		b.setDropItem(false);
 
-		new ItemTurtle(p, b, Util.getLocationfromYaw(p.getLocation(), 3), 60).runTaskTimer(pl, 0, 1);
+		new ItemTurtleTask(p, b, Util.getLocationfromYaw(p.getLocation(), 3), 60).runTaskTimer(pl, 0, 1);
 	}
 
 	public void itemRedturtle(Player p){
@@ -605,9 +605,9 @@ public class ItemListener extends RaceManager implements Listener{
 		int rank = RaceManager.getRank(p);
 		Player target = null;
 		if(rank == 1)
-			new ItemDyedTurtle(p, getPlayerfromRank(rank + 1), turtle, false, true).runTaskTimer(YPLKart.getInstance(), 0, 1);
+			new ItemDyedTurtleTask(p, getPlayerfromRank(rank + 1), turtle, false, true).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		else
-			new ItemDyedTurtle(p, getPlayerfromRank(rank - 1), turtle, false, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+			new ItemDyedTurtleTask(p, getPlayerfromRank(rank - 1), turtle, false, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 	}
 
 	public void itemThornedturtle(Player p){
@@ -634,7 +634,7 @@ public class ItemListener extends RaceManager implements Listener{
 		turtle.setCustomNameVisible(false);
 		turtle.setDropItem(false);
 
-		new ItemDyedTurtle(p, getPlayerfromRank(1), turtle, true, false).runTaskTimer(pl, 0, 1);
+		new ItemDyedTurtleTask(p, getPlayerfromRank(1), turtle, true, false).runTaskTimer(pl, 0, 1);
 	}
 
 	public void itemKiller(final Player p){
@@ -658,7 +658,7 @@ public class ItemListener extends RaceManager implements Listener{
 		EnumCharacter job = r.getCharacter();
 
 		int life = Settings.KillerEffectSecond + job.getItemAdjustPositiveEffectSecond();
-		new SendCountDownTitle(p, life, "⚠ AUTO CONTROL ⚠", ChatColor.RED, ChatColor.YELLOW).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		new SendCountDownTitleTask(p, life, "⚠ AUTO CONTROL ⚠", ChatColor.RED, ChatColor.YELLOW).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		r.setUsingKiller(life, true);
 
 		if(r.getKart() == null){

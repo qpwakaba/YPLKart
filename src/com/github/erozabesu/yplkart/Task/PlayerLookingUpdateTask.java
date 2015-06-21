@@ -12,6 +12,7 @@ import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
 public class PlayerLookingUpdateTask extends BukkitRunnable{
+	public int renderdistance = 60;
 	public String id;
 	public EnumCharacter job;
 	public ArrayList<String> sendPlayer = new ArrayList<String>();
@@ -23,7 +24,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 		for(Player other : Bukkit.getOnlinePlayers()){
 			if(other.getUniqueId().toString().equalsIgnoreCase(id))continue;
 			if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
-			if(p.getLocation().distance(other.getLocation())>120)continue;
+			//if(p.getLocation().distance(other.getLocation())>renderdistance)continue;
 
 			PacketUtil.disguise(p, other, this.job);
 			sendPlayer.add(other.getUniqueId().toString());
@@ -48,7 +49,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 		for(Player other : Bukkit.getOnlinePlayers()){
 			if(other.getUniqueId().toString().equalsIgnoreCase(this.id))continue;
 			if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
-			if(p.getLocation().distance(other.getLocation())>120)continue;
+			if(p.getLocation().distance(other.getLocation())>renderdistance)continue;
 
 			//範囲内の送信した事がないプレイヤーにパケットを送る
 			currentPlayer.add(other.getUniqueId().toString());

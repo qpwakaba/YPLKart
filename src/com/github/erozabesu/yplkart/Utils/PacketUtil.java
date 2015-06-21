@@ -24,8 +24,8 @@ public class PacketUtil extends ReflectionUtil{
 	 *・テレポートしたとき : EventData.onTeleport
 	 *・乗り物に搭乗したとき : EventData.onVehicleEnter
 	 * わざわざタスクを起動している理由ですが
-	 * 見た目を偽装されたプレイヤーとの距離が140ブロック程度離れた後、再び140ブロック以内に近づいた際に見た目がプレイヤーに戻ってしまうためです。
-	 * タスクでは140ブロック以内に新規に進入したプレイヤーを監視しパケットを再送しています。
+	 * 見た目を偽装されたプレイヤーとの距離が60ブロック程度離れた後、再び60ブロック以内に近づいた際に見た目がプレイヤーに戻ってしまうためです。
+	 * タスクでは60ブロック以内に新規に進入したプレイヤーを監視しパケットを再送しています。
 	 */
 	public static void runPlayerLookingUpdate(Player p){
 		RaceManager.getRace(p).setPlayerLookingUpdateTask(
@@ -33,6 +33,11 @@ public class PacketUtil extends ReflectionUtil{
 		);
 	}
 
+	/*
+	 * job.getCraftClassName()で得られるエンティティの姿にpを変身させます
+	 * targetプレイヤーに向けパケットを送信します
+	 * targetがnullの場合全プレイヤーに送信します
+	 */
 	public static void disguise(Player p, Player target, EnumCharacter job){
 		if(job == null){
 			return;
@@ -50,15 +55,18 @@ public class PacketUtil extends ReflectionUtil{
 			Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
 			Method d = craftentity.getClass().getMethod("d", int.class);
 
+			setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
+			d.invoke(craftentity, p.getEntityId());
+
 			LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
 			bukkitentity.setCustomName(p.getName());
 			bukkitentity.setCustomNameVisible(true);
 
-			setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
-			d.invoke(craftentity, p.getEntityId());
-
 			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
 			Object spawnentitypacket = getSpawnEntityLivingPacket(craftentity);
+			Object attachentitypacket = null;
+			if(p.getVehicle() != null)
+				attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(p.getVehicle()));
 			Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
 			Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p.getEquipment().getHelmet());
 			Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p.getEquipment().getChestplate());
@@ -68,8 +76,10 @@ public class PacketUtil extends ReflectionUtil{
 			if(target == null){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					if(other.getUniqueId() == p.getUniqueId())continue;
+					if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
 					sendPacket(other, entitydestroypacket);
 					sendPacket(other, spawnentitypacket);
+					if(attachentitypacket != null)sendPacket(other, attachentitypacket);
 					if(handpacket != null)sendPacket(other, handpacket);
 					if(helmetpacket != null)sendPacket(other, helmetpacket);
 					if(chectpacket != null)sendPacket(other, chectpacket);
@@ -79,6 +89,7 @@ public class PacketUtil extends ReflectionUtil{
 			}else{
 				sendPacket(target, entitydestroypacket);
 				sendPacket(target, spawnentitypacket);
+				if(attachentitypacket != null)sendPacket(target, attachentitypacket);
 				if(handpacket != null)sendPacket(target, handpacket);
 				if(helmetpacket != null)sendPacket(target, helmetpacket);
 				if(chectpacket != null)sendPacket(target, chectpacket);
@@ -96,6 +107,9 @@ public class PacketUtil extends ReflectionUtil{
 
 			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
 			Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
+			Object attachentitypacket = null;
+			if(p.getVehicle() != null)
+				attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(p.getVehicle()));
 			Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
 			Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p.getEquipment().getHelmet());
 			Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p.getEquipment().getChestplate());
@@ -109,8 +123,10 @@ public class PacketUtil extends ReflectionUtil{
 
 			for(Player other : Bukkit.getOnlinePlayers()){
 				if(other.getUniqueId() == p.getUniqueId())continue;
+				if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
 				sendPacket(other, entitydestroypacket);
 				sendPacket(other, spawnnamedentitypacket);
+				if(attachentitypacket != null)sendPacket(other, attachentitypacket);
 				if(handpacket != null)sendPacket(other, handpacket);
 				if(helmetpacket != null)sendPacket(other, helmetpacket);
 				if(chectpacket != null)sendPacket(other, chectpacket);
@@ -248,7 +264,7 @@ public class PacketUtil extends ReflectionUtil{
 		return con;
 	}
 
-	private static Object getAttachEntityPacket(Object vehicle, Object passenger) throws Exception{
+	private static Object getAttachEntityPacket(Object passenger, Object vehicle) throws Exception{
 		Class<?> clazz = getBukkitClass("PacketPlayOutAttachEntity");
 		Object con = clazz.getConstructor(int.class, getBukkitClass("Entity"), getBukkitClass("Entity")).newInstance(0, passenger, vehicle);
 

@@ -20,7 +20,7 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
-import com.github.erozabesu.yplkart.Task.SendExpandedTitle;
+import com.github.erozabesu.yplkart.Task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
@@ -221,7 +221,7 @@ public class Race {
 
 		double currentmillisecond = RaceManager.getCurrentMilliSeconds();
 
-		new SendExpandedTitle(getPlayer(), 7, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		new SendExpandedTitleTask(getPlayer(), 7, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer().size() + "位  " + currentmillisecond/1000 + "秒", 10, 140, 10, ChatColor.GREEN, true);
 
 		if(getKart() == null)
@@ -268,7 +268,7 @@ public class Race {
 		Util.createSignalFireworks(getPlayer().getLocation());
 		Util.createFlowerShower(getPlayer(), 5);
 
-		new SendExpandedTitle(getPlayer(), 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		new SendExpandedTitleTask(getPlayer(), 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		RaceManager.isRaceStarted = true;
 	}
 

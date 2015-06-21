@@ -30,8 +30,8 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Object.RaceManager;
-import com.github.erozabesu.yplkart.Task.FlowerShower;
-import com.github.erozabesu.yplkart.Task.SendBlinkingTitle;
+import com.github.erozabesu.yplkart.Task.FlowerShowerTask;
+import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil{
 
@@ -307,7 +307,7 @@ public class Util extends ReflectionUtil{
 
 			if(RaceManager.isEntry(p)){
 				final Race r = RaceManager.getRace(p);
-				new SendBlinkingTitle((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
+				new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
 
 				p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
 				p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
@@ -508,7 +508,7 @@ public class Util extends ReflectionUtil{
 	}
 
 	public static void createFlowerShower(Player p, int maxlife){
-		new FlowerShower(p,maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		new FlowerShowerTask(p,maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
 	}
 
 	public static void createSignalFireworks(Location l){

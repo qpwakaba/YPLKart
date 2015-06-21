@@ -40,7 +40,7 @@ import com.github.erozabesu.yplkart.Enum.EnumSelectMenu;
 import com.github.erozabesu.yplkart.Enum.Permission;
 import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Object.RaceManager;
-import com.github.erozabesu.yplkart.Task.SendBlinkingTitle;
+import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
@@ -276,7 +276,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
-				new SendBlinkingTitle(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
+				new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
 				p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
 				p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
 			}
