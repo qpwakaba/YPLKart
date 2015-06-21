@@ -1,5 +1,5 @@
 name: YPLKart
-main: main.java.com.github.erozabesu.YPLKart.YPLKart
+main: com.github.erozabesu.yplkart.YPLKart
 version: 1.0.6
 commands:
   ka:
