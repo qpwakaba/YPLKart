@@ -590,7 +590,7 @@ public class ItemListener extends RaceManager implements Listener{
 			return;
 		}
 		if(getRank(p) == 0)return;
-		if(!hasNearbyUnpassedCheckpoint(p)){
+		if(getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p)) == null){
 			Util.sendMessage(p, "#Red周囲に未通過のチェックポイントがないため使用できません");
 			return;
 		}
@@ -622,7 +622,7 @@ public class ItemListener extends RaceManager implements Listener{
 			Util.sendMessage(p, "1位のプレイヤーはトゲゾーこうらを使えません");
 			return;
 		}
-		if(!hasNearbyUnpassedCheckpoint(p)){
+		if(getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p)) == null){
 			Util.sendMessage(p, "#Red周囲に未通過のチェックポイントがないため使用できません");
 			return;
 		}
@@ -641,14 +641,16 @@ public class ItemListener extends RaceManager implements Listener{
 		if(!isEntry(p))return;
 		if(getRank(p) == 0)return;
 
-		if(!hasNearbyUnpassedCheckpoint(p)){
+		Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p));
+
+		if(unpassedcheckpoint == null){
 			Util.sendMessage(p, "#Red周囲に未通過のチェックポイントがないため使用できません");
 			return;
 		}
 
 		final Race r = getRace(p);
 
-		if(r.getUsingKiller()){
+		if(r.getUsingKiller() != null){
 			Util.sendMessage(p, "#Red既に使用中です");
 			return;
 		}
@@ -659,7 +661,7 @@ public class ItemListener extends RaceManager implements Listener{
 
 		int life = Settings.KillerEffectSecond + job.getItemAdjustPositiveEffectSecond();
 		new SendCountDownTitleTask(p, life, "⚠ AUTO CONTROL ⚠", ChatColor.RED, ChatColor.YELLOW).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		r.setUsingKiller(life, true);
+		r.setUsingKiller(life, unpassedcheckpoint);
 
 		if(r.getKart() == null){
 			EnumKarts kart = EnumKarts.Kart1;

@@ -52,7 +52,10 @@ public class Race {
 	private BukkitTask itemNegativeSpeedTask;
 	private BukkitTask playerLookingUpdateTask;
 
-	private boolean usingKiller;
+	/*
+	 * キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する
+	 */
+	private Entity usingKiller;
 
 	private boolean cmdForceLeave;
 
@@ -95,7 +98,7 @@ public class Race {
 		//	this.itemNegativeSpeedTask.cancel();
 		this.itemNegativeSpeedTask = null;
 
-		this.usingKiller = false;
+		this.usingKiller = null;
 
 		this.cmdForceLeave = false;
 
@@ -181,7 +184,7 @@ public class Race {
 		return this.playerLookingUpdateTask;
 	}
 
-	public boolean getUsingKiller(){
+	public Entity getUsingKiller(){
 		return this.usingKiller;
 	}
 
@@ -354,12 +357,12 @@ public class Race {
 		this.playerLookingUpdateTask = newtask;
 	}
 
-	public void setUsingKiller(int life, boolean value){
-		this.usingKiller = value;
-		if(this.usingKiller){
+	public void setUsingKiller(int life, Entity nearestunpassedcheckpoint){
+		this.usingKiller = nearestunpassedcheckpoint;
+		if(this.usingKiller != null){
 			Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 				public void run(){
-					usingKiller = false;
+					usingKiller = null;
 				}
 			}, life * 20);
 		}

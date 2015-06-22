@@ -144,7 +144,7 @@ public class Util extends ReflectionUtil{
 		return livingentity;
 	}
 
-	public static Entity getNearestEntity(ArrayList<Entity> entities, Location l){
+	public static Entity getNearestEntity(List<Entity> entities, Location l){
 		Iterator<Entity> i = entities.iterator();
 		Entity e = null;
 		Entity temp;
@@ -487,7 +487,7 @@ public class Util extends ReflectionUtil{
 	public static void createSafeExplosion(Player executor, Location l, int damage, int range){
 		Particle.sendToLocation("CLOUD", l, 0, 0, 0, 1, 10);
 		Particle.sendToLocation("SMOKE_NORMAL", l, 0, 0, 0, 1, 10);
-		l.getWorld().playSound(l, Sound.EXPLODE, 0.5F, 1.0F);
+		l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
 		ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
 		for(LivingEntity damaged : entities){
 			if(executor != null)

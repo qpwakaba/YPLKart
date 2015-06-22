@@ -3,6 +3,7 @@ package com.github.erozabesu.yplkart.OverrideClass.v1_8_R2;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.server.v1_8_R2.Block;
 import net.minecraft.server.v1_8_R2.BlockPosition;
@@ -57,6 +58,8 @@ public class CustomMinecart extends EntityMinecartRideable{
 	private double killerX = 0;
 	private double killerY = 0;
 	private double killerZ = 0;
+	private List<String> passedCheckPoint;
+	private org.bukkit.entity.Entity lastPassedCheckPoint;
 
 	/*
 	 * 予めカートのパラメータを格納しておくことで余計な処理を省くことができるが
@@ -79,22 +82,20 @@ public class CustomMinecart extends EntityMinecartRideable{
 		this.display = display;
 		this.yaw = l.getYaw();
 
-		if(!display){
-			setYawPitch(this.yaw + 90F, 0F);
-			return;
-		}else{
+		if(display){
 			this.pitch = -l.getPitch();
 			setYawPitch(this.yaw + 90F, this.pitch);
+			return;
 		}
-
-		this.maxSpeedStack = EnumKarts.getKartfromString(this.kart.getName()).getMaxSpeed();
-		this.acceleration = EnumKarts.getKartfromString(this.kart.getName()).getAcceleration();
-		this.speedOnDirt = EnumKarts.getKartfromString(this.kart.getName()).getSpeedOnDirt();
+		setYawPitch(this.yaw + 90F, 0F);
+		this.maxSpeedStack = kart.getMaxSpeed();
+		this.acceleration = kart.getAcceleration();
+		this.speedOnDirt = kart.getSpeedOnDirt();
 //TODO CraftBukkit
-		this.S = this.climbableHeight = EnumKarts.getKartfromString(this.kart.getName()).getClimbableHeight();
-		this.corneringPower = EnumKarts.getKartfromString(this.kart.getName()).getDefaultCorneringPower();
-		this.corneringPowerDrift = EnumKarts.getKartfromString(this.kart.getName()).getDriftCorneringPower();
-		this.speedDecreaseDrift = EnumKarts.getKartfromString(this.kart.getName()).getDriftSpeedDecrease();
+		this.S = this.climbableHeight = kart.getClimbableHeight();
+		this.corneringPower = kart.getDefaultCorneringPower();
+		this.corneringPowerDrift = kart.getDriftCorneringPower();
+		this.speedDecreaseDrift = kart.getDriftSpeedDecrease();
 	}
 
 	//マインカートが搭乗可能な状態だった場合搭乗させる
@@ -120,8 +121,8 @@ public class CustomMinecart extends EntityMinecartRideable{
 	@Override
 	public void t_()
 	{
-		if (this.world.isClientSide) {
 //TODO CraftBukkit
+		if (this.world.isClientSide) {
 			this.O();
 			return;
 		}
@@ -224,32 +225,32 @@ public class CustomMinecart extends EntityMinecartRideable{
 	public void setMotion(EntityHuman human){
 		this.lastMotionSpeed = calcMotionSpeed(this.motX, this.motZ) * this.kart.getWeight();
 
-		if(RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller()){
-			this.speedStack = this.maxSpeedStack;
+		/*
+		 * キラー発動中
+		 * 「最寄」の「一度も通過していない」チェックポイントに向け自動で移動する
+		 * コースアウトを防ぐため、最寄のチェックポイントとの平面距離が3ブロック以内になるまで
+		 * 次のチェックポイントへは移動しない
+		 */
+		if(RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller() != null){
 			Player p = (Player)human.getBukkitEntity();
-			//this.noclip = true;
-			this.S = 5;
 			Race r = RaceManager.getRace(p);
+//TODO CraftBukkit
+			this.noclip = true;
+			this.speedStack = this.maxSpeedStack;
 
-			p.playSound(p.getLocation(), Sound.GHAST_FIREBALL, 0.13F, 1.5F);
-			p.playSound(p.getLocation(), Sound.FIZZ, 0.2F, 1.0F);
-
-			for(org.bukkit.entity.Entity e : p.getNearbyEntities(2.5, 2, 2.5)){
-				if(e.getUniqueId() != p.getUniqueId()){
-					if(e instanceof Player){
-						if(RaceManager.isEntry((Player)e));
-							Util.createSafeExplosion(p, e.getLocation(), Settings.KillerMovingDamage + RaceManager.getRace(p).getCharacter().getItemAdjustAttackDamage(), 2);
-					}
-				}
-			}
-
-			if(this.killerX != 0 && this.killerZ != 0){
+			//〓〓モーション初期化
+			if(this.killerX != 0 && this.killerY != 0 && this.killerZ != 0){
 				this.motX = this.killerX;
-				//this.motY = this.killerY;
-				//this.motY = 0.04;
+				this.motY = this.killerY;
 				this.motZ = this.killerZ;
 			}
 			setYawPitch(Util.getYawfromVector(new Vector(this.motX, this.motY, this.motZ))+180,0);
+
+			//〓〓演出
+			p.playSound(p.getLocation(), Sound.GHAST_FIREBALL, 0.13F, 1.5F);
+			p.playSound(p.getLocation(), Sound.FIZZ, 0.2F, 1.0F);
+			Util.createSafeExplosion(p, this.getBukkitEntity().getLocation(), Settings.KillerMovingDamage + RaceManager.getRace(p).getCharacter().getItemAdjustAttackDamage(), 2);
+
 			Location current = this.bukkitEntity.getLocation().add(0,0.5,0);
 			current.setYaw(current.getYaw() + 270);
 			Location ll = Util.getLocationfromYaw(current, -15);
@@ -258,13 +259,27 @@ public class CustomMinecart extends EntityMinecartRideable{
 				Particle.sendToLocation("REDSTONE", ll.add(((double)Util.getRandom(10))/10, ((double)Util.getRandom(10))/10, ((double)Util.getRandom(10))/10), 0, 0, 0, 0, 10);
 			}
 
+			//〓〓チェックポイント
+			//初回起動
+			if(this.passedCheckPoint == null){
+				this.passedCheckPoint = new ArrayList<String>(r.getPassedCheckPoint());
+				this.lastPassedCheckPoint = RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller();
+				Vector v = Util.getVectorLocationToLocation(this.lastPassedCheckPoint.getLocation().add(0,-RaceManager.checkPointHeight+2, 0), this.getBukkitEntity().getLocation()).multiply(1.8);
+				this.killerX = v.getX();
+				this.killerY = v.getY();
+				this.killerZ = v.getZ();
+			}
+			if(this.lastPassedCheckPoint != null)
+				if(RaceManager.checkPointHeight + 5 < this.lastPassedCheckPoint.getLocation().distance(this.getBukkitEntity().getLocation()))
+					return;
+
 			ArrayList<org.bukkit.entity.Entity> checkpoint = new ArrayList<org.bukkit.entity.Entity>();
 			String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
-			ArrayList<org.bukkit.entity.Entity> templist = RaceManager.getNearbyCheckpoint(p.getLocation(), 30, r.getEntry());
+			ArrayList<org.bukkit.entity.Entity> templist = RaceManager.getNearbyCheckpoint(p.getLocation(), 40, r.getEntry());
 			if(templist == null)return;
 
 			for (org.bukkit.entity.Entity e : templist) {
-				if(!r.getPassedCheckPoint().contains(lap + e.getUniqueId().toString())){
+				if(!this.passedCheckPoint.contains(lap + e.getUniqueId().toString())){
 					checkpoint.add(e);
 				}
 			}
@@ -273,21 +288,24 @@ public class CustomMinecart extends EntityMinecartRideable{
 				return;
 			}
 
-			org.bukkit.entity.Entity e = Util.getNearestEntity(checkpoint, this.getBukkitEntity().getLocation());
-			Vector v = Util.getVectorLocationToLocation(e.getLocation().add(0,-RaceManager.checkPointHeight+1, 0), this.getBukkitEntity().getLocation()).multiply(1.8);
+			this.lastPassedCheckPoint = Util.getNearestEntity(checkpoint, this.getBukkitEntity().getLocation());
+			this.passedCheckPoint.add(lap + this.lastPassedCheckPoint.getUniqueId().toString());
+			Vector v = Util.getVectorLocationToLocation(this.lastPassedCheckPoint.getLocation().add(0,-RaceManager.checkPointHeight+2, 0), this.getBukkitEntity().getLocation()).multiply(1.8);
 			this.killerX = v.getX();
-			//this.killerY = v.getY();
+			this.killerY = v.getY();
 			this.killerZ = v.getZ();
 		}else{
 //TODO CraftBukkit
-			this.S = this.climbableHeight;
 			float sideMotion = human.aZ * 0.0F;//横方向への移動速度(+-0.98固定)
 			float forwardMotion = human.ba;//縦方向への移動速度(+-3.92固定)
-
-			this.killerX = 0;
-			this.killerZ = 0;
 //TODO CraftBukkit
 			this.noclip = false;
+			this.passedCheckPoint = null;
+			this.lastPassedCheckPoint = null;
+			this.killerX = 0;
+			this.killerY = 0;
+			this.killerZ = 0;
+
 			calcSpeedStack(human);
 
 			if(0 < forwardMotion){
@@ -325,29 +343,25 @@ public class CustomMinecart extends EntityMinecartRideable{
 			Particle.sendToLocation("SPELL", ll.add(((double)Util.getRandom(4))/10, 0.5, ((double)Util.getRandom(4))/10), 0, 0, 0, 0, 5);
 
 			setYawPitch(this.yaw, /*(float) (-this.speedStack/10)*/0);
-
 //TODO CraftBukkit
 			calcMotion(forwardMotion, sideMotion, /*f3*/human.bI()/2.0F);
 		}
 		//はしご、つたのようなよじ登れるブロックに立っている場合
 		if (isClambableBlock()) {
-				float f4 = 0.15F;
-				this.motX = MathHelper.a(this.motX, -f4, f4);
-				this.motZ = MathHelper.a(this.motZ, -f4, f4);
-				this.fallDistance = 0.0F;
-				if (this.motY < -0.15D) {
-					this.motY = -0.15D;
-				}
-
-			/*if ((human.isSneaking()) && (this.motY < 0.0D)) {
-			this.motY = 0.0D;
-			}*/
+			float f4 = 0.15F;
+			this.motX = MathHelper.a(this.motX, -f4, f4);
+			this.motZ = MathHelper.a(this.motZ, -f4, f4);
+			this.fallDistance = 0.0F;
+			if (this.motY < -0.15D) {
+				this.motY = -0.15D;
+			}
 		}
 
 		move(this.motX, this.motY, this.motZ);
 		if ((this.positionChanged) && (isClambableBlock())) {
 			this.motY = 0.2D+this.speedStack/300;
 		}
+
 //TODO CraftBukkit
 		if ((this.world.isClientSide) && ((!this.world.isLoaded(new BlockPosition((int)this.locX, 0, (int)this.locZ))) || (!this.world.getChunkAtWorldCoords(new BlockPosition((int)this.locX, 0, (int)this.locZ)).o()))) {
 			if (this.locY > 0.0D)
@@ -364,14 +378,14 @@ public class CustomMinecart extends EntityMinecartRideable{
 		//this.motZ *= groundFriction;
 
 		//スピードメーター
-		if(!RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller())
+		if(RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller() == null)
 			((Player)human.getBukkitEntity()).setLevel(calcMotionSpeed(this.motX, this.motZ));
 	}
 
 	public void calcSpeedStack(EntityHuman human){
 		Player p = (Player)human.getBukkitEntity();
 		if(RaceManager.getRace(p).getStepDashBoard()){
-			this.speedStack = this.maxSpeedStack + 100 * Settings.BoostRailEffectLevel + RaceManager.getRace(p).getCharacter().getItemAdjustPositiveEffectLevel() * 50;
+			this.speedStack = this.maxSpeedStack * Settings.BoostRailEffectLevel + RaceManager.getRace(p).getCharacter().getItemAdjustPositiveEffectLevel() * 50;
 			return;
 		}
 		for(PotionEffect potion : p.getActivePotionEffects()){

@@ -178,7 +178,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		Race r = getRace(p);
 
-		ArrayList<String> checkpoint = getNearbyCheckpointID(e.getPlayer().getLocation(), 20, r.getEntry());
+		ArrayList<String> checkpoint = getNearbyCheckpointID(e.getPlayer().getLocation(), checkPointDetectRadius, r.getEntry());
 		if(checkpoint == null)return;
 
 		Iterator<String> i = checkpoint.iterator();
@@ -311,7 +311,7 @@ public class DataListener extends RaceManager implements Listener {
 		Player p = (Player) e.getEntity();
 		if(!isEntry(p))return;
 
-		if(getRace(p).getUsingKiller()){
+		if(getRace(p).getUsingKiller() != null){
 			e.setCancelled(true);
 			return;
 		}

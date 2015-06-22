@@ -36,6 +36,7 @@ import com.github.erozabesu.yplkart.Utils.Util;
 
 public class RaceManager {
 	public static int checkPointHeight = 8;
+	public static int checkPointDetectRadius = 20;
 	public static boolean isRaceStarted = false;
 	private static int laptime = 0;
 	private static HashMap<UUID, Race> racedata = new HashMap<UUID, Race>();
@@ -202,32 +203,56 @@ public class RaceManager {
 	}*/
 
 	public static ArrayList<Entity> getNearbyCheckpoint(Location l, double radius, String circuitname){
-		List<Entity> entityList = Util.getNearbyEntities(l.add(0, checkPointHeight+5, 0), radius);
+		List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
 
 		ArrayList<Entity> nearbycheckpoint = new ArrayList<Entity>();
 		for (Entity e : entityList) {
-			if(isCustomWitherSkull(e, circuitname)){
-				if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname)){
-					nearbycheckpoint.add(e);
-				}else{
-				}
-			}
+			//プレイヤーとの高低差が一定以上のチェックポイントはスルー
+			if(Math.abs(e.getLocation().getY()-l.getY()) < checkPointHeight+5)
+				if(isCustomWitherSkull(e, circuitname))
+					if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
+						nearbycheckpoint.add(e);
 		}
 
 		if(nearbycheckpoint.isEmpty())return null;
 		return nearbycheckpoint;
 	}
 
+	public static List<Entity> getNearbyUnpassedCheckpoint(Location l, double radius, Race r){
+		String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+		List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
+
+		List<Entity> nearbycheckpoint = new ArrayList<Entity>();
+		for (Entity e : entityList) {
+			//プレイヤーとの高低差が一定以上のチェックポイントはスルー
+			if(Math.abs(e.getLocation().getY()-l.getY()) < checkPointHeight+5)
+				if(isCustomWitherSkull(e, r.getEntry()))
+					if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(r.getEntry()))
+						if(!r.getPassedCheckPoint().contains(lap + e.getUniqueId().toString()))
+							nearbycheckpoint.add(e);
+		}
+
+		if(nearbycheckpoint.isEmpty())return null;
+		return nearbycheckpoint;
+	}
+
+	public static Entity getNearestUnpassedCheckpoint(Location l, double radius, Race r){
+		List<Entity> checkpoint = getNearbyUnpassedCheckpoint(l, radius, r);
+		if(checkpoint == null)return null;
+
+		return Util.getNearestEntity(checkpoint, l);
+	}
+
 	public static ArrayList<String> getNearbyCheckpointID(Location l, double radius, String circuitname){
-		List<Entity> entityList = Util.getNearbyEntities(l.add(0, checkPointHeight, 0), radius);
+		List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
 
 		ArrayList<String> nearbycheckpoint = new ArrayList<String>();
 		for (Entity e : entityList) {
-			if(isCustomWitherSkull(e, circuitname)){
-				if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname)){
-					nearbycheckpoint.add(e.getUniqueId().toString());
-				}
-			}
+			//プレイヤーとの高低差が一定以上のチェックポイントはスルー
+			if(Math.abs(e.getLocation().getY()-l.getY()) < checkPointHeight+5)
+				if(isCustomWitherSkull(e, circuitname))
+					if(ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
+						nearbycheckpoint.add(e.getUniqueId().toString());
 		}
 
 		if(nearbycheckpoint.isEmpty())return null;
@@ -281,20 +306,6 @@ public class RaceManager {
 			}
 	}
 
-	public static boolean hasNearbyUnpassedCheckpoint(Player p){
-		Race r = RaceManager.getRace(p);
-		String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
-		ArrayList<org.bukkit.entity.Entity> templist = getNearbyCheckpoint(p.getLocation(), 50, r.getEntry());
-		if(templist == null)return false;
-
-		for (org.bukkit.entity.Entity e : templist) {
-			if(!r.getPassedCheckPoint().contains(lap + e.getUniqueId().toString())){
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public static Minecart createCustomMinecart(Location l, EnumKarts kart){
 		try {
 			Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
@@ -311,6 +322,7 @@ public class RaceManager {
 
 			return cart;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
