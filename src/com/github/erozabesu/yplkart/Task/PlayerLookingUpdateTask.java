@@ -9,7 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Object.RaceManager;
-import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
 public class PlayerLookingUpdateTask extends BukkitRunnable{
 	public int renderdistance = 60;
@@ -26,7 +25,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 			if(!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))continue;
 			//if(p.getLocation().distance(other.getLocation())>renderdistance)continue;
 
-			PacketUtil.disguise(p, other, this.job);
+			//PacketUtil.disguise(p, other, this.job);
 			sendPlayer.add(other.getUniqueId().toString());
 		}
 	}
@@ -39,7 +38,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 			return;
 		}
 		if(RaceManager.getRace(p).getCharacter() == null){
-			PacketUtil.returnPlayer(p);
+			//PacketUtil.returnPlayer(p);
 			this.cancel();
 			return;
 		}
@@ -54,7 +53,7 @@ public class PlayerLookingUpdateTask extends BukkitRunnable{
 			//範囲内の送信した事がないプレイヤーにパケットを送る
 			currentPlayer.add(other.getUniqueId().toString());
 			if(!sendPlayer.contains(other.getUniqueId().toString())){
-				PacketUtil.disguise(p, other, this.job);
+				//PacketUtil.disguise(p, other, this.job);
 				sendPlayer.add(other.getUniqueId().toString());
 			}
 		}

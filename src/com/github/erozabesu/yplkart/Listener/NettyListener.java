@@ -2,6 +2,8 @@ package com.github.erozabesu.yplkart.Listener;
 
 import io.netty.channel.Channel;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +19,7 @@ import com.github.erozabesu.yplkart.Utils.PlayerChannelHandler;
 
 public class NettyListener implements Listener{
 	private static YPLKart pl;
+	public static HashMap<Integer, String> playerEntityId = new HashMap<Integer, String>();
 	public NettyListener(YPLKart plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		pl = plugin;
@@ -37,31 +40,35 @@ public class NettyListener implements Listener{
         }
     }
 
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent e) throws Exception{
+    	if(e.getPlugin().equals(pl)){
+    		for(Player player: Bukkit.getOnlinePlayers()) {
+    			remove(player);
+    		}
+    	}
+    }
+
 	@EventHandler
-	public void onPluginDisable(PluginDisableEvent e) throws Exception{
-		if(e.getPlugin().equals(pl)){
-			for(Player player: Bukkit.getOnlinePlayers()) {
-				remove(player);
-			}
-		}
+	public void onPlayerJoin(PlayerJoinEvent e) throws Exception{
+		playerEntityId.put(e.getPlayer().getEntityId(), e.getPlayer().getUniqueId().toString());
+		inject(e.getPlayer());
 	}
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) throws Exception{
-    	inject(e.getPlayer());
-    }
-
-    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) throws Exception{
+    	playerEntityId.remove(e.getPlayer().getEntityId());
     	remove(e.getPlayer());
     }
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent e) throws Exception{
-        if(e.getPlugin().equals(pl)){
-            for(Player player: Bukkit.getOnlinePlayers()){
-            	inject(player);
-            }
-        }
+    	if(e.getPlugin().equals(pl)){
+    		playerEntityId.clear();
+    		for(Player p: Bukkit.getOnlinePlayers()){
+    			playerEntityId.put(p.getEntityId(), p.getUniqueId().toString());
+    			inject(p);
+    		}
+    	}
     }
 }
