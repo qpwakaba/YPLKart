@@ -69,6 +69,20 @@ public class ReflectionUtil{
 		return null;
 	}
 
+	public static Object getFieldValue(Object instance, String name) throws Exception {
+		Field field = instance.getClass().getDeclaredField(name);
+		field.setAccessible(true);
+		return field.get(instance);
+	}
+
+	public static void setFieldValue(Field field, Object obj, Object value) {
+		try {
+			field.set(obj, value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static Object getCraftEntity(Entity entity){
 		try {
 			return entity.getClass().getMethod("getHandle").invoke(entity);

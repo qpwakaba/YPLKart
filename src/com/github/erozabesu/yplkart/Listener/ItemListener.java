@@ -55,7 +55,6 @@ import com.github.erozabesu.yplkart.Task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class ItemListener extends RaceManager implements Listener{
-
 	private static YPLKart pl;
 	public ItemListener(YPLKart plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -316,7 +315,7 @@ public class ItemListener extends RaceManager implements Listener{
 	@EventHandler
 	public void onStepSpeedBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isEntry(e.getPlayer()))return;
+		if(!RaceManager.isEntry(e.getPlayer()))return;
 
 		final Player p = e.getPlayer();
 
@@ -339,7 +338,7 @@ public class ItemListener extends RaceManager implements Listener{
 				}
 
 				setPositiveItemSpeed(p, Settings.BoostRailEffectSecond, Settings.BoostRailEffectLevel, Sound.EXPLODE);
-				p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
+				//p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
 				boostRailCool.put(p, true);
 			}
 		}

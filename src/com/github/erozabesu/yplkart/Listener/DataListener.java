@@ -80,13 +80,13 @@ public class DataListener extends RaceManager implements Listener {
 		}
 	}
 
-	//搭乗に成功した場合データ登録+パケット再送
+	//搭乗に成功した場合データ登録
 	@EventHandler
 	public void onVehicleEnter(VehicleEnterEvent e){
 		if(!Settings.isEnable(e.getEntered().getWorld()))return;
 		if(!(e.getEntered() instanceof Player))return;
 
-		PacketUtil.runPlayerLookingUpdate((Player) e.getEntered());
+		//PacketUtil.runPlayerLookingUpdate((Player) e.getEntered());
 		if(RaceManager.isCustomMinecart(e.getVehicle())){
 			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
 			if(kart == null)return;
@@ -206,7 +206,7 @@ public class DataListener extends RaceManager implements Listener {
 		final Player p = e.getPlayer();
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
-				PacketUtil.runPlayerLookingUpdate(p);
+				//PacketUtil.runPlayerLookingUpdate(p);
 
 				if(isEntry(p)){
 					Scoreboards.showBoard(p);
@@ -246,7 +246,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
-				PacketUtil.runPlayerLookingUpdate(e.getPlayer());
+				//PacketUtil.runPlayerLookingUpdate(e.getPlayer());
 			}
 		}, 10);
 	}
@@ -259,7 +259,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
-					PacketUtil.runPlayerLookingUpdate(p);
+					//PacketUtil.runPlayerLookingUpdate(p);
 					p.setSprinting(true);
 					if(r.getKart() != null){
 						try {

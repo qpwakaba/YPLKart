@@ -10,29 +10,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
-import com.github.erozabesu.yplkart.Object.RaceManager;
-import com.github.erozabesu.yplkart.Task.PlayerLookingUpdateTask;
 
 public class PacketUtil extends ReflectionUtil{
-	/*プレイヤーの見た目を選択キャラクターに偽装するタスクを起動します
-	 *タスクを起動するタイミングは基本的にプレイヤーを描画し直さなければならない場合だと思われます
-	 *・キャラクター選択をしたとき : RaceManager.character()
-	 *・サーバーに参加したとき : EventData.onJoin
-	 *・リスポーンしたとき : EventData.onRespawn
-	 *・テレポートしたとき : EventData.onTeleport
-	 *・乗り物に搭乗したとき : EventData.onVehicleEnter
-	 * わざわざタスクを起動している理由ですが
-	 * 見た目を偽装されたプレイヤーとの距離が60ブロック程度離れた後、再び60ブロック以内に近づいた際に見た目がプレイヤーに戻ってしまうためです。
-	 * タスクでは60ブロック以内に新規に進入したプレイヤーを監視しパケットを再送しています。
-	 */
-	public static void runPlayerLookingUpdate(Player p){
-		RaceManager.getRace(p).setPlayerLookingUpdateTask(
-			new PlayerLookingUpdateTask(p.getUniqueId().toString(), RaceManager.getRace(p).getCharacter()).runTaskTimer(YPLKart.getInstance(), 0, 5)
-		);
-	}
-
 	/*
 	 * job.getCraftClassName()で得られるエンティティの姿にpを変身させます
 	 * targetプレイヤーに向けパケットを送信します
@@ -99,6 +79,25 @@ public class PacketUtil extends ReflectionUtil{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
+	}
+
+	public static Object getDisguisePacket(Player p, EnumCharacter job) throws Exception{
+		Object craftentity = getCraftEntityClass(p.getWorld(), job.getCraftClassName());
+
+		Location loc = p.getLocation();
+
+		Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
+		Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+		Method d = craftentity.getClass().getMethod("d", int.class);
+
+		setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
+		d.invoke(craftentity, p.getEntityId());
+
+		LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
+		bukkitentity.setCustomName(p.getName());
+		bukkitentity.setCustomNameVisible(true);
+
+		return getSpawnEntityLivingPacket(craftentity);
 	}
 
 	public static void returnPlayer(final Player p){
@@ -170,14 +169,33 @@ public class PacketUtil extends ReflectionUtil{
 	}
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	private static Field getPlayerConnectionField(Player p) throws Exception{
-		return getField(ReflectionUtil.getCraftEntity(p), "playerConnection");
-	}
-
 	private static Object getPlayerConnection(Player p) throws Exception{
-		return getPlayerConnectionField(p).get(ReflectionUtil.getCraftEntity(p));
+		Field connection = getField(ReflectionUtil.getCraftEntity(p), "playerConnection");
+
+		return connection.get(ReflectionUtil.getCraftEntity(p));
 	}
+
+	private static Object getNetworkManager(Player p) throws Exception {
+		Object playerconnection = getPlayerConnection(p);
+		Field networkField = getField(playerconnection, "networkManager");
+
+		return networkField.get(playerconnection);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getChannel(Player p) throws Exception {
+		Object network = getNetworkManager(p);
+		Field channelField = null;
+		if(getBukkitVersion().equalsIgnoreCase("v1_8_R1")){
+			channelField = ReflectionUtil.getField(network, "i");
+		}else if(getBukkitVersion().equalsIgnoreCase("v1_8_R2")){
+			channelField = ReflectionUtil.getField(network, "k");
+		}else if(getBukkitVersion().equalsIgnoreCase("v1_8_R2")){
+			channelField = ReflectionUtil.getField(network, "channel");
+		}
+
+        return (T) channelField.get(network);
+    }
 
 	private static void sendPacket(Player p, Object packet) throws Exception {
 		Object playerConnection = getPlayerConnection(p);
@@ -248,7 +266,7 @@ public class PacketUtil extends ReflectionUtil{
 		return con;
 	}
 
-	private static Object getEntityDestroyPacket(int id) throws Exception{
+	public static Object getEntityDestroyPacket(int id) throws Exception{
 		int[] ids = new int[1];
 		ids[0] = id;
 		Class<?> clazz = getBukkitClass("PacketPlayOutEntityDestroy");

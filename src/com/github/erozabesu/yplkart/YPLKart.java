@@ -15,6 +15,7 @@ import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Listener.DataListener;
 import com.github.erozabesu.yplkart.Listener.ItemListener;
+import com.github.erozabesu.yplkart.Listener.NettyListener;
 import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
@@ -37,6 +38,7 @@ public class YPLKart extends JavaPlugin{
 		getCommand("ka").setExecutor(CMDExecutor);
 		new DataListener(this);
 		new ItemListener(this);
+		new NettyListener(this);
 		new Settings(this);
 		new RaceData(this);
 		new DisplayKartData(this);
