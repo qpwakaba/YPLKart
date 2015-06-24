@@ -311,7 +311,8 @@ public class DataListener extends RaceManager implements Listener {
 					e.setCancelled(true);
 
 		if(!getRace(p).getStart())
-			e.setCancelled(true);
+			if(e.getCause() != DamageCause.VOID)
+				e.setCancelled(true);
 	}
 
 	@EventHandler
