@@ -464,7 +464,9 @@ public class ItemListener extends RaceManager implements Listener{
 	public void onDropItem(PlayerDropItemEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
 		if(!isEntry(e.getPlayer()))return;
-		e.getItemDrop().remove();
+
+		if(EnumItem.Menu.isSimilar(e.getItemDrop().getItemStack()))e.setCancelled(true);
+		else e.getItemDrop().remove();
 	}
 
 	public void itemTeresa(Player user){
