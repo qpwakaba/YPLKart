@@ -258,7 +258,8 @@ public class Race {
 	}
 
 	public void setStart(boolean value, Location from, Location to){
-		this.start = value;
+		setStart(value);
+		EnumItem.removeAllKeyItems(getPlayer());
 		//EnumItem.removeAllKeyItems(getPlayer());
 
 		Vector v = Util.getVectorLocationToLocation(to, from);
