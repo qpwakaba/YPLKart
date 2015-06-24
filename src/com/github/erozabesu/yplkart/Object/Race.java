@@ -216,6 +216,8 @@ public class Race {
 		getPlayer().setMaxHealth(20);
 		getPlayer().setHealth(20);
 		setStart(false);
+		this.character = null;
+		this.kart = null;
 
 		final String entry = getEntry();
 
