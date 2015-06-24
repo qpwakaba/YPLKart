@@ -135,6 +135,7 @@ public class RaceManager {
 		p.setMaxHealth(20D);
 		p.setHealth(20D);
 
+		getRace(p).setCharacter(null);
 		PacketUtil.returnPlayer(p);
 		Util.sendMessage(p, "キャラクター選択を取り消しました");
 	}

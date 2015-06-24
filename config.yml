@@ -6,6 +6,7 @@ enable_permission:
   cmd_entry: true
   cmd_exit: true
   cmd_character: true
+  cmd_characterreset: true
   cmd_kart: true
   cmd_leave: true
   cmd_ranking: true
@@ -14,6 +15,7 @@ enable_permission:
   cmd_other_entry: true
   cmd_other_exit: true
   cmd_other_character: true
+  cmd_other_characterreset: true
   cmd_other_kart: true
   cmd_other_leave: true
   cmd_other_ranking: true

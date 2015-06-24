@@ -35,7 +35,7 @@ public final class Settings{
 	public static boolean EnablePermissionCMDEntry = true;
 	public static boolean EnablePermissionCMDExit = true;
 	public static boolean EnablePermissionCMDCharacter = true;
-	//public static boolean EnablePermissionCMDCharacterReset = true;
+	public static boolean EnablePermissionCMDCharacterReset = true;
 	public static boolean EnablePermissionCMDRide = true;
 	public static boolean EnablePermissionCMDLeave = true;
 	public static boolean EnablePermissionCMDRanking = true;
@@ -45,7 +45,7 @@ public final class Settings{
 	public static boolean EnablePermissionCMDOtherEntry = true;
 	public static boolean EnablePermissionCMDOtherExit = true;
 	public static boolean EnablePermissionCMDOtherCharacter = true;
-	//public static boolean EnablePermissionCMDOtherCharacterReset = true;
+	public static boolean EnablePermissionCMDOtherCharacterReset = true;
 	public static boolean EnablePermissionCMDOtherRide = true;
 	public static boolean EnablePermissionCMDOtherLeave = true;
 	public static boolean EnablePermissionCMDOtherItem = true;
@@ -240,8 +240,8 @@ public final class Settings{
 		if(!config.contains("enable_permission.cmd_character"))config.set("enable_permission.cmd_character", EnablePermissionCMDCharacter);
 		EnablePermissionCMDCharacter = config.getBoolean("enable_permission.cmd_character");
 
-		//if(!config.contains("enable_permission.cmd_characterreset"))config.set("enable_permission.cmd_characterreset", EnablePermissionCMDCharacterReset);
-		//EnablePermissionCMDCharacterReset = config.getBoolean("enable_permission.cmd_characterreset");
+		if(!config.contains("enable_permission.cmd_characterreset"))config.set("enable_permission.cmd_characterreset", EnablePermissionCMDCharacterReset);
+		EnablePermissionCMDCharacterReset = config.getBoolean("enable_permission.cmd_characterreset");
 
 		if(!config.contains("enable_permission.cmd_kart"))config.set("enable_permission.cmd_kart", EnablePermissionCMDRide);
 		EnablePermissionCMDRide = config.getBoolean("enable_permission.cmd_kart");
@@ -269,8 +269,8 @@ public final class Settings{
 		if(!config.contains("enable_permission.cmd_other_character"))config.set("enable_permission.cmd_other_character", EnablePermissionCMDOtherCharacter);
 		EnablePermissionCMDOtherCharacter = config.getBoolean("enable_permission.cmd_other_character");
 
-		//if(!config.contains("enable_permission.cmd_other_characterreset"))config.set("enable_permission.cmd_other_characterreset", EnablePermissionCMDOtherCharacterReset);
-		//EnablePermissionCMDOtherCharacterReset = config.getBoolean("enable_permission.cmd_other_characterreset");
+		if(!config.contains("enable_permission.cmd_other_characterreset"))config.set("enable_permission.cmd_other_characterreset", EnablePermissionCMDOtherCharacterReset);
+		EnablePermissionCMDOtherCharacterReset = config.getBoolean("enable_permission.cmd_other_characterreset");
 
 		if(!config.contains("enable_permission.cmd_other_kart"))config.set("enable_permission.cmd_other_kart", EnablePermissionCMDOtherRide);
 		EnablePermissionCMDOtherRide = config.getBoolean("enable_permission.cmd_other_kart");

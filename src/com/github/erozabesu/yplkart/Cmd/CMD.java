@@ -63,9 +63,9 @@ public class CMD implements CommandExecutor{
 											  + "/ka character {player name} random :\n"
 											  + "/ka character all random :";
 
-	/*protected String referenceCharacterReset = 		"/ka characterreset :";
+	protected String referenceCharacterReset = 		"/ka characterreset :";
 	protected String referenceCharacterResetOther = "/ka characterreset {player name} :\n"
-												  + "/ka characterreset all :";*/
+												  + "/ka characterreset all :";
 
 	protected String referenceRide = 		"/ka kart {kart name} :\n"
 										  + "/ka kart random :";
@@ -99,8 +99,8 @@ public class CMD implements CommandExecutor{
 							   + referenceMenu + "\n"
 							   + referenceMenuOther + "\n"
 							   + "/ka character :\n"
-							//   + referenceCharacterReset + "\n"
-							//   + referenceCharacterResetOther + "\n"
+							   + referenceCharacterReset + "\n"
+							   + referenceCharacterResetOther + "\n"
 							   + "/ka ride :\n"
 							   + referenceLeave + "\n"
 							   + referenceLeaveOther + "\n"
@@ -139,8 +139,8 @@ public class CMD implements CommandExecutor{
 				this.cmd.exit();
 			else if(args[0].equalsIgnoreCase("character"))
 				this.cmd.character();
-			//else if(args[0].equalsIgnoreCase("characterreset"))
-			//	this.cmd.characterreset();
+			else if(args[0].equalsIgnoreCase("characterreset"))
+				this.cmd.characterreset();
 			else if(args[0].equalsIgnoreCase("kart"))
 				this.cmd.ride();
 			else if(args[0].equalsIgnoreCase("leave"))

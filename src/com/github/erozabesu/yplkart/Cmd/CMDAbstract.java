@@ -23,7 +23,7 @@ abstract class CMDAbstract extends CMD{
 
 	abstract void character();
 
-	//abstract void characterreset();
+	abstract void characterreset();
 
 	abstract void ride();
 

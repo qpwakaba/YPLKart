@@ -230,7 +230,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 
 	//ka characterreset {player}
 	//ka characterreset all
-	/*@Override
+	@Override
 	void characterreset() {
 		if (length == 2){
 			if(args[1].equalsIgnoreCase("all")){
@@ -248,7 +248,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 		}else{
 			Util.sendMessage(null, referenceCharacterResetOther);
 		}
-	}*/
+	}
 
 	//ka ride all {kart name}
 	//ka ride {player name} {kart name}

@@ -18,7 +18,7 @@ public enum Permission {
 	cmd_ride(					YPLKart.plname + ".cmd.kart", 					Settings.EnablePermissionCMDRide, 				Settings.EnablePermissionCMDOtherRide),
 	cmd_leave(					YPLKart.plname + ".cmd.leave", 					Settings.EnablePermissionCMDLeave, 				Settings.EnablePermissionCMDOtherLeave),
 	cmd_character(				YPLKart.plname + ".cmd.character",				Settings.EnablePermissionCMDCharacter, 			Settings.EnablePermissionCMDOtherCharacter),
-	//cmd_characterreset(		YPLKart.plname + ".cmd.characterreset",			Settings.EnablePermissionCMDCharacterReset,		Settings.EnablePermissionCMDOtherCharacterReset),
+	cmd_characterreset(			YPLKart.plname + ".cmd.characterreset",			Settings.EnablePermissionCMDCharacterReset,		Settings.EnablePermissionCMDOtherCharacterReset),
 	cmd_ranking(				YPLKart.plname + ".cmd.ranking",				Settings.EnablePermissionCMDRanking,			Settings.EnablePermissionCMDOtherRanking),
 
 	op_cmd_circuit(				YPLKart.plname + ".op.cmd.circuit", 			Settings.EnableOPPermissionCMDCircuit, 			Settings.EnableOPPermissionCMDCircuit),

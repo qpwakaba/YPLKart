@@ -316,7 +316,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka characterreset
 	//ka characterreset {player}
 	//ka characterreset all
-	/*@Override
+	@Override
 	void characterreset() {
 		if(this.length == 1){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_characterreset, false, false))return;
@@ -339,7 +339,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		}else{
 			Util.sendMessage(this.p, referenceCharacterReset + "\n" + referenceCharacterResetOther);
 		}
-	}*/
+	}
 
 	//ka ride {kart name}
 	//ka ride random
