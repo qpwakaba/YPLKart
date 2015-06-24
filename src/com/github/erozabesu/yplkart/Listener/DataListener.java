@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -349,6 +350,55 @@ public class DataListener extends RaceManager implements Listener {
 		});
 	}
 
+	/*
+	 * ・キャラクター選択ウィンドウを閉じたとき
+	 * 		キャラクター未選択→キャラクター選択ウィンドウを開く
+	 * 		カート搭乗パーミッション所有・カート未選択→カート選択ウィンドウを開く
+	 * ・カート選択ウィンドウを閉じたとき
+	 * 		カート搭乗パーミッション所有→
+	 * 			カート未選択→カート選択ウィンドウを開く
+	 */
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent e){
+		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
+
+		final Player p = (Player) e.getPlayer();
+		Race r = getRace(p);
+		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
+			if(r.getCharacter() == null){
+				Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+					public void run(){
+						showCharacterSelectMenu(p);
+					}
+				});
+				return;
+			}
+			if(Permission.hasPermission(p, Permission.kart_ride, true)){
+				if(r.getKart() == null){
+					Util.sendMessage(p, "#Redカートを選択して下さい");
+					Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+						public void run(){
+							showKartSelectMenu(p);
+						}
+					});
+				}
+				return;
+			}
+		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
+			if(Permission.hasPermission(p, Permission.kart_ride, true)){
+				if(r.getKart() == null){
+					Util.sendMessage(p, "#Redカートを選択して下さい");
+					Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+						public void run(){
+							showKartSelectMenu(p);
+						}
+					});
+				}
+			}
+		}
+	}
+
 	//エントリー中：cancel
 	//インベントリネーム一致：cancel
 	@EventHandler
@@ -362,6 +412,7 @@ public class DataListener extends RaceManager implements Listener {
 		}
 
 		Player p = (Player) e.getWhoClicked();
+		Race r = getRace(p);
 		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
 			e.setCancelled(true);
 			p.updateInventory();
@@ -380,8 +431,12 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.character(p, EnumCharacter.getRandomCharacter());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
-				p.closeInventory();
-				RaceManager.showKartSelectMenu(p);
+				if(r.getCharacter() == null){
+					Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				}else{
+					p.closeInventory();
+					RaceManager.showKartSelectMenu(p);
+				}
 			//キャラクター選択
 			}else if(EnumCharacter.getClassfromString(clicked) != null){
 				RaceManager.character(p, EnumCharacter.getClassfromString(clicked));
@@ -405,8 +460,12 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
-				p.closeInventory();
-				RaceManager.showCharacterSelectMenu(p);
+				if(r.getKart() == null){
+					Util.sendMessage(p, "#Redカートを選択して下さい");
+				}else{
+					p.closeInventory();
+					RaceManager.showCharacterSelectMenu(p);
+				}
 			//カート選択
 			}else if(EnumKarts.getKartfromString(clicked) != null){
 				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getKartfromString(clicked));

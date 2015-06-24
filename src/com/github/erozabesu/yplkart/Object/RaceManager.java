@@ -410,7 +410,7 @@ public class RaceManager {
 
 	public static void showCharacterSelectMenu(Player p){
 		Inventory inv = Bukkit.createInventory(null, 36, "Character Select Menu");
-		inv.setItem(8, EnumSelectMenu.CharacterCancel.getMenuItem());
+		//inv.setItem(8, EnumSelectMenu.CharacterCancel.getMenuItem());
 		inv.setItem(11, EnumCharacter.Human.getMenuItem());
 		inv.setItem(12, EnumCharacter.Zombie.getMenuItem());
 		inv.setItem(13, EnumCharacter.Creeper.getMenuItem());
@@ -422,14 +422,17 @@ public class RaceManager {
 		inv.setItem(23, EnumCharacter.Squid.getMenuItem());
 		inv.setItem(24, EnumCharacter.Villager.getMenuItem());
 		inv.setItem(31, EnumSelectMenu.CharacterRandom.getMenuItem());
-		inv.setItem(30, EnumSelectMenu.CharacterPrev.getMenuItem());
-		inv.setItem(32, EnumSelectMenu.CharacterNext.getMenuItem());
+
+		if(Permission.hasPermission(p, Permission.kart_ride, true)){
+			inv.setItem(30, EnumSelectMenu.CharacterPrev.getMenuItem());
+			inv.setItem(32, EnumSelectMenu.CharacterNext.getMenuItem());
+		}
 		p.openInventory(inv);
 	}
 
 	public static void showKartSelectMenu(Player p){
 		Inventory inv = Bukkit.createInventory(null, 36, "Kart Select Menu");
-		inv.setItem(8, EnumSelectMenu.KartCancel.getMenuItem());
+		//inv.setItem(8, EnumSelectMenu.KartCancel.getMenuItem());
 		inv.setItem(9, EnumKarts.Kart1.getMenuItem());
 		inv.setItem(11, EnumKarts.Kart2.getMenuItem());
 		inv.setItem(13, EnumKarts.Kart3.getMenuItem());
