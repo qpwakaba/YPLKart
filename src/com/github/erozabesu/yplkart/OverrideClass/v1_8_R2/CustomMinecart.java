@@ -62,7 +62,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 	private org.bukkit.entity.Entity lastPassedCheckPoint;
 
 	/*
-	 * 予めカートのパラメータを格納しておくことで余計な処理を省くことができるが
+	 * 予めカートのパラメータを格納しておくことで余計な処理を省けるが
 	 * ka reloadコマンドで設定の変更を行っても反映されない
 	 *
 	 * 動的にカートのパラメータを取得すればka reload処理後に反映されるが
@@ -78,7 +78,6 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 	public CustomMinecart(World w, EnumKarts kart, Location l, boolean display){
 		super(w);
-		this.kart = kart;
 		this.display = display;
 		this.yaw = l.getYaw();
 
@@ -88,6 +87,11 @@ public class CustomMinecart extends EntityMinecartRideable{
 			return;
 		}
 		setYawPitch(this.yaw + 90F, 0F);
+		setParameter(kart);
+	}
+
+	public void setParameter(EnumKarts kart){
+		this.kart = kart;
 		this.maxSpeedStack = kart.getMaxSpeed();
 		this.acceleration = kart.getAcceleration();
 		this.speedOnDirt = kart.getSpeedOnDirt();

@@ -26,11 +26,9 @@ public class PlayerChannelHandler extends ChannelDuplexHandler{
 		try{
 			/*
 			 * プレイヤーがLivingEntityに姿を変えていた場合、LivingEntityのMetadataパケットに
-			 * EntityHuman特有のデータも上乗せ送信されてしまいクライアントがクラッシュするため
-			 * 該当データを削除する。
+			 * EntityHuman特有のデータが送信されクライアントがクラッシュしてしまうため該当データを削除する。
 			 * EntityHuman特有のデータとは、
-			 * PacketPlayOutEntityMetadata.bに格納されているList<DataWatcher.WatchableObject>の中の
-			 * 特定の4つのデータ。
+			 * PacketPlayOutEntityMetadata.bに格納されているList<DataWatcher.WatchableObject>の中の特定の4つのデータ。
 			 * DataWatcher.WatchableObject.a()メソッドを実行するとWatchableObjectのindexが取得できるので
 			 * indexが10、16、17、18に一致したものを削除する。
 			 * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。

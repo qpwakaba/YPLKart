@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.material.MaterialData;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.Scoreboards;
@@ -260,22 +261,58 @@ public class RaceManager {
 		return nearbycheckpoint;
 	}
 
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	/*
+	 * 既にカート搭乗中に再度別のカートに乗る場合はパラメータの再設定と見た目・名前の更新のみ行う。
+	 * この時サーバーがリロードされていた場合NoSuchMethodExceptionが出力されるため、
+	 * その場合は古いカートを撤去し新しいカートに搭乗させる。
+	 */
 	public static void setPassengerCustomMinecart(final Player p, final EnumKarts kart){
 		if(!Permission.hasPermission(p, Permission.kart_ride, false))return;
+		final Location l = p.getLocation();
 
-		removeCustomMinecart(p);
+		if(p.getVehicle() != null){
+			if(isCustomMinecart(p.getVehicle())){
+				Object customkart = p.getVehicle().getMetadata(YPLKart.plname).get(0).value();
+				try {
+					Minecart cart = (Minecart) customkart.getClass().getMethod("getBukkitEntity").invoke(customkart);
+					cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
+					cart.setCustomName(kart.getName());
+					cart.setCustomNameVisible(false);
+
+					customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
+					ride(p, kart);
+					return;
+				}catch (NoSuchMethodException e) {
+					removeCustomMinecart(p);
+				}catch (Exception e) {
+					e.printStackTrace();
+					return;
+				}
+			}else{
+				p.leaveVehicle();
+			}
+		}
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
-				createCustomMinecart(p.getLocation(), kart).setPassenger(p);
+				createCustomMinecart(l, kart).setPassenger(p);
 			}
-		}, 1);
+		}, 2);
 	}
+
+	public static void setKartParameter(){
+
+	}
+
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static boolean isCustomMinecart(Entity e){
 		if(e instanceof Minecart)
 			if(e.getCustomName() != null)
 				if(EnumKarts.getKartArrayList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
-					return true;
+					if(e.getMetadata(YPLKart.plname).get(0) != null)
+						return true;
 		return false;
 	}
 
@@ -294,13 +331,14 @@ public class RaceManager {
 		return true;
 	}
 
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
 	public static void removeCustomMinecart(Player p){
 		if(p.getVehicle() != null)
 			if(isCustomMinecart(p.getVehicle())){
 				getRace(p).setCMDForceLeave(true);
 				Entity vehicle = p.getVehicle();
 				p.leaveVehicle();
-				//p.teleport(p.getLocation().add(0,2,0));
 				vehicle.remove();
 				getRace(p).setCMDForceLeave(false);
 			}
@@ -311,7 +349,7 @@ public class RaceManager {
 			Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
 			Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
 			Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class, Location.class, boolean.class).newInstance(craftWorld, kart, l, false);
-			final Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
+			Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
 
 			customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(), l.getY()+1, l.getZ());
 			craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getBukkitClass("Entity")).invoke(craftWorld, customCart);
@@ -319,6 +357,8 @@ public class RaceManager {
 			cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
 			cart.setCustomName(kart.getName());
 			cart.setCustomNameVisible(false);
+
+			cart.setMetadata(YPLKart.plname, new FixedMetadataValue(YPLKart.getInstance(), customCart));
 
 			return cart;
 		} catch (Exception e) {
