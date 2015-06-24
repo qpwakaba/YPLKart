@@ -131,7 +131,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 	@Override
 	void entry() {
 		if(this.length == 3){
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				messageInvalidCircuit(null, args[2]);
 				return;
 			}
@@ -321,7 +321,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("list")){
 				RaceData.listCricuit(null);
 			}else{
-				if(!RaceData.getCircuitList().contains(args[1])){
+				if(!RaceData.isCircuit(args[1])){
 					messageInvalidCircuit(null, args[1]);
 					return;
 				}
@@ -331,7 +331,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 		//ka ranking {player name} 	{circuit name}
 		//ka ranking all 			{circuit name}
 		}else if(this.length == 3){
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				messageInvalidCircuit(null, args[2]);
 				return;
 			}

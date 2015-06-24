@@ -179,7 +179,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		//ka entry {circuit name}
 		if (this.length == 2){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_entry, false, false))return;
-			if(!RaceData.getCircuitList().contains(args[1])){
+			if(!RaceData.isCircuit(args[1])){
 				messageInvalidCircuit(this.p, args[1]);
 				return;
 			}
@@ -189,7 +189,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		//ka entry all {circuit name}
 		}else if(this.length == 3){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_entry, true, false))return;
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				messageInvalidCircuit(this.p, args[2]);
 				return;
 			}
@@ -444,7 +444,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("list")){
 				RaceData.listCricuit(this.p);
 			}else{
-				if(!RaceData.getCircuitList().contains(args[1])){
+				if(!RaceData.isCircuit(args[1])){
 					messageInvalidCircuit(this.p, args[1]);
 					return;
 				}
@@ -455,7 +455,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		//ka ranking all 			{circuit name}
 		}else if(this.length == 3){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_ranking, true, false))return;
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				messageInvalidCircuit(this.p, args[2]);
 				return;
 			}

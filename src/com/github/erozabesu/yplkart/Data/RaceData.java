@@ -396,6 +396,14 @@ public final class RaceData{
 		return names;
 	}
 
+	public static boolean isCircuit(String value){
+		for(String circuit : getCircuitSet()){
+			if(circuit.equalsIgnoreCase(value))
+				return true;
+		}
+		return false;
+	}
+
 	//〓〓	ファイル生成		〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 	public static void CreateConfig() {
 		if(!(configFile.exists())){

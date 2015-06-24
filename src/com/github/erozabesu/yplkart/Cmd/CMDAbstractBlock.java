@@ -116,7 +116,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 	@Override
 	void entry() {
 		if(this.length == 3){
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				return;
 			}
 			if(args[1].equalsIgnoreCase("all")){
@@ -270,7 +270,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 		Player other = Bukkit.getPlayer(args[1]);
 
 		if(this.length == 3){
-			if(!RaceData.getCircuitList().contains(args[2])){
+			if(!RaceData.isCircuit(args[2])){
 				messageInvalidCircuit(other, args[2]);
 				return;
 			}
