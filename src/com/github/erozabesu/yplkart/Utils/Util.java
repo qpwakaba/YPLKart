@@ -287,9 +287,13 @@ public class Util extends ReflectionUtil{
 
 	public static void addDamage(Entity damaged, Entity executor, int damage){
 		if(!(damaged instanceof LivingEntity))return;
-		if(damaged instanceof Player)
+		if(damaged instanceof Player){
 			if(0 < ((Player)damaged).getNoDamageTicks())
 				return;
+			if(RaceManager.isEntry((Player)damaged))
+				if(!RaceManager.getRace((Player)damaged).getStart())
+					return;
+		}
 
 		damaged.playEffect(EntityEffect.HURT);
 

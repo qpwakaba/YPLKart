@@ -518,7 +518,14 @@ public class CustomMinecart extends EntityMinecartRideable{
 			(!entity.T) && (!this.T) &&
 			(entity != this.passenger))
 		{
-			Entity other = entity.vehicle == null ? entity : getVehicle(entity);
+			//エントリーしていて、かつスタートしていないプレイヤーへの衝突は例外としてキャンセル
+			org.bukkit.entity.Entity otherpassenger = getPassenger(entity).getBukkitEntity();
+			if(otherpassenger instanceof Player)
+				if(RaceManager.isEntry((Player)otherpassenger))
+					if(!RaceManager.getRace((Player)otherpassenger).getStart())
+						return;
+
+			Entity other = getVehicle(entity);
 
 			double otherspeed = RaceManager.isCustomMinecart(other.getBukkitEntity()) ? calcMotionSpeed(other.motX, other.motZ) * EnumKarts.getKartfromEntity(other.getBukkitEntity()).getWeight() : calcMotionSpeed(other.motX, other.motZ);
 
@@ -545,7 +552,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 	//搭乗している一番下のエンティティを返す
 	public Entity getVehicle(Entity entity){
-		if(entity.vehicle == null)return null;
+		if(entity.vehicle == null)return entity;
 
 		Entity vehicle = entity.vehicle;
 		if(vehicle != null){
@@ -559,7 +566,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 	//搭乗している一番上のエンティティを返す
 	public Entity getPassenger(Entity entity){
-		if(entity.passenger == null)return null;
+		if(entity.passenger == null)return entity;
 
 		Entity passenger = entity.passenger;
 		if(passenger != null){
