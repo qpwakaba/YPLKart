@@ -291,6 +291,7 @@ public class DataListener extends RaceManager implements Listener {
 
 	//キラー使用中の窒素ダメージを無効
 	//カート搭乗中の落下ダメージを無効
+	//エントリー→←スタート の間のダメージを無効
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent e){
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
@@ -299,13 +300,18 @@ public class DataListener extends RaceManager implements Listener {
 		if(!isEntry(p))return;
 
 		if(getRace(p).getUsingKiller() != null){
-			e.setCancelled(true);
-			return;
+			if(e.getCause() == DamageCause.SUFFOCATION){
+				e.setCancelled(true);
+				return;
+			}
 		}
 		if(e.getCause() == DamageCause.FALL)
 			if(p.getVehicle() != null)
 				if(RaceManager.isCustomMinecart(p.getVehicle()))
 					e.setCancelled(true);
+
+		if(!getRace(p).getStart())
+			e.setCancelled(true);
 	}
 
 	@EventHandler
