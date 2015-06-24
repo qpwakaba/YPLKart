@@ -173,42 +173,6 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	/*public static void registerCustomMinecart(){
-		String name = "CustomMinecart";
-		Class<?> customEntityClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-
-		Field mapStringToClassField, mapClassToStringField, mapClassToIdField, mapStringToIdField;
-		//protected static Field mapIdToClassField;
-
-		mapStringToClassField = ReflectionUtil.getField(ReflectionUtil.getBukkitClass("EntityTypes"), "c");
-		mapClassToStringField = ReflectionUtil.getField(ReflectionUtil.getBukkitClass("EntityTypes"), "d");
-		//mapIdtoClassField = ReflectionUtil.getField(ReflectionUtil.getBukkitClass("EntityTypes"), "e");
-		mapClassToIdField = ReflectionUtil.getField(ReflectionUtil.getBukkitClass("EntityTypes"), "f");
-		mapStringToIdField = ReflectionUtil.getField(ReflectionUtil.getBukkitClass("EntityTypes"), "g");
-
-		if (mapStringToClassField == null || mapStringToIdField == null || mapClassToStringField == null || mapClassToIdField == null)
-			return;
-
-		try {
-			Map<String, Class> mapStringToClass = (Map<String, Class>) mapStringToClassField.get(null);
-			Map<String, Integer> mapStringToId = (Map<String, Integer>) mapStringToIdField.get(null);
-			Map<Class, String> mapClasstoString = (Map<Class, String>) mapClassToStringField.get(null);
-			Map<Class, Integer> mapClassToId = (Map<Class, Integer>) mapClassToIdField.get(null);
-
-			mapStringToClass.put(name, customEntityClass);
-			mapStringToId.put(name, Integer.valueOf(42));
-			mapClasstoString.put(customEntityClass, name);
-			mapClassToId.put(customEntityClass, Integer.valueOf(42));
-
-			mapStringToClassField.set(null, mapStringToClass);
-			mapStringToIdField.set(null, mapStringToId);
-			mapClassToStringField.set(null, mapClasstoString);
-			mapClassToIdField.set(null, mapClassToId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
-
 	public static ArrayList<Entity> getNearbyCheckpoint(Location l, double radius, String circuitname){
 		List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
 
@@ -553,24 +517,6 @@ public class RaceManager {
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-	/*public static void runRankingUpdateTask() {
-		YPLKart.getInstance().getServer().getScheduler()
-				.runTaskTimer(YPLKart.getInstance(), new Runnable() {
-					public void run() {
-						if (isRaceEnd()){
-							laptime = 0;
-							return;
-						}
-
-						for (Player p : getEntryPlayer()) {
-							Scoreboards.reloadBoard(p);
-						}
-						for (Player p : getGoalPlayer()) {
-							Scoreboards.reloadBoard(p);
-						}
-					}
-				}, 0, 4);
-	}*/
 
 	public static void runLapTimeUpdateTask() {
 		YPLKart.getInstance().getServer().getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
