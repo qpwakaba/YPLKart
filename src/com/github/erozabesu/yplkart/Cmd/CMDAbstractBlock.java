@@ -284,6 +284,10 @@ public class CMDAbstractBlock extends CMDAbstract{
 	@Override
 	void reload() {
 		Settings.reloadConfig();
+		for(Player p : Bukkit.getOnlinePlayers()){
+			RaceManager.removeCustomMinecart(p);
+			RaceManager.leave(p);
+		}
 		Util.sendMessage(null, "コンフィグをリロードしました");
 	}
 
