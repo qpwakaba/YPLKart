@@ -44,8 +44,11 @@ public class Race {
 	private int point;
 	private String firstpassedcheckpoint;
 	private ArrayList<String> passedcheckpoint;
+
 	private ArrayList<ItemStack> inventory;
 	private ArrayList<ItemStack> armorcontents;
+	private ArrayList<ItemStack> keyitem;
+	private ArrayList<ItemStack> keyarmor;
 
 	private BukkitTask deathpenaltytask;
 	private BukkitTask itemPositiveSpeedTask;
@@ -226,8 +229,8 @@ public class Race {
 
 		double currentmillisecond = RaceManager.getCurrentMilliSeconds();
 
-		new SendExpandedTitleTask(getPlayer(), 7, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer().size() + "位  " + currentmillisecond/1000 + "秒", 10, 140, 10, ChatColor.GREEN, true);
+		new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer().size() + "位  " + currentmillisecond/1000 + "秒", 10, 100, 10, ChatColor.GREEN, true);
 
 		if(getKart() == null)
 			RaceData.addRunningRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
@@ -240,6 +243,7 @@ public class Race {
 		setPoint(getPassedCheckPoint().size() + (RaceManager.getEntryPlayer().size())*10);
 
 		EnumItem.removeAllKeyItems(getPlayer());
+		this.recoveryInventory();
 		RaceManager.removeCustomMinecart(getPlayer());
 
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
@@ -386,6 +390,23 @@ public class Race {
 
 	public void saveInventory(){
 		PlayerInventory inv = getPlayer().getInventory();
+		ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
+		ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
+
+		for(ItemStack slot : inv.getContents()){
+			inventory.add(slot);
+		}
+		armorcontents.add(inv.getHelmet());
+		armorcontents.add(inv.getChestplate());
+		armorcontents.add(inv.getLeggings());
+		armorcontents.add(inv.getBoots());
+
+		this.inventory = inventory;
+		this.armorcontents = armorcontents;
+	}
+
+	public void saveKeyItem(){
+		PlayerInventory inv = getPlayer().getInventory();
 		ArrayList<ItemStack> contents = new ArrayList<ItemStack>();
 		ArrayList<ItemStack> armor = new ArrayList<ItemStack>();
 		for(ItemStack slot : inv.getContents()){
@@ -409,8 +430,8 @@ public class Race {
 		if(EnumItem.isKeyItem(inv.getBoots()))armor.add(inv.getBoots());
 		else armor.add(null);
 
-		this.inventory = contents;
-		this.armorcontents = armor;
+		this.keyitem = contents;
+		this.keyarmor = armor;
 	}
 
 	public void recoveryInventory(){
@@ -431,5 +452,25 @@ public class Race {
 
 		this.inventory = new ArrayList<ItemStack>();
 		this.armorcontents = new ArrayList<ItemStack>();
+	}
+
+	public void recoveryKeyItem(){
+		if(!this.inventory.isEmpty()){
+			PlayerInventory inv = getPlayer().getInventory();
+			for(int i = 0;i < 36;i++){
+				inv.setItem(i, inventory.get(i));
+			}
+		}
+
+		if(!this.armorcontents.isEmpty()){
+			PlayerInventory inv = getPlayer().getInventory();
+			if(this.armorcontents.get(0) != null)inv.setHelmet(this.armorcontents.get(0));
+			if(this.armorcontents.get(1) != null)inv.setChestplate(this.armorcontents.get(1));
+			if(this.armorcontents.get(2) != null)inv.setLeggings(this.armorcontents.get(2));
+			if(this.armorcontents.get(3) != null)inv.setBoots(this.armorcontents.get(3));
+		}
+
+		this.keyitem = new ArrayList<ItemStack>();
+		this.keyarmor = new ArrayList<ItemStack>();
 	}
 }

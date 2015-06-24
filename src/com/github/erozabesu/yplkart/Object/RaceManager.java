@@ -78,15 +78,18 @@ public class RaceManager {
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
 		Race r = getRace(p);
 
-		//初期化
+		//変数初期化
 		r.init();
 		r.setEntry(circuitname);
 		characterReset(p);
 		removeCustomMinecart(p);
 		leave(p);
-		EnumItem.removeAllKeyItems(p);
-		EnumItem.addItem(p, EnumItem.Menu.getItem());
 		Scoreboards.entryCircuit(p);
+
+		//インベントリ初期化
+		r.saveInventory();
+		p.getInventory().clear();
+		EnumItem.addItem(p, EnumItem.Menu.getItem());
 
 		//プレイヤー処理
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
