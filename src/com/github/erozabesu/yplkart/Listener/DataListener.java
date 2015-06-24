@@ -355,8 +355,10 @@ public class DataListener extends RaceManager implements Listener {
 	 * 		キャラクター未選択→キャラクター選択ウィンドウを開く
 	 * 		カート搭乗パーミッション所有・カート未選択→カート選択ウィンドウを開く
 	 * ・カート選択ウィンドウを閉じたとき
-	 * 		カート搭乗パーミッション所有→
-	 * 			カート未選択→カート選択ウィンドウを開く
+	 * 		カート未選択→
+	 * 			カート搭乗パーミッション所有→カート選択ウィンドウを開く
+	 * 		キャラクター未選択→キャラクター選択ウィンドウを開く
+	 * 		(characterresetコマンド等でキャラクター選択が取り消される可能性があるため有り得る状況)
 	 */
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
@@ -394,7 +396,17 @@ public class DataListener extends RaceManager implements Listener {
 							showKartSelectMenu(p);
 						}
 					});
+					return;
 				}
+			}
+			if(r.getCharacter() == null){
+				Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+					public void run(){
+						showCharacterSelectMenu(p);
+					}
+				});
+				return;
 			}
 		}
 	}
@@ -435,7 +447,10 @@ public class DataListener extends RaceManager implements Listener {
 					Util.sendMessage(p, "#Redキャラクターを選択して下さい");
 				}else{
 					p.closeInventory();
-					RaceManager.showKartSelectMenu(p);
+
+					//kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
+					if(r.getKart() != null)
+						RaceManager.showKartSelectMenu(p);
 				}
 			//キャラクター選択
 			}else if(EnumCharacter.getClassfromString(clicked) != null){
@@ -464,7 +479,10 @@ public class DataListener extends RaceManager implements Listener {
 					Util.sendMessage(p, "#Redカートを選択して下さい");
 				}else{
 					p.closeInventory();
-					RaceManager.showCharacterSelectMenu(p);
+
+					//character == nullの場合はonInventoryCloseで強制的にメニューが表示される
+					if(r.getCharacter() != null)
+						RaceManager.showCharacterSelectMenu(p);
 				}
 			//カート選択
 			}else if(EnumKarts.getKartfromString(clicked) != null){
