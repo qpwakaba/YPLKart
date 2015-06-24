@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -31,16 +30,15 @@ public class PacketUtil extends ReflectionUtil{
 
 			Location loc = p.getLocation();
 
-			Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
 			Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
 			Method d = craftentity.getClass().getMethod("d", int.class);
+			Method setCustomName = craftentity.getClass().getMethod("setCustomName", String.class);
+			Method setCustomNameVisible = craftentity.getClass().getMethod("setCustomNameVisible", boolean.class);
 
 			setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
 			d.invoke(craftentity, p.getEntityId());
-
-			LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
-			bukkitentity.setCustomName(p.getName());
-			bukkitentity.setCustomNameVisible(true);
+			setCustomName.invoke(craftentity, p.getName());
+			setCustomNameVisible.invoke(craftentity, true);
 
 			Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
 			Object spawnentitypacket = getSpawnEntityLivingPacket(craftentity);
@@ -86,16 +84,15 @@ public class PacketUtil extends ReflectionUtil{
 
 		Location loc = p.getLocation();
 
-		Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
 		Method setLocation = craftentity.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
 		Method d = craftentity.getClass().getMethod("d", int.class);
+		Method setCustomName = craftentity.getClass().getMethod("setCustomName", String.class);
+		Method setCustomNameVisible = craftentity.getClass().getMethod("setCustomNameVisible", boolean.class);
 
 		setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), 0, 0);
 		d.invoke(craftentity, p.getEntityId());
-
-		LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
-		bukkitentity.setCustomName(p.getName());
-		bukkitentity.setCustomNameVisible(true);
+		setCustomName.invoke(craftentity, p.getName());
+		setCustomNameVisible.invoke(craftentity, true);
 
 		return getSpawnEntityLivingPacket(craftentity);
 	}
@@ -114,11 +111,6 @@ public class PacketUtil extends ReflectionUtil{
 			Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p.getEquipment().getChestplate());
 			Object leggingspacket = p.getEquipment().getLeggings() == null ? null : getEquipmentPacket(p, 2, p.getEquipment().getLeggings());
 			Object bootspacket = p.getEquipment().getBoots() == null ? null : getEquipmentPacket(p, 1, p.getEquipment().getBoots());
-
-			Method getBukkitEntity = craftentity.getClass().getMethod("getBukkitEntity");
-			LivingEntity bukkitentity = (LivingEntity) getBukkitEntity.invoke(craftentity);
-			bukkitentity.setCustomName(p.getName());
-			bukkitentity.setCustomNameVisible(true);
 
 			for(Player other : Bukkit.getOnlinePlayers()){
 				if(other.getUniqueId() == p.getUniqueId())continue;

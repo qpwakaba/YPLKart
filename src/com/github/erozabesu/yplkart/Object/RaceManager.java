@@ -123,7 +123,6 @@ public class RaceManager {
 		p.setHealth(character.getMaxHealth());
 		EnumCharacter.playCharacterVoice(p, character);
 
-		//PacketUtil.runPlayerLookingUpdate(p);
 		PacketUtil.disguise(p, null, character);
 		Util.sendMessage(p, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
 	}

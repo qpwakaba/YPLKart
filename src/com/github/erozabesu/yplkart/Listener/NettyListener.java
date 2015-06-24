@@ -14,8 +14,8 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.OverrideClass.PlayerChannelHandler;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
-import com.github.erozabesu.yplkart.Utils.PlayerChannelHandler;
 
 public class NettyListener implements Listener{
 	private static YPLKart pl;

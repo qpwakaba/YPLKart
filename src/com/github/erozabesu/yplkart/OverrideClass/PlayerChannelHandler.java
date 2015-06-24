@@ -1,4 +1,4 @@
-package com.github.erozabesu.yplkart.Utils;
+package com.github.erozabesu.yplkart.OverrideClass;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,12 +15,26 @@ import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Listener.NettyListener;
 import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Object.RaceManager;
+import com.github.erozabesu.yplkart.Utils.PacketUtil;
+import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
+import com.github.erozabesu.yplkart.Utils.Util;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 		try{
+			/*
+			 * プレイヤーがLivingEntityに姿を変えていた場合、LivingEntityのMetadataパケットに
+			 * EntityHuman特有のデータも上乗せ送信されてしまいクライアントがクラッシュするため
+			 * 該当データを削除する。
+			 * EntityHuman特有のデータとは、
+			 * PacketPlayOutEntityMetadata.bに格納されているList<DataWatcher.WatchableObject>の中の
+			 * 特定の4つのデータ。
+			 * DataWatcher.WatchableObject.a()メソッドを実行するとWatchableObjectのindexが取得できるので
+			 * indexが10、16、17、18に一致したものを削除する。
+			 * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
+			 */
 			if(msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")){
 				int id = (int) ReflectionUtil.getFieldValue(msg, "a");
 				if(NettyListener.playerEntityId.get(id) == null){
