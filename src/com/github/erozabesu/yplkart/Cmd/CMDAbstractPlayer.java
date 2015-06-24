@@ -483,6 +483,10 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_reload, false, false))return;
 
 		Settings.reloadConfig();
+		for(Player p : Bukkit.getOnlinePlayers()){
+			RaceManager.removeCustomMinecart(p);
+			RaceManager.leave(p);
+		}
 		Util.sendMessage(this.p, "コンフィグをリロードしました");
 	}
 
