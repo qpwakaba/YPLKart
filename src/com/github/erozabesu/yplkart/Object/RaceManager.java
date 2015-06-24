@@ -110,10 +110,12 @@ public class RaceManager {
 	public static void exit(Player p){
 		Scoreboards.exitCircuit(p);
 
-		Race r = getRace(p);
-		r.setEntry("");
-
+		getRace(p).init();
+		characterReset(p);
+		removeCustomMinecart(p);
+		leave(p);
 		EnumItem.removeAllKeyItems(p);
+
 		Util.sendMessage(p, "エントリーを取り消しました");
 	}
 
