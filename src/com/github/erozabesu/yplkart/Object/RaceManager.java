@@ -77,15 +77,17 @@ public class RaceManager {
 	public static void entry(final Player p, final String circuitname){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
 		Race r = getRace(p);
+
+		//初期化
 		r.init();
 		r.setEntry(circuitname);
-		if(r.getCharacter() == null)character(p, EnumCharacter.Human);
-		else character(p, r.getCharacter());
-
+		characterReset(p);
+		removeCustomMinecart(p);
+		leave(p);
 		EnumItem.removeAllKeyItems(p);
 		Scoreboards.entryCircuit(p);
-		removeCustomMinecart(p);
 
+		//プレイヤー処理
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
 				if(RaceData.getPosition(circuitname) != null)
