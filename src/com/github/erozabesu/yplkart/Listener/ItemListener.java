@@ -80,19 +80,9 @@ public class ItemListener extends RaceManager implements Listener{
 			if(Permission.hasPermission(p, Permission.op_cmd_circuit, false)){
 				try {
 					createCustomWitherSkull(p.getLocation(), p.getItemInHand().getItemMeta().getLore().get(0));
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-				/*Snowball projectile = p.launchProjectile(Snowball.class);
-				Vector v = projectile.getVelocity();
-				if(p.isOnGround()){
-					v.setX(0);
-					v.setY(-10);
-					v.setZ(0);
-					projectile.setVelocity(v);
-				}
-				projectile.setCustomName(ChatColor.GOLD + p.getItemInHand().getItemMeta().getLore().get(0));
-				projectile.setCustomNameVisible(true);*/
 			}
 		}else if(EnumItem.ItemBox.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
@@ -127,6 +117,9 @@ public class ItemListener extends RaceManager implements Listener{
 					b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 				}
 			}
+		}else if(EnumItem.Menu.isSimilar(p.getItemInHand())){
+			e.setCancelled(true);
+			RaceManager.showCharacterSelectMenu(p);
 		}
 		if(isEntry(p)){
 			if(EnumItem.Mushroom.isSimilar(p.getItemInHand())){

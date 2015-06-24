@@ -22,6 +22,7 @@ public enum EnumItem{
 	ItemBox(					Material.INK_SACK,		(byte)0,	0,										1, 												64, "アイテムボックスツール", "アイテムボックスを設置します。"),
 	ItemBoxTier2(				Material.INK_SACK,		(byte)0,	0,										1, 												64, "高級アイテムボックスツール", "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
 	ItemBoxFake(				Material.INK_SACK,		(byte)0,	0,										1, 												64, "にせアイテムボックスツール", "にせアイテムボックスを設置します。当たっても復活します。"),
+	Menu(						Material.GOLD_INGOT,	(byte)0,	0,										1, 												64, "メニューを開きます", ""),
 
 	Star(						Material.NETHER_STAR,	(byte)0,	Settings.StarTier,						1, 												Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
 	StarMultiple(				Material.NETHER_STAR,	(byte)0,	Settings.StarMultipleTier,				Settings.StarMultipleDropAmount, 				Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
@@ -178,9 +179,11 @@ public enum EnumItem{
 
 	public static void removeUnuseslotKeyItems(Player p){
 		PlayerInventory inv = p.getInventory();
-		for(int i = Settings.ItemSlot + RaceManager.getRace(p).getCharacter().getItemAdjustMaxSlotSize();i < 36;i++){
-			if(isKeyItem(inv.getItem(i)))
-				inv.setItem(i, null);
+		int i = Settings.ItemSlot;
+		i += RaceManager.getRace(p).getCharacter() == null ? 0 : RaceManager.getRace(p).getCharacter().getItemAdjustMaxSlotSize();
+		for(int j = i;j < 36;j++){
+			if(isKeyItem(inv.getItem(j)))
+				inv.setItem(j, null);
 		}
 	}
 
@@ -214,7 +217,8 @@ public enum EnumItem{
 			if(inv.getItem(i) == null)continue;
 
 			temp = inv.getItem(i);
-			maxstacksize = EnumItem.getMaxstackSize(temp) + RaceManager.getRace(p).getCharacter().getItemAdjustMaxStackSize();
+			maxstacksize = EnumItem.getMaxstackSize(temp);
+			maxstacksize += RaceManager.getRace(p).getCharacter() == null ? 0 : RaceManager.getRace(p).getCharacter().getItemAdjustMaxStackSize();
 
 			if(maxstacksize < temp.getAmount()){
 				flow = temp.clone();
@@ -241,7 +245,8 @@ public enum EnumItem{
 
 			if(inv.getItem(j) != null){
 				if(inv.getItem(j).isSimilar(over.get(overindex))){
-					int tempmaxstacksize = EnumItem.getMaxstackSize(inv.getItem(j)) + RaceManager.getRace(p).getCharacter().getItemAdjustMaxStackSize();
+					int tempmaxstacksize = EnumItem.getMaxstackSize(inv.getItem(j));
+					tempmaxstacksize += RaceManager.getRace(p).getCharacter() == null ? 0 : RaceManager.getRace(p).getCharacter().getItemAdjustMaxStackSize();
 					if(inv.getItem(j).getAmount() < tempmaxstacksize){
 						int tempflow = (inv.getItem(j).getAmount() + over.get(overindex).getAmount()) - tempmaxstacksize;
 						if(tempflow < 0){

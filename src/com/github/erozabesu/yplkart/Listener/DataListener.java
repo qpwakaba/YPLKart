@@ -23,7 +23,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -241,18 +240,6 @@ public class DataListener extends RaceManager implements Listener {
 	}
 
 	@EventHandler
-	public void onTeleport(final PlayerTeleportEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(getRace(e.getPlayer()).getCharacter() == null)return;
-
-		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
-			public void run(){
-				//PacketUtil.runPlayerLookingUpdate(e.getPlayer());
-			}
-		}, 10);
-	}
-
-	@EventHandler
 	public void onRespawn(PlayerRespawnEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
 		final Player p = e.getPlayer();
@@ -260,7 +247,6 @@ public class DataListener extends RaceManager implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
-					//PacketUtil.runPlayerLookingUpdate(p);
 					p.setSprinting(true);
 					if(r.getKart() != null){
 						try {

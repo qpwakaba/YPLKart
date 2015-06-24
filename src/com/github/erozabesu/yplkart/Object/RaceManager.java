@@ -85,6 +85,7 @@ public class RaceManager {
 		removeCustomMinecart(p);
 		leave(p);
 		EnumItem.removeAllKeyItems(p);
+		EnumItem.addItem(p, EnumItem.Menu.getItem());
 		Scoreboards.entryCircuit(p);
 
 		//プレイヤー処理
