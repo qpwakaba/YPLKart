@@ -445,7 +445,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	@EventHandler
-	public void onFall(EntityChangeBlockEvent e){
+	public void onFallingBlockFalled(EntityChangeBlockEvent e){
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof FallingBlock))return;
 		if(e.getEntity().getCustomName() == null)return;
