@@ -33,7 +33,7 @@ public class NettyListener implements Listener{
         }
     }
 
-    public static void remove(final Player p) throws Exception{
+    public static void remove(Player p) throws Exception{
         final Channel channel = PacketUtil.getChannel(p);
         if(channel.pipeline().get(PlayerChannelHandler.class) != null){
             channel.pipeline().remove(PlayerChannelHandler.class);
