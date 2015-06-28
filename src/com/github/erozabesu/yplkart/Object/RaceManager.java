@@ -89,7 +89,6 @@ public class RaceManager {
 		//インベントリ初期化
 		r.saveInventory();
 		p.getInventory().clear();
-		EnumItem.addItem(p, EnumItem.Menu.getItem());
 
 		//プレイヤー処理
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
@@ -103,6 +102,7 @@ public class RaceManager {
 			public void run(){
 				if(p.isOnline()){
 					showCharacterSelectMenu(p);
+					EnumItem.addItem(p, EnumItem.Menu.getItem());
 				}
 			}
 		}, 6);
