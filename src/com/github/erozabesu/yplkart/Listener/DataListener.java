@@ -343,19 +343,11 @@ public class DataListener extends RaceManager implements Listener {
 		});
 	}
 
-	/*
-	 * ・キャラクター選択ウィンドウを閉じたとき
-	 * 		キャラクター未選択→キャラクター選択ウィンドウを開く
-	 * 		カート搭乗パーミッション所有・カート未選択→カート選択ウィンドウを開く
-	 * ・カート選択ウィンドウを閉じたとき
-	 * 		カート未選択→
-	 * 			カート搭乗パーミッション所有→カート選択ウィンドウを開く
-	 * 		キャラクター未選択→キャラクター選択ウィンドウを開く
-	 * 		(characterresetコマンド等でキャラクター選択が取り消される可能性があるため有り得る状況)
-	 */
+	//エントリー中の場合、キャラクター・カートが未選択の場合はメニューを閉じさせません
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
+		if(!isEntry((Player) e.getPlayer()))return;
 
 		final Player p = (Player) e.getPlayer();
 		Race r = getRace(p);
@@ -369,28 +361,24 @@ public class DataListener extends RaceManager implements Listener {
 				});
 				return;
 			}
-			if(Permission.hasPermission(p, Permission.kart_ride, true)){
-				if(r.getKart() == null){
-					Util.sendMessage(p, "#Redカートを選択して下さい");
-					Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-						public void run(){
-							showKartSelectMenu(p);
-						}
-					});
-				}
+			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
+				Util.sendMessage(p, "#Redカートを選択して下さい");
+				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+					public void run(){
+						showKartSelectMenu(p);
+					}
+				});
 				return;
 			}
 		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
-			if(Permission.hasPermission(p, Permission.kart_ride, true)){
-				if(r.getKart() == null){
-					Util.sendMessage(p, "#Redカートを選択して下さい");
-					Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-						public void run(){
-							showKartSelectMenu(p);
-						}
-					});
-					return;
-				}
+			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
+				Util.sendMessage(p, "#Redカートを選択して下さい");
+				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
+					public void run(){
+						showKartSelectMenu(p);
+					}
+				});
+				return;
 			}
 			if(r.getCharacter() == null){
 				Util.sendMessage(p, "#Redキャラクターを選択して下さい");
@@ -411,6 +399,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getWhoClicked().getWorld()))return;
 		if(!(e.getWhoClicked() instanceof Player))return;
 
+		//エントリー中はインベントリの操作をさせない
 		if(isEntry((Player) e.getWhoClicked())){
 			e.setCancelled(true);
 			((Player)e.getWhoClicked()).updateInventory();
@@ -436,14 +425,19 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.character(p, EnumCharacter.getRandomCharacter());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
-				if(r.getCharacter() == null){
-					Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				if(isEntry(p)){
+					if(r.getCharacter() == null){
+						Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+					}else{
+						p.closeInventory();
+
+						//kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
+						if(r.getKart() != null)
+							RaceManager.showKartSelectMenu(p);
+					}
 				}else{
 					p.closeInventory();
-
-					//kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
-					if(r.getKart() != null)
-						RaceManager.showKartSelectMenu(p);
+					RaceManager.showKartSelectMenu(p);
 				}
 			//キャラクター選択
 			}else if(EnumCharacter.getClassfromString(clicked) != null){
@@ -468,14 +462,19 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
-				if(r.getKart() == null){
-					Util.sendMessage(p, "#Redカートを選択して下さい");
+				if(isEntry(p)){
+					if(r.getKart() == null){
+						Util.sendMessage(p, "#Redカートを選択して下さい");
+					}else{
+						p.closeInventory();
+
+						//character == nullの場合はonInventoryCloseで強制的にメニューが表示される
+						if(r.getCharacter() != null)
+							RaceManager.showCharacterSelectMenu(p);
+					}
 				}else{
 					p.closeInventory();
-
-					//character == nullの場合はonInventoryCloseで強制的にメニューが表示される
-					if(r.getCharacter() != null)
-						RaceManager.showCharacterSelectMenu(p);
+					RaceManager.showCharacterSelectMenu(p);
 				}
 			//カート選択
 			}else if(EnumKarts.getKartfromString(clicked) != null){
