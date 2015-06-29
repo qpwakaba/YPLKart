@@ -1,7 +1,7 @@
 # YPLKart
 <b>CraftBukkit Action Race Game Plugin</b><br/><br/>
-<b>配布先フォーラム：</b>http://forum.minecraftuser.jp/viewtopic.php?f=38&t=27037
-<b>ダウンロードページ：</b>http://yubio.html.xdomain.jp/
+<b>配布先フォーラム：</b>http://forum.minecraftuser.jp/viewtopic.php?f=38&t=27037<br/>
+<b>ダウンロードページ：</b>http://yubio.html.xdomain.jp/<br/>
 
 マリオカート風の複数人向け対人レースを可能にするプラグインです。
 
