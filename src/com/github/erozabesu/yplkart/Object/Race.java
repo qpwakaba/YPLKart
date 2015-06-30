@@ -13,6 +13,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.RaceData;
@@ -25,7 +26,7 @@ import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class Race {
-	private String id;
+	private UUID id;
 
 	private EnumCharacter character;
 	private EnumKarts kart;
@@ -65,7 +66,7 @@ public class Race {
 	private boolean stepDashBoard;
 
 	public Race(String id){
-		this.id = id;
+		this.id = UUID.fromString(id);
 		init();
 	}
 
@@ -110,7 +111,7 @@ public class Race {
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 	public Player getPlayer(){
-		return Bukkit.getPlayer(UUID.fromString(this.id));
+		return Bukkit.getPlayer(this.id);
 	}
 
 	public String getEntry(){
@@ -215,32 +216,31 @@ public class Race {
 
 	public void setGoal(){
 		this.goal = true;
-		getPlayer().setWalkSpeed(0.2F);
-		getPlayer().setMaxHealth(20);
-		getPlayer().setHealth(20);
-		setStart(false);
-		this.character = null;
-		this.kart = null;
-
 		final String entry = getEntry();
 
 		Util.createSignalFireworks(getPlayer().getLocation());
 		Util.createFlowerShower(getPlayer(), 20);
 
-		double currentmillisecond = RaceManager.getCurrentMilliSeconds();
+		double currentmillisecond = RaceManager.getCircuit(entry).getLapMilliSeconds();
 
 		new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer().size() + "位  " + currentmillisecond/1000 + "秒", 10, 100, 10, ChatColor.GREEN, true);
+		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer(entry).size() + "位  " + currentmillisecond/1000 + "秒", 10, 100, 10, ChatColor.GREEN, true);
+		Util.broadcastMessage(getPlayer().getName() + "さん#Yellow" + String.valueOf(RaceManager.getGoalPlayer(entry).size()) + "位#Greenでゴール！ #WhiteTime : #Yellow" + currentmillisecond/1000 + "#White秒");
+		setPoint(getPassedCheckPoint().size() + (RaceManager.getEntryPlayer(entry).size())*10);
+
 
 		if(getKart() == null)
 			RaceData.addRunningRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 		else
 			RaceData.addKartRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 
+		getPlayer().setWalkSpeed(0.2F);
+		getPlayer().setMaxHealth(20);
+		getPlayer().setHealth(20);
+		setStart(false);
+		this.character = null;
+		this.kart = null;
 		RaceManager.leave(getPlayer());
-
-		Util.broadcastMessage(getPlayer().getName() + "さん#Yellow" + String.valueOf(RaceManager.getGoalPlayer().size()) + "位#Greenでゴール！ #WhiteTime : #Yellow" + currentmillisecond/1000 + "#White秒");
-		setPoint(getPassedCheckPoint().size() + (RaceManager.getEntryPlayer().size())*10);
 
 		EnumItem.removeAllKeyItems(getPlayer());
 		this.recoveryInventory();
@@ -259,12 +259,12 @@ public class Race {
 
 	public void setStart(boolean value){
 		this.start = value;
+		RaceManager.setupCircuit(this.entry, this.id);
 	}
 
 	public void setStart(boolean value, Location from, Location to){
 		setStart(value);
 		EnumItem.removeAllKeyItems(getPlayer());
-		//EnumItem.removeAllKeyItems(getPlayer());
 
 		Vector v = Util.getVectorLocationToLocation(to, from);
 		Location l = getPlayer().getLocation().add(v.getX()*5,0,v.getZ()*5);
@@ -279,13 +279,8 @@ public class Race {
 		Util.createFlowerShower(getPlayer(), 5);
 
 		new SendExpandedTitleTask(getPlayer(), 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		RaceManager.isRaceStarted = true;
+		RaceManager.getCircuit(this.entry).setStart(true);
 	}
-
-	/*public void removeGoal(Player p){
-		if(goal.containsKey(p.getUniqueId()))
-			goal.remove(p.getUniqueId());
-	}*/
 
 	public void setLapStepCool(boolean value){
 		this.lapstepcool = value;

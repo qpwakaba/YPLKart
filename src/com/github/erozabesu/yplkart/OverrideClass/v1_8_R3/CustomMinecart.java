@@ -22,12 +22,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.Permission;
 import com.github.erozabesu.yplkart.Object.Race;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Particle;
 import com.github.erozabesu.yplkart.Utils.Util;
 

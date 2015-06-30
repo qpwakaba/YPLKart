@@ -1,4 +1,4 @@
-package com.github.erozabesu.yplkart.Object;
+package com.github.erozabesu.yplkart;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,8 +22,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import com.github.erozabesu.yplkart.Scoreboards;
-import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
@@ -31,6 +29,8 @@ import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.EnumSelectMenu;
 import com.github.erozabesu.yplkart.Enum.Permission;
+import com.github.erozabesu.yplkart.Object.Circuit;
+import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
@@ -38,38 +38,21 @@ import com.github.erozabesu.yplkart.Utils.Util;
 public class RaceManager {
 	public static int checkPointHeight = 8;
 	public static int checkPointDetectRadius = 20;
-	public static boolean isRaceStarted = false;
-	private static int laptime = 0;
 	private static HashMap<UUID, Race> racedata = new HashMap<UUID, Race>();
-	private static ArrayList<Entity> jammerentity = new ArrayList<Entity>();
+	private static HashMap<String, Circuit> circuit = new HashMap<String, Circuit>();
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static Boolean isEntry(Player p) {
-		if (getRace(p).getEntry() != "")
-			if (!getRace(p).getGoal())
-				return true;
-		return false;
+	public static void setupCircuit(String circuitname, UUID entryplayer){
+		if(circuit.get(circuitname) == null)
+			circuit.put(circuitname, new Circuit(circuitname));
+
+		circuit.get(circuitname).entryPlayer(entryplayer);
 	}
 
-	public static Boolean isRaceEnd() {
-		if (getEntryPlayer().isEmpty())
-			return true;
-		return false;
-	}
-
-	public static ArrayList<String> getActiveRace(){
-		if (getEntryPlayer().isEmpty())
-			return null;
-
-		ArrayList<String> activerace = new ArrayList<String>();
-		for(Player p : getEntryPlayer()){
-			Race r = getRace(p);
-			if(r.getStart())
-				if(!activerace.contains(r.getEntry()))
-					activerace.add(r.getEntry());
-		}
-		return activerace;
+	public static void endCircuit(String circuitname){
+		if(circuit.get(circuitname) == null)
+			circuit.remove(circuitname);
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -78,7 +61,10 @@ public class RaceManager {
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
 		Race r = getRace(p);
 
-		//変数初期化
+		//Circuit初期化
+		setupCircuit(circuitname, p.getUniqueId());
+
+		//Race初期化
 		r.init();
 		r.setEntry(circuitname);
 		characterReset(p);
@@ -175,6 +161,84 @@ public class RaceManager {
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static Circuit getCircuit(Player p){
+		try{
+			return circuit.get(getRace(p).getEntry());
+		}catch(NullPointerException ex){
+			return null;
+		}
+	}
+
+	public static Circuit getCircuit(String circuitname){
+		try{
+			return circuit.get(circuitname);
+		}catch(NullPointerException ex){
+			return null;
+		}
+	}
+
+	public static Race getRace(Player p){
+		if (racedata.get(p.getUniqueId()) == null){
+			racedata.put(p.getUniqueId(), new Race(p.getUniqueId().toString()));
+		}
+		return racedata.get(p.getUniqueId());
+	}
+
+	public static List<Player> getEntryPlayer(String circuitname) {
+		if(circuit.get(circuitname) == null)return null;
+
+		List<Player> entryplayer = new ArrayList<Player>();
+		return circuit.get(circuitname).getEntryPlayer();
+	}
+
+	public static List<Player> getGoalPlayer(String circuitname) {
+		ArrayList<Player> goalplayer = new ArrayList<Player>();
+		for (Player p : getEntryPlayer(circuitname)) {
+			if (getRace(p).getGoal())
+				goalplayer.add(p);
+		}
+		return goalplayer;
+	}
+
+	public static Player getPlayerfromRank(String circuitname, int rank) {
+		for (Player p : getEntryPlayer(circuitname)) {
+			if (getRank(p) == rank)
+				return p;
+		}
+		return null;
+	}
+
+	// レース走行中(CPポイントカウント中)の順位
+	public static Integer getRank(Player p) {
+		HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
+
+		for(Player entryplayer : getEntryPlayer(getRace(p).getEntry())){
+			//if(!entryplayer.getUniqueId().equals(p.getUniqueId()))
+				count.put(entryplayer.getUniqueId(), getRace(entryplayer).getPassedCheckPoint().size());
+		}
+
+		List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(
+				count.entrySet());
+		Collections.sort(entry, new Comparator<Map.Entry<UUID, Integer>>() {
+			@Override
+			public int compare(Entry<UUID, Integer> entry1,
+					Entry<UUID, Integer> entry2) {
+				return entry2.getValue().compareTo(entry1
+						.getValue());
+			}
+		});
+
+		int rank = 1;
+		for (Entry<UUID, Integer> ranking : entry) {
+			if (ranking.getKey().equals(p.getUniqueId()))
+				return rank;
+
+			rank++;
+		}
+
+		return 0;
+	}
 
 	public static ArrayList<Entity> getNearbyCheckpoint(Location l, double radius, String circuitname){
 		List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
@@ -280,6 +344,13 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+	public static Boolean isEntry(Player p) {
+		if (getRace(p).getEntry() != "")
+			if (!getRace(p).getGoal())
+				return true;
+		return false;
+	}
+
 	public static boolean isCustomMinecart(Entity e){
 		if(e instanceof Minecart)
 			if(e.getCustomName() != null)
@@ -305,6 +376,12 @@ public class RaceManager {
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static void removeAllJammerEntity(){
+		for(Circuit cir : circuit.values()){
+			cir.removeAllJammerEntity();
+		}
+	}
 
 	public static void removeCustomMinecart(Player p){
 		if(p.getVehicle() != null)
@@ -418,133 +495,5 @@ public class RaceManager {
 		inv.setItem(30, EnumSelectMenu.KartPrev.getMenuItem());
 		inv.setItem(32, EnumSelectMenu.KartNext.getMenuItem());
 		p.openInventory(inv);
-	}
-
-	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-	public static Race getRace(Player p) {
-		if (racedata.get(p.getUniqueId()) == null){
-			racedata.put(p.getUniqueId(), new Race(p.getUniqueId().toString()));
-		}
-		return racedata.get(p.getUniqueId());
-	}
-
-	public static ArrayList<Player> getEntryPlayer() {
-		ArrayList<Player> entryplayer = new ArrayList<Player>();
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (getRace(p) == null)
-				continue;
-			if (getRace(p).getEntry() != "")
-				if (!getRace(p).getGoal())
-					entryplayer.add(p);
-		}
-		return entryplayer;
-	}
-
-	public static ArrayList<Player> getGoalPlayer() {
-		ArrayList<Player> goalplayer = new ArrayList<Player>();
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (getRace(p).getGoal())
-				goalplayer.add(p);
-		}
-		return goalplayer;
-	}
-
-	public static Player getPlayerfromRank(int rank) {
-		for (Player p : getEntryPlayer()) {
-			if (getRank(p) == rank)
-				return p;
-		}
-		return null;
-	}
-
-	// レース走行中(CPポイントカウント中)の順位
-	public static Integer getRank(Player p) {
-		HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
-
-		for (UUID id : racedata.keySet()) {
-			if (Bukkit.getPlayer(id) != null)
-				if (isEntry(Bukkit.getPlayer(id)))
-					count.put(id, racedata.get(id).getPassedCheckPoint().size());
-		}
-
-		List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(
-				count.entrySet());
-		Collections.sort(entry, new Comparator<Map.Entry<UUID, Integer>>() {
-			@Override
-			public int compare(Entry<UUID, Integer> entry1,
-					Entry<UUID, Integer> entry2) {
-				return entry2.getValue().compareTo(entry1
-						.getValue());
-			}
-		});
-
-		int rank = 1;
-		for (Entry<UUID, Integer> ranking : entry) {
-			if (ranking.getKey().equals(p.getUniqueId()))
-				return rank;
-			rank++;
-		}
-
-		return 0;
-	}
-
-	public static int getCurrentMilliSeconds(){
-		if(laptime == 0)return 0;
-
-		return laptime * 50;
-	}
-
-	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static void addJammerEntity(Entity e) {
-		jammerentity.add(e);
-	}
-
-	public static boolean isJammerEntity(Entity e) {
-		return jammerentity.contains(e) ? true : false;
-	}
-
-	public static void removeJammerEntity(Entity entity) {
-		if (jammerentity.contains(entity))
-			jammerentity.remove(entity);
-	}
-
-	public static void removeAllJammerEntity() {
-		if (jammerentity.size() != 0) {
-			for (Entity e : jammerentity) {
-				if (!e.isDead())
-					e.remove();
-			}
-			jammerentity.clear();
-		}
-	}
-
-	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static void runLapTimeUpdateTask() {
-		YPLKart.getInstance().getServer().getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-			public void run() {
-				if(isRaceStarted)
-					laptime++;
-			}
-		}, 0, 1);
-	}
-
-	public static void runDetectRaceEndTask() {
-		YPLKart.getInstance().getServer().getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-			public void run() {
-				if(isRaceStarted){
-					if (isRaceEnd()) {
-						removeAllJammerEntity();
-						laptime = 0;
-						isRaceStarted = false;
-						for(UUID id : racedata.keySet()){
-							racedata.get(id).init();
-						}
-						Util.broadcastMessage("#Aquaレース終了を検知したため一時データを初期化しました");
-					}
-				}
-			}
-		}, 0, 20);
 	}
 }

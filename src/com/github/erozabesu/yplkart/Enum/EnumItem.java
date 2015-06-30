@@ -12,9 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 
 public enum EnumItem{
 	CheckPoint(					Material.NETHER_STAR,	(byte)0,	0,										1, 												64, "チェックポイントツール", ""),

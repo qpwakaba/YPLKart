@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.Permission;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class CMDAbstractConsole extends CMDAbstract{
