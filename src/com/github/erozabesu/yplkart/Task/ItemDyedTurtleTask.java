@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Object.Race;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class ItemDyedTurtleTask extends BukkitRunnable{

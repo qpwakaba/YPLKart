@@ -29,6 +29,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
@@ -39,7 +40,6 @@ import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.EnumSelectMenu;
 import com.github.erozabesu.yplkart.Enum.Permission;
 import com.github.erozabesu.yplkart.Object.Race;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;

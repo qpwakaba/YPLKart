@@ -9,8 +9,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class ItemStarTask extends BukkitRunnable{

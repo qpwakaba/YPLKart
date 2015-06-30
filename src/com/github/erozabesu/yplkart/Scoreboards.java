@@ -12,7 +12,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
 public class Scoreboards{

@@ -20,9 +20,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public final class RaceData{

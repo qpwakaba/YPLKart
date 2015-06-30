@@ -11,10 +11,10 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Listener.NettyListener;
 import com.github.erozabesu.yplkart.Object.Race;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.Utils.Util;

@@ -17,9 +17,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.material.MaterialData;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public final class DisplayKartData{

@@ -16,7 +16,6 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Listener.DataListener;
 import com.github.erozabesu.yplkart.Listener.ItemListener;
 import com.github.erozabesu.yplkart.Listener.NettyListener;
-import com.github.erozabesu.yplkart.Object.RaceManager;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class YPLKart extends JavaPlugin{
@@ -41,10 +40,6 @@ public class YPLKart extends JavaPlugin{
 		new Settings(this);
 		new RaceData(this);
 		new DisplayKartData(this);
-
-		//RaceManager.runRankingUpdateTask();
-		RaceManager.runDetectRaceEndTask();
-		RaceManager.runLapTimeUpdateTask();
 
 		for(World w : Bukkit.getWorlds()){
 			DisplayKartData.respawnKart(w);
