@@ -21,7 +21,7 @@ public class FlowerShowerTask extends BukkitRunnable{
 	public void run(){
 		life++;
 
-		if(maxlife < life){
+		if(maxlife < life || !p.isOnline()){
 			this.cancel();
 			return;
 		}
