@@ -38,6 +38,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit setposition {circuit name}
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit setgoalposition {circuit name}
+	//ka circuit setgoalposition {circuit name} clear
 	//ka circuit setgoalposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit rename {circuit name} {new circuitname}
 	//ka circuit list
@@ -69,6 +70,9 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		}else if(this.length == 4){
 			if(args[1].equalsIgnoreCase("rename")){
 				RaceData.renameCircuit(this.p, args[2], args[3]);
+				return;
+			}else if(args[1].equalsIgnoreCase("setgoalposition") && args[3].equalsIgnoreCase("clear")){
+				RaceData.setGoalPositionClear(this.p, args[2]);
 				return;
 			}
 		}else if(this.length == 9){

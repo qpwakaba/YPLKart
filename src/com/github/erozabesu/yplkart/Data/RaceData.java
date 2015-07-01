@@ -208,6 +208,16 @@ public final class RaceData{
 		}
 	}
 
+	public static void setGoalPositionClear(Player p, String circuitname){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			config.set(circuitname + ".goalposition", null);
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの終了座標を初期化しました。参加者はレース終了後、開始前に居た座標に帰還されます");
+			saveConfigFile();
+		}
+	}
+
 	public static void addRunningRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 

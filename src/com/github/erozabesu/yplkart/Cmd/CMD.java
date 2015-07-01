@@ -25,6 +25,7 @@ public class CMD implements CommandExecutor{
 											+ "/ka circuit setposition {circuit name} :\n"
 											+ "/ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :\n"
 											+ "/ka circuit setgoalposition {circuit name} :\n"
+											+ "/ka circuit setgoalposition {circuit name} clear :\n"
 											+ "/ka circuit setgoalposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :\n"
 											+ "/ka circuit rename {circuit name} {new circuitname} :\n"
 											+ "/ka circuit list :";
