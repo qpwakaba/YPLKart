@@ -16,6 +16,7 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Listener.DataListener;
 import com.github.erozabesu.yplkart.Listener.ItemListener;
 import com.github.erozabesu.yplkart.Listener.NettyListener;
+import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class YPLKart extends JavaPlugin{
@@ -53,8 +54,12 @@ public class YPLKart extends JavaPlugin{
 	public void onDisable(){
 		Scoreboards.clearBoard();
 		for(Player p : Bukkit.getOnlinePlayers()){
-			if(RaceManager.getRace(p).getCharacter() != null)
-				RaceManager.characterReset(p);
+			Race r = RaceManager.getRace(p);
+			if(RaceManager.isEntry(p)){
+				r.recoveryExp();
+				r.recoveryInventory();
+			}
+			RaceManager.characterReset(p);
 			RaceManager.removeCustomMinecart(p);
 		}
 		RaceManager.removeAllJammerEntity();
