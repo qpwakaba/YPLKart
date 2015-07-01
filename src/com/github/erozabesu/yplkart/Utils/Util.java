@@ -416,6 +416,7 @@ public class Util extends ReflectionUtil{
 		text = text.replace("{kart name}", "{#Whitekart name#Green}");
 		text = text.replace("{item name}", "{#Whiteitem name#Green}");
 		text = text.replace("{amount}", "{#Whiteamount#Green}");
+		text = text.replace("{number of player}", "{#Whitenumber of player#Green}");
 		return text;
 	}
 
