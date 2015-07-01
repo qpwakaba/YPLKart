@@ -48,9 +48,6 @@ public class CMDAbstractConsole extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("rename")){
 				RaceData.renameCircuit(null, args[2], args[3]);
 				return;
-			}else if(args[1].equalsIgnoreCase("setgoalposition") && args[3].equalsIgnoreCase("clear")){
-				RaceData.setGoalPositionClear(null, args[2]);
-				return;
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
@@ -68,9 +65,6 @@ public class CMDAbstractConsole extends CMDAbstract{
 			//0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z
 			}else if(args[1].equalsIgnoreCase("setposition")){
 				RaceData.setPosition(null, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]), Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
-				return;
-			}else if(args[1].equalsIgnoreCase("setgoalposition")){
-				RaceData.setGoalPosition(null, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]), Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
 				return;
 			}
 		}

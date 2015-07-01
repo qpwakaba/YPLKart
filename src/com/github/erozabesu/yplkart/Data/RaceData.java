@@ -177,47 +177,6 @@ public final class RaceData{
 		}
 	}
 
-	public static void setGoalPosition(Player p, String circuitname){
-		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
-		}else{
-			Location l = p.getLocation();
-			config.set(circuitname + ".goalposition.world", l.getWorld().getName());
-			config.set(circuitname + ".goalposition.x", l.getX());
-			config.set(circuitname + ".goalposition.y", l.getY());
-			config.set(circuitname + ".goalposition.z", l.getZ());
-			config.set(circuitname + ".goalposition.yaw", l.getYaw());
-			config.set(circuitname + ".goalposition.pitch", l.getPitch());
-			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの終了座標を設定しました");
-			saveConfigFile();
-		}
-	}
-
-	public static void setGoalPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
-		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
-		}else{
-			config.set(circuitname + ".goalposition.world", worldname);
-			config.set(circuitname + ".goalposition.x", x);
-			config.set(circuitname + ".goalposition.y", y);
-			config.set(circuitname + ".goalposition.z", z);
-			config.set(circuitname + ".goalposition.yaw", yaw);
-			config.set(circuitname + ".goalposition.pitch", pitch);
-			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの終了座標を設定しました");
-			saveConfigFile();
-		}
-	}
-
-	public static void setGoalPositionClear(Player p, String circuitname){
-		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
-		}else{
-			config.set(circuitname + ".goalposition", null);
-			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの終了座標を初期化しました。参加者はレース終了後、開始前に居た座標に帰還されます");
-			saveConfigFile();
-		}
-	}
-
 	public static void addRunningRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 
@@ -263,15 +222,6 @@ public final class RaceData{
 			return null;
 
 		return new Location(Bukkit.getWorld(config.getString(circuitname + ".world")),config.getDouble(circuitname + ".x"),config.getDouble(circuitname + ".y"),config.getDouble(circuitname + ".z"),(float)config.getDouble(circuitname + ".yaw"),(float)config.getDouble(circuitname + ".pitch"));
-	}
-
-	public static Location getGoalPosition(String circuitname){
-		if(!getCircuitSet().contains(circuitname))
-			return null;
-		if(config.getString(circuitname + ".goalposition.world") == null)
-			return null;
-
-		return new Location(Bukkit.getWorld(config.getString(circuitname + ".goalposition.world")),config.getDouble(circuitname + ".goalposition.x"),config.getDouble(circuitname + ".goalposition.y"),config.getDouble(circuitname + ".goalposition.z"),(float)config.getDouble(circuitname + ".goalposition.yaw"),(float)config.getDouble(circuitname + ".goalposition.pitch"));
 	}
 
 	public static String getRanking(Player p, String circuitname){
