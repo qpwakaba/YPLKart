@@ -28,6 +28,8 @@ import com.github.erozabesu.yplkart.Utils.Util;
 public class Race {
 	private UUID id;
 	private Location goalposition;
+	private int level;
+	private float exp;
 
 	private EnumCharacter character;
 	private EnumKarts kart;
@@ -75,6 +77,8 @@ public class Race {
 		//this.character = EnumCharacter.Human;
 		//this.kart = null;
 		this.goalposition = getPlayer().getLocation().add(0,1,0);
+		this.level = getPlayer().getLevel();
+		this.exp = getPlayer().getExp();
 
 		this.entry = "";
 		this.goal = false;
@@ -239,6 +243,7 @@ public class Race {
 		else
 			RaceData.addKartRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 
+		//終了処理 順序に注意?
 		getPlayer().setWalkSpeed(0.2F);
 		getPlayer().setMaxHealth(20);
 		getPlayer().setHealth(20);
@@ -248,7 +253,8 @@ public class Race {
 		RaceManager.leave(getPlayer());
 		RaceManager.removeCustomMinecart(getPlayer());
 		EnumItem.removeAllKeyItems(getPlayer());
-		this.recoveryInventory();
+		recoveryInventory();
+		recoveryExp();
 		getPlayer().teleport(goalposition);
 	}
 
@@ -422,6 +428,11 @@ public class Race {
 
 		this.keyitem = contents;
 		this.keyarmor = armor;
+	}
+
+	public void recoveryExp(){
+		getPlayer().setLevel(this.level);
+		getPlayer().setExp(this.exp);
 	}
 
 	public void recoveryInventory(){
