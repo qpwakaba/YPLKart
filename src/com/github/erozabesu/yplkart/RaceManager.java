@@ -132,11 +132,8 @@ public class RaceManager {
 	public static void characterReset(Player p){
 		if(getRace(p).getCharacter() == null)return;
 
-		p.setWalkSpeed(0.2F);
-		p.setMaxHealth(20D);
-		p.setHealth(20D);
-
 		getRace(p).setCharacter(null);
+		getRace(p).recoveryPhysical();
 		PacketUtil.returnPlayer(p);
 		Util.sendMessage(p, "キャラクター選択を取り消しました");
 	}
