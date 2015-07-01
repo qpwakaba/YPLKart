@@ -55,12 +55,14 @@ public class YPLKart extends JavaPlugin{
 		Scoreboards.clearBoard();
 		for(Player p : Bukkit.getOnlinePlayers()){
 			Race r = RaceManager.getRace(p);
+			RaceManager.characterReset(p);
+			RaceManager.removeCustomMinecart(p);
 			if(RaceManager.isEntry(p)){
 				r.recoveryExp();
 				r.recoveryInventory();
+				p.teleport(r.getGoalPosition());
+				Util.sendMessage(p, "エントリーを取り消しました");
 			}
-			RaceManager.characterReset(p);
-			RaceManager.removeCustomMinecart(p);
 		}
 		RaceManager.removeAllJammerEntity();
 	}
