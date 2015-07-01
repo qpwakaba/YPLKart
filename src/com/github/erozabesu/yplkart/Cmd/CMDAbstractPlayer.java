@@ -63,16 +63,10 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			}else if(args[1].equalsIgnoreCase("setposition")){
 				RaceData.setPosition(this.p, args[2]);
 				return;
-			}else if(args[1].equalsIgnoreCase("setgoalposition")){
-				RaceData.setGoalPosition(this.p, args[2]);
-				return;
 			}
 		}else if(this.length == 4){
 			if(args[1].equalsIgnoreCase("rename")){
 				RaceData.renameCircuit(this.p, args[2], args[3]);
-				return;
-			}else if(args[1].equalsIgnoreCase("setgoalposition") && args[3].equalsIgnoreCase("clear")){
-				RaceData.setGoalPositionClear(this.p, args[2]);
 				return;
 			}
 		}else if(this.length == 9){
@@ -91,9 +85,6 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			//0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z
 			}else if(args[1].equalsIgnoreCase("setposition")){
 				RaceData.setPosition(this.p, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]), Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
-				return;
-			}else if(args[1].equalsIgnoreCase("setgoalposition")){
-				RaceData.setGoalPosition(this.p, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]), Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
 				return;
 			}
 		}
