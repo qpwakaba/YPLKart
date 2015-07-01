@@ -73,6 +73,8 @@ public class RaceManager {
 		Scoreboards.entryCircuit(p);
 
 		//インベントリ初期化
+		p.setLevel(0);
+		p.setExp(0);
 		r.saveInventory();
 		p.getInventory().clear();
 
@@ -141,7 +143,6 @@ public class RaceManager {
 	}
 
 	public static void leave(Player p){
-		p.setLevel(0);
 		if(getRace(p).getKart() != null)
 			Util.sendMessage(p, "搭乗を解除しました");
 		getRace(p).setKart(null);
