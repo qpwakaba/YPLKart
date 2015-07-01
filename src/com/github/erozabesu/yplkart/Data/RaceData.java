@@ -268,7 +268,7 @@ public final class RaceData{
 	public static Location getGoalPosition(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
 			return null;
-		if(Bukkit.getWorld(config.getString(circuitname + ".world")) == null)
+		if(config.getString(circuitname + ".goalposition.world") == null)
 			return null;
 
 		return new Location(Bukkit.getWorld(config.getString(circuitname + ".goalposition.world")),config.getDouble(circuitname + ".goalposition.x"),config.getDouble(circuitname + ".goalposition.y"),config.getDouble(circuitname + ".goalposition.z"),(float)config.getDouble(circuitname + ".goalposition.yaw"),(float)config.getDouble(circuitname + ".goalposition.pitch"));
