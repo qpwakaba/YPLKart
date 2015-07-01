@@ -37,16 +37,16 @@ public class Circuit {
 		this.updatetask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
 			public void run(){
 				if (isRaceEnd()){
-
+					//プレイヤーデータの初期化はレース終了時のみ行うようにしなければ、
+					//まだレース中のプレイヤーのスコアボード・ドロップアイテムに影響してしまう
 					for(UUID id : entry){
-						RaceManager.getRace(Bukkit.getPlayer(id)).init();
+						RaceManager.exit(Bukkit.getPlayer(id));
 					}
-
 					removeAllJammerEntity();
 					init();
 
 					RaceManager.endCircuit(name);
-					Util.broadcastMessage("#Blue" + name + "#Aquaのレースを終了しました");
+					Util.broadcastMessage("#Blue" + name + "#Aquaのレースが終了しました。");
 				}
 			}
 		}, 0, 100);

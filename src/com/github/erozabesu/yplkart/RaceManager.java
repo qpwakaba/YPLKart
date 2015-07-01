@@ -140,11 +140,11 @@ public class RaceManager {
 		Util.sendMessage(p, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
-	//コマンド・ゴール時のみ
 	public static void leave(Player p){
 		p.setLevel(0);
+		if(getRace(p).getKart() != null)
+			Util.sendMessage(p, "搭乗を解除しました");
 		getRace(p).setKart(null);
-		Util.sendMessage(p, "搭乗を解除しました");
 	}
 
 	public static void ranking(Player p, String circuitname){
@@ -183,6 +183,13 @@ public class RaceManager {
 			racedata.put(p.getUniqueId(), new Race(p.getUniqueId().toString()));
 		}
 		return racedata.get(p.getUniqueId());
+	}
+
+	public static Race getRace(UUID id){
+		if (racedata.get(id) == null){
+			racedata.put(id, new Race(id.toString()));
+		}
+		return racedata.get(id);
 	}
 
 	public static List<Player> getEntryPlayer(String circuitname) {

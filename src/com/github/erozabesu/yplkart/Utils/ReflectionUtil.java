@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class ReflectionUtil{
@@ -81,6 +82,16 @@ public class ReflectionUtil{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static Object getPlayerNBT(Player p) throws Exception{
+		Class nbtclass = getBukkitClass("NBTTagCompound");
+		Object nbt = nbtclass.newInstance();
+		Object entityplayer = getCraftEntity(p);
+
+		entityplayer.getClass().getMethod("b", nbtclass).invoke(entityplayer, nbt);
+		entityplayer.getClass().getMethod("a", nbtclass).invoke(entityplayer, nbt);
+		return nbt;
 	}
 
 	public static Object getCraftEntity(Entity entity){

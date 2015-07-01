@@ -227,10 +227,17 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
 
 		Player p = e.getPlayer();
+		Race r = getRace(p);
 
 		RaceManager.removeCustomMinecart(p);
 		p.setWalkSpeed(0.2F);
 		Scoreboards.clearBoard(p);
+
+		//万が一ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
+		if(r.getGoal()){
+			p.teleport(r.getGoalPosition());
+			r.init();
+		}
 
 		//ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
 		//ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
