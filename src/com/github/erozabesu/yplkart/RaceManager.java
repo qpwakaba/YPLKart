@@ -130,7 +130,7 @@ public class RaceManager {
 	}
 
 	public static void characterReset(Player p){
-		Race r = getRace(p);
+		if(getRace(p).getCharacter() == null)return;
 
 		p.setWalkSpeed(0.2F);
 		p.setMaxHealth(20D);
@@ -143,13 +143,19 @@ public class RaceManager {
 
 	public static void ride(Player p, EnumKarts kart){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
+		if(!isEntry(p)){
+			Util.sendMessage(p, "#Redエントリーしていない状態ではカート選択はできません");
+			return;
+		}
+
 		getRace(p).setKart(kart);
 		Util.sendMessage(p, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
 	public static void leave(Player p){
-		if(getRace(p).getKart() != null)
-			Util.sendMessage(p, "搭乗を解除しました");
+		if(getRace(p).getKart() == null)return;
+
+		Util.sendMessage(p, "搭乗を解除しました");
 		getRace(p).setKart(null);
 	}
 
