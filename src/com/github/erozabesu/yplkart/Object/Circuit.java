@@ -41,11 +41,12 @@ public class Circuit {
 					for(UUID id : entry){
 						RaceManager.getRace(Bukkit.getPlayer(id)).init();
 					}
+
 					removeAllJammerEntity();
+					init();
+
 					RaceManager.endCircuit(name);
 					Util.broadcastMessage("#Blue" + name + "#Aquaのレースを終了しました");
-
-					init();
 				}
 			}
 		}, 0, 100);
