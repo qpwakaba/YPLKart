@@ -28,6 +28,10 @@ import com.github.erozabesu.yplkart.Utils.Util;
 public class Race {
 	private UUID id;
 	private Location goalposition;
+	private double maxhealth;
+	private double health;
+	private int hunger;
+	private float walkspeed;
 	private int level;
 	private float exp;
 
@@ -74,11 +78,16 @@ public class Race {
 	}
 
 	public void init(){
+		Player p = getPlayer();
 		//this.character = EnumCharacter.Human;
 		//this.kart = null;
 		this.goalposition = getPlayer().getLocation().add(0,1,0);
-		this.level = getPlayer().getLevel();
-		this.exp = getPlayer().getExp();
+		this.maxhealth = p.getMaxHealth();
+		this.health = p.getHealth();
+		this.hunger = p.getFoodLevel();
+		this.walkspeed = p.getWalkSpeed();
+		this.level = p.getLevel();
+		this.exp = p.getExp();
 
 		this.entry = "";
 		this.goal = false;
@@ -433,6 +442,13 @@ public class Race {
 	public void recoveryExp(){
 		getPlayer().setLevel(this.level);
 		getPlayer().setExp(this.exp);
+	}
+
+	public void recoveryPhysical(){
+		getPlayer().setMaxHealth(this.maxhealth);
+		getPlayer().setHealth(this.health);
+		getPlayer().setFoodLevel(this.hunger);
+		getPlayer().setWalkSpeed(this.walkspeed);
 	}
 
 	public void recoveryInventory(){
