@@ -48,6 +48,9 @@ public class CMDAbstractConsole extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("rename")){
 				RaceData.renameCircuit(null, args[2], args[3]);
 				return;
+			}else if(args[1].equalsIgnoreCase("setgoalposition") && args[3].equalsIgnoreCase("clear")){
+				RaceData.setGoalPositionClear(null, args[2]);
+				return;
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
