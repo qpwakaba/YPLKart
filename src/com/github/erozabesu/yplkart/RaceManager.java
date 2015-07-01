@@ -51,7 +51,7 @@ public class RaceManager {
 	}
 
 	public static void endCircuit(String circuitname){
-		if(circuit.get(circuitname) == null)
+		if(circuit.get(circuitname) != null)
 			circuit.remove(circuitname);
 	}
 
