@@ -27,6 +27,7 @@ import com.github.erozabesu.yplkart.Utils.Util;
 
 public class Race {
 	private UUID id;
+	private Location goalposition;
 
 	private EnumCharacter character;
 	private EnumKarts kart;
@@ -73,6 +74,7 @@ public class Race {
 	public void init(){
 		//this.character = EnumCharacter.Human;
 		//this.kart = null;
+		this.goalposition = getPlayer().getLocation().add(0,1,0);
 
 		this.entry = "";
 		this.goal = false;
@@ -249,9 +251,9 @@ public class Race {
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
 				if(RaceData.getGoalPosition(entry) != null){
-					if(getPlayer().isOnline()){
-						getPlayer().teleport(RaceData.getGoalPosition(entry));
-					}
+					getPlayer().teleport(RaceData.getGoalPosition(entry));
+				}else{
+					getPlayer().teleport(goalposition);
 				}
 			}
 		}, 10);
