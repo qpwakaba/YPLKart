@@ -33,9 +33,7 @@ public final class RaceData{
 	private static File configFile;
 	private static FileConfiguration config;
 
-	private static boolean EnableThisPlugin = true;
-	public static boolean EnableScoreboard = true;
-	public static List<String> DisWorlds;
+	private static int minplayer = 3;
 
 	public RaceData(YPLKart plugin){
 		pl = plugin;
@@ -162,6 +160,17 @@ public final class RaceData{
 		}
 	}
 
+	public static void setMinPlayer(Player p, String circuitname, int amount){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".minplayer", amount);
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました。エントリーしたプレイヤーがこの人数を満たすまで、レースは開始されません。");
+			saveConfigFile();
+		}
+	}
+
 	public static void setPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
@@ -213,6 +222,15 @@ public final class RaceData{
 				return;
 			}
 		}
+	}
+
+	public static int getMinPlayer(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return minplayer;
+		if(config.getInt(circuitname + ".minplayer") == 0)
+			return minplayer;
+
+		return config.getInt(circuitname + ".minplayer");
 	}
 
 	public static Location getPosition(String circuitname){

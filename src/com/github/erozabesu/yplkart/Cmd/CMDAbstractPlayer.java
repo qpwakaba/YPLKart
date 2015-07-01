@@ -35,11 +35,9 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit create {circuit name} {world} {x} {y} {z} {yaw} {pitch}
 	//ka circuit delete {circuit name}
 	//ka circuit edit {circuit name}
+	//ka circuit setminplayer {circuit name} {number of player}
 	//ka circuit setposition {circuit name}
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
-	//ka circuit setgoalposition {circuit name}
-	//ka circuit setgoalposition {circuit name} clear
-	//ka circuit setgoalposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit rename {circuit name} {new circuitname}
 	//ka circuit list
 	@Override
@@ -67,6 +65,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		}else if(this.length == 4){
 			if(args[1].equalsIgnoreCase("rename")){
 				RaceData.renameCircuit(this.p, args[2], args[3]);
+				return;
+			}else if(args[1].equalsIgnoreCase("setminplayer")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(this.p);
+					return;
+				}
+				RaceData.setMinPlayer(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){
