@@ -112,6 +112,11 @@ public class RaceManager {
 
 	public static void character(Player p, EnumCharacter character){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
+		if(!isEntry(p)){
+			Util.sendMessage(p, "#Redエントリーしていない状態ではキャラクター選択はできません");
+			return;
+		}
+
 		Race r = getRace(p);
 		r.setCharacter(character);
 		p.getInventory().setHelmet(EnumItem.MarioHat.getItem());
