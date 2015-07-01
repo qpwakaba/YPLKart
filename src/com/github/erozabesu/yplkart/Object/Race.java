@@ -116,6 +116,10 @@ public class Race {
 		return Bukkit.getPlayer(this.id);
 	}
 
+	public Location getGoalPosition(){
+		return this.goalposition;
+	}
+
 	public String getEntry(){
 		return this.entry;
 	}
@@ -230,7 +234,6 @@ public class Race {
 		Util.broadcastMessage(getPlayer().getName() + "さん#Yellow" + String.valueOf(RaceManager.getGoalPlayer(entry).size()) + "位#Greenでゴール！ #WhiteTime : #Yellow" + currentmillisecond/1000 + "#White秒");
 		setPoint(getPassedCheckPoint().size() + (RaceManager.getEntryPlayer(entry).size())*10);
 
-
 		if(getKart() == null)
 			RaceData.addRunningRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 		else
@@ -243,20 +246,10 @@ public class Race {
 		this.character = null;
 		this.kart = null;
 		RaceManager.leave(getPlayer());
-
+		RaceManager.removeCustomMinecart(getPlayer());
 		EnumItem.removeAllKeyItems(getPlayer());
 		this.recoveryInventory();
-		RaceManager.removeCustomMinecart(getPlayer());
-
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				if(RaceData.getGoalPosition(entry) != null){
-					getPlayer().teleport(RaceData.getGoalPosition(entry));
-				}else{
-					getPlayer().teleport(goalposition);
-				}
-			}
-		}, 10);
+		getPlayer().teleport(goalposition);
 	}
 
 	public void setStart(boolean value){
