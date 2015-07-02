@@ -488,6 +488,14 @@ public class Util extends ReflectionUtil{
 		return text;
 	}
 
+
+	public static String convertInitialUpperString(String string){
+		String initial = string.substring(0, 1).toUpperCase();
+		String other = string.substring(1, string.length()).toLowerCase();
+
+		return initial + other;
+	}
+
 	//ブロック、非生物エンティティに影響しない爆発を発生
 	public static void createSafeExplosion(Player executor, Location l, int damage, int range){
 		Particle.sendToLocation("CLOUD", l, 0, 0, 0, 1, 10);

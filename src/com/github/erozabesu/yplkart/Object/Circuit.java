@@ -11,7 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.RaceData;
+import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class Circuit {
@@ -20,6 +23,7 @@ public class Circuit {
 	private boolean isstarted;
 	private BukkitTask updatetask;
 	private BukkitTask laptimetask;
+	private BukkitTask matchingtask;
 	private List<UUID> entry;
 	private List<Entity> jammerentity;
 
@@ -46,10 +50,67 @@ public class Circuit {
 					init();
 
 					RaceManager.endCircuit(name);
+					Scoreboards.endCircuit(name);
 					Util.broadcastMessage("#Blue" + name + "#Aquaのレースが終了しました。");
 				}
 			}
 		}, 0, 100);
+
+		this.matchingtask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+			public void run(){
+				//エントリーしたプレイヤーが規定人数以上
+				if(entry.size() < RaceData.getMinPlayer(name))return;
+				//オンラインのプレイヤー人数が規定人数以上
+				if(getEntryPlayer().size() < RaceData.getMinPlayer(name))return;
+
+				setupRacer();
+				matchingtask.cancel();
+				matchingtask = null;
+
+				Scoreboards.startCircuit(name);
+
+				Util.broadcastMessage("#Aqua規定人数が揃いましたので " + "#Blue" + name + "#Aquaのレースを開始します");
+			}
+		}, 0, 100);
+	}
+
+	private void setupRacer(){
+		for(UUID id : entry){
+			if(Bukkit.getPlayer(id) != null){
+				if(Bukkit.getPlayer(id).isOnline()){
+					final Player p = Bukkit.getPlayer(id);
+					Scoreboards.entryCircuit(p);
+
+					//インベントリ初期化
+					p.setLevel(0);
+					p.setExp(0);
+					RaceManager.getRace(p).saveInventory();
+					p.getInventory().clear();
+
+					p.leaveVehicle();
+					p.teleport(RaceData.getPosition(name));
+					RaceManager.showCharacterSelectMenu(p);
+					EnumItem.addItem(p, EnumItem.Menu.getItem());
+
+					//プレイヤー処理
+					/*Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+						public void run(){
+							if(RaceData.getPosition(name) != null)
+								if(p.isOnline())
+									p.teleport(RaceData.getPosition(name));
+						}
+					}, 5);
+					Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+						public void run(){
+							if(p.isOnline()){
+								showCharacterSelectMenu(p);
+								EnumItem.addItem(p, EnumItem.Menu.getItem());
+							}
+						}
+					}, 6);*/
+				}
+			}
+		}
 	}
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -72,6 +133,21 @@ public class Circuit {
 	public void entryPlayer(UUID id){
 		if(!this.entry.contains(id))
 			this.entry.add(id);
+	}
+
+	public void entryPlayer(Player p){
+		if(!this.entry.contains(p.getUniqueId()))
+			this.entry.add(p.getUniqueId());
+	}
+
+	public void exitPlayer(UUID id){
+		if(this.entry.contains(id))
+			this.entry.remove(id);
+	}
+
+	public void exitPlayer(Player p){
+		if(this.entry.contains(p.getUniqueId()))
+			this.entry.remove(p.getUniqueId());
 	}
 
 	public void setStart(boolean value){

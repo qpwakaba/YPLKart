@@ -5,6 +5,7 @@ import java.util.HashMap;
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -12,12 +13,17 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.github.erozabesu.yplkart.Data.Settings;
+import com.github.erozabesu.yplkart.Utils.Util;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
 public class Scoreboards{
 	private static HashMap<String, Scoreboard> scoreboard = new HashMap<String, Scoreboard>();
 
 	private static String getPlayerRegisterName(Player p){
+		return ChatColor.GREEN + p.getName();
+	}
+
+	private static String getPlayerRegisterName(OfflinePlayer p){
 		return ChatColor.GREEN + p.getName();
 	}
 
@@ -51,13 +57,31 @@ public class Scoreboards{
 
 		Objective obj = sb.registerNewObjective(YPLKart.plname, "dummy");
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-		obj.setDisplayName("ランキング");
+		obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
 
 		Team team = sb.registerNewTeam(YPLKart.plname);
 		team.setCanSeeFriendlyInvisibles(false);
 		team.setAllowFriendlyFire(false);
 
 		scoreboard.put(name, sb);
+	}
+
+	public static void startCircuit(String name){
+		if(scoreboard.get(name) == null)return;
+
+		Scoreboard sb = scoreboard.get(name);
+		Objective obj = sb.getObjective(DisplaySlot.SIDEBAR);
+		if(obj.getDisplayName().equalsIgnoreCase(Util.convertInitialUpperString(name) + " 参加申請中"))
+			obj.setDisplayName("ランキング");
+	}
+
+	public static void endCircuit(String name){
+		if(scoreboard.get(name) == null)return;
+
+		Scoreboard sb = scoreboard.get(name);
+		Objective obj = sb.getObjective(DisplaySlot.SIDEBAR);
+		if(obj.getDisplayName().equalsIgnoreCase("ランキング"))
+			obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
 	}
 
 	public static void entryCircuit(Player p){
@@ -74,7 +98,6 @@ public class Scoreboards{
 		p.setScoreboard(sb);
 	}
 
-
 	public static void exitCircuit(Player p){
 		String entry = RaceManager.getRace(p).getEntry();
 		if(entry.equalsIgnoreCase(""))return;
@@ -84,7 +107,7 @@ public class Scoreboards{
 
 		sb.getTeam(YPLKart.plname).removeEntry(getPlayerRegisterName(p));
 		sb.resetScores(getPlayerRegisterName(p));
-		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		clearBoard(p);
 	}
 
 	public static void setPoint(Player p){
@@ -93,6 +116,8 @@ public class Scoreboards{
 
 		scoreboard.get(entry).getObjective(YPLKart.plname).getScore(getPlayerRegisterName(p)).setScore(RaceManager.getRace(p).getPoint());
 	}
+
+	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static void clearBoard(){
 		for(String key : scoreboard.keySet()){
