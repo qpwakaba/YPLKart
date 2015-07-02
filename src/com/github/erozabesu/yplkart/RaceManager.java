@@ -87,6 +87,8 @@ public class RaceManager {
 		removeCustomMinecart(p);
 		leave(p);
 
+		p.teleport(r.getGoalPosition());
+
 		r.init();
 
 		Util.sendMessage(p, "エントリーを取り消しました");
@@ -348,7 +350,7 @@ public class RaceManager {
 	 */
 	public static Boolean isEntry(Player p) {
 		if (getRace(p).getEntry() != "")
-				return true;
+			return true;
 		return false;
 	}
 
