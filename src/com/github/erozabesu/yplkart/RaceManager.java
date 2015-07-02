@@ -68,44 +68,26 @@ public class RaceManager {
 		r.init();
 		r.setEntry(circuitname);
 		characterReset(p);
-		removeCustomMinecart(p);
 		leave(p);
 		Scoreboards.entryCircuit(p);
-
-		//インベントリ初期化
-		p.setLevel(0);
-		p.setExp(0);
-		r.saveInventory();
-		p.getInventory().clear();
-
-		//プレイヤー処理
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				if(RaceData.getPosition(circuitname) != null)
-					if(p.isOnline())
-						p.teleport(RaceData.getPosition(circuitname));
-			}
-		}, 5);
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				if(p.isOnline()){
-					showCharacterSelectMenu(p);
-					EnumItem.addItem(p, EnumItem.Menu.getItem());
-				}
-			}
-		}, 6);
 
 		Util.sendMessage(p, "サーキット：" + "#Gold" + circuitname + "#Greenのレースにエントリーしました");
 	}
 
 	public static void exit(Player p){
 		Scoreboards.exitCircuit(p);
+		getCircuit(p).exitPlayer(p);
 
-		getRace(p).init();
+		Race r = getRace(p);
+
+		r.recoveryExp();
+		r.recoveryInventory();
+		r.recoveryPhysical();
 		characterReset(p);
 		removeCustomMinecart(p);
 		leave(p);
-		EnumItem.removeAllKeyItems(p);
+
+		r.init();
 
 		Util.sendMessage(p, "エントリーを取り消しました");
 	}
