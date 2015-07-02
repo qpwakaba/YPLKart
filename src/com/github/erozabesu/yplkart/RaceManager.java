@@ -92,7 +92,7 @@ public class RaceManager {
 		Util.sendMessage(p, "エントリーを取り消しました");
 	}
 
-	public static void character(Player p, EnumCharacter character){
+	public static void character(final Player p, EnumCharacter character){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
 		if(!isEntry(p)){
 			Util.sendMessage(p, "#Redエントリーしていない状態ではキャラクター選択はできません");
@@ -104,7 +104,11 @@ public class RaceManager {
 		p.getInventory().setHelmet(EnumItem.MarioHat.getItem());
 		p.setWalkSpeed(character.getWalkSpeed());
 		p.setMaxHealth(character.getMaxHealth());
-		p.setHealth(character.getMaxHealth());
+		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+			public void run(){
+				p.setHealth(p.getMaxHealth());
+			}
+		}, 5);
 		EnumCharacter.playCharacterVoice(p, character);
 
 		PacketUtil.disguise(p, null, character);
@@ -334,10 +338,6 @@ public class RaceManager {
 				createCustomMinecart(l, kart).setPassenger(p);
 			}
 		}, 2);
-	}
-
-	public static void setKartParameter(){
-
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
