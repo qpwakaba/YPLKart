@@ -193,8 +193,8 @@ public enum EnumCharacter {
 		return (int) classsetting[6];
 	}
 
-	public int getMaxHealth(){
-		return (int) classsetting[7];
+	public double getMaxHealth(){
+		return classsetting[7];
 	}
 
 	public float getWalkSpeed(){
