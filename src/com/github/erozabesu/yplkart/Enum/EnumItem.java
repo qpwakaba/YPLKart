@@ -171,10 +171,10 @@ public enum EnumItem{
 				inv.setItem(i, null);
 		}
 
-		if(inv.getHelmet() != null)if(EnumItem.isKeyItem(inv.getHelmet()))if(!RaceManager.isEntry(p))inv.setHelmet(new ItemStack(Material.AIR));
-		if(inv.getChestplate() != null)if(EnumItem.isKeyItem(inv.getChestplate()))if(!RaceManager.isEntry(p))inv.setChestplate(new ItemStack(Material.AIR));
-		if(inv.getLeggings() != null)if(EnumItem.isKeyItem(inv.getLeggings()))if(!RaceManager.isEntry(p))inv.setLeggings(new ItemStack(Material.AIR));
-		if(inv.getBoots() != null)if(EnumItem.isKeyItem(inv.getBoots()))if(!RaceManager.isEntry(p))inv.setBoots(new ItemStack(Material.AIR));
+		if(inv.getHelmet() != null)if(EnumItem.isKeyItem(inv.getHelmet()))inv.setHelmet(new ItemStack(Material.AIR));
+		if(inv.getChestplate() != null)if(EnumItem.isKeyItem(inv.getChestplate()))inv.setChestplate(new ItemStack(Material.AIR));
+		if(inv.getLeggings() != null)if(EnumItem.isKeyItem(inv.getLeggings()))inv.setLeggings(new ItemStack(Material.AIR));
+		if(inv.getBoots() != null)if(EnumItem.isKeyItem(inv.getBoots()))inv.setBoots(new ItemStack(Material.AIR));
 	}
 
 	public static void removeUnuseslotKeyItems(Player p){

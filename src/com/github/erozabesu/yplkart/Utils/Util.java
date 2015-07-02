@@ -19,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -288,28 +287,21 @@ public class Util extends ReflectionUtil{
 	public static void addDamage(Entity damaged, Entity executor, int damage){
 		if(!(damaged instanceof LivingEntity))return;
 		if(damaged instanceof Player){
-			if(0 < ((Player)damaged).getNoDamageTicks())
-				return;
-			if(RaceManager.isEntry((Player)damaged))
-				if(!RaceManager.getRace((Player)damaged).getStart())
-					return;
-		}
+			final Player p = (Player)damaged;
+			if(0 < p.getNoDamageTicks())return;
+			if(!RaceManager.isRacing(p))return;
 
-		damaged.playEffect(EntityEffect.HURT);
+			p.playEffect(EntityEffect.HURT);
 
-		if(1 <= ((Damageable)damaged).getHealth() - damage){
-			((Damageable)damaged).setHealth(((Damageable)damaged).getHealth()-damage);
-		}else{
-			((Damageable)damaged).setHealth(((Damageable)damaged).getMaxHealth());
-			if(!(damaged instanceof Player))return;
+			if(1 <= p.getHealth() - damage){
+				p.setHealth(p.getHealth()-damage);
+			}else{
+				p.setHealth(p.getMaxHealth());
+				if(executor != null)
+					broadcastMessageNoHeader(damaged.getName() + " killed by " + executor.getName());
+				else
+					broadcastMessageNoHeader(damaged.getName() + " is dead");
 
-			final Player p = (Player) damaged;
-			if(executor != null)
-				broadcastMessageNoHeader(damaged.getName() + " killed by " + executor.getName());
-			else
-				broadcastMessageNoHeader(damaged.getName() + " is dead");
-
-			if(RaceManager.isEntry(p)){
 				final Race r = RaceManager.getRace(p);
 				new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
 
@@ -324,6 +316,8 @@ public class Util extends ReflectionUtil{
 					}
 				}, r.getCharacter().getDeathPenaltySecond() * 20);
 			}
+		}else{
+			((LivingEntity)damaged).damage(damage, executor);
 		}
 	}
 
@@ -508,7 +502,7 @@ public class Util extends ReflectionUtil{
 			if(0 < damaged.getNoDamageTicks())continue;
 			if(damaged.isDead())continue;
 			if(!(damaged instanceof Player))continue;
-			if(!RaceManager.isEntry((Player) damaged))continue;
+			if(!RaceManager.isRacing((Player) damaged))continue;
 
 			Vector v = Util.getVectorLocationToLocation(l, damaged.getLocation());
 			v.setX(v.clone().multiply(-1).getX());

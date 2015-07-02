@@ -3,7 +3,6 @@ package com.github.erozabesu.yplkart.Task;
 import java.util.HashMap;
 
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -67,11 +66,8 @@ public class ItemStarTask extends BukkitRunnable{
 		}
 		life++;
 
-		for(Entity e : p.getNearbyEntities(1.5, 1.5, 1.5)){
-			if(e instanceof Player){
-				if(RaceManager.isEntry((Player)e));
-					Util.createSafeExplosion(this.p, e.getLocation(), this.hitdamage, 2);
-			}
+		for(Player other : Util.getNearbyPlayers(this.p.getLocation(), 1.5)){
+			Util.addDamage(other, this.p, this.hitdamage);
 		}
 
 		if(life % 20 == 0)
