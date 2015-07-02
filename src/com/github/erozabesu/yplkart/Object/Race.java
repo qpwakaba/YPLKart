@@ -91,6 +91,8 @@ public class Race {
 		this.exp = p.getExp();
 
 		this.entry = "";
+		this.standby = false;
+		this.start = false;
 		this.goal = false;
 
 		this.laststepblock = null;

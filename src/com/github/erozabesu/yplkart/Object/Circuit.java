@@ -43,7 +43,10 @@ public class Circuit {
 				if (isRaceEnd()){
 					//プレイヤーデータの初期化はレース終了時のみ行うようにしなければ、
 					//まだレース中のプレイヤーのスコアボード・ドロップアイテムに影響してしまう
-					for(UUID id : entry){
+					Iterator<UUID> i = entry.iterator();
+					UUID id;
+					while(i.hasNext()){
+						id = i.next();
 						RaceManager.exit(Bukkit.getPlayer(id));
 					}
 					removeAllJammerEntity();
@@ -78,36 +81,22 @@ public class Circuit {
 		for(UUID id : entry){
 			if(Bukkit.getPlayer(id) != null){
 				if(Bukkit.getPlayer(id).isOnline()){
-					final Player p = Bukkit.getPlayer(id);
-					Scoreboards.entryCircuit(p);
+					Player p = Bukkit.getPlayer(id);
+					Race r = RaceManager.getRace(p);
 
-					//インベントリ初期化
+					Scoreboards.entryCircuit(p);
+					r.setStandBy(true);
+
+					//初期化
+					r.saveInventory();
+					p.getInventory().clear();
 					p.setLevel(0);
 					p.setExp(0);
-					RaceManager.getRace(p).saveInventory();
-					p.getInventory().clear();
 
 					p.leaveVehicle();
 					p.teleport(RaceData.getPosition(name));
 					RaceManager.showCharacterSelectMenu(p);
 					EnumItem.addItem(p, EnumItem.Menu.getItem());
-
-					//プレイヤー処理
-					/*Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-						public void run(){
-							if(RaceData.getPosition(name) != null)
-								if(p.isOnline())
-									p.teleport(RaceData.getPosition(name));
-						}
-					}, 5);
-					Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-						public void run(){
-							if(p.isOnline()){
-								showCharacterSelectMenu(p);
-								EnumItem.addItem(p, EnumItem.Menu.getItem());
-							}
-						}
-					}, 6);*/
 				}
 			}
 		}
@@ -211,7 +200,7 @@ public class Circuit {
 		UUID id;
 		while(entrylist.hasNext()){
 			id = entrylist.next();
-			if (RaceManager.isRacing(Bukkit.getPlayer(id)) && Bukkit.getPlayer(id).isOnline())
+			if (RaceManager.isEntry(Bukkit.getPlayer(id)) && Bukkit.getPlayer(id).isOnline())
 				return false;
 		}
 
