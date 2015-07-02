@@ -211,7 +211,7 @@ public class Circuit {
 		UUID id;
 		while(entrylist.hasNext()){
 			id = entrylist.next();
-			if (RaceManager.isEntry(Bukkit.getPlayer(id)) && Bukkit.getPlayer(id).isOnline())
+			if (RaceManager.isRacing(Bukkit.getPlayer(id)) && Bukkit.getPlayer(id).isOnline())
 				return false;
 		}
 

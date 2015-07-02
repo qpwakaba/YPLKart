@@ -39,6 +39,7 @@ public class Race {
 	private EnumKarts kart;
 
 	private String entry;
+	private boolean standby;
 	private boolean goal;
 	private boolean start;
 
@@ -135,6 +136,10 @@ public class Race {
 
 	public String getEntry(){
 		return this.entry;
+	}
+
+	public boolean getStandBy(){
+		return this.standby;
 	}
 
 	public boolean getGoal(){
@@ -265,6 +270,10 @@ public class Race {
 		recoveryInventory();
 		recoveryExp();
 		getPlayer().teleport(goalposition);
+	}
+
+	public void setStandBy(boolean value) {
+		this.standby = value;
 	}
 
 	public void setStart(boolean value){

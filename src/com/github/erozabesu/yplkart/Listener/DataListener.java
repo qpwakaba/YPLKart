@@ -125,7 +125,7 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void saveLastStepBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isEntry(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer()))return;
 
 		getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
 	}
@@ -134,7 +134,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void saveLapcount(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		Player p = e.getPlayer();
-		if(!isEntry(p))return;
+		if(!isStandBy(p))return;
 		Race r = getRace(p);
 		if(r.getLapStepCool())return;
 
@@ -173,7 +173,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void RunningRank(PlayerMoveEvent e) {//順位
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		Player p = e.getPlayer();
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 		if(getRace(p).getLapCount() < 1)return;
 
 		Race r = getRace(p);
@@ -195,7 +195,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void onRegainHealth(EntityRegainHealthEvent e){
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof Player))return;
-		if(!isEntry((Player)e.getEntity()))return;
+		if(!isRacing((Player)e.getEntity()))return;
 		e.setCancelled(true);
 	}
 
@@ -208,7 +208,7 @@ public class DataListener extends RaceManager implements Listener {
 			public void run(){
 				//PacketUtil.runPlayerLookingUpdate(p);
 
-				if(isEntry(p)){
+				if(isStandBy(p)){
 					Scoreboards.showBoard(p);
 					p.setWalkSpeed(getRace(p).getCharacter().getWalkSpeed());
 					if(getRace(p).getKart() != null)
@@ -266,7 +266,7 @@ public class DataListener extends RaceManager implements Listener {
 			}
 		}, 10);
 
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
@@ -304,7 +304,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof Player))return;
 		Player p = (Player) e.getEntity();
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 
 		if(getRace(p).getUsingKiller() != null){
 			if(e.getCause() == DamageCause.SUFFOCATION){
@@ -329,7 +329,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		RaceManager.removeCustomMinecart(p);
 
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 		Race r = getRace(p);
 
 		p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
@@ -354,7 +354,7 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isEntry((Player) e.getPlayer()))return;
+		if(!isStandBy((Player) e.getPlayer()))return;
 
 		final Player p = (Player) e.getPlayer();
 		Race r = getRace(p);
@@ -406,8 +406,8 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getWhoClicked().getWorld()))return;
 		if(!(e.getWhoClicked() instanceof Player))return;
 
-		//エントリー中はインベントリの操作をさせない
-		if(isEntry((Player) e.getWhoClicked())){
+		//召集後はインベントリの操作をさせない
+		if(isStandBy((Player) e.getWhoClicked())){
 			e.setCancelled(true);
 			((Player)e.getWhoClicked()).updateInventory();
 		}
@@ -432,7 +432,7 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.character(p, EnumCharacter.getRandomCharacter());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
-				if(isEntry(p)){
+				if(isStandBy(p)){
 					if(r.getCharacter() == null){
 						Util.sendMessage(p, "#Redキャラクターを選択して下さい");
 					}else{
@@ -469,7 +469,7 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
-				if(isEntry(p)){
+				if(isStandBy(p)){
 					if(r.getKart() == null){
 						Util.sendMessage(p, "#Redカートを選択して下さい");
 					}else{

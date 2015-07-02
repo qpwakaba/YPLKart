@@ -121,7 +121,7 @@ public class ItemListener extends RaceManager implements Listener{
 			e.setCancelled(true);
 			showCharacterSelectMenu(p);
 		}
-		if(isEntry(p)){
+		if(isRacing(p)){
 			if(EnumItem.Mushroom.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
 				if(Permission.hasPermission(p, Permission.use_mushroom, false)){
@@ -201,7 +201,7 @@ public class ItemListener extends RaceManager implements Listener{
 	public void onInteractObjectEntity(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		final Player p = e.getPlayer();
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 
 		List<Entity> entities = p.getNearbyEntities(0.7, 2, 0.7);
 
@@ -309,7 +309,7 @@ public class ItemListener extends RaceManager implements Listener{
 	@EventHandler
 	public void onStepSpeedBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isEntry(e.getPlayer()))return;
+		if(!isRacing(e.getPlayer()))return;
 
 		final Player p = e.getPlayer();
 
@@ -457,14 +457,14 @@ public class ItemListener extends RaceManager implements Listener{
 	@EventHandler
 	public void onPickupItem(PlayerPickupItemEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isEntry(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer()))return;
 		e.setCancelled(true);
 	}
 
 	@EventHandler
 	public void onDropItem(PlayerDropItemEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isEntry(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer()))return;
 
 		if(EnumItem.Menu.isSimilar(e.getItemDrop().getItemStack()))e.setCancelled(true);
 		else e.getItemDrop().remove();
@@ -568,7 +568,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemTurtle(Player p){
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 		if(getRank(p) == 0)return;
 
 		Util.setItemDecrease(p);
@@ -581,7 +581,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemRedturtle(Player user){
-		if(!isEntry(user))return;
+		if(!isRacing(user))return;
 		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
@@ -608,7 +608,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemThornedturtle(Player user){
-		if(!isEntry(user))return;
+		if(!isRacing(user))return;
 		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
@@ -635,7 +635,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemKiller(final Player p){
-		if(!isEntry(p))return;
+		if(!isRacing(p))return;
 		if(getRank(p) == 0)return;
 
 		Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p));

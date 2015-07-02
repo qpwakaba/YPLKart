@@ -57,7 +57,7 @@ public class YPLKart extends JavaPlugin{
 			Race r = RaceManager.getRace(p);
 			RaceManager.characterReset(p);
 			RaceManager.removeCustomMinecart(p);
-			if(RaceManager.isEntry(p)){
+			if(RaceManager.isStandBy(p)){
 				r.recoveryPhysical();
 				r.recoveryExp();
 				r.recoveryInventory();

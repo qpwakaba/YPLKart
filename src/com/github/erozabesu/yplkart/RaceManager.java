@@ -94,8 +94,8 @@ public class RaceManager {
 
 	public static void character(final Player p, EnumCharacter character){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
-		if(!isEntry(p)){
-			Util.sendMessage(p, "#Redエントリーしていない状態ではキャラクター選択はできません");
+		if(!isStandBy(p)){
+			Util.sendMessage(p, "#Redレースが開始されるまでキャラクター選択はできません");
 			return;
 		}
 
@@ -126,8 +126,8 @@ public class RaceManager {
 
 	public static void ride(Player p, EnumKarts kart){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
-		if(!isEntry(p)){
-			Util.sendMessage(p, "#Redエントリーしていない状態ではカート選択はできません");
+		if(!isStandBy(p)){
+			Util.sendMessage(p, "#Redレースが開始されるまでカート選択はできません");
 			return;
 		}
 
@@ -342,10 +342,37 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+	/*
+	 * レースに参加申請し、開始されるまで待機している状態です
+	 * 行動の制限等は掛かりません
+	 */
 	public static Boolean isEntry(Player p) {
 		if (getRace(p).getEntry() != "")
-			if (!getRace(p).getGoal())
 				return true;
+		return false;
+	}
+
+	/*
+	 * 申請していたレースが規定人数を満たし参加者が召集された状態です
+	 * まだレースは開始されていません
+	 * レースの終了までインベントリの操作等が出来ない代わりに
+	 * 専用のアイテムが利用でき、キャラクター選択やレース専用カートへの搭乗が可能となります
+	 */
+	public static Boolean isStandBy(Player p){
+		if (isEntry(p))
+			if (getRace(p).getStandBy())
+				return true;
+		return false;
+	}
+
+	/*
+	 * 申請していたレースが開始された状態です
+	 */
+	public static Boolean isRacing(Player p){
+		if(isEntry(p))
+			if(isStandBy(p))
+				if(getRace(p).getStart())
+					return true;
 		return false;
 	}
 
