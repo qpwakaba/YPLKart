@@ -182,7 +182,7 @@ public class PacketUtil extends ReflectionUtil{
 			channelField = ReflectionUtil.getField(network, "i");
 		}else if(getBukkitVersion().equalsIgnoreCase("v1_8_R2")){
 			channelField = ReflectionUtil.getField(network, "k");
-		}else if(getBukkitVersion().equalsIgnoreCase("v1_8_R2")){
+		}else if(getBukkitVersion().equalsIgnoreCase("v1_8_R3")){
 			channelField = ReflectionUtil.getField(network, "channel");
 		}
 
