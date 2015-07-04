@@ -36,6 +36,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit delete {circuit name}
 	//ka circuit edit {circuit name}
 	//ka circuit setminplayer {circuit name} {number of player}
+	//ka circuit setmatchingtime {circuit name} {number of second}
 	//ka circuit setposition {circuit name}
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit rename {circuit name} {new circuitname}
@@ -72,6 +73,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				RaceData.setMinPlayer(this.p, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(this.p);
+					return;
+				}
+				RaceData.setMatchingTime(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){
@@ -482,11 +490,12 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	void reload(){
 		if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_reload, false, false))return;
 
-		Settings.reloadConfig();
 		for(Player p : Bukkit.getOnlinePlayers()){
-			RaceManager.removeCustomMinecart(p);
-			RaceManager.leave(p);
+			RaceManager.exit(p);
 		}
+		RaceManager.endAllCircuit();
+
+		Settings.reloadConfig();
 		Util.sendMessage(this.p, "コンフィグをリロードしました");
 	}
 
