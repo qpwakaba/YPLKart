@@ -28,11 +28,6 @@ public class CMDAbstractBlock extends CMDAbstract{
 			Util.sendMessage(Bukkit.getPlayer(args[0]), reference);
 	}
 
-	//ka circuit create {circuit name} {world} {x} {y} {z}
-	//ka circuit delete {circuit name}
-	//ka circuit setposition {circuit name} {worldname} {x} {y} {z}
-	//ka circuit rename {circuit name} {new circuitname}
-	//ka circuit list
 	@Override
 	void circuit(){
 		if(this.length == 2){
@@ -69,6 +64,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 					return;
 				}
 				RaceData.setLimitTime(null, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("setlap")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(null);
+					return;
+				}
+				RaceData.setNumberOfLaps(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){

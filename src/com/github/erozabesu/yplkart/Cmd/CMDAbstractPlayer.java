@@ -35,6 +35,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit create {circuit name} {world} {x} {y} {z} {yaw} {pitch}
 	//ka circuit delete {circuit name}
 	//ka circuit edit {circuit name}
+	//ka circuit setlap {circuit name} {number of laps}
 	//ka circuit setminplayer {circuit name} {number of player}
 	//ka circuit setmatchingtime {circuit name} {number of second}
 	//ka circuit setposition {circuit name}
@@ -100,6 +101,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				RaceData.setLimitTime(this.p, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("setlap")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(this.p);
+					return;
+				}
+				RaceData.setNumberOfLaps(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){
