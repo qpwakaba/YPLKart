@@ -43,52 +43,91 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void setupCircuit(String circuitname, UUID entryplayer){
+	public static Circuit setupCircuit(String circuitname){
 		if(circuit.get(circuitname) == null)
 			circuit.put(circuitname, new Circuit(circuitname));
 
-		circuit.get(circuitname).entryPlayer(entryplayer);
+		return circuit.get(circuitname);
 	}
 
 	public static void endCircuit(String circuitname){
-		if(circuit.get(circuitname) != null)
+		if(circuit.get(circuitname) != null){
+			circuit.get(circuitname).init();
 			circuit.remove(circuitname);
+		}
+	}
+
+	public static void endAllCircuit(){
+		for(Circuit c : circuit.values()){
+			c.init();
+		}
+		circuit.clear();
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void entry(final Player p, final String circuitname){
+	public static void acceptMatching(Player p){
+		Circuit c = getCircuit(p);
+		if(c == null){
+			Util.sendMessage(p, "#Redレースにエントリーしていません");
+			return;
+		}else if(!c.isMatching()){
+			Util.sendMessage(p, "#Red現在そのレースには参加できません");
+			return;
+		}else{
+			c.acceptMatching(p);
+			Util.sendMessageNoHeader(p, "#Aquaレース参加を承認しました。準備が整うまでお待ち下さい");
+		}
+	}
+
+	public static void denyMatching(Player p){
+		Circuit c = getCircuit(p);
+		if(c == null){
+			Util.sendMessage(p, "#Redレースにエントリーしていません");
+			return;
+		}else if(!c.isMatching()){
+			Util.sendMessage(p, "#Red現在そのレースには参加できません");
+			return;
+		}else{
+			c.denyMatching(p);
+			exit(p);
+		}
+	}
+
+	public static void entry(Player p, String circuitname){
 		if(p.getGameMode() == GameMode.SPECTATOR)return;
-		Race r = getRace(p);
+		Circuit c = setupCircuit(circuitname);
+		getRace(p).setEntry(circuitname);
 
-		//Circuit初期化
-		setupCircuit(circuitname, p.getUniqueId());
+		if(c.isStarted()){
+			c.entryReservePlayer(p);
+			Util.sendMessage(p, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+		}else{
+			c.entryPlayer(p);
+			Scoreboards.entryCircuit(p);
 
-		//Race初期化
-		r.init();
-		r.setEntry(circuitname);
-		characterReset(p);
-		leave(p);
-		Scoreboards.entryCircuit(p);
+			Util.sendMessage(p, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
 
-		Util.sendMessage(p, "サーキット：" + "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+			if(c.isMatching())
+				acceptMatching(p);
+		}
 	}
 
 	public static void exit(Player p){
 		Scoreboards.exitCircuit(p);
 		getCircuit(p).exitPlayer(p);
-
 		Race r = getRace(p);
 
-		r.recoveryExp();
-		r.recoveryInventory();
-		r.recoveryPhysical();
+		if(isStandBy(p)){
+			r.recoveryExp();
+			r.recoveryInventory();
+			r.recoveryPhysical();
+			p.teleport(r.getGoalPosition());
+		}
+
 		characterReset(p);
 		removeCustomMinecart(p);
 		leave(p);
-
-		p.teleport(r.getGoalPosition());
-
 		r.init();
 
 		Util.sendMessage(p, "エントリーを取り消しました");

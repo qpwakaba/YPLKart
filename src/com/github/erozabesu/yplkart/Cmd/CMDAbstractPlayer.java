@@ -41,8 +41,21 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit rename {circuit name} {new circuitname}
 	//ka circuit list
+	
+	//ka circuit accept
+	//ka circuit deny
 	@Override
 	void circuit(){
+		if(this.length == 2){
+			if(args[1].equalsIgnoreCase("accept")){
+				RaceManager.acceptMatching(this.p);
+				return;
+			}else if(args[1].equalsIgnoreCase("deny")){
+				RaceManager.denyMatching(this.p);
+				return;
+			}
+		}
+		
 		if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_circuit, false, false))return;
 		if(this.length == 2){
 			if(args[1].equalsIgnoreCase("list")){

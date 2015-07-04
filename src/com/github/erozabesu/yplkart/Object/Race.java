@@ -89,6 +89,8 @@ public class Race {
 		this.walkspeed = p.getWalkSpeed();
 		this.level = p.getLevel();
 		this.exp = p.getExp();
+		this.inventory = new ArrayList<ItemStack>();
+		this.armorcontents = new ArrayList<ItemStack>();
 
 		this.entry = "";
 		this.standby = false;
@@ -105,21 +107,10 @@ public class Race {
 		this.point = 0;
 		this.firstpassedcheckpoint = "";
 		this.passedcheckpoint = new ArrayList<String>();
-		this.inventory = new ArrayList<ItemStack>();
-		this.armorcontents = new ArrayList<ItemStack>();
 
-		//if(this.deathpenaltytask != null)
-		//	this.deathpenaltytask.cancel();
 		this.deathpenaltytask = null;
-
-		//if(this.itemPositiveSpeedTask != null)
-		//	this.itemPositiveSpeedTask.cancel();
 		this.itemPositiveSpeedTask = null;
-
-		//if(this.itemNegativeSpeedTask != null)
-		//	this.itemNegativeSpeedTask.cancel();
 		this.itemNegativeSpeedTask = null;
-
 		this.usingKiller = null;
 
 		this.cmdForceLeave = false;
@@ -280,7 +271,7 @@ public class Race {
 
 	public void setStart(boolean value){
 		this.start = value;
-		RaceManager.setupCircuit(this.entry, this.id);
+		RaceManager.getCircuit(this.entry).setStart(true);
 	}
 
 	public void setStart(boolean value, Location from, Location to){
@@ -402,6 +393,20 @@ public class Race {
 				stepDashBoard = false;
 			}
 		}, (Settings.BoostRailEffectSecond + RaceManager.getRace(getPlayer()).getCharacter().getItemAdjustPositiveEffectSecond()) * 20);
+	}
+
+	public void savePlayerData(){
+		Player p = getPlayer();
+
+		this.goalposition = p.getLocation().add(0,1,0);
+		this.maxhealth = p.getMaxHealth();
+		this.health = p.getHealth();
+		this.hunger = p.getFoodLevel();
+		this.walkspeed = p.getWalkSpeed();
+		this.level = p.getLevel();
+		this.exp = p.getExp();
+
+		saveInventory();
 	}
 
 	public void saveInventory(){
