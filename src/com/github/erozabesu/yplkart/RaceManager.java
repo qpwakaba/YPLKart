@@ -118,6 +118,10 @@ public class RaceManager {
 		getCircuit(p).exitPlayer(p);
 		Race r = getRace(p);
 
+		characterReset(p);
+		removeCustomMinecart(p);
+		leave(p);
+
 		if(isStandBy(p)){
 			r.recoveryExp();
 			r.recoveryInventory();
@@ -125,9 +129,6 @@ public class RaceManager {
 			p.teleport(r.getGoalPosition());
 		}
 
-		characterReset(p);
-		removeCustomMinecart(p);
-		leave(p);
 		r.init();
 
 		Util.sendMessage(p, "エントリーを取り消しました");
