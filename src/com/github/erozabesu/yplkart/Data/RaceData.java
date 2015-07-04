@@ -33,6 +33,7 @@ public final class RaceData{
 	private static File configFile;
 	private static FileConfiguration config;
 
+	private static int numberoflaps = 3;
 	private static int minplayer = 3;
 	private static int matchingtime = 30;
 	private static int limittime = 300;
@@ -162,6 +163,17 @@ public final class RaceData{
 		}
 	}
 
+	public static void setNumberOfLaps(Player p, String circuitname, int amount){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".numberoflaps", amount);
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの周回数を#White" + amount + "周#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
 	public static void setMinPlayer(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
@@ -213,7 +225,7 @@ public final class RaceData{
 	public static void addRunningRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 
-			String path = circuitname + ".laptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId().toString();
+			String path = circuitname + ".laptime." + getNumberOfLaps(circuitname) + "." + p.getUniqueId().toString();
 			if(!config.contains(path)){
 				config.set(path, laptime);
 				saveConfigFile();
@@ -232,7 +244,7 @@ public final class RaceData{
 	public static void addKartRaceLapTime(Player p, String circuitname, double laptime){
 		if(getCircuitSet().contains(circuitname)){
 
-			String path = circuitname + ".kartlaptime." + ((int)Settings.NumberOfLaps-1) + "." + p.getUniqueId().toString();
+			String path = circuitname + ".kartlaptime." + getNumberOfLaps(circuitname) + "." + p.getUniqueId().toString();
 			if(!config.contains(path)){
 				config.set(path, laptime);
 				saveConfigFile();
@@ -246,6 +258,15 @@ public final class RaceData{
 				return;
 			}
 		}
+	}
+
+	public static int getNumberOfLaps(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return numberoflaps;
+		if(config.getInt(circuitname + ".numberoflaps") == 0)
+			return numberoflaps;
+
+		return config.getInt(circuitname + ".numberoflaps");
 	}
 
 	public static int getMinPlayer(String circuitname){
@@ -268,9 +289,9 @@ public final class RaceData{
 
 	public static int getLimitTime(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
-			return matchingtime;
+			return limittime;
 		if(config.getInt(circuitname + ".limittime") == 0)
-			return matchingtime;
+			return limittime;
 
 		return config.getInt(circuitname + ".limittime");
 	}

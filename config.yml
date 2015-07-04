@@ -33,7 +33,6 @@ disabled_worlds:
 - testworld
 - testworld2
 settings:
-  number_of_laps: 3
   start_block_id: '41:0'
   goal_block_id: '42:0'
   dirt_block_id: '12:0'

@@ -62,7 +62,6 @@ public final class Settings{
 	//public static boolean EnableOPPermissionCMDCheckPointTool = true;
 	public static boolean EnableOPPermissionCMDItemBoxTool = true;
 
-	public static int NumberOfLaps = 3;
 	public static String StartBlock = "41:0";
 	public static String GoalBlock = "42:0";
 	public static String DirtBlock = "12:0";
@@ -312,9 +311,6 @@ public final class Settings{
 		EnableOPPermissionCMDItemBoxTool = config.getBoolean("enable_op_permission.cmd_itemboxtool");
 
 //〓セッティング
-		if(!config.contains("settings.number_of_laps"))config.set("settings.number_of_laps", 3);
-		NumberOfLaps = config.getInt("settings.number_of_laps") + 1;
-
 		if(!config.contains("settings.start_block_id"))config.set("settings.start_block_id", StartBlock);
 		StartBlock = config.getString("settings.start_block_id");
 
