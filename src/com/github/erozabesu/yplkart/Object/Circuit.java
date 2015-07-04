@@ -373,7 +373,7 @@ public class Circuit{
 	public List<Player> getEntryPlayer(){
 		List<Player> entry = new ArrayList<Player>();
 		for(UUID id : this.entry){
-			if(Bukkit.getPlayer(id).isOnline())
+			if(Bukkit.getPlayer(id) != null)
 				entry.add(Bukkit.getPlayer(id));
 		}
 		return entry;
