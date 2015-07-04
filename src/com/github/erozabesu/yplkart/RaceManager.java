@@ -352,6 +352,10 @@ public class RaceManager {
 	public static void setPassengerCustomMinecart(final Player p, final EnumKarts kart){
 		if(!Permission.hasPermission(p, Permission.kart_ride, false))return;
 		final Location l = p.getLocation();
+		if(!isStandBy(p)){
+			Util.sendMessage(p, "#Redレースが開始されるまでカート選択はできません");
+			return;
+		}
 
 		if(p.getVehicle() != null){
 			if(isCustomMinecart(p.getVehicle())){
