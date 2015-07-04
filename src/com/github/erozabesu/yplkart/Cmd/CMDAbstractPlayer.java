@@ -41,7 +41,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
 	//ka circuit rename {circuit name} {new circuitname}
 	//ka circuit list
-	
+
 	//ka circuit accept
 	//ka circuit deny
 	@Override
@@ -55,7 +55,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				return;
 			}
 		}
-		
+
 		if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_circuit, false, false))return;
 		if(this.length == 2){
 			if(args[1].equalsIgnoreCase("list")){
@@ -93,6 +93,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				RaceData.setMatchingTime(this.p, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("setlimittime")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(this.p);
+					return;
+				}
+				RaceData.setLimitTime(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){

@@ -62,6 +62,13 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				RaceData.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
 				return;
+			}else if(args[1].equalsIgnoreCase("setlimittime")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(null);
+					return;
+				}
+				RaceData.setLimitTime(null, args[2], Integer.valueOf(args[3]));
+				return;
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
