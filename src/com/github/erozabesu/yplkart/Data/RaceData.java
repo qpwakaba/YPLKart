@@ -35,6 +35,7 @@ public final class RaceData{
 
 	private static int minplayer = 3;
 	private static int matchingtime = 30;
+	private static int limittime = 300;
 
 	public RaceData(YPLKart plugin){
 		pl = plugin;
@@ -183,6 +184,17 @@ public final class RaceData{
 		}
 	}
 
+	public static void setLimitTime(Player p, String circuitname, int second){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".limittime", second);
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenのレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
 	public static void setPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
@@ -252,6 +264,15 @@ public final class RaceData{
 			return matchingtime;
 
 		return config.getInt(circuitname + ".matchingtime");
+	}
+
+	public static int getLimitTime(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return matchingtime;
+		if(config.getInt(circuitname + ".limittime") == 0)
+			return matchingtime;
+
+		return config.getInt(circuitname + ".limittime");
 	}
 
 	public static Location getPosition(String circuitname){

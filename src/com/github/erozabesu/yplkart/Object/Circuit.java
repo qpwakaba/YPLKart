@@ -20,9 +20,10 @@ import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class Circuit {
+public class Circuit{
 	private String name;
 	private int laptime;
+	private int limittime;
 	private int matchingcountdown;
 	private boolean isstarted;
 	private boolean ismatching;
@@ -51,6 +52,7 @@ public class Circuit {
 	 */
 	public Circuit(final String name){
 		this.name = name;
+		this.limittime = RaceData.getLimitTime(name);
 		init();
 
 		runCountUpTask();
@@ -85,7 +87,6 @@ public class Circuit {
 					continue;
 				}
 			}
-
 			exitPlayer(id);
 		}
 	}
@@ -117,6 +118,37 @@ public class Circuit {
 		if(this.matchingtask != null)
 			this.matchingtask.cancel();
 		this.matchingtask = null;
+	}
+
+	public void endRace(){
+		sendMessageEntryPlayer("#Blue" + Util.convertInitialUpperString(name) + "#Aquaのレースが終了しました");
+		Iterator<UUID> i = entry.iterator();
+		UUID id;
+		while(i.hasNext()){
+			id = i.next();
+			i.remove();
+			RaceManager.exit(Bukkit.getPlayer(id));
+		}
+
+		//リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
+		final List<UUID> nextentry = new ArrayList<UUID>(reserveentry);
+		if(0 < nextentry.size()){
+			Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+				public void run(){
+					Circuit c = RaceManager.setupCircuit(name);
+					for(UUID id : nextentry){
+						RaceManager.entry(Bukkit.getPlayer(id), name);
+						c.entryPlayer(id);
+					}
+				}
+			}, 10);
+		}
+
+		//初期化
+		removeAllJammerEntity();
+		init();
+		RaceManager.endCircuit(name);
+		Scoreboards.endCircuit(name);
 	}
 
 	public void entryPlayer(UUID id){
@@ -202,15 +234,31 @@ public class Circuit {
 		}
 	}
 
-	//
 	public void runCountUpTask(){
 		if(this.countuptask != null)
 			this.countuptask.cancel();
 
 		this.countuptask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
 			public void run(){
-				if(isStarted())
+				if(isStarted()){
 					laptime++;
+
+					if(laptime % 20 == 0){
+						int remaintime = limittime - laptime/20;
+						if(remaintime == 60){
+							sendMessageEntryPlayer("#Gray======== #Aqua残り時間#White60秒#Aqua！ #Gray========");
+						}else if(remaintime == 30){
+							sendMessageEntryPlayer("#Gray======== #Aqua残り時間#White30秒#Aqua！ #Gray========");
+						}else if(remaintime == 10){
+							sendMessageEntryPlayer("#Gray======== #Red残り時間#White10秒#Aqua！ #Gray========");
+						}else if(0 < remaintime && remaintime < 10){
+							sendMessageEntryPlayer("#Gray========       #White" + remaintime + "#Red！        #Gray========");
+						}else if(remaintime == 0){
+							sendMessageEntryPlayer("#Gray======== #Redタイムアップ！  #Gray========");
+							endRace();
+						}
+					}
+				}
 			}
 		}, 0, 1);
 	}
@@ -222,36 +270,7 @@ public class Circuit {
 		this.detectend = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
 			public void run(){
 				if (isRaceEnd()){
-					//プレイヤーデータの初期化
-					//まだレース中のプレイヤーのスコアボード・ドロップアイテムに影響するためレース終了時の行う
-					sendMessageEntryPlayer("#Blue" + Util.convertInitialUpperString(name) + "#Aquaのレースが終了しました");
-					Iterator<UUID> i = entry.iterator();
-					UUID id;
-					while(i.hasNext()){
-						id = i.next();
-						i.remove();
-						RaceManager.exit(Bukkit.getPlayer(id));
-					}
-
-					//リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
-					final List<UUID> nextentry = new ArrayList<UUID>(reserveentry);
-					if(0 < nextentry.size()){
-						Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-							public void run(){
-								Circuit c = RaceManager.setupCircuit(name);
-								for(UUID id : nextentry){
-									RaceManager.entry(Bukkit.getPlayer(id), name);
-									c.entryPlayer(id);
-								}
-							}
-						}, 10);
-					}
-
-					//初期化
-					removeAllJammerEntity();
-					init();
-					RaceManager.endCircuit(name);
-					Scoreboards.endCircuit(name);
+					endRace();
 				}
 			}
 		}, 10, 100);
@@ -332,9 +351,8 @@ public class Circuit {
 	}
 
 	public void sendMessageEntryPlayer(String message){
-		for(UUID id : entry){
-			if(Bukkit.getPlayer(id).isOnline())
-				Util.sendMessageNoHeader(Bukkit.getPlayer(id), message);
+		for(Player p : getEntryPlayer()){
+			Util.sendMessageNoHeader(p, message);
 		}
 	}
 
