@@ -22,6 +22,7 @@ public class CMD implements CommandExecutor{
 											+ "/ka circuit create {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :\n"
 											+ "/ka circuit delete {circuit name} :\n"
 											+ "/ka circuit edit {circuit name} :\n"
+											+ "/ka circuit setlap {circuit name} {number of laps} :\n"
 											+ "/ka circuit setminplayer {circuit name} {number of player} :\n"
 											+ "/ka circuit setmatchingtime {circuit name} {number of second} :\n"
 											+ "/ka circuit setlimittime {circuit name} {number of second} :\n"
