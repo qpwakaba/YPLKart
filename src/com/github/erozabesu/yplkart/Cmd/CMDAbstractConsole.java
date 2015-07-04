@@ -55,6 +55,13 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				RaceData.setMinPlayer(null, args[2], Integer.valueOf(args[3]));
 				return;
+			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(null);
+					return;
+				}
+				RaceData.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
+				return;
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
@@ -360,11 +367,12 @@ public class CMDAbstractConsole extends CMDAbstract{
 
 	@Override
 	void reload() {
-		Settings.reloadConfig();
 		for(Player p : Bukkit.getOnlinePlayers()){
-			RaceManager.removeCustomMinecart(p);
-			RaceManager.leave(p);
+			RaceManager.exit(p);
 		}
+		RaceManager.endAllCircuit();
+
+		Settings.reloadConfig();
 		Util.sendMessage(null, "コンフィグをリロードしました");
 	}
 
