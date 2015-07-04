@@ -34,6 +34,7 @@ public final class RaceData{
 	private static FileConfiguration config;
 
 	private static int minplayer = 3;
+	private static int matchingtime = 30;
 
 	public RaceData(YPLKart plugin){
 		pl = plugin;
@@ -166,7 +167,18 @@ public final class RaceData{
 		}else{
 			Location l = p.getLocation();
 			config.set(circuitname + ".minplayer", amount);
-			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました。エントリーしたプレイヤーがこの人数を満たすまで、レースは開始されません。");
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
+	public static void setMatchingTime(Player p, String circuitname, int second){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".matchingtime", second);
+			Util.sendMessage(p, "#Greenサーキット：" + "#Gold" + circuitname + "#Greenのマッチング時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -231,6 +243,15 @@ public final class RaceData{
 			return minplayer;
 
 		return config.getInt(circuitname + ".minplayer");
+	}
+
+	public static int getMatchingTime(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return matchingtime;
+		if(config.getInt(circuitname + ".matchingtime") == 0)
+			return matchingtime;
+
+		return config.getInt(circuitname + ".matchingtime");
 	}
 
 	public static Location getPosition(String circuitname){

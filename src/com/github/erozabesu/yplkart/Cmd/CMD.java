@@ -127,10 +127,6 @@ public class CMD implements CommandExecutor{
 
 			if(args.length == 0)
 				this.cmd.ka();
-			else if(args[0].equalsIgnoreCase("accept"))
-				this.cmd.circuit();
-			else if(args[0].equalsIgnoreCase("deny"))
-				this.cmd.circuit();
 			else if(args[0].equalsIgnoreCase("circuit"))
 				this.cmd.circuit();
 			else if(args[0].equalsIgnoreCase("display"))
