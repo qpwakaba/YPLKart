@@ -33,6 +33,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
+import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
@@ -143,7 +144,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(r.getLastStepBlock().equalsIgnoreCase(Settings.StartBlock)){
 			if(Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.GoalBlock)){
 				//正常ルート
-				if(lapcount + 1 == Settings.NumberOfLaps){
+				if(lapcount== RaceData.getNumberOfLaps(r.getEntry())){
 					r.setGoal();
 				}else{
 					if(lapcount == 0){
