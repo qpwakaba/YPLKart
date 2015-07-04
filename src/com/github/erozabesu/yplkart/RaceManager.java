@@ -74,6 +74,8 @@ public class RaceManager {
 		}else if(!c.isMatching()){
 			Util.sendMessage(p, "#Red現在そのレースには参加できません");
 			return;
+		}else if(isStandBy(p)){
+			return;
 		}else{
 			c.acceptMatching(p);
 			Util.sendMessageNoHeader(p, "#Aquaレース参加を承認しました。準備が整うまでお待ち下さい");
@@ -87,6 +89,8 @@ public class RaceManager {
 			return;
 		}else if(!c.isMatching()){
 			Util.sendMessage(p, "#Red現在そのレースには参加できません");
+			return;
+		}else if(isStandBy(p)){
 			return;
 		}else{
 			c.denyMatching(p);
