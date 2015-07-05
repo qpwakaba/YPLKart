@@ -43,7 +43,7 @@ public class SendCountDownTitleTask extends BukkitRunnable{
 		if(life % 20 == 0){
 			if(((int)(maxlife-life)/20) != 0){
 				PacketUtil.sendTitle(p, text, 0, 25, 0, color, false);
-				PacketUtil.sendTitle(p, "効果時間 残り : " + ((int)(maxlife-life)/20) + "秒", 0, 25, 0, subcolor, true);
+				PacketUtil.sendTitle(p, "残り時間 残り : " + ((int)(maxlife-life)/20) + "秒", 0, 25, 0, subcolor, true);
 			}
 		}
 	}
