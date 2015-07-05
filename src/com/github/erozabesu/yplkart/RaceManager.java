@@ -225,12 +225,7 @@ public class RaceManager {
 				p.leaveVehicle();
 			}
 		}
-		//TODO
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				createCustomMinecart(l, kart).setPassenger(p);
-			}
-		}, 2);
+		createCustomMinecart(l, kart).setPassenger(p);
 	}
 
 	public static void leaveRacingKart(Player p){
