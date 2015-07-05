@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 
 public class PacketUtil extends ReflectionUtil{
@@ -158,6 +159,26 @@ public class PacketUtil extends ReflectionUtil{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/* プレイヤーをテレポート後即エンティティに搭乗させると、
+	 * サーバーとクライアントで情報の食い違いが発生するため、それを正すためだけの処理
+	 * クライアント側では搭乗された判定が行われないため、搭乗状態のはずが自由移動できてしまう
+	 * 移動しても、サーバーでは搭乗状態になっているため、すぐもとの場所に戻される
+	 * 数チック後にエンティティに搭乗するパケットを再送し食い違いを修正する
+	 */
+	public static void sendOwnAttachEntityPacket(final Player p){
+		if(p.getVehicle() == null)return;
+		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+			public void run(){
+				try {
+					Object attachentitypacket = getAttachEntityPacket(getCraftEntity(p), getCraftEntity(p.getVehicle()));
+					sendPacket(p, attachentitypacket);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}, 5);
 	}
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
