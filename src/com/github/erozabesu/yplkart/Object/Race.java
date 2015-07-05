@@ -92,15 +92,15 @@ public class Race {
 
 	public void init(){
 		Player p = getPlayer();
-		//this.character = EnumCharacter.Human;
-		//this.kart = null;
-		this.goalposition = getPlayer().getLocation().add(0,1,0);
-		this.maxhealth = p.getMaxHealth();
-		this.health = p.getHealth();
-		this.hunger = p.getFoodLevel();
-		this.walkspeed = p.getWalkSpeed();
-		this.level = p.getLevel();
-		this.exp = p.getExp();
+		if(p != null){
+			this.goalposition = getPlayer().getLocation().add(0,1,0);
+			this.maxhealth = p.getMaxHealth();
+			this.health = p.getHealth();
+			this.hunger = p.getFoodLevel();
+			this.walkspeed = p.getWalkSpeed();
+			this.level = p.getLevel();
+			this.exp = p.getExp();
+		}
 		this.inventory = new ArrayList<ItemStack>();
 		this.armorcontents = new ArrayList<ItemStack>();
 
