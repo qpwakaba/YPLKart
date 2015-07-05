@@ -572,32 +572,47 @@ public class Race {
 	}
 
 	public void recoveryPhysical(){
-		Player p = getPlayer();
+		final Player p = getPlayer();
 		if(p == null)return;
 
 		p.setMaxHealth(this.maxhealth);
-		p.setHealth(this.health);
 		p.setFoodLevel(this.hunger);
 		p.setWalkSpeed(this.walkspeed);
+		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+			public void run(){
+				if(getPlayer() != null)
+					p.setHealth(health);
+			}
+		}, 5L);
 	}
 
 	public void recoveryPhysicalOnQuit(){
-		Player p = getPlayer();
+		final Player p = getPlayer();
 		if(p == null)return;
 
 		p.setMaxHealth(this.quitmaxhealth);
-		p.setHealth(this.quithealth);
 		p.setFoodLevel(this.quithunger);
 		p.setWalkSpeed(this.quitwalkspeed);
+		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+			public void run(){
+				if(getPlayer() != null)
+					p.setHealth(quithealth);
+			}
+		}, 5L);
 	}
 
 	public void recoveryCharacterPhysical(){
-		Player p = getPlayer();
+		final Player p = getPlayer();
 		if(p == null)return;
 
 		p.setMaxHealth(this.character.getMaxHealth());
-		p.setHealth(this.character.getMaxHealth());
 		p.setWalkSpeed(this.character.getWalkSpeed());
+		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+			public void run(){
+				if(getPlayer() != null)
+					p.setHealth(character.getMaxHealth());
+			}
+		}, 5L);
 	}
 
 	public void recoveryInventory(){
