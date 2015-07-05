@@ -259,32 +259,21 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void onRespawn(PlayerRespawnEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
+		if(!isStandBy(e.getPlayer().getUniqueId()))return;
+
 		final Player p = e.getPlayer();
 		final Race r = getRace(p);
 
-		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
+		Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable(){
 			public void run(){
 					p.setSprinting(true);
-					if(r.getKart() != null){
-						try {
-							RaceManager.rideRacingKart(p, r.getKart());
-							p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-					}
+					p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+					p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
+					p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
+					r.recoveryKart();
+					new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
 			}
-		}, 10);
-
-		if(!isRacing(p.getUniqueId()))return;
-
-		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
-			public void run(){
-				new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
-				p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
-				p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
-			}
-		}, 2);
+		});
 
 		r.setDeathPenaltyTask(
 			Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
@@ -301,9 +290,6 @@ public class DataListener extends RaceManager implements Listener {
 			Location respawn = r.getLastPassedCheckPoint().getLocation().add(0, - checkPointHeight,0);
 			e.setRespawnLocation(new Location(respawn.getWorld(), respawn.getX(), respawn.getY(), respawn.getZ(), r.getLastYaw(), 0));
 		}
-
-		//if(p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))return;
-		//r.recoveryInventory();
 	}
 
 	//キラー使用中の窒素ダメージを無効
@@ -476,7 +462,7 @@ public class DataListener extends RaceManager implements Listener {
 				p.closeInventory();
 			//ランダムボタン
 			}else if(EnumSelectMenu.KartRandom.equalsIgnoreCase(clicked)){
-				RaceManager.rideRacingKart(p, EnumKarts.getRandomKart());
+				RaceManager.setKartRaceData(id, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
 				if(isStandBy(id)){
@@ -495,7 +481,7 @@ public class DataListener extends RaceManager implements Listener {
 				}
 			//カート選択
 			}else if(EnumKarts.getKartfromString(clicked) != null){
-				RaceManager.rideRacingKart(p, EnumKarts.getKartfromString(clicked));
+				RaceManager.setKartRaceData(id, EnumKarts.getKartfromString(clicked));
 			}
 			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
 		}
