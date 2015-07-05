@@ -172,10 +172,10 @@ public class RaceManager {
 				r.recoveryPhysical();
 				p.teleport(r.getGoalPosition());
 			}
+			Util.sendMessage(id, "エントリーを取り消しました");
 		}
 
 		r.init();
-		Util.sendMessage(id, "エントリーを取り消しました");
 	}
 
 	public static void clearCharacterRaceData(UUID id){
