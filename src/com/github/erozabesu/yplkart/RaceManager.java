@@ -193,7 +193,8 @@ public class RaceManager {
 	public static void clearKartRaceData(UUID id){
 		if(getRace(id).getKart() == null)return;
 
-		Util.sendMessage(id, "搭乗を解除しました");
+		if(Bukkit.getPlayer(id) != null)
+			Util.sendMessage(id, "搭乗を解除しました");
 		getRace(id).setKart(null);
 	}
 
