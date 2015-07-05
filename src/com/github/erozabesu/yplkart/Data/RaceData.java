@@ -305,7 +305,7 @@ public final class RaceData{
 		return new Location(Bukkit.getWorld(config.getString(circuitname + ".world")),config.getDouble(circuitname + ".x"),config.getDouble(circuitname + ".y"),config.getDouble(circuitname + ".z"),(float)config.getDouble(circuitname + ".yaw"),(float)config.getDouble(circuitname + ".pitch"));
 	}
 
-	public static String getRanking(Player p, String circuitname){
+	public static String getRanking(UUID id, String circuitname){
 		if(!getCircuitSet().contains(circuitname))return null;
 		try{
 			//記憶されている周回数
@@ -346,16 +346,16 @@ public final class RaceData{
 						entry.get(entry.size()-rank);
 						ranking += "   #Yellow" + rank + ". #White" + Bukkit.getOfflinePlayer(entry.get(entry.size()-rank).getKey()).getName() + " : " + "#Yellow" + entry.get(entry.size()-rank).getValue() + " sec\n";
 					}
-					if(p.getUniqueId().toString().equalsIgnoreCase(entry.get(entry.size()-rank).getKey().toString())){
+					if(id.toString().equalsIgnoreCase(entry.get(entry.size()-rank).getKey().toString())){
 						ownrank = rank;
 						ownsec = entry.get(entry.size()-rank).getValue();
 					}
 				}
 
 				if(ownrank != 0 && ownsec != 0)
-					ranking += "#White" + p.getName() + "#Greenさんの順位は#Yellow" + ownrank + "位 : " + ownsec + " sec" + "#Greenです\n";
+					ranking += "#White" + Bukkit.getOfflinePlayer(id).getName() + "#Greenさんの順位は#Yellow" + ownrank + "位 : " + ownsec + " sec" + "#Greenです\n";
 				else
-					ranking += "#White" + p.getName() + "#Greenさんのデータは存在しません";
+					ranking += "#White" + Bukkit.getOfflinePlayer(id).getName() + "#Greenさんのデータは存在しません";
 			}
 
 			return ranking;
@@ -364,7 +364,7 @@ public final class RaceData{
 		return null;
 	}
 
-	public static String getKartRanking(Player p, String circuitname){
+	public static String getKartRanking(UUID id, String circuitname){
 		if(!getCircuitSet().contains(circuitname))return null;
 		try{
 			//記憶されている周回数
@@ -405,15 +405,15 @@ public final class RaceData{
 						entry.get(entry.size()-rank);
 						ranking += "   #Yellow" + rank + ". #White" + Bukkit.getOfflinePlayer(entry.get(entry.size()-rank).getKey()).getName() + " : " + "#Yellow" + entry.get(entry.size()-rank).getValue() + " sec\n";
 					}
-					if(p.getUniqueId().toString().equalsIgnoreCase(entry.get(entry.size()-rank).getKey().toString())){
+					if(id.toString().equalsIgnoreCase(entry.get(entry.size()-rank).getKey().toString())){
 						ownrank = rank;
 						ownsec = entry.get(entry.size()-rank).getValue();
 					}
 				}
 				if(ownrank != 0 && ownsec != 0)
-					ranking += "#White" + p.getName() + "#Greenさんの順位は#Yellow" + ownrank + "位 : " + ownsec + " sec" + "#Greenです\n";
+					ranking += "#White" + Bukkit.getOfflinePlayer(id).getName() + "#Greenさんの順位は#Yellow" + ownrank + "位 : " + ownsec + " sec" + "#Greenです\n";
 				else
-					ranking += "#White" + p.getName() + "#Greenさんのデータは存在しません";
+					ranking += "#White" + Bukkit.getOfflinePlayer(id).getName() + "#Greenさんのデータは存在しません";
 			}
 
 			return ranking;

@@ -3,6 +3,7 @@ package com.github.erozabesu.yplkart.Listener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,7 +92,7 @@ public class DataListener extends RaceManager implements Listener {
 			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
 			if(kart == null)return;
 
-			RaceManager.ride((Player) e.getEntered(), kart);
+			RaceManager.ride(((Player) e.getEntered()).getUniqueId(), kart);
 		}
 	}
 
@@ -125,7 +126,7 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void saveLastStepBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isStandBy(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer().getUniqueId()))return;
 
 		getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
 	}
@@ -134,7 +135,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void saveLapcount(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		Player p = e.getPlayer();
-		if(!isStandBy(p))return;
+		if(!isStandBy(p.getUniqueId()))return;
 		Race r = getRace(p);
 		if(r.getLapStepCool())return;
 
@@ -173,7 +174,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void RunningRank(PlayerMoveEvent e) {//順位
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		Player p = e.getPlayer();
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 		if(getRace(p).getLapCount() < 1)return;
 
 		Race r = getRace(p);
@@ -195,7 +196,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void onRegainHealth(EntityRegainHealthEvent e){
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof Player))return;
-		if(!isRacing((Player)e.getEntity()))return;
+		if(!isRacing(((Player)e.getEntity()).getUniqueId()))return;
 		e.setCancelled(true);
 	}
 
@@ -206,10 +207,9 @@ public class DataListener extends RaceManager implements Listener {
 		final Player p = e.getPlayer();
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
-				if(isStandBy(p)){
+				if(isStandBy(p.getUniqueId())){
 					Race r = getRace(p);
-					Scoreboards.showBoard(p);
-					r.recoveryExpOnQuit();
+					Scoreboards.showBoard(p.getUniqueId());
 					r.recoveryPhysicalOnQuit();
 					r.recoveryInventoryOnQuit();
 
@@ -236,14 +236,13 @@ public class DataListener extends RaceManager implements Listener {
 		//レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
 		//ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、復元不可能になる可能性があるから。
 		//再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
-		if(isStandBy(p)){
-			Scoreboards.hideBoard(p);
+		if(isStandBy(p.getUniqueId())){
+			Scoreboards.hideBoard(p.getUniqueId());
 
 			r.savePlayerDataOnQuit();
 			r.saveInventoryOnQuit();
 
 			removeCustomMinecart(p);
-			r.recoveryExp();
 			r.recoveryInventory();
 			r.recoveryPhysical();
 			p.teleport(r.getGoalPosition());
@@ -254,7 +253,7 @@ public class DataListener extends RaceManager implements Listener {
 				r.init();
 			}
 		}else{
-			RaceManager.exit(p);
+			RaceManager.exit(p.getUniqueId());
 		}
 	}
 
@@ -278,7 +277,7 @@ public class DataListener extends RaceManager implements Listener {
 			}
 		}, 10);
 
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 
 		Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
 			public void run(){
@@ -316,7 +315,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof Player))return;
 		Player p = (Player) e.getEntity();
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 
 		if(getRace(p).getUsingKiller() != null){
 			if(e.getCause() == DamageCause.SUFFOCATION){
@@ -341,7 +340,7 @@ public class DataListener extends RaceManager implements Listener {
 
 		RaceManager.removeCustomMinecart(p);
 
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 		Race r = getRace(p);
 
 		p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
@@ -366,7 +365,7 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isStandBy((Player) e.getPlayer()))return;
+		if(!isStandBy(((Player) e.getPlayer()).getUniqueId()))return;
 
 		final Player p = (Player) e.getPlayer();
 		Race r = getRace(p);
@@ -419,12 +418,13 @@ public class DataListener extends RaceManager implements Listener {
 		if(!(e.getWhoClicked() instanceof Player))return;
 
 		//召集後はインベントリの操作をさせない
-		if(isStandBy((Player) e.getWhoClicked())){
+		if(isStandBy(((Player) e.getWhoClicked()).getUniqueId())){
 			e.setCancelled(true);
 			((Player)e.getWhoClicked()).updateInventory();
 		}
 
 		Player p = (Player) e.getWhoClicked();
+		UUID id = p.getUniqueId();
 		Race r = getRace(p);
 		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
 			e.setCancelled(true);
@@ -441,10 +441,10 @@ public class DataListener extends RaceManager implements Listener {
 				p.closeInventory();
 			//ランダムボタン
 			}else if(EnumSelectMenu.CharacterRandom.equalsIgnoreCase(clicked)){
-				RaceManager.character(p, EnumCharacter.getRandomCharacter());
+				RaceManager.character(id, EnumCharacter.getRandomCharacter());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
-				if(isStandBy(p)){
+				if(isStandBy(id)){
 					if(r.getCharacter() == null){
 						Util.sendMessage(p, "#Redキャラクターを選択して下さい");
 					}else{
@@ -460,7 +460,7 @@ public class DataListener extends RaceManager implements Listener {
 				}
 			//キャラクター選択
 			}else if(EnumCharacter.getClassfromString(clicked) != null){
-				RaceManager.character(p, EnumCharacter.getClassfromString(clicked));
+				RaceManager.character(id, EnumCharacter.getClassfromString(clicked));
 			}
 			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
 		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
@@ -481,7 +481,7 @@ public class DataListener extends RaceManager implements Listener {
 				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
-				if(isStandBy(p)){
+				if(isStandBy(id)){
 					if(r.getKart() == null){
 						Util.sendMessage(p, "#Redカートを選択して下さい");
 					}else{

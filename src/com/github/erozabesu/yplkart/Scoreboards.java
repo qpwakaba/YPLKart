@@ -1,12 +1,11 @@
 package com.github.erozabesu.yplkart;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -19,12 +18,9 @@ import com.github.erozabesu.yplkart.Utils.Util;
 public class Scoreboards{
 	private static HashMap<String, Scoreboard> scoreboard = new HashMap<String, Scoreboard>();
 
-	private static String getPlayerRegisterName(Player p){
-		return ChatColor.GREEN + p.getName();
-	}
-
-	private static String getPlayerRegisterName(OfflinePlayer p){
-		return ChatColor.GREEN + p.getName();
+	private static String getPlayerRegisterName(UUID id){
+		String name = Bukkit.getPlayer(id) != null ? Bukkit.getPlayer(id).getName() : Bukkit.getOfflinePlayer(id).getName();
+		return ChatColor.GREEN + name;
 	}
 
 	/* Server().getScoreboardManager().getMainScoreboard()
@@ -84,37 +80,40 @@ public class Scoreboards{
 			obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
 	}
 
-	public static void entryCircuit(Player p){
-		String entry = RaceManager.getRace(p).getEntry();
+	public static void entryCircuit(UUID id){
+		String entry = RaceManager.getRace(id).getEntry();
 		if(entry.equalsIgnoreCase(""))return;
 
 		createScoreboard(entry);
 		Scoreboard sb = scoreboard.get(entry);
 		if(sb == null)return;
 
+
 		Team team = sb.getTeam(YPLKart.plname);
-		team.addPlayer(p);
-		setPoint(p);
-		p.setScoreboard(sb);
+		team.addPlayer(Bukkit.getPlayer(id) == null ? Bukkit.getOfflinePlayer(id) : Bukkit.getPlayer(id));
+		setPoint(id);
+
+		if(Bukkit.getPlayer(id) != null)
+			Bukkit.getPlayer(id).setScoreboard(sb);
 	}
 
-	public static void exitCircuit(Player p){
-		String entry = RaceManager.getRace(p).getEntry();
+	public static void exitCircuit(UUID id){
+		String entry = RaceManager.getRace(id).getEntry();
 		if(entry.equalsIgnoreCase(""))return;
 
 		Scoreboard sb = scoreboard.get(entry);
 		if(sb == null)return;
 
-		sb.getTeam(YPLKart.plname).removeEntry(getPlayerRegisterName(p));
-		sb.resetScores(getPlayerRegisterName(p));
-		hideBoard(p);
+		sb.getTeam(YPLKart.plname).removeEntry(getPlayerRegisterName(id));
+		sb.resetScores(getPlayerRegisterName(id));
+		hideBoard(id);
 	}
 
-	public static void setPoint(Player p){
-		String entry = RaceManager.getRace(p).getEntry();
+	public static void setPoint(UUID id){
+		String entry = RaceManager.getRace(id).getEntry();
 		if(entry.equalsIgnoreCase(""))return;
 
-		scoreboard.get(entry).getObjective(YPLKart.plname).getScore(getPlayerRegisterName(p)).setScore(RaceManager.getRace(p).getPoint());
+		scoreboard.get(entry).getObjective(YPLKart.plname).getScore(getPlayerRegisterName(id)).setScore(RaceManager.getRace(id).getPoint());
 	}
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -125,17 +124,19 @@ public class Scoreboards{
 		}
 	}
 
-	public static void hideBoard(Player p){
-		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+	public static void hideBoard(UUID id){
+		if(Bukkit.getPlayer(id) != null)
+			Bukkit.getPlayer(id).setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 	}
 
-	public static void showBoard(Player p){
-		String entry = RaceManager.getRace(p).getEntry();
+	public static void showBoard(UUID id){
+		String entry = RaceManager.getRace(id).getEntry();
 		if(entry.equalsIgnoreCase(""))return;
 
 		Scoreboard sb = scoreboard.get(entry);
 		if(sb == null)return;
 
-		p.setScoreboard(sb);
+		if(Bukkit.getPlayer(id) != null)
+			Bukkit.getPlayer(id).setScoreboard(sb);
 	}
 }
