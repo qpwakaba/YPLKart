@@ -283,7 +283,7 @@ public class Race {
 		setStart(false);
 		this.character = null;
 		this.kart = null;
-		RaceManager.leave(getPlayer());
+		RaceManager.leave(this.id);
 		RaceManager.removeCustomMinecart(getPlayer());
 		EnumItem.removeAllKeyItems(getPlayer());
 		recoveryInventory();
@@ -340,7 +340,7 @@ public class Race {
 		if(getPassedCheckPoint().contains(value))return;
 		getPassedCheckPoint().add(value);
 		setPoint(getPassedCheckPoint().size());
-		Scoreboards.setPoint(getPlayer());
+		Scoreboards.setPoint(this.id);
 	}
 
 	public void setPoint(int value){
@@ -420,6 +420,8 @@ public class Race {
 			}
 		}, (Settings.BoostRailEffectSecond + RaceManager.getRace(getPlayer()).getCharacter().getItemAdjustPositiveEffectSecond()) * 20);
 	}
+
+	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public void savePlayerData(){
 		if(getPlayer() == null)return;
@@ -515,13 +517,13 @@ public class Race {
 		this.keyarmor = armor;
 	}
 
-	public void recoveryExp(){
+	private void recoveryExp(){
 		if(getPlayer() == null)return;
 		getPlayer().setLevel(this.level);
 		getPlayer().setExp(this.exp);
 	}
 
-	public void recoveryExpOnQuit(){
+	private void recoveryExpOnQuit(){
 		if(getPlayer() == null)return;
 		getPlayer().setLevel(this.quitlevel);
 		getPlayer().setExp(this.quitexp);
@@ -543,8 +545,16 @@ public class Race {
 		getPlayer().setWalkSpeed(this.quitwalkspeed);
 	}
 
+	public void recoveryCharacterPhysical(){
+		if(getPlayer() == null)return;
+		getPlayer().setMaxHealth(this.character.getMaxHealth());
+		getPlayer().setHealth(this.character.getMaxHealth());
+		getPlayer().setWalkSpeed(this.character.getWalkSpeed());
+	}
+
 	public void recoveryInventory(){
 		if(getPlayer() == null)return;
+		recoveryExp();
 		if(!this.inventory.isEmpty()){
 			PlayerInventory inv = getPlayer().getInventory();
 			for(int i = 0;i < 36;i++){
@@ -566,6 +576,7 @@ public class Race {
 
 	public void recoveryInventoryOnQuit(){
 		if(getPlayer() == null)return;
+		recoveryExpOnQuit();
 		if(!this.quitinventory.isEmpty()){
 			PlayerInventory inv = getPlayer().getInventory();
 			for(int i = 0;i < 36;i++){
