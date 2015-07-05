@@ -308,28 +308,30 @@ public class DataListener extends RaceManager implements Listener {
 
 	//キラー使用中の窒素ダメージを無効
 	//カート搭乗中の落下ダメージを無効
-	//エントリー→←スタート の間のダメージを無効
+	//スタンバイ状態～レース開始までのダメージを無効
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent e){
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		if(!(e.getEntity() instanceof Player))return;
+		if(e.getCause() == DamageCause.VOID)return;
 		Player p = (Player) e.getEntity();
-		if(!isRacing(p.getUniqueId()))return;
 
-		if(getRace(p).getUsingKiller() != null){
-			if(e.getCause() == DamageCause.SUFFOCATION){
-				e.setCancelled(true);
-				return;
-			}
-		}
-		if(e.getCause() == DamageCause.FALL)
-			if(p.getVehicle() != null)
-				if(RaceManager.isRacingKart(p.getVehicle()))
+		if(isRacing(p.getUniqueId())){
+			if(getRace(p).getUsingKiller() != null){
+				if(e.getCause() == DamageCause.SUFFOCATION){
 					e.setCancelled(true);
-
-		if(!getRace(p).getStart())
-			if(e.getCause() != DamageCause.VOID)
-				e.setCancelled(true);
+					return;
+				}
+			}
+			if(e.getCause() == DamageCause.FALL)
+				if(p.getVehicle() != null)
+					if(RaceManager.isRacingKart(p.getVehicle()))
+						e.setCancelled(true);
+		}else if(isStandBy(p.getUniqueId()) && !isRacing(p.getUniqueId())){
+			if(!getRace(p).getStart())
+				if(e.getCause() != DamageCause.VOID)
+					e.setCancelled(true);
+		}
 	}
 
 	@EventHandler
@@ -337,14 +339,11 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		final Player p = (Player)e.getEntity();
 
-		RaceManager.leaveRacingKart(p);
-
-		if(!isRacing(p.getUniqueId()))return;
+		if(!isStandBy(p.getUniqueId()))return;
 		Race r = getRace(p);
 
-		p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
 		Util.sendMessage(p, "デスペナルティ！");
-
+		RaceManager.leaveRacingKart(p);
 		r.setLastYaw(p.getLocation().getYaw());
 
 		if(p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))return;
