@@ -46,7 +46,6 @@ import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class DataListener extends RaceManager implements Listener {
-
 	private YPLKart pl;
 	public DataListener(YPLKart plugin){
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -207,17 +206,15 @@ public class DataListener extends RaceManager implements Listener {
 		final Player p = e.getPlayer();
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
-				//PacketUtil.runPlayerLookingUpdate(p);
-
 				if(isStandBy(p)){
+					Race r = getRace(p);
 					Scoreboards.showBoard(p);
-					p.setWalkSpeed(getRace(p).getCharacter().getWalkSpeed());
-					if(getRace(p).getKart() != null)
-						try {
-							RaceManager.setPassengerCustomMinecart(p, getRace(p).getKart());
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
+					r.recoveryExpOnQuit();
+					r.recoveryPhysicalOnQuit();
+					r.recoveryInventoryOnQuit();
+
+					p.teleport(r.getGoalPositionOnQuit());
+					RaceManager.setPassengerCustomMinecart(p, r.getKart());
 				}
 			}
 		}, 20);
@@ -230,21 +227,35 @@ public class DataListener extends RaceManager implements Listener {
 		Player p = e.getPlayer();
 		Race r = getRace(p);
 
-		RaceManager.removeCustomMinecart(p);
-		p.setWalkSpeed(0.2F);
-		Scoreboards.clearBoard(p);
-
-		//万が一ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
-		if(r.getGoal()){
-			p.teleport(r.getGoalPosition());
-			r.init();
-		}
-
 		//ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
 		//ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
 		if(p.getVehicle() != null)
 			if(RaceManager.isCustomDisplayMinecart(p.getVehicle()))
 				p.leaveVehicle();
+
+		//レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
+		//ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、復元不可能になる可能性があるから。
+		//再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
+		if(isStandBy(p)){
+			Scoreboards.hideBoard(p);
+
+			r.savePlayerDataOnQuit();
+			r.saveInventoryOnQuit();
+
+			removeCustomMinecart(p);
+			r.recoveryExp();
+			r.recoveryInventory();
+			r.recoveryPhysical();
+			p.teleport(r.getGoalPosition());
+
+			//ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
+			if(r.getGoal()){
+				p.teleport(r.getGoalPosition());
+				r.init();
+			}
+		}else{
+			RaceManager.exit(p);
+		}
 	}
 
 	@EventHandler
