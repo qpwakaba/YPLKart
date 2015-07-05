@@ -124,16 +124,16 @@ public class RaceManager {
 			return;
 		}
 
-		Race r = getRace(id);
 		final Player p = Bukkit.getPlayer(id);
+		Race r = getRace(id);
 
 		r.setCharacter(character);
 		r.recoveryCharacterPhysical();
+		//TODO : issue #46
 		p.getInventory().setHelmet(EnumItem.MarioHat.getItem());
 
 		PacketUtil.disguise(p, null, character);
-		if(Bukkit.getPlayer(id) != null)
-			EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
+		EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
 		Util.sendMessage(id, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
 	}
 
@@ -147,7 +147,11 @@ public class RaceManager {
 			return;
 		}
 
-		getRace(id).setKart(kart);
+		Player p = Bukkit.getPlayer(id);
+		Race r = getRace(id);
+		r.setKart(kart);
+		r.recoveryKart();
+
 		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
@@ -191,41 +195,6 @@ public class RaceManager {
 
 		Util.sendMessage(id, "搭乗を解除しました");
 		getRace(id).setKart(null);
-	}
-
-	/*
-	 * 既にカート搭乗中に再度別のカートに乗る場合はパラメータの再設定と見た目・名前の更新のみ行う。
-	 * この時サーバーがリロードされていた場合NoSuchMethodExceptionが出力されるため、
-	 * その場合は古いカートを撤去し新しいカートに搭乗させる。
-	 */
-	public static void rideRacingKart(final Player p, final EnumKarts kart){
-		if(!Permission.hasPermission(p, Permission.kart_ride, false))return;
-		if(kart == null)return;
-		final Location l = p.getLocation();
-
-		if(p.getVehicle() != null){
-			if(isRacingKart(p.getVehicle())){
-				Object customkart = p.getVehicle().getMetadata(YPLKart.plname).get(0).value();
-				try {
-					Minecart cart = (Minecart) customkart.getClass().getMethod("getBukkitEntity").invoke(customkart);
-					cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
-					cart.setCustomName(kart.getName());
-					cart.setCustomNameVisible(false);
-
-					customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
-					setKartRaceData(p.getUniqueId(), kart);
-					return;
-				}catch (NoSuchMethodException e) {
-					leaveRacingKart(p);
-				}catch (Exception e) {
-					e.printStackTrace();
-					return;
-				}
-			}else{
-				p.leaveVehicle();
-			}
-		}
-		createCustomMinecart(l, kart).setPassenger(p);
 	}
 
 	public static void leaveRacingKart(Player p){

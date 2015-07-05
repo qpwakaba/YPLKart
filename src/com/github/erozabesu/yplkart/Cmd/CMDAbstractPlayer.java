@@ -394,14 +394,14 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		if (this.length == 2){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_ride, false, false))return;
 			if(args[1].equalsIgnoreCase("random")){
-				RaceManager.rideRacingKart(this.p, EnumKarts.getRandomKart());
+				RaceManager.setKartRaceData(this.id, EnumKarts.getRandomKart());
 			}else{
 				EnumKarts kart = EnumKarts.getKartfromString(args[1]);
 				if(kart == null){
 					messageInvalidKart(this.p);
 					return;
 				}
-				RaceManager.rideRacingKart(this.p, kart);
+				RaceManager.setKartRaceData(this.id, kart);
 			}
 		//ka ride all {kart name}
 		//ka ride {player name} {kart name}
@@ -421,7 +421,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.rideRacingKart(other, kart);
+					RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				}
 				if(args[2].equalsIgnoreCase("random"))
 					messageRideRandomAll(this.p);
@@ -433,7 +433,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.rideRacingKart(other, kart);
+				RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				messageRideOther(this.p, other, kart);
 			}
 		}else{

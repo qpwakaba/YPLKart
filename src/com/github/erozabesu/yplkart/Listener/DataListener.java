@@ -209,12 +209,11 @@ public class DataListener extends RaceManager implements Listener {
 			public void run(){
 				if(isStandBy(p.getUniqueId())){
 					Race r = getRace(p);
+					p.teleport(r.getGoalPositionOnQuit());
 					Scoreboards.showBoard(p.getUniqueId());
 					r.recoveryPhysicalOnQuit();
 					r.recoveryInventoryOnQuit();
-
-					p.teleport(r.getGoalPositionOnQuit());
-					RaceManager.rideRacingKart(p, r.getKart());
+					r.recoveryKart();
 				}
 			}
 		}, 20);

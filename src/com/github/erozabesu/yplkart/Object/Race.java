@@ -7,9 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -515,6 +517,38 @@ public class Race {
 
 		this.keyitem = contents;
 		this.keyarmor = armor;
+	}
+
+	/*
+	 * 既にカート搭乗中に再度別のカートに乗る場合はパラメータの再設定と見た目・名前の更新のみ行う。
+	 * サーバーがリロードされていた場合NoSuchMethodExceptionが出力されるため、
+	 * その場合は古いカートを撤去し新しいカートに搭乗させる。
+	 */
+	public void recoveryKart(){
+		if(getPlayer() == null)return;
+		Player p = getPlayer();
+		if(p.getVehicle() != null){
+			if(RaceManager.isRacingKart(p.getVehicle())){
+				Object customkart = p.getVehicle().getMetadata(YPLKart.plname).get(0).value();
+				try {
+					Minecart cart = (Minecart) customkart.getClass().getMethod("getBukkitEntity").invoke(customkart);
+					cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
+					cart.setCustomName(kart.getName());
+					cart.setCustomNameVisible(false);
+
+					customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
+					return;
+				}catch (NoSuchMethodException e) {
+					RaceManager.leaveRacingKart(p);
+				}catch (Exception e) {
+					e.printStackTrace();
+					return;
+				}
+			}else{
+				p.leaveVehicle();
+			}
+		}
+		RaceManager.createCustomMinecart(p.getLocation(), kart).setPassenger(p);
 	}
 
 	private void recoveryExp(){
