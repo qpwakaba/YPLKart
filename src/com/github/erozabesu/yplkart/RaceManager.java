@@ -155,6 +155,8 @@ public class RaceManager {
 		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+	
 	public static void clearEntryRaceData(UUID id){
 		Scoreboards.exitCircuit(id);
 		getCircuit(id).exitPlayer(id);
