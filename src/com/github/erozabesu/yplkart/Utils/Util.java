@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -289,7 +290,7 @@ public class Util extends ReflectionUtil{
 		if(damaged instanceof Player){
 			final Player p = (Player)damaged;
 			if(0 < p.getNoDamageTicks())return;
-			if(!RaceManager.isRacing(p))return;
+			if(!RaceManager.isRacing(p.getUniqueId()))return;
 
 			p.playEffect(EntityEffect.HURT);
 
@@ -358,7 +359,13 @@ public class Util extends ReflectionUtil{
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void sendMessage(Player p, String message){
+	public static void sendMessage(Object adress, String message){
+		Player p = null;
+		if(adress instanceof Player)
+			p = (Player) adress;
+		else if(adress instanceof UUID)
+			p = Bukkit.getPlayer((UUID) adress);
+
 		String header = "#Yellow[" + YPLKart.plname + "] #Green";
 		for (String line : replaceLine(message)) {
 			line = replacePatch(line);
@@ -371,7 +378,28 @@ public class Util extends ReflectionUtil{
 		}
 	}
 
-	public static void sendMessageNoHeader(Player p, String message){
+	public static void sendMessageNoHeader(Object adress, String message){
+		Player p = null;
+		if(adress instanceof Player)
+			p = (Player) adress;
+		else if(adress instanceof UUID)
+			p = Bukkit.getPlayer((UUID) adress);
+
+		for (String line : replaceLine(message)) {
+			line = replacePatch(line);
+			line = replaceChatColor(line);
+
+			if (p != null)
+				p.sendMessage(line);
+			else
+				YPLKart.log.log(Level.INFO, ChatColor.stripColor(line));
+		}
+	}
+
+	public static void sendMessageNoHeader(UUID id, String message){
+		Player p = Bukkit.getPlayer(id);
+		if(p == null)return;
+
 		for (String line : replaceLine(message)) {
 			line = replacePatch(line);
 			line = replaceChatColor(line);
@@ -504,7 +532,7 @@ public class Util extends ReflectionUtil{
 			if(0 < damaged.getNoDamageTicks())continue;
 			if(damaged.isDead())continue;
 			if(!(damaged instanceof Player))continue;
-			if(!RaceManager.isRacing((Player) damaged))continue;
+			if(!RaceManager.isRacing(((Player)damaged).getUniqueId()))continue;
 
 			Vector v = Util.getVectorLocationToLocation(l, damaged.getLocation());
 			v.setX(v.clone().multiply(-1).getX());
