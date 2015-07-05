@@ -185,6 +185,19 @@ public final class RaceData{
 		}
 	}
 
+	public static void sendRanking(UUID id, String circuitname){
+		String ranking = RaceData.getRanking(id, circuitname);
+		String kartranking = RaceData.getKartRanking(id, circuitname);
+		if(ranking == null && kartranking == null)
+			Util.sendMessage(id, "#Redサーキット : " + "#Yellow" + circuitname + " #Redのレースデータがありません");
+		else{
+			if(kartranking != null)
+				Util.sendMessageNoHeader(id, kartranking);
+			if(ranking != null)
+				Util.sendMessageNoHeader(id, ranking);
+		}
+	}
+
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static int getNumberOfLaps(String circuitname){

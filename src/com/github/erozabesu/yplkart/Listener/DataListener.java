@@ -92,7 +92,7 @@ public class DataListener extends RaceManager implements Listener {
 			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
 			if(kart == null)return;
 
-			RaceManager.ride(((Player) e.getEntered()).getUniqueId(), kart);
+			RaceManager.setKartRaceData(((Player) e.getEntered()).getUniqueId(), kart);
 		}
 	}
 
@@ -253,7 +253,7 @@ public class DataListener extends RaceManager implements Listener {
 				r.init();
 			}
 		}else{
-			RaceManager.exit(p.getUniqueId());
+			RaceManager.clearEntryRaceData(p.getUniqueId());
 		}
 	}
 
@@ -441,7 +441,7 @@ public class DataListener extends RaceManager implements Listener {
 				p.closeInventory();
 			//ランダムボタン
 			}else if(EnumSelectMenu.CharacterRandom.equalsIgnoreCase(clicked)){
-				RaceManager.character(id, EnumCharacter.getRandomCharacter());
+				RaceManager.setCharacterRaceData(id, EnumCharacter.getRandomCharacter());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
 				if(isStandBy(id)){
@@ -460,7 +460,7 @@ public class DataListener extends RaceManager implements Listener {
 				}
 			//キャラクター選択
 			}else if(EnumCharacter.getClassfromString(clicked) != null){
-				RaceManager.character(id, EnumCharacter.getClassfromString(clicked));
+				RaceManager.setCharacterRaceData(id, EnumCharacter.getClassfromString(clicked));
 			}
 			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
 		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){

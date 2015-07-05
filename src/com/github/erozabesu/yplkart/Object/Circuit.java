@@ -70,8 +70,8 @@ public class Circuit{
 					Scoreboards.entryCircuit(id);
 					r.init();
 					r.setEntry(name);
-					RaceManager.characterReset(id);
-					RaceManager.leave(id);
+					RaceManager.clearCharacterRaceData(id);
+					RaceManager.clearKartRaceData(id);
 					r.setStandBy(true);
 					r.savePlayerData();
 
@@ -127,7 +127,7 @@ public class Circuit{
 		while(i.hasNext()){
 			id = i.next();
 			i.remove();
-			RaceManager.exit(id);
+			RaceManager.clearEntryRaceData(id);
 		}
 
 		//リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
@@ -138,7 +138,7 @@ public class Circuit{
 					Circuit c = RaceManager.setupCircuit(name);
 					for(UUID id : nextentry){
 						if(Bukkit.getPlayer(id) != null){
-							RaceManager.entry(id, name);
+							RaceManager.setEntryRaceData(id, name);
 							c.entryPlayer(id);
 						}
 					}
@@ -323,7 +323,7 @@ public class Circuit{
 						if(!Bukkit.getPlayer(exitid).isOnline() || !matchingaccept.contains(exitid)){
 							exitlist.remove();
 							denyMatching(exitid);
-							RaceManager.exit(exitid);
+							RaceManager.clearEntryRaceData(exitid);
 						}
 					}
 

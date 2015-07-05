@@ -283,7 +283,7 @@ public class Race {
 		setStart(false);
 		this.character = null;
 		this.kart = null;
-		RaceManager.leave(this.id);
+		RaceManager.clearKartRaceData(this.id);
 		RaceManager.removeCustomMinecart(getPlayer());
 		EnumItem.removeAllKeyItems(getPlayer());
 		recoveryInventory();

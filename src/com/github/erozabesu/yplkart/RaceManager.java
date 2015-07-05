@@ -22,7 +22,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
-import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
@@ -65,7 +64,7 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void acceptMatching(UUID id){
+	public static void setMatchingCircuitData(UUID id){
 		Circuit c = getCircuit(id);
 		if(c == null){
 			Util.sendMessage(id, "#Redレースにエントリーしていません");
@@ -81,7 +80,7 @@ public class RaceManager {
 		}
 	}
 
-	public static void denyMatching(UUID id){
+	public static void clearMatchingCircuitData(UUID id){
 		Circuit c = getCircuit(id);
 		if(c == null){
 			Util.sendMessage(id, "#Redレースにエントリーしていません");
@@ -93,11 +92,13 @@ public class RaceManager {
 			return;
 		}else{
 			c.denyMatching(id);
-			exit(id);
+			clearEntryRaceData(id);
 		}
 	}
 
-	public static void entry(UUID id, String circuitname){
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static void setEntryRaceData(UUID id, String circuitname){
 		Circuit c = setupCircuit(circuitname);
 		getRace(id).setEntry(circuitname);
 
@@ -111,34 +112,11 @@ public class RaceManager {
 			Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
 
 			if(c.isMatching())
-				acceptMatching(id);
+				setMatchingCircuitData(id);
 		}
 	}
 
-	public static void exit(UUID id){
-		Scoreboards.exitCircuit(id);
-		getCircuit(id).exitPlayer(id);
-		Race r = getRace(id);
-
-		characterReset(id);
-		leave(id);
-
-		Player p = Bukkit.getPlayer(id);
-		if(p != null){
-			removeCustomMinecart(p);
-			if(isStandBy(id)){
-				r.recoveryInventory();
-				r.recoveryPhysical();
-				p.teleport(r.getGoalPosition());
-			}
-		}
-
-		r.init();
-
-		Util.sendMessage(id, "エントリーを取り消しました");
-	}
-
-	public static void character(UUID id, EnumCharacter character){
+	public static void setCharacterRaceData(UUID id, EnumCharacter character){
 		if(!isStandBy(id)){
 			Util.sendMessage(id, "#Redレースが開始されるまでキャラクター選択はできません");
 			return;
@@ -161,19 +139,7 @@ public class RaceManager {
 		Util.sendMessage(id, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
 	}
 
-	public static void characterReset(UUID id){
-		if(getRace(id).getCharacter() == null)return;
-
-		getRace(id).setCharacter(null);
-		Player p = Bukkit.getPlayer(id);
-		if(p != null){
-			getRace(id).recoveryPhysical();
-			PacketUtil.returnPlayer(p);
-			Util.sendMessage(id, "キャラクター選択を取り消しました");
-		}
-	}
-
-	public static void ride(UUID id, EnumKarts kart){
+	public static void setKartRaceData(UUID id, EnumKarts kart){
 		if(!isStandBy(id)){
 			Util.sendMessage(id, "#Redレースが開始されるまでカート選択はできません");
 			return;
@@ -187,24 +153,48 @@ public class RaceManager {
 		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
-	public static void leave(UUID id){
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static void clearEntryRaceData(UUID id){
+		Scoreboards.exitCircuit(id);
+		getCircuit(id).exitPlayer(id);
+		Race r = getRace(id);
+
+		clearCharacterRaceData(id);
+		clearKartRaceData(id);
+
+		Player p = Bukkit.getPlayer(id);
+		if(p != null){
+			removeCustomMinecart(p);
+			if(isStandBy(id)){
+				r.recoveryInventory();
+				r.recoveryPhysical();
+				p.teleport(r.getGoalPosition());
+			}
+		}
+
+		r.init();
+
+		Util.sendMessage(id, "エントリーを取り消しました");
+	}
+
+	public static void clearCharacterRaceData(UUID id){
+		if(getRace(id).getCharacter() == null)return;
+
+		getRace(id).setCharacter(null);
+		Player p = Bukkit.getPlayer(id);
+		if(p != null){
+			getRace(id).recoveryPhysical();
+			PacketUtil.returnPlayer(p);
+			Util.sendMessage(id, "キャラクター選択を取り消しました");
+		}
+	}
+
+	public static void clearKartRaceData(UUID id){
 		if(getRace(id).getKart() == null)return;
 
 		Util.sendMessage(id, "搭乗を解除しました");
 		getRace(id).setKart(null);
-	}
-
-	public static void ranking(UUID id, String circuitname){
-		String ranking = RaceData.getRanking(id, circuitname);
-		String kartranking = RaceData.getKartRanking(id, circuitname);
-		if(ranking == null && kartranking == null)
-			Util.sendMessage(id, "#Redサーキット : " + "#Yellow" + circuitname + " #Redのレースデータがありません");
-		else{
-			if(kartranking != null)
-				Util.sendMessageNoHeader(id, kartranking);
-			if(ranking != null)
-				Util.sendMessageNoHeader(id, ranking);
-		}
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -374,7 +364,7 @@ public class RaceManager {
 					cart.setCustomNameVisible(false);
 
 					customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
-					ride(p.getUniqueId(), kart);
+					setKartRaceData(p.getUniqueId(), kart);
 					return;
 				}catch (NoSuchMethodException e) {
 					removeCustomMinecart(p);
