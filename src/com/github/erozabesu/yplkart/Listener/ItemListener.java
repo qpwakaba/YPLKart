@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -75,6 +76,7 @@ public class ItemListener extends RaceManager implements Listener{
 		if(e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_AIR)return;
 
 		final Player p = e.getPlayer();
+		final UUID id = p.getUniqueId();
 		if(EnumItem.CheckPoint.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
 			if(Permission.hasPermission(p, Permission.op_cmd_circuit, false)){
@@ -121,7 +123,7 @@ public class ItemListener extends RaceManager implements Listener{
 			e.setCancelled(true);
 			showCharacterSelectMenu(p);
 		}
-		if(isRacing(p)){
+		if(isRacing(id)){
 			if(EnumItem.Mushroom.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
 				if(Permission.hasPermission(p, Permission.use_mushroom, false)){
@@ -147,7 +149,7 @@ public class ItemListener extends RaceManager implements Listener{
 					b.setDropItem(false);
 					Util.removeEntityCollision(b);
 
-					new ItemBananaTask(RaceManager.getCircuit(p),b, l).runTaskTimer(pl, 0, 1);
+					new ItemBananaTask(RaceManager.getCircuit(id),b, l).runTaskTimer(pl, 0, 1);
 					p.getWorld().playSound(p.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
 				}
 			}else if(EnumItem.FakeItembox.isSimilar(p.getItemInHand())){
@@ -157,7 +159,7 @@ public class ItemListener extends RaceManager implements Listener{
 					EnderCrystal endercrystal = p.getWorld().spawn(Util.getLocationfromYaw(p.getLocation().add(0,0.5,0), -5).getBlock().getLocation().add(0.5,0,0.5), EnderCrystal.class);
 					endercrystal.setCustomName(FakeItemBoxName);
 					endercrystal.setCustomNameVisible(true);
-					RaceManager.getCircuit(p).addJammerEntity(endercrystal);
+					RaceManager.getCircuit(id).addJammerEntity(endercrystal);
 					p.getWorld().playEffect(p.getLocation(), Effect.CLICK1, 0);
 				}
 			}else if(EnumItem.Thunder.isSimilar(p.getItemInHand())){
@@ -201,7 +203,8 @@ public class ItemListener extends RaceManager implements Listener{
 	public void onInteractObjectEntity(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
 		final Player p = e.getPlayer();
-		if(!isRacing(p))return;
+		final UUID id = p.getUniqueId();
+		if(!isRacing(id))return;
 
 		List<Entity> entities = p.getNearbyEntities(0.7, 2, 0.7);
 
@@ -210,7 +213,7 @@ public class ItemListener extends RaceManager implements Listener{
 				if(entity instanceof FallingBlock){
 					if(entity.getCustomName().equalsIgnoreCase(EnumItem.Banana.getName())){
 						if(Permission.hasPermission(p, Permission.interact_banana, false)){
-							RaceManager.getCircuit(p).removeJammerEntity(entity);
+							RaceManager.getCircuit(id).removeJammerEntity(entity);
 							entity.remove();
 
 							if(p.getNoDamageTicks()==0){
@@ -309,9 +312,10 @@ public class ItemListener extends RaceManager implements Listener{
 	@EventHandler
 	public void onStepSpeedBlock(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isRacing(e.getPlayer()))return;
+		if(!isRacing(e.getPlayer().getUniqueId()))return;
 
 		final Player p = e.getPlayer();
+		final UUID id = p.getUniqueId();
 
 		if (Util.getStepMaterial(p.getLocation()) == Material.PISTON_BASE || Util.getStepMaterial(p.getLocation()) == Material.PISTON_STICKY_BASE){
 			if(Permission.hasPermission(p, Permission.interact_boostrail, false)){
@@ -457,14 +461,14 @@ public class ItemListener extends RaceManager implements Listener{
 	@EventHandler
 	public void onPickupItem(PlayerPickupItemEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isStandBy(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer().getUniqueId()))return;
 		e.setCancelled(true);
 	}
 
 	@EventHandler
 	public void onDropItem(PlayerDropItemEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isStandBy(e.getPlayer()))return;
+		if(!isStandBy(e.getPlayer().getUniqueId()))return;
 
 		if(EnumItem.Menu.isSimilar(e.getItemDrop().getItemStack()))e.setCancelled(true);
 		else e.getItemDrop().remove();
@@ -568,7 +572,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemTurtle(Player p){
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 		if(getRank(p) == 0)return;
 
 		Util.setItemDecrease(p);
@@ -581,7 +585,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemRedturtle(Player user){
-		if(!isRacing(user))return;
+		if(!isRacing(user.getUniqueId()))return;
 		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
@@ -608,7 +612,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemThornedturtle(Player user){
-		if(!isRacing(user))return;
+		if(!isRacing(user.getUniqueId()))return;
 		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
@@ -635,7 +639,7 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemKiller(final Player p){
-		if(!isRacing(p))return;
+		if(!isRacing(p.getUniqueId()))return;
 		if(getRank(p) == 0)return;
 
 		Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p));

@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -66,146 +65,153 @@ public class RaceManager {
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void acceptMatching(Player p){
-		Circuit c = getCircuit(p);
+	public static void acceptMatching(UUID id){
+		Circuit c = getCircuit(id);
 		if(c == null){
-			Util.sendMessage(p, "#Redレースにエントリーしていません");
+			Util.sendMessage(id, "#Redレースにエントリーしていません");
 			return;
 		}else if(!c.isMatching()){
-			Util.sendMessage(p, "#Red現在そのレースには参加できません");
+			Util.sendMessage(id, "#Red現在そのレースには参加できません");
 			return;
-		}else if(isStandBy(p)){
+		}else if(isStandBy(id)){
 			return;
 		}else{
-			c.acceptMatching(p);
-			Util.sendMessageNoHeader(p, "#Aquaレース参加を承認しました。準備が整うまでお待ち下さい");
+			c.acceptMatching(id);
+			Util.sendMessageNoHeader(id, "#Aquaレース参加を承認しました。準備が整うまでお待ち下さい");
 		}
 	}
 
-	public static void denyMatching(Player p){
-		Circuit c = getCircuit(p);
+	public static void denyMatching(UUID id){
+		Circuit c = getCircuit(id);
 		if(c == null){
-			Util.sendMessage(p, "#Redレースにエントリーしていません");
+			Util.sendMessage(id, "#Redレースにエントリーしていません");
 			return;
 		}else if(!c.isMatching()){
-			Util.sendMessage(p, "#Red現在そのレースには参加できません");
+			Util.sendMessage(id, "#Red現在そのレースには参加できません");
 			return;
-		}else if(isStandBy(p)){
+		}else if(isStandBy(id)){
 			return;
 		}else{
-			c.denyMatching(p);
-			exit(p);
+			c.denyMatching(id);
+			exit(id);
 		}
 	}
 
-	public static void entry(Player p, String circuitname){
-		if(p.getGameMode() == GameMode.SPECTATOR)return;
+	public static void entry(UUID id, String circuitname){
 		Circuit c = setupCircuit(circuitname);
-		getRace(p).setEntry(circuitname);
+		getRace(id).setEntry(circuitname);
 
 		if(c.isStarted()){
-			c.entryReservePlayer(p);
-			Util.sendMessage(p, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+			c.entryReservePlayer(id);
+			Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
 		}else{
-			c.entryPlayer(p);
-			Scoreboards.entryCircuit(p);
+			c.entryPlayer(id);
+			Scoreboards.entryCircuit(id);
 
-			Util.sendMessage(p, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+			Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
 
 			if(c.isMatching())
-				acceptMatching(p);
+				acceptMatching(id);
 		}
 	}
 
-	public static void exit(Player p){
-		Scoreboards.exitCircuit(p);
-		getCircuit(p).exitPlayer(p);
-		Race r = getRace(p);
+	public static void exit(UUID id){
+		Scoreboards.exitCircuit(id);
+		getCircuit(id).exitPlayer(id);
+		Race r = getRace(id);
 
-		characterReset(p);
-		removeCustomMinecart(p);
-		leave(p);
+		characterReset(id);
+		leave(id);
 
-		if(isStandBy(p)){
-			r.recoveryExp();
-			r.recoveryInventory();
-			r.recoveryPhysical();
-			p.teleport(r.getGoalPosition());
+		Player p = Bukkit.getPlayer(id);
+		if(p != null){
+			removeCustomMinecart(p);
+			if(isStandBy(id)){
+				r.recoveryInventory();
+				r.recoveryPhysical();
+				p.teleport(r.getGoalPosition());
+			}
 		}
 
 		r.init();
 
-		Util.sendMessage(p, "エントリーを取り消しました");
+		Util.sendMessage(id, "エントリーを取り消しました");
 	}
 
-	public static void character(final Player p, EnumCharacter character){
-		if(p.getGameMode() == GameMode.SPECTATOR)return;
-		if(!isStandBy(p)){
-			Util.sendMessage(p, "#Redレースが開始されるまでキャラクター選択はできません");
+	public static void character(UUID id, EnumCharacter character){
+		if(!isStandBy(id)){
+			Util.sendMessage(id, "#Redレースが開始されるまでキャラクター選択はできません");
+			return;
+		}
+		if(Bukkit.getPlayer(id) == null){
+			Util.sendMessage(null, "#Redオフラインプレイヤーへのキャラクター選択はできません");
 			return;
 		}
 
-		Race r = getRace(p);
+		Race r = getRace(id);
+		final Player p = Bukkit.getPlayer(id);
+
 		r.setCharacter(character);
+		r.recoveryCharacterPhysical();
 		p.getInventory().setHelmet(EnumItem.MarioHat.getItem());
-		p.setWalkSpeed(character.getWalkSpeed());
-		p.setMaxHealth(character.getMaxHealth());
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				p.setHealth(p.getMaxHealth());
-			}
-		}, 5);
-		EnumCharacter.playCharacterVoice(p, character);
 
 		PacketUtil.disguise(p, null, character);
-		Util.sendMessage(p, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
+		if(Bukkit.getPlayer(id) != null)
+			EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
+		Util.sendMessage(id, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
 	}
 
-	public static void characterReset(Player p){
-		if(getRace(p).getCharacter() == null)return;
+	public static void characterReset(UUID id){
+		if(getRace(id).getCharacter() == null)return;
 
-		getRace(p).setCharacter(null);
-		getRace(p).recoveryPhysical();
-		PacketUtil.returnPlayer(p);
-		Util.sendMessage(p, "キャラクター選択を取り消しました");
+		getRace(id).setCharacter(null);
+		Player p = Bukkit.getPlayer(id);
+		if(p != null){
+			getRace(id).recoveryPhysical();
+			PacketUtil.returnPlayer(p);
+			Util.sendMessage(id, "キャラクター選択を取り消しました");
+		}
 	}
 
-	public static void ride(Player p, EnumKarts kart){
-		if(p.getGameMode() == GameMode.SPECTATOR)return;
-		if(!isStandBy(p)){
-			Util.sendMessage(p, "#Redレースが開始されるまでカート選択はできません");
+	public static void ride(UUID id, EnumKarts kart){
+		if(!isStandBy(id)){
+			Util.sendMessage(id, "#Redレースが開始されるまでカート選択はできません");
+			return;
+		}
+		if(Bukkit.getPlayer(id) == null){
+			Util.sendMessage(null, "#Redオフラインプレイヤーへのカート選択はできません");
 			return;
 		}
 
-		getRace(p).setKart(kart);
-		Util.sendMessage(p, "#White" + kart.getName() + "カート#Greenに搭乗しました");
+		getRace(id).setKart(kart);
+		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
-	public static void leave(Player p){
-		if(getRace(p).getKart() == null)return;
+	public static void leave(UUID id){
+		if(getRace(id).getKart() == null)return;
 
-		Util.sendMessage(p, "搭乗を解除しました");
-		getRace(p).setKart(null);
+		Util.sendMessage(id, "搭乗を解除しました");
+		getRace(id).setKart(null);
 	}
 
-	public static void ranking(Player p, String circuitname){
-		String ranking = RaceData.getRanking(p, circuitname);
-		String kartranking = RaceData.getKartRanking(p, circuitname);
+	public static void ranking(UUID id, String circuitname){
+		String ranking = RaceData.getRanking(id, circuitname);
+		String kartranking = RaceData.getKartRanking(id, circuitname);
 		if(ranking == null && kartranking == null)
-			Util.sendMessage(p, "#Redサーキット : " + "#Yellow" + circuitname + " #Redのレースデータがありません");
+			Util.sendMessage(id, "#Redサーキット : " + "#Yellow" + circuitname + " #Redのレースデータがありません");
 		else{
 			if(kartranking != null)
-				Util.sendMessageNoHeader(p, kartranking);
+				Util.sendMessageNoHeader(id, kartranking);
 			if(ranking != null)
-				Util.sendMessageNoHeader(p, ranking);
+				Util.sendMessageNoHeader(id, ranking);
 		}
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static Circuit getCircuit(Player p){
+	public static Circuit getCircuit(UUID id){
 		try{
-			return circuit.get(getRace(p).getEntry());
+			return circuit.get(getRace(id).getEntry());
 		}catch(NullPointerException ex){
 			return null;
 		}
@@ -357,10 +363,6 @@ public class RaceManager {
 		if(!Permission.hasPermission(p, Permission.kart_ride, false))return;
 		if(kart == null)return;
 		final Location l = p.getLocation();
-		if(!isStandBy(p)){
-			Util.sendMessage(p, "#Redレースが開始されるまでカート選択はできません");
-			return;
-		}
 
 		if(p.getVehicle() != null){
 			if(isCustomMinecart(p.getVehicle())){
@@ -372,7 +374,7 @@ public class RaceManager {
 					cart.setCustomNameVisible(false);
 
 					customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
-					ride(p, kart);
+					ride(p.getUniqueId(), kart);
 					return;
 				}catch (NoSuchMethodException e) {
 					removeCustomMinecart(p);
@@ -384,6 +386,7 @@ public class RaceManager {
 				p.leaveVehicle();
 			}
 		}
+		//TODO
 		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 			public void run(){
 				createCustomMinecart(l, kart).setPassenger(p);
@@ -397,8 +400,8 @@ public class RaceManager {
 	 * レースに参加申請し、開始されるまで待機している状態です
 	 * 行動の制限等は掛かりません
 	 */
-	public static Boolean isEntry(Player p) {
-		if (getRace(p).getEntry() != "")
+	public static Boolean isEntry(UUID id) {
+		if (getRace(id).getEntry() != "")
 			return true;
 		return false;
 	}
@@ -409,9 +412,9 @@ public class RaceManager {
 	 * レースの終了までインベントリの操作等が出来ない代わりに
 	 * 専用のアイテムが利用でき、キャラクター選択やレース専用カートへの搭乗が可能となります
 	 */
-	public static Boolean isStandBy(Player p){
-		if (isEntry(p))
-			if (getRace(p).getStandBy())
+	public static Boolean isStandBy(UUID id){
+		if (isEntry(id))
+			if (getRace(id).getStandBy())
 				return true;
 		return false;
 	}
@@ -419,10 +422,10 @@ public class RaceManager {
 	/*
 	 * 申請していたレースが開始された状態です
 	 */
-	public static Boolean isRacing(Player p){
-		if(isEntry(p))
-			if(isStandBy(p))
-				if(getRace(p).getStart())
+	public static Boolean isRacing(UUID id){
+		if(isEntry(id))
+			if(isStandBy(id))
+				if(getRace(id).getStart())
 					return true;
 		return false;
 	}

@@ -67,11 +67,11 @@ public class Circuit{
 					Player p = Bukkit.getPlayer(id);
 					Race r = RaceManager.getRace(p);
 
-					Scoreboards.entryCircuit(p);
+					Scoreboards.entryCircuit(id);
 					r.init();
 					r.setEntry(name);
-					RaceManager.characterReset(p);
-					RaceManager.leave(p);
+					RaceManager.characterReset(id);
+					RaceManager.leave(id);
 					r.setStandBy(true);
 					r.savePlayerData();
 
@@ -127,10 +127,7 @@ public class Circuit{
 		while(i.hasNext()){
 			id = i.next();
 			i.remove();
-			if(Bukkit.getPlayer(id) == null)
-				RaceManager.exit((Player) Bukkit.getOfflinePlayer(id));
-			else
-				RaceManager.exit(Bukkit.getPlayer(id));
+			RaceManager.exit(id);
 		}
 
 		//リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
@@ -141,7 +138,7 @@ public class Circuit{
 					Circuit c = RaceManager.setupCircuit(name);
 					for(UUID id : nextentry){
 						if(Bukkit.getPlayer(id) != null){
-							RaceManager.entry(Bukkit.getPlayer(id), name);
+							RaceManager.entry(id, name);
 							c.entryPlayer(id);
 						}
 					}
@@ -326,7 +323,7 @@ public class Circuit{
 						if(!Bukkit.getPlayer(exitid).isOnline() || !matchingaccept.contains(exitid)){
 							exitlist.remove();
 							denyMatching(exitid);
-							RaceManager.exit(Bukkit.getPlayer(exitid));
+							RaceManager.exit(exitid);
 						}
 					}
 
@@ -384,6 +381,15 @@ public class Circuit{
 		return entry;
 	}
 
+	public List<UUID> getEntryPlayerID(){
+		List<UUID> entry = new ArrayList<UUID>();
+		for(UUID id : this.entry){
+			if(Bukkit.getPlayer(id) != null)
+				entry.add(id);
+		}
+		return entry;
+	}
+
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public boolean isStarted(){
@@ -396,20 +402,20 @@ public class Circuit{
 
 	//レースが終了しているかどうか判定する
 	public boolean isRaceEnd(){
-		Iterator<Player> i = getEntryPlayer().iterator();
-		Player p;
+		Iterator<UUID> i = getEntryPlayerID().iterator();
+		UUID id;
 		if(isStarted()){
 			while(i.hasNext()){
-				p = i.next();
-				if(RaceManager.isEntry(p)
-						&& RaceManager.getRace(p).getStart()
-						&& !RaceManager.getRace(p).getGoal())
+				id = i.next();
+				if(RaceManager.isEntry(id)
+						&& RaceManager.getRace(id).getStart()
+						&& !RaceManager.getRace(id).getGoal())
 							return false;
 			}
 		}else{
 			while(i.hasNext()){
-				p = i.next();
-				if(RaceManager.isEntry(p))
+				id = i.next();
+				if(RaceManager.isEntry(id))
 					return false;
 			}
 		}

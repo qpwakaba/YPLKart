@@ -522,7 +522,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 			//エントリーしていて、かつスタートしていないプレイヤーへの衝突は例外としてキャンセル
 			org.bukkit.entity.Entity otherpassenger = getPassenger(entity).getBukkitEntity();
 			if(otherpassenger instanceof Player)
-				if(!RaceManager.isRacing((Player)otherpassenger))return;
+				if(!RaceManager.isRacing(((Player)otherpassenger).getUniqueId()))return;
 
 			Entity other = getVehicle(entity);
 

@@ -1,6 +1,7 @@
 package com.github.erozabesu.yplkart;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -54,12 +55,12 @@ public class YPLKart extends JavaPlugin{
 	public void onDisable(){
 		Scoreboards.clearBoard();
 		for(Player p : Bukkit.getOnlinePlayers()){
+			UUID id = p.getUniqueId();
 			Race r = RaceManager.getRace(p);
-			RaceManager.characterReset(p);
+			RaceManager.characterReset(id);
 			RaceManager.removeCustomMinecart(p);
-			if(RaceManager.isStandBy(p)){
+			if(RaceManager.isStandBy(id)){
 				r.recoveryPhysical();
-				r.recoveryExp();
 				r.recoveryInventory();
 				p.teleport(r.getGoalPosition());
 				Util.sendMessage(p, "エントリーを取り消しました");
