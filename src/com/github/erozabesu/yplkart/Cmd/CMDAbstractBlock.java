@@ -243,14 +243,14 @@ public class CMDAbstractBlock extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.setPassengerCustomMinecart(other, kart);
+					RaceManager.rideRacingKart(other, kart);
 				}
 			}else{
 				if(!Util.isOnline(args[1]))
 					return;
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.setPassengerCustomMinecart(other, kart);
+				RaceManager.rideRacingKart(other, kart);
 			}
 		}else{
 		}
@@ -263,14 +263,14 @@ public class CMDAbstractBlock extends CMDAbstract{
 		if (length == 2) {
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.removeCustomMinecart(other);
+					RaceManager.leaveRacingKart(other);
 					RaceManager.clearKartRaceData(other.getUniqueId());
 				}
 			}else{
 				if(!Util.isOnline(args[1]))return;
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.removeCustomMinecart(other);
+				RaceManager.leaveRacingKart(other);
 				RaceManager.clearKartRaceData(other.getUniqueId());
 			}
 		}else{

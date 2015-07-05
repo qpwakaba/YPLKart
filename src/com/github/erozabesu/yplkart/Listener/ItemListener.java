@@ -328,7 +328,7 @@ public class ItemListener extends RaceManager implements Listener{
 				}, 10L);
 
 				if(p.getVehicle() != null){
-					if(isCustomMinecart(p.getVehicle())){
+					if(isRacingKart(p.getVehicle())){
 						getRace(p).setStepDashBoard();
 						p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
 						return;
@@ -675,7 +675,7 @@ public class ItemListener extends RaceManager implements Listener{
 					public void run(){
 						try {
 							if(p.getVehicle() != null){
-								removeCustomMinecart(p);
+								leaveRacingKart(p);
 							}
 						}catch (Exception ex) {
 							ex.printStackTrace();

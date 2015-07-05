@@ -72,7 +72,7 @@ public class DataListener extends RaceManager implements Listener {
 	public void onVehicleExit(VehicleExitEvent e){
 		if(!(e.getExited() instanceof Player))return;
 		if(!Settings.isEnable(e.getExited().getWorld()))return;
-		if(!RaceManager.isCustomMinecart(e.getVehicle()))return;
+		if(!RaceManager.isRacingKart(e.getVehicle()))return;
 
 		Player p = (Player) e.getExited();
 		if(!getRace(p).getCMDFroceLeave()){
@@ -88,7 +88,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(!(e.getEntered() instanceof Player))return;
 
 		//PacketUtil.runPlayerLookingUpdate((Player) e.getEntered());
-		if(RaceManager.isCustomMinecart(e.getVehicle())){
+		if(RaceManager.isRacingKart(e.getVehicle())){
 			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
 			if(kart == null)return;
 
@@ -100,7 +100,7 @@ public class DataListener extends RaceManager implements Listener {
 	@EventHandler
 	public void interactKart(PlayerInteractEntityEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!RaceManager.isCustomMinecart(e.getRightClicked()))return;
+		if(!RaceManager.isRacingKart(e.getRightClicked()))return;
 		if(!Permission.hasPermission(e.getPlayer(), Permission.kart_ride, false))
 			e.setCancelled(true);
 	}
@@ -214,7 +214,7 @@ public class DataListener extends RaceManager implements Listener {
 					r.recoveryInventoryOnQuit();
 
 					p.teleport(r.getGoalPositionOnQuit());
-					RaceManager.setPassengerCustomMinecart(p, r.getKart());
+					RaceManager.rideRacingKart(p, r.getKart());
 				}
 			}
 		}, 20);
@@ -230,7 +230,7 @@ public class DataListener extends RaceManager implements Listener {
 		//ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
 		//ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
 		if(p.getVehicle() != null)
-			if(RaceManager.isCustomDisplayMinecart(p.getVehicle()))
+			if(RaceManager.isDisplayKart(p.getVehicle()))
 				p.leaveVehicle();
 
 		//レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
@@ -242,7 +242,7 @@ public class DataListener extends RaceManager implements Listener {
 			r.savePlayerDataOnQuit();
 			r.saveInventoryOnQuit();
 
-			removeCustomMinecart(p);
+			leaveRacingKart(p);
 			r.recoveryInventory();
 			r.recoveryPhysical();
 			p.teleport(r.getGoalPosition());
@@ -268,7 +268,7 @@ public class DataListener extends RaceManager implements Listener {
 					p.setSprinting(true);
 					if(r.getKart() != null){
 						try {
-							RaceManager.setPassengerCustomMinecart(p, r.getKart());
+							RaceManager.rideRacingKart(p, r.getKart());
 							p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
 						} catch (Exception e1) {
 							e1.printStackTrace();
@@ -325,7 +325,7 @@ public class DataListener extends RaceManager implements Listener {
 		}
 		if(e.getCause() == DamageCause.FALL)
 			if(p.getVehicle() != null)
-				if(RaceManager.isCustomMinecart(p.getVehicle()))
+				if(RaceManager.isRacingKart(p.getVehicle()))
 					e.setCancelled(true);
 
 		if(!getRace(p).getStart())
@@ -338,7 +338,7 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getEntity().getWorld()))return;
 		final Player p = (Player)e.getEntity();
 
-		RaceManager.removeCustomMinecart(p);
+		RaceManager.leaveRacingKart(p);
 
 		if(!isRacing(p.getUniqueId()))return;
 		Race r = getRace(p);
@@ -478,7 +478,7 @@ public class DataListener extends RaceManager implements Listener {
 				p.closeInventory();
 			//ランダムボタン
 			}else if(EnumSelectMenu.KartRandom.equalsIgnoreCase(clicked)){
-				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getRandomKart());
+				RaceManager.rideRacingKart(p, EnumKarts.getRandomKart());
 			//ネクストプレビューボタン
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
 				if(isStandBy(id)){
@@ -497,7 +497,7 @@ public class DataListener extends RaceManager implements Listener {
 				}
 			//カート選択
 			}else if(EnumKarts.getKartfromString(clicked) != null){
-				RaceManager.setPassengerCustomMinecart(p, EnumKarts.getKartfromString(clicked));
+				RaceManager.rideRacingKart(p, EnumKarts.getKartfromString(clicked));
 			}
 			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
 		}
