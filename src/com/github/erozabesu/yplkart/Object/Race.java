@@ -206,6 +206,8 @@ public class Race {
 	}
 
 	public Entity getLastPassedCheckPoint(){
+		if(getPlayer() == null)return null;
+
 		for(Entity e : getPlayer().getWorld().getEntities()){
 			if(e.getUniqueId().toString().equalsIgnoreCase(this.lastpassedcheckpoint))
 				return e;
@@ -420,6 +422,7 @@ public class Race {
 	}
 
 	public void savePlayerData(){
+		if(getPlayer() == null)return;
 		Player p = getPlayer();
 
 		this.goalposition = p.getLocation().add(0,1,0);
@@ -434,6 +437,7 @@ public class Race {
 	}
 
 	public void savePlayerDataOnQuit(){
+		if(getPlayer() == null)return;
 		Player p = getPlayer();
 
 		this.quitposition = p.getLocation().add(0,1,0);
@@ -446,6 +450,7 @@ public class Race {
 	}
 
 	public void saveInventory(){
+		if(getPlayer() == null)return;
 		PlayerInventory inv = getPlayer().getInventory();
 		ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
 		ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
@@ -463,6 +468,7 @@ public class Race {
 	}
 
 	public void saveInventoryOnQuit(){
+		if(getPlayer() == null)return;
 		PlayerInventory inv = getPlayer().getInventory();
 		ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
 		ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
@@ -480,6 +486,7 @@ public class Race {
 	}
 
 	public void saveKeyItem(){
+		if(getPlayer() == null)return;
 		PlayerInventory inv = getPlayer().getInventory();
 		ArrayList<ItemStack> contents = new ArrayList<ItemStack>();
 		ArrayList<ItemStack> armor = new ArrayList<ItemStack>();
@@ -509,16 +516,19 @@ public class Race {
 	}
 
 	public void recoveryExp(){
+		if(getPlayer() == null)return;
 		getPlayer().setLevel(this.level);
 		getPlayer().setExp(this.exp);
 	}
 
 	public void recoveryExpOnQuit(){
+		if(getPlayer() == null)return;
 		getPlayer().setLevel(this.quitlevel);
 		getPlayer().setExp(this.quitexp);
 	}
 
 	public void recoveryPhysical(){
+		if(getPlayer() == null)return;
 		getPlayer().setMaxHealth(this.maxhealth);
 		getPlayer().setHealth(this.health);
 		getPlayer().setFoodLevel(this.hunger);
@@ -526,6 +536,7 @@ public class Race {
 	}
 
 	public void recoveryPhysicalOnQuit(){
+		if(getPlayer() == null)return;
 		getPlayer().setMaxHealth(this.quitmaxhealth);
 		getPlayer().setHealth(this.quithealth);
 		getPlayer().setFoodLevel(this.quithunger);
@@ -533,6 +544,7 @@ public class Race {
 	}
 
 	public void recoveryInventory(){
+		if(getPlayer() == null)return;
 		if(!this.inventory.isEmpty()){
 			PlayerInventory inv = getPlayer().getInventory();
 			for(int i = 0;i < 36;i++){
@@ -553,6 +565,7 @@ public class Race {
 	}
 
 	public void recoveryInventoryOnQuit(){
+		if(getPlayer() == null)return;
 		if(!this.quitinventory.isEmpty()){
 			PlayerInventory inv = getPlayer().getInventory();
 			for(int i = 0;i < 36;i++){
@@ -573,6 +586,7 @@ public class Race {
 	}
 
 	public void recoveryKeyItem(){
+		if(getPlayer() == null)return;
 		if(!this.inventory.isEmpty()){
 			PlayerInventory inv = getPlayer().getInventory();
 			for(int i = 0;i < 36;i++){
