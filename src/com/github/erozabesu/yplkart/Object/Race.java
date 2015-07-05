@@ -526,6 +526,8 @@ public class Race {
 	 */
 	public void recoveryKart(){
 		if(getPlayer() == null)return;
+		if(getKart() == null)return;
+
 		Player p = getPlayer();
 		if(p.getVehicle() != null){
 			if(RaceManager.isRacingKart(p.getVehicle())){
