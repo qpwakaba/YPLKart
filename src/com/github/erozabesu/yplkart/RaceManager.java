@@ -161,9 +161,6 @@ public class RaceManager {
 		getCircuit(id).exitPlayer(id);
 		Race r = getRace(id);
 
-		clearCharacterRaceData(id);
-		clearKartRaceData(id);
-
 		Player p = Bukkit.getPlayer(id);
 		if(p != null){
 			leaveRacingKart(p);
@@ -174,6 +171,9 @@ public class RaceManager {
 			}
 			Util.sendMessage(id, "エントリーを取り消しました");
 		}
+
+		clearCharacterRaceData(id);
+		clearKartRaceData(id);
 
 		r.init();
 	}

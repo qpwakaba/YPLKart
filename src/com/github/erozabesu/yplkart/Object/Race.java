@@ -528,7 +528,7 @@ public class Race {
 		if(getPlayer() == null)return;
 		if(getKart() == null)return;
 
-		Player p = getPlayer();
+		final Player p = getPlayer();
 		if(p.getVehicle() != null){
 			if(RaceManager.isRacingKart(p.getVehicle())){
 				Object customkart = p.getVehicle().getMetadata(YPLKart.plname).get(0).value();
@@ -550,7 +550,9 @@ public class Race {
 				p.leaveVehicle();
 			}
 		}
-		RaceManager.createCustomMinecart(p.getLocation(), kart).setPassenger(p);
+		Minecart cart = RaceManager.createCustomMinecart(p.getLocation(), kart);
+		cart.setPassenger(p);
+		PacketUtil.sendOwnAttachEntityPacket(p);
 	}
 
 	private void recoveryExp(){

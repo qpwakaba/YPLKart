@@ -190,18 +190,14 @@ public class DataListener extends RaceManager implements Listener {
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
 
 		final Player p = e.getPlayer();
-		Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				if(isStandBy(p.getUniqueId())){
-					Race r = getRace(p);
-					p.teleport(r.getGoalPositionOnQuit());
-					Scoreboards.showBoard(p.getUniqueId());
-					r.recoveryPhysicalOnQuit();
-					r.recoveryInventoryOnQuit();
-					r.recoveryKart();
-				}
-			}
-		}, 20*5);
+		if(isStandBy(p.getUniqueId())){
+			Race r = getRace(p);
+			p.teleport(r.getGoalPositionOnQuit());
+			Scoreboards.showBoard(p.getUniqueId());
+			r.recoveryPhysicalOnQuit();
+			r.recoveryInventoryOnQuit();
+			r.recoveryKart();
+		}
 	}
 
 	@EventHandler
