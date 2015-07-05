@@ -243,14 +243,14 @@ public class CMDAbstractBlock extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.rideRacingKart(other, kart);
+					RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				}
 			}else{
 				if(!Util.isOnline(args[1]))
 					return;
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.rideRacingKart(other, kart);
+				RaceManager.setKartRaceData(other.getUniqueId(), kart);
 			}
 		}else{
 		}

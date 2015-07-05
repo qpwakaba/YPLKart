@@ -289,7 +289,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.rideRacingKart(other, kart);
+					RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				}
 				if(args[2].equalsIgnoreCase("random"))
 					messageRideRandomAll(null);
@@ -301,7 +301,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.rideRacingKart(other, kart);
+				RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				messageRideOther(null, other, kart);
 			}
 		}else{
