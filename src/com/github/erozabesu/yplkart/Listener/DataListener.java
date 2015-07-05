@@ -201,7 +201,7 @@ public class DataListener extends RaceManager implements Listener {
 					r.recoveryKart();
 				}
 			}
-		}, 20);
+		}, 20*5);
 	}
 
 	@EventHandler
@@ -217,8 +217,8 @@ public class DataListener extends RaceManager implements Listener {
 			if(RaceManager.isDisplayKart(p.getVehicle()))
 				p.leaveVehicle();
 
+		//ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、
 		//レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
-		//ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、復元不可能になる可能性があるから。
 		//再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
 		if(isStandBy(p.getUniqueId())){
 			Scoreboards.hideBoard(p.getUniqueId());
