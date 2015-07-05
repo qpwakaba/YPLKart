@@ -556,38 +556,48 @@ public class Race {
 	}
 
 	private void recoveryExp(){
-		if(getPlayer() == null)return;
-		getPlayer().setLevel(this.level);
-		getPlayer().setExp(this.exp);
+		Player p = getPlayer();
+		if(p == null)return;
+
+		p.setLevel(this.level);
+		p.setExp(this.exp);
 	}
 
 	private void recoveryExpOnQuit(){
-		if(getPlayer() == null)return;
-		getPlayer().setLevel(this.quitlevel);
-		getPlayer().setExp(this.quitexp);
+		Player p = getPlayer();
+		if(p == null)return;
+
+		p.setLevel(this.quitlevel);
+		p.setExp(this.quitexp);
 	}
 
 	public void recoveryPhysical(){
-		if(getPlayer() == null)return;
-		getPlayer().setMaxHealth(this.maxhealth);
-		getPlayer().setHealth(this.health);
-		getPlayer().setFoodLevel(this.hunger);
-		getPlayer().setWalkSpeed(this.walkspeed);
+		Player p = getPlayer();
+		if(p == null)return;
+
+		p.setMaxHealth(this.maxhealth);
+		p.setHealth(this.health);
+		p.setFoodLevel(this.hunger);
+		p.setWalkSpeed(this.walkspeed);
 	}
 
 	public void recoveryPhysicalOnQuit(){
-		if(getPlayer() == null)return;
-		getPlayer().setMaxHealth(this.quitmaxhealth);
-		getPlayer().setHealth(this.quithealth);
-		getPlayer().setFoodLevel(this.quithunger);
-		getPlayer().setWalkSpeed(this.quitwalkspeed);
+		Player p = getPlayer();
+		if(p == null)return;
+
+		p.setMaxHealth(this.quitmaxhealth);
+		p.setHealth(this.quithealth);
+		p.setFoodLevel(this.quithunger);
+		p.setWalkSpeed(this.quitwalkspeed);
 	}
 
 	public void recoveryCharacterPhysical(){
-		if(getPlayer() == null)return;
-		getPlayer().setMaxHealth(this.character.getMaxHealth());
-		getPlayer().setHealth(this.character.getMaxHealth());
-		getPlayer().setWalkSpeed(this.character.getWalkSpeed());
+		Player p = getPlayer();
+		if(p == null)return;
+
+		p.setMaxHealth(this.character.getMaxHealth());
+		p.setHealth(this.character.getMaxHealth());
+		p.setWalkSpeed(this.character.getWalkSpeed());
 	}
 
 	public void recoveryInventory(){
