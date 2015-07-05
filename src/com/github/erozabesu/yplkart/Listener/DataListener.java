@@ -80,13 +80,14 @@ public class DataListener extends RaceManager implements Listener {
 		}
 	}
 
-	//カートを右クリック
+	//レース用カートを右クリックした場合キャンセル
 	@EventHandler
 	public void interactKart(PlayerInteractEntityEvent e){
 		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!RaceManager.isRacingKart(e.getRightClicked()))return;
-		if(!Permission.hasPermission(e.getPlayer(), Permission.kart_ride, false))
+		if(RaceManager.isRacingKart(e.getRightClicked())){
 			e.setCancelled(true);
+			return;
+		}
 	}
 
 	@EventHandler
