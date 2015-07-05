@@ -127,7 +127,10 @@ public class Circuit{
 		while(i.hasNext()){
 			id = i.next();
 			i.remove();
-			RaceManager.exit(Bukkit.getPlayer(id));
+			if(Bukkit.getPlayer(id) == null)
+				RaceManager.exit((Player) Bukkit.getOfflinePlayer(id));
+			else
+				RaceManager.exit(Bukkit.getPlayer(id));
 		}
 
 		//リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
@@ -137,8 +140,10 @@ public class Circuit{
 				public void run(){
 					Circuit c = RaceManager.setupCircuit(name);
 					for(UUID id : nextentry){
-						RaceManager.entry(Bukkit.getPlayer(id), name);
-						c.entryPlayer(id);
+						if(Bukkit.getPlayer(id) != null){
+							RaceManager.entry(Bukkit.getPlayer(id), name);
+							c.entryPlayer(id);
+						}
 					}
 				}
 			}, 10);

@@ -34,6 +34,18 @@ public class Race {
 	private float walkspeed;
 	private int level;
 	private float exp;
+	private ArrayList<ItemStack> inventory;
+	private ArrayList<ItemStack> armorcontents;
+
+	private Location quitposition;
+	private double quitmaxhealth;
+	private double quithealth;
+	private int quithunger;
+	private float quitwalkspeed;
+	private int quitlevel;
+	private float quitexp;
+	private ArrayList<ItemStack> quitinventory;
+	private ArrayList<ItemStack> quitarmorcontents;
 
 	private EnumCharacter character;
 	private EnumKarts kart;
@@ -54,8 +66,6 @@ public class Race {
 	private String firstpassedcheckpoint;
 	private ArrayList<String> passedcheckpoint;
 
-	private ArrayList<ItemStack> inventory;
-	private ArrayList<ItemStack> armorcontents;
 	private ArrayList<ItemStack> keyitem;
 	private ArrayList<ItemStack> keyarmor;
 
@@ -92,6 +102,16 @@ public class Race {
 		this.inventory = new ArrayList<ItemStack>();
 		this.armorcontents = new ArrayList<ItemStack>();
 
+		this.quitposition = this.goalposition;
+		this.quitmaxhealth = this.maxhealth;
+		this.quithealth = this.health;
+		this.quithunger = this.hunger;
+		this.quitwalkspeed = this.walkspeed;
+		this.quitlevel = this.level;
+		this.quitexp = this.exp;
+		this.quitinventory = new ArrayList<ItemStack>();
+		this.quitarmorcontents = new ArrayList<ItemStack>();
+
 		this.entry = "";
 		this.standby = false;
 		this.start = false;
@@ -125,6 +145,10 @@ public class Race {
 
 	public Location getGoalPosition(){
 		return this.goalposition;
+	}
+
+	public Location getGoalPositionOnQuit(){
+		return this.quitposition;
 	}
 
 	public String getEntry(){
@@ -409,6 +433,18 @@ public class Race {
 		saveInventory();
 	}
 
+	public void savePlayerDataOnQuit(){
+		Player p = getPlayer();
+
+		this.quitposition = p.getLocation().add(0,1,0);
+		this.quitmaxhealth = p.getMaxHealth();
+		this.quithealth = p.getHealth();
+		this.quithunger = p.getFoodLevel();
+		this.quitwalkspeed = p.getWalkSpeed();
+		this.quitlevel = p.getLevel();
+		this.quitexp = p.getExp();
+	}
+
 	public void saveInventory(){
 		PlayerInventory inv = getPlayer().getInventory();
 		ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
@@ -424,6 +460,23 @@ public class Race {
 
 		this.inventory = inventory;
 		this.armorcontents = armorcontents;
+	}
+
+	public void saveInventoryOnQuit(){
+		PlayerInventory inv = getPlayer().getInventory();
+		ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
+		ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
+
+		for(ItemStack slot : inv.getContents()){
+			inventory.add(slot);
+		}
+		armorcontents.add(inv.getHelmet());
+		armorcontents.add(inv.getChestplate());
+		armorcontents.add(inv.getLeggings());
+		armorcontents.add(inv.getBoots());
+
+		this.quitinventory = inventory;
+		this.quitarmorcontents = armorcontents;
 	}
 
 	public void saveKeyItem(){
@@ -460,11 +513,23 @@ public class Race {
 		getPlayer().setExp(this.exp);
 	}
 
+	public void recoveryExpOnQuit(){
+		getPlayer().setLevel(this.quitlevel);
+		getPlayer().setExp(this.quitexp);
+	}
+
 	public void recoveryPhysical(){
 		getPlayer().setMaxHealth(this.maxhealth);
 		getPlayer().setHealth(this.health);
 		getPlayer().setFoodLevel(this.hunger);
 		getPlayer().setWalkSpeed(this.walkspeed);
+	}
+
+	public void recoveryPhysicalOnQuit(){
+		getPlayer().setMaxHealth(this.quitmaxhealth);
+		getPlayer().setHealth(this.quithealth);
+		getPlayer().setFoodLevel(this.quithunger);
+		getPlayer().setWalkSpeed(this.quitwalkspeed);
 	}
 
 	public void recoveryInventory(){
@@ -485,6 +550,26 @@ public class Race {
 
 		this.inventory = new ArrayList<ItemStack>();
 		this.armorcontents = new ArrayList<ItemStack>();
+	}
+
+	public void recoveryInventoryOnQuit(){
+		if(!this.quitinventory.isEmpty()){
+			PlayerInventory inv = getPlayer().getInventory();
+			for(int i = 0;i < 36;i++){
+				inv.setItem(i, quitinventory.get(i));
+			}
+		}
+
+		if(!this.quitarmorcontents.isEmpty()){
+			PlayerInventory inv = getPlayer().getInventory();
+			if(this.quitarmorcontents.get(0) != null)inv.setHelmet(this.quitarmorcontents.get(0));
+			if(this.quitarmorcontents.get(1) != null)inv.setChestplate(this.quitarmorcontents.get(1));
+			if(this.quitarmorcontents.get(2) != null)inv.setLeggings(this.quitarmorcontents.get(2));
+			if(this.quitarmorcontents.get(3) != null)inv.setBoots(this.quitarmorcontents.get(3));
+		}
+
+		this.quitinventory = new ArrayList<ItemStack>();
+		this.quitarmorcontents = new ArrayList<ItemStack>();
 	}
 
 	public void recoveryKeyItem(){
