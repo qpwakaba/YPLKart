@@ -1,13 +1,11 @@
 package com.github.erozabesu.yplkart;
 
 import java.io.File;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.Cmd.CMD;
@@ -17,7 +15,6 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Listener.DataListener;
 import com.github.erozabesu.yplkart.Listener.ItemListener;
 import com.github.erozabesu.yplkart.Listener.NettyListener;
-import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class YPLKart extends JavaPlugin{
@@ -54,19 +51,7 @@ public class YPLKart extends JavaPlugin{
 	@Override
 	public void onDisable(){
 		Scoreboards.clearBoard();
-		for(Player p : Bukkit.getOnlinePlayers()){
-			UUID id = p.getUniqueId();
-			Race r = RaceManager.getRace(p);
-			RaceManager.clearCharacterRaceData(id);
-			RaceManager.leaveRacingKart(p);
-			if(RaceManager.isStandBy(id)){
-				r.recoveryPhysical();
-				r.recoveryInventory();
-				p.teleport(r.getGoalPosition());
-				Util.sendMessage(p, "エントリーを取り消しました");
-			}
-		}
-		RaceManager.removeAllJammerEntity();
+		RaceManager.endAllCircuit();
 	}
 
 	public static YPLKart getInstance(){

@@ -57,7 +57,7 @@ public class RaceManager {
 
 	public static void endAllCircuit(){
 		for(Circuit c : circuit.values()){
-			c.init();
+			c.endRace();
 		}
 		circuit.clear();
 	}
