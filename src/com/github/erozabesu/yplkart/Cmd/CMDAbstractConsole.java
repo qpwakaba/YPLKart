@@ -157,7 +157,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 			}
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.entry(other.getUniqueId(), args[2]);
+					RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
 				}
 				messageEntryAll(null, args[2]);
 			}else{
@@ -167,7 +167,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				Player other = Bukkit.getPlayer(args[1]);
 				messageEntryOther(null, other, args[2]);
-				RaceManager.entry(other.getUniqueId(), args[2]);
+				RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
 			}
 		}else{
 			Util.sendMessage(null, "===========================================\n"
@@ -184,14 +184,14 @@ public class CMDAbstractConsole extends CMDAbstract{
 		if (length == 2) {
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.exit(other.getUniqueId());
+					RaceManager.clearEntryRaceData(other.getUniqueId());
 				}
 				messageExitAll(null);
 			}else{
 				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.exit(other.getUniqueId());
+				RaceManager.clearEntryRaceData(other.getUniqueId());
 				messageExitOther(null, other);
 			}
 		}else{
@@ -209,7 +209,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 			if(args[2].equalsIgnoreCase("random")){
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
-						RaceManager.character(other.getUniqueId(), EnumCharacter.getRandomCharacter());
+						RaceManager.setCharacterRaceData(other.getUniqueId(), EnumCharacter.getRandomCharacter());
 					}
 					messageCharacterRandomAll(null);
 				}else{
@@ -219,7 +219,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 					}
 					EnumCharacter character = EnumCharacter.getRandomCharacter();
 					Player other = Bukkit.getPlayer(args[1]);
-					RaceManager.character(other.getUniqueId(), character);
+					RaceManager.setCharacterRaceData(other.getUniqueId(), character);
 					messageCharacterOther(null, other, character);
 				}
 			}else{
@@ -230,7 +230,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
-						RaceManager.character(other.getUniqueId(), character);
+						RaceManager.setCharacterRaceData(other.getUniqueId(), character);
 					}
 					messageCharacterAll(null, character);
 				}else{
@@ -239,7 +239,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 						return;
 					}
 					Player other = Bukkit.getPlayer(args[1]);
-					RaceManager.character(other.getUniqueId(), character);
+					RaceManager.setCharacterRaceData(other.getUniqueId(), character);
 					messageCharacterOther(null, other, character);
 				}
 			}
@@ -255,14 +255,14 @@ public class CMDAbstractConsole extends CMDAbstract{
 		if (length == 2){
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.characterReset(other.getUniqueId());
+					RaceManager.clearCharacterRaceData(other.getUniqueId());
 				}
 				messageCharacterResetAll(null);
 			}else{
 				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.characterReset(other.getUniqueId());
+				RaceManager.clearCharacterRaceData(other.getUniqueId());
 				messageCharacterResetOther(null, other);
 			}
 		}else{
@@ -317,7 +317,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.removeCustomMinecart(other);
-					RaceManager.leave(other.getUniqueId());
+					RaceManager.clearKartRaceData(other.getUniqueId());
 				}
 				messageLeaveAll(null);
 			}else{
@@ -325,7 +325,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.removeCustomMinecart(other);
-				RaceManager.leave(other.getUniqueId());
+				RaceManager.clearKartRaceData(other.getUniqueId());
 				messageLeaveOther(null, other);
 			}
 		}else{
@@ -346,7 +346,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 					return;
 				}
 
-				RaceManager.ranking(null, args[1]);
+				RaceData.sendRanking(null, args[1]);
 			}
 		//ka ranking {player name} 	{circuit name}
 		//ka ranking all 			{circuit name}
@@ -357,7 +357,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 			}
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.ranking(other.getUniqueId(), args[2]);
+					RaceData.sendRanking(other.getUniqueId(), args[2]);
 				}
 				messageRankingAll(null, args[2]);
 			}else{
@@ -366,7 +366,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.ranking(other.getUniqueId(), args[2]);
+				RaceData.sendRanking(other.getUniqueId(), args[2]);
 				messageRankingOther(null, other, args[2]);
 			}
 		}else{
@@ -377,7 +377,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 	@Override
 	void reload() {
 		for(Player other : Bukkit.getOnlinePlayers()){
-			RaceManager.exit(other.getUniqueId());
+			RaceManager.clearEntryRaceData(other.getUniqueId());
 		}
 		RaceManager.endAllCircuit();
 

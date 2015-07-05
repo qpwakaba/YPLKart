@@ -141,13 +141,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 			}
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player p : Bukkit.getOnlinePlayers()){
-					RaceManager.entry(p.getUniqueId(), args[2]);
+					RaceManager.setEntryRaceData(p.getUniqueId(), args[2]);
 				}
 			}else{
 				if(!Util.isOnline(args[1])){
 					return;
 				}
-				RaceManager.entry(Bukkit.getPlayer(args[1]).getUniqueId(), args[2]);
+				RaceManager.setEntryRaceData(Bukkit.getPlayer(args[1]).getUniqueId(), args[2]);
 			}
 		}else{
 		}
@@ -160,13 +160,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 		if (length == 2) {
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.exit(other.getUniqueId());
+					RaceManager.clearEntryRaceData(other.getUniqueId());
 				}
 			}else{
 				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.exit(other.getUniqueId());
+				RaceManager.clearEntryRaceData(other.getUniqueId());
 			}
 		}else{
 		}
@@ -182,13 +182,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 			if(args[2].equalsIgnoreCase("random")){
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
-						RaceManager.character(other.getUniqueId(), EnumCharacter.getRandomCharacter());
+						RaceManager.setCharacterRaceData(other.getUniqueId(), EnumCharacter.getRandomCharacter());
 					}
 				}else{
 					if(!Util.isOnline(args[1]))
 						return;
 					EnumCharacter character = EnumCharacter.getRandomCharacter();
-					RaceManager.character(Bukkit.getPlayer(args[1]).getUniqueId(), character);
+					RaceManager.setCharacterRaceData(Bukkit.getPlayer(args[1]).getUniqueId(), character);
 				}
 			}else{
 				EnumCharacter character = EnumCharacter.getClassfromString(args[2]);
@@ -196,12 +196,12 @@ public class CMDAbstractBlock extends CMDAbstract{
 					return;
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
-						RaceManager.character(other.getUniqueId(), character);
+						RaceManager.setCharacterRaceData(other.getUniqueId(), character);
 					}
 				}else{
 					if(!Util.isOnline(args[1]))
 						return;
-					RaceManager.character(Bukkit.getPlayer(args[1]).getUniqueId(), character);
+					RaceManager.setCharacterRaceData(Bukkit.getPlayer(args[1]).getUniqueId(), character);
 				}
 			}
 		}else{
@@ -215,12 +215,12 @@ public class CMDAbstractBlock extends CMDAbstract{
 		if (length == 2){
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.characterReset(other.getUniqueId());
+					RaceManager.clearCharacterRaceData(other.getUniqueId());
 				}
 			}else{
 				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
 
-				RaceManager.characterReset(Bukkit.getPlayer(args[1]).getUniqueId());
+				RaceManager.clearCharacterRaceData(Bukkit.getPlayer(args[1]).getUniqueId());
 			}
 		}else{
 		}
@@ -264,14 +264,14 @@ public class CMDAbstractBlock extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.removeCustomMinecart(other);
-					RaceManager.leave(other.getUniqueId());
+					RaceManager.clearKartRaceData(other.getUniqueId());
 				}
 			}else{
 				if(!Util.isOnline(args[1]))return;
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.removeCustomMinecart(other);
-				RaceManager.leave(other.getUniqueId());
+				RaceManager.clearKartRaceData(other.getUniqueId());
 			}
 		}else{
 		}
@@ -291,7 +291,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 				return;
 			}
 
-			RaceManager.ranking(other.getUniqueId(), args[2]);
+			RaceData.sendRanking(other.getUniqueId(), args[2]);
 		}else{
 			Util.sendMessage(null, "===========================================\n" + referenceRankingOther + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
 		}
@@ -300,7 +300,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 	@Override
 	void reload() {
 		for(Player p : Bukkit.getOnlinePlayers()){
-			RaceManager.exit(p.getUniqueId());
+			RaceManager.clearEntryRaceData(p.getUniqueId());
 		}
 		RaceManager.endAllCircuit();
 

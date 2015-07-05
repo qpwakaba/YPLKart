@@ -57,7 +57,7 @@ public class YPLKart extends JavaPlugin{
 		for(Player p : Bukkit.getOnlinePlayers()){
 			UUID id = p.getUniqueId();
 			Race r = RaceManager.getRace(p);
-			RaceManager.characterReset(id);
+			RaceManager.clearCharacterRaceData(id);
 			RaceManager.removeCustomMinecart(p);
 			if(RaceManager.isStandBy(id)){
 				r.recoveryPhysical();
