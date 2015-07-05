@@ -179,6 +179,8 @@ public class Circuit{
 
 		if(this.reserveentry.contains(id))
 			this.reserveentry.remove(id);
+
+		denyMatching(id);
 	}
 
 	public void exitPlayer(Player p){
@@ -187,6 +189,8 @@ public class Circuit{
 
 		if(this.reserveentry.contains(p.getUniqueId()))
 			this.reserveentry.remove(p.getUniqueId());
+
+		denyMatching(p.getUniqueId());
 	}
 
 	public void acceptMatching(UUID id){

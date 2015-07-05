@@ -89,7 +89,6 @@ public class RaceManager {
 		}else if(isStandBy(id)){
 			return;
 		}else{
-			c.denyMatching(id);
 			clearEntryRaceData(id);
 		}
 	}
@@ -156,7 +155,7 @@ public class RaceManager {
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-	
+
 	public static void clearEntryRaceData(UUID id){
 		Scoreboards.exitCircuit(id);
 		getCircuit(id).exitPlayer(id);
@@ -176,7 +175,6 @@ public class RaceManager {
 		}
 
 		r.init();
-
 		Util.sendMessage(id, "エントリーを取り消しました");
 	}
 
