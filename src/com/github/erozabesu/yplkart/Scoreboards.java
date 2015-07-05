@@ -107,7 +107,7 @@ public class Scoreboards{
 
 		sb.getTeam(YPLKart.plname).removeEntry(getPlayerRegisterName(p));
 		sb.resetScores(getPlayerRegisterName(p));
-		clearBoard(p);
+		hideBoard(p);
 	}
 
 	public static void setPoint(Player p){
@@ -125,7 +125,7 @@ public class Scoreboards{
 		}
 	}
 
-	public static void clearBoard(Player p){
+	public static void hideBoard(Player p){
 		p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 	}
 
