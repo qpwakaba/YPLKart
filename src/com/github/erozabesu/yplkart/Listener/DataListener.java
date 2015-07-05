@@ -236,7 +236,7 @@ public class DataListener extends RaceManager implements Listener {
 				p.teleport(r.getGoalPosition());
 				r.init();
 			}
-		}else if(isEntry(p.getUniqueId())){
+		}else if(isEntry(p.getUniqueId()) && !isStandBy(p.getUniqueId())){
 			RaceManager.clearEntryRaceData(p.getUniqueId());
 		}
 	}
