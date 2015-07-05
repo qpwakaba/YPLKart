@@ -58,7 +58,7 @@ public class YPLKart extends JavaPlugin{
 			UUID id = p.getUniqueId();
 			Race r = RaceManager.getRace(p);
 			RaceManager.clearCharacterRaceData(id);
-			RaceManager.removeCustomMinecart(p);
+			RaceManager.leaveRacingKart(p);
 			if(RaceManager.isStandBy(id)){
 				r.recoveryPhysical();
 				r.recoveryInventory();

@@ -527,7 +527,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 			Entity other = getVehicle(entity);
 
-			double otherspeed = RaceManager.isCustomMinecart(other.getBukkitEntity()) ? calcMotionSpeed(other.motX, other.motZ) * EnumKarts.getKartfromEntity(other.getBukkitEntity()).getWeight() : calcMotionSpeed(other.motX, other.motZ);
+			double otherspeed = RaceManager.isRacingKart(other.getBukkitEntity()) ? calcMotionSpeed(other.motX, other.motZ) * EnumKarts.getKartfromEntity(other.getBukkitEntity()).getWeight() : calcMotionSpeed(other.motX, other.motZ);
 
 			if(this.lastMotionSpeed < otherspeed)return;
 

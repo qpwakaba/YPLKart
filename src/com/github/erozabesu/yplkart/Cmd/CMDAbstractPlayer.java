@@ -394,14 +394,14 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		if (this.length == 2){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_ride, false, false))return;
 			if(args[1].equalsIgnoreCase("random")){
-				RaceManager.setPassengerCustomMinecart(this.p, EnumKarts.getRandomKart());
+				RaceManager.rideRacingKart(this.p, EnumKarts.getRandomKart());
 			}else{
 				EnumKarts kart = EnumKarts.getKartfromString(args[1]);
 				if(kart == null){
 					messageInvalidKart(this.p);
 					return;
 				}
-				RaceManager.setPassengerCustomMinecart(this.p, kart);
+				RaceManager.rideRacingKart(this.p, kart);
 			}
 		//ka ride all {kart name}
 		//ka ride {player name} {kart name}
@@ -421,7 +421,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.setPassengerCustomMinecart(other, kart);
+					RaceManager.rideRacingKart(other, kart);
 				}
 				if(args[2].equalsIgnoreCase("random"))
 					messageRideRandomAll(this.p);
@@ -433,7 +433,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.setPassengerCustomMinecart(other, kart);
+				RaceManager.rideRacingKart(other, kart);
 				messageRideOther(this.p, other, kart);
 			}
 		}else{
@@ -449,7 +449,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		//ka leave
 		if(this.length == 1){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_leave, false, false))return;
-			RaceManager.removeCustomMinecart(this.p);
+			RaceManager.leaveRacingKart(this.p);
 			RaceManager.clearKartRaceData(this.id);
 		//ka leave {player}
 		//ka leave all
@@ -458,7 +458,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
-					RaceManager.removeCustomMinecart(other);
+					RaceManager.leaveRacingKart(other);
 					RaceManager.clearKartRaceData(this.id);
 				}
 				messageLeaveAll(this.p);
@@ -466,7 +466,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
 
 				Player other = Bukkit.getPlayer(args[1]);
-				RaceManager.removeCustomMinecart(other);
+				RaceManager.leaveRacingKart(other);
 				RaceManager.clearKartRaceData(other.getUniqueId());
 				messageLeaveOther(this.p, other);
 			}
