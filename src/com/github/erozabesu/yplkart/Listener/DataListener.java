@@ -24,7 +24,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -78,21 +77,6 @@ public class DataListener extends RaceManager implements Listener {
 		if(!getRace(p).getCMDFroceLeave()){
 			e.setCancelled(true);
 			return;
-		}
-	}
-
-	//搭乗に成功した場合データ登録
-	@EventHandler
-	public void onVehicleEnter(VehicleEnterEvent e){
-		if(!Settings.isEnable(e.getEntered().getWorld()))return;
-		if(!(e.getEntered() instanceof Player))return;
-
-		//PacketUtil.runPlayerLookingUpdate((Player) e.getEntered());
-		if(RaceManager.isRacingKart(e.getVehicle())){
-			EnumKarts kart = EnumKarts.getKartfromEntity(e.getVehicle());
-			if(kart == null)return;
-
-			RaceManager.setKartRaceData(((Player) e.getEntered()).getUniqueId(), kart);
 		}
 	}
 
