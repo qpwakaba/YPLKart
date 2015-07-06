@@ -48,7 +48,7 @@ public class RaceManager {
 		return circuit.get(circuitname);
 	}
 
-	public static void endCircuit(String circuitname){
+	public static void clearCircuitData(String circuitname){
 		if(circuit.get(circuitname) != null){
 			circuit.get(circuitname).init();
 			circuit.remove(circuitname);

@@ -149,7 +149,7 @@ public class Circuit{
 		//初期化
 		removeAllJammerEntity();
 		init();
-		RaceManager.endCircuit(name);
+		RaceManager.clearCircuitData(name);
 		Scoreboards.endCircuit(name);
 	}
 
