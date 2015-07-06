@@ -96,20 +96,25 @@ public class RaceManager {
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static void setEntryRaceData(UUID id, String circuitname){
-		Circuit c = setupCircuit(circuitname);
-		getRace(id).setEntry(circuitname);
-
-		if(c.isStarted()){
-			c.entryReservePlayer(id);
-			Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+		if(isEntry(id)){
+			String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
+			Util.sendMessage(id, "#Red既に#Blue" + oldcircuitname + "#Redのレースにエントリーしています。他のレースにエントリーしたい場合は現在のエントリーを取り消して下さい");
 		}else{
-			c.entryPlayer(id);
-			Scoreboards.entryCircuit(id);
+			Circuit c = setupCircuit(circuitname);
+			getRace(id).setEntry(circuitname);
 
-			Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+			if(c.isStarted()){
+				c.entryReservePlayer(id);
+				Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+			}else{
+				c.entryPlayer(id);
+				Scoreboards.entryCircuit(id);
 
-			if(c.isMatching())
-				setMatchingCircuitData(id);
+				Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+
+				if(c.isMatching())
+					setMatchingCircuitData(id);
+			}
 		}
 	}
 
