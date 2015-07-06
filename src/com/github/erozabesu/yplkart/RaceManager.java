@@ -162,25 +162,27 @@ public class RaceManager {
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static void clearEntryRaceData(UUID id){
-		Scoreboards.exitCircuit(id);
-		getCircuit(id).exitPlayer(id);
-		Race r = getRace(id);
+		if(isEntry(id)){
+			Scoreboards.exitCircuit(id);
+			getCircuit(id).exitPlayer(id);
+			Race r = getRace(id);
 
-		Player p = Bukkit.getPlayer(id);
-		if(p != null){
-			leaveRacingKart(p);
-			if(isStandBy(id)){
-				r.recoveryInventory();
-				r.recoveryPhysical();
-				p.teleport(r.getGoalPosition());
+			Player p = Bukkit.getPlayer(id);
+			if(p != null){
+				leaveRacingKart(p);
+				if(isStandBy(id)){
+					r.recoveryInventory();
+					r.recoveryPhysical();
+					p.teleport(r.getGoalPosition());
+				}
+				Util.sendMessage(id, "エントリーを取り消しました");
 			}
-			Util.sendMessage(id, "エントリーを取り消しました");
+
+			clearCharacterRaceData(id);
+			clearKartRaceData(id);
+
+			r.init();
 		}
-
-		clearCharacterRaceData(id);
-		clearKartRaceData(id);
-
-		r.init();
 	}
 
 	public static void clearCharacterRaceData(UUID id){
