@@ -35,6 +35,11 @@ public class SendCountDownTitleTask extends BukkitRunnable{
 			return;
 		}
 
+		if(!RaceManager.isEntry(this.p.getUniqueId())){
+			this.cancel();
+			return;
+		}
+
 		if(maxlife < life){
 			this.cancel();
 			return;
