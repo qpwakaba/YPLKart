@@ -34,6 +34,24 @@ import com.github.erozabesu.yplkart.Task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil{
+	public static Class<?> CraftBlock;
+	public static Class<?> CraftMaterial;
+
+	public static Method Block_getById;
+	public static Method Block_getMaterial;
+	public static Method Material_isSolid;
+
+	public Util(){
+		try {
+			CraftBlock = getBukkitClass("Block");
+			CraftMaterial = getBukkitClass("Material");
+			Block_getById = CraftBlock.getMethod("getById", int.class);
+			Block_getMaterial = CraftBlock.getMethod("getMaterial");
+			Material_isSolid = CraftMaterial.getMethod("isSolid");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static int getRandom(int value){
 		int num;
@@ -95,6 +113,16 @@ public class Util extends ReflectionUtil{
 		float yaw = fromadjust.getYaw();
 		double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw+360 : yaw));
 		double z = Math.cos(Math.toRadians(yaw < 0 ? yaw+360 : yaw));
+
+		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
+		return to;
+	}
+
+	public static Location getSideLocationfromYaw(Location from, double offset){
+		Location fromadjust = adjustBlockLocation(from);
+		float yaw = fromadjust.getYaw();
+		double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw+180 : yaw));
+		double z = Math.cos(Math.toRadians(yaw < 0 ? yaw+180 : yaw));
 
 		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
 		return to;
@@ -268,13 +296,13 @@ public class Util extends ReflectionUtil{
 		return true;
 	}
 
-	public static Boolean isSolidBlock(Location l) throws Exception{
-		Class<?> block = getBukkitClass("Block");
-		Method getById = block.getMethod("getById", int.class);
-		Method getMaterial = block.getMethod("getMaterial");
-		Method isSolid = getBukkitClass("Material").getMethod("isSolid");
-
-		return (Boolean) isSolid.invoke(getMaterial.invoke(getById.invoke(block, l.getBlock().getTypeId())));
+	public static Boolean isSolidBlock(Location l){
+		try {
+			return (Boolean) Material_isSolid.invoke(Block_getMaterial.invoke(Block_getById.invoke(CraftBlock, l.getBlock().getTypeId())));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static Boolean isSlabBlock(Location l){

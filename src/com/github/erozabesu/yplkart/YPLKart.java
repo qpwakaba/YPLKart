@@ -39,6 +39,7 @@ public class YPLKart extends JavaPlugin{
 		new Settings(this);
 		new RaceData(this);
 		new DisplayKartData(this);
+		new Util();
 
 		for(World w : Bukkit.getWorlds()){
 			DisplayKartData.respawnKart(w);
