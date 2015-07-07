@@ -24,6 +24,7 @@ public class CMD implements CommandExecutor{
 											+ "/ka circuit edit {circuit name} :\n"
 											+ "/ka circuit setlap {circuit name} {number of laps} :\n"
 											+ "/ka circuit setminplayer {circuit name} {number of player} :\n"
+											+ "/ka circuit setmaxplayer {circuit name} {number of player} :\n"
 											+ "/ka circuit setmatchingtime {circuit name} {number of second} :\n"
 											+ "/ka circuit setlimittime {circuit name} {number of second} :\n"
 											+ "/ka circuit setposition {circuit name} :\n"

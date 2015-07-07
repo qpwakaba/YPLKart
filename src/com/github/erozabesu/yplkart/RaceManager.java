@@ -98,33 +98,38 @@ public class RaceManager {
 	public static void setEntryRaceData(UUID id, String circuitname){
 		if(isEntry(id)){
 			String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
-			Util.sendMessage(id, "[header]#Red既に#Blue" + oldcircuitname + "#Redのレースにエントリーしています。他のレースにエントリーしたい場合は現在のエントリーを取り消して下さい");
+			Util.sendMessage(id, "#Red既に#Blue" + oldcircuitname + "#Redのレースにエントリーしています。他のレースにエントリーしたい場合は現在のエントリーを取り消して下さい");
 		}else{
 			Circuit c = setupCircuit(circuitname);
-			getRace(id).setEntry(circuitname);
-
-			if(c.isStarted()){
+			if(c.isFillPlayer()){
 				c.entryReservePlayer(id);
-				Util.sendMessage(id, "[header]#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+				Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既に規定人数が満たされているため、次回開催されるレースにエントリーされました");
 			}else{
-				c.entryPlayer(id);
-				Scoreboards.entryCircuit(id);
+				getRace(id).setEntry(circuitname);
 
-				Util.sendMessage(id, "[header]#Gold" + circuitname + "#Greenのレースにエントリーしました");
+				if(c.isStarted()){
+					c.entryReservePlayer(id);
+					Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+				}else{
+					c.entryPlayer(id);
+					Scoreboards.entryCircuit(id);
 
-				if(c.isMatching())
-					setMatchingCircuitData(id);
+					Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+
+					if(c.isMatching())
+						setMatchingCircuitData(id);
+				}
 			}
 		}
 	}
 
 	public static void setCharacterRaceData(UUID id, EnumCharacter character){
 		if(!isStandBy(id)){
-			Util.sendMessage(id, "[header]#Redレースが開始されるまでキャラクター選択はできません");
+			Util.sendMessage(id, "#Redレースが開始されるまでキャラクター選択はできません");
 			return;
 		}
 		if(Bukkit.getPlayer(id) == null){
-			Util.sendMessage(null, "[header]#Redオフラインプレイヤーへのキャラクター選択はできません");
+			Util.sendMessage(null, "#Redオフラインプレイヤーへのキャラクター選択はできません");
 			return;
 		}
 
@@ -138,16 +143,16 @@ public class RaceManager {
 
 		PacketUtil.disguise(p, null, character);
 		EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
-		Util.sendMessage(id, "[header]キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
+		Util.sendMessage(id, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
 	}
 
 	public static void setKartRaceData(UUID id, EnumKarts kart){
 		if(!isStandBy(id)){
-			Util.sendMessage(id, "[header]#Redレースが開始されるまでカート選択はできません");
+			Util.sendMessage(id, "#Redレースが開始されるまでカート選択はできません");
 			return;
 		}
 		if(Bukkit.getPlayer(id) == null){
-			Util.sendMessage(null, "[header]#Redオフラインプレイヤーへのカート選択はできません");
+			Util.sendMessage(null, "#Redオフラインプレイヤーへのカート選択はできません");
 			return;
 		}
 
@@ -156,7 +161,7 @@ public class RaceManager {
 		r.setKart(kart);
 		r.recoveryKart();
 
-		Util.sendMessage(id, "[header]#White" + kart.getName() + "カート#Greenに搭乗しました");
+		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -175,7 +180,7 @@ public class RaceManager {
 					r.recoveryPhysical();
 					p.teleport(r.getGoalPosition());
 				}
-				Util.sendMessage(id, "[header]エントリーを取り消しました");
+				Util.sendMessage(id, "エントリーを取り消しました");
 			}
 
 			clearCharacterRaceData(id);
@@ -193,7 +198,7 @@ public class RaceManager {
 		if(p != null){
 			getRace(id).recoveryPhysical();
 			PacketUtil.returnPlayer(p);
-			Util.sendMessage(id, "[header]キャラクター選択を取り消しました");
+			Util.sendMessage(id, "キャラクター選択を取り消しました");
 		}
 	}
 
@@ -201,7 +206,7 @@ public class RaceManager {
 		if(getRace(id).getKart() == null)return;
 
 		if(Bukkit.getPlayer(id) != null)
-			Util.sendMessage(id, "[header]搭乗を解除しました");
+			Util.sendMessage(id, "搭乗を解除しました");
 		getRace(id).setKart(null);
 	}
 
