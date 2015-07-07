@@ -397,7 +397,7 @@ public class RaceManager {
 	public static Boolean isRacing(UUID id){
 		if(isEntry(id))
 			if(isStandBy(id))
-				if(getRace(id).getStart())
+				if(getCircuit(id).isStarted())
 					return true;
 		return false;
 	}

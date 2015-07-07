@@ -299,7 +299,6 @@ public class Race {
 
 	public void setStart(boolean value){
 		this.start = value;
-		RaceManager.getCircuit(this.entry).setStart(true);
 	}
 
 	public void setStart(boolean value, Location from, Location to){
@@ -314,12 +313,6 @@ public class Race {
 		if(checkpoint != null){
 			setFirstPassedCheckPoint(checkpoint.get(0).getUniqueId().toString());
 		}
-
-		Util.createSignalFireworks(getPlayer().getLocation());
-		Util.createFlowerShower(getPlayer(), 5);
-
-		new SendExpandedTitleTask(getPlayer(), 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		RaceManager.getCircuit(this.entry).setStart(true);
 	}
 
 	public void setLapStepCool(boolean value){
