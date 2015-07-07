@@ -72,6 +72,7 @@ public class Race {
 	private ArrayList<ItemStack> keyarmor;
 
 	private BukkitTask deathpenaltytask;
+	private BukkitTask deathpenaltytitlesendtask;
 	private BukkitTask itemPositiveSpeedTask;
 	private BukkitTask itemNegativeSpeedTask;
 	private BukkitTask playerLookingUpdateTask;
@@ -131,6 +132,7 @@ public class Race {
 		this.passedcheckpoint = new ArrayList<String>();
 
 		this.deathpenaltytask = null;
+		this.deathpenaltytitlesendtask = null;
 		this.itemPositiveSpeedTask = null;
 		this.itemNegativeSpeedTask = null;
 		this.usingKiller = null;
@@ -219,6 +221,10 @@ public class Race {
 
 	public BukkitTask getDeathPenaltyTask(){
 		return this.deathpenaltytask;
+	}
+
+	public BukkitTask getDeathPenaltySendTitleTask(){
+		return this.deathpenaltytitlesendtask;
 	}
 
 	public BukkitTask getItemPositiveSpeed(){
@@ -365,6 +371,13 @@ public class Race {
 			this.deathpenaltytask.cancel();
 
 		this.deathpenaltytask = newtask;
+	}
+
+	public void setDeathPenaltyTitleSendTask(BukkitTask newtask){
+		if(this.deathpenaltytitlesendtask != null)
+			this.deathpenaltytitlesendtask.cancel();
+
+		this.deathpenaltytitlesendtask = newtask;
 	}
 
 	public void setItemPositiveSpeedTask(BukkitTask newtask){
