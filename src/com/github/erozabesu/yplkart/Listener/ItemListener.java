@@ -270,8 +270,7 @@ public class ItemListener extends RaceManager implements Listener{
 								}, 2 * 20L + 10L);
 
 								int denominator = getRacingPlayer(getRace(p).getEntry()).size();
-								//TODO
-								denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
+								//denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
 								if(denominator == 0)denominator = 1;
 								int rank = getRank(p);
 								if(rank == 0)rank = 1;
