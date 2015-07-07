@@ -329,9 +329,9 @@ public class Util extends ReflectionUtil{
 			}else{
 				p.setHealth(p.getMaxHealth());
 				if(executor != null)
-					broadcastMessage(damaged.getName() + " killed by " + executor.getName());
+					broadcastMessage("#White" + damaged.getName() + " killed by " + executor.getName());
 				else
-					broadcastMessage(damaged.getName() + " is dead");
+					broadcastMessage("#White" + damaged.getName() + " is dead");
 
 				final Race r = RaceManager.getRace(p);
 				new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
