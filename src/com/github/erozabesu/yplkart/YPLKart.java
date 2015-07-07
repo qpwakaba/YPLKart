@@ -45,8 +45,8 @@ public class YPLKart extends JavaPlugin{
 			DisplayKartData.respawnKart(w);
 		}
 
-		Util.sendMessage(null, "v." + getDescription().getVersion() + " Loaded Config");
-		Util.sendMessage(null, "v." + getDescription().getVersion() + " Plugin has been Enabled");
+		Util.sendMessage(null, "[header]v." + getDescription().getVersion() + " Loaded Config");
+		Util.sendMessage(null, "[header]v." + getDescription().getVersion() + " Plugin has been Enabled");
 	}
 
 	@Override

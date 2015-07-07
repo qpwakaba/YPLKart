@@ -167,7 +167,7 @@ public final class DisplayKartData{
 			pl.saveResource(filename, true);
 			configFile = new File(datafolder, filename);
 			config = YamlConfiguration.loadConfiguration(configFile);
-			Util.sendMessage(null, filename + ".ymlを生成しました");
+			Util.sendMessage(null, "[header]" + filename + ".ymlを生成しました");
 		}
 	}
 

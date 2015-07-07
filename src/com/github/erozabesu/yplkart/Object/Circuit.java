@@ -323,8 +323,8 @@ public class Circuit{
 		for(UUID id : entry){
 			Player p = Bukkit.getPlayer(id);
 			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-			Util.sendMessageNoHeader(p, "#Aquaレースを開始する準備が整いました");
-			Util.sendMessageNoHeader(p, "#Aqua↓↓↓のチャットをクリックして参加を確定して下さい");
+			Util.sendMessage(p, "#Aquaレースを開始する準備が整いました");
+			Util.sendMessage(p, "#Aqua↓↓↓のチャットをクリックして参加を確定して下さい");
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + p.getName() + tellraw);
 		}
 
@@ -397,7 +397,7 @@ public class Circuit{
 
 	public void sendMessageEntryPlayer(String message){
 		for(Player p : getEntryPlayer()){
-			Util.sendMessageNoHeader(p, message);
+			Util.sendMessage(p, message);
 		}
 	}
 

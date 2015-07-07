@@ -360,19 +360,19 @@ public class ItemListener extends RaceManager implements Listener{
 		if(EnumItem.ItemBox.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxName)){
 				e.getEntity().remove();
-				Util.sendMessage(p, e.getEntity().getCustomName() + "を削除しました");
+				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
 				e.setCancelled(true);
 			}
 		}else if(EnumItem.ItemBoxTier2.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameTier2)){
 				e.getEntity().remove();
-				Util.sendMessage(p, e.getEntity().getCustomName() + "を削除しました");
+				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
 				e.setCancelled(true);
 			}
 		}else if(EnumItem.ItemBoxFake.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameFake) || e.getEntity().getCustomName().equalsIgnoreCase(FakeItemBoxName)){
 				e.getEntity().remove();
-				Util.sendMessage(p, e.getEntity().getCustomName() + "を削除しました");
+				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
 				e.setCancelled(true);
 			}
 		}
