@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.Settings;
+import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class ItemStarTask extends BukkitRunnable{
@@ -32,8 +33,10 @@ public class ItemStarTask extends BukkitRunnable{
 		boostTask.put(p, this);
 
 		Util.setItemDecrease(p);
-		RaceManager.getRace(p).setDeathPenaltyTask(null);
-		RaceManager.getRace(p).setItemNegativeSpeedTask(null);
+		Race r = RaceManager.getRace(p);
+		r.setDeathPenaltyTask(null);
+		r.setDeathPenaltyTitleSendTask(null);
+		r.setItemNegativeSpeedTask(null);
 		p.setNoDamageTicks(effectsecond);
 		p.setFireTicks(0);
 		p.setWalkSpeed(Settings.StarWalkSpeed);

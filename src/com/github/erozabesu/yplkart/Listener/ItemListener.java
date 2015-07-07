@@ -742,6 +742,7 @@ public class ItemListener extends RaceManager implements Listener{
 		Util.setPotionEffect(p,PotionEffectType.SPEED,second,level + race.getCharacter().getItemAdjustPositiveEffectLevel());
 		if(race.getDeathPenaltyTask() != null){
 			race.setDeathPenaltyTask(null);
+			race.setDeathPenaltyTitleSendTask(null);
 			p.setWalkSpeed(race.getCharacter().getWalkSpeed());
 		}
 		race.setItemPositiveSpeedTask(

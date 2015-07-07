@@ -253,7 +253,9 @@ public class DataListener extends RaceManager implements Listener {
 					p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
 					p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
 					r.recoveryKart();
-					new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
+					r.setDeathPenaltyTitleSendTask(
+						new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1)
+					);
 			}
 		});
 
