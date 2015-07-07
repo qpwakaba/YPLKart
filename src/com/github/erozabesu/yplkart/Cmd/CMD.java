@@ -18,7 +18,8 @@ public class CMD implements CommandExecutor{
 	CMDAbstract cmd;
 	protected String itemlist = "mushroom, powerfullmushroom, banana, fakeitembox, turtle, redturtle, thornedturtle, gesso, thunder, star, teresa, killer, itemboxtool, itemboxtooltier2, fakeitemboxtool";
 
-	protected String referenceCircuitIngame = "/ka circuit create {circuit name} :\n"
+	protected String referenceCircuitIngame = "/ka circuit info {circuit name} :\n"
+											+ "/ka circuit create {circuit name} :\n"
 											+ "/ka circuit create {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :\n"
 											+ "/ka circuit delete {circuit name} :\n"
 											+ "/ka circuit edit {circuit name} :\n"
