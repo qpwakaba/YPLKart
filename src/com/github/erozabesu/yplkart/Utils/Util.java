@@ -397,7 +397,7 @@ public class Util extends ReflectionUtil{
 			p = Bukkit.getPlayer((UUID) adress);
 
 		for (String line : replaceLine(message)) {
-			line = replacePatch(line);
+			line = replacePatch("#Green" + line);
 			line = replaceChatColor(line);
 
 			if (p != null)
