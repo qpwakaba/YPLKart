@@ -17,7 +17,9 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.RaceData;
+import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
+import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
@@ -457,6 +459,13 @@ public class Circuit{
 					}
 				}else if(racestartcountdown == 12){
 					for(Player p : getEntryPlayer()){
+						if(RaceManager.getRace(p).getCharacter() == null){
+							RaceManager.setCharacterRaceData(p.getUniqueId(), EnumCharacter.getRandomCharacter());
+						}
+						if(RaceManager.getRace(p).getKart() == null){
+							RaceManager.setKartRaceData(p.getUniqueId(), EnumKarts.getRandomKart());
+						}
+						p.closeInventory();
 						EnumItem.removeAllKeyItems(p);
 						PacketUtil.sendTitle(p, "Standby", 10, 40, 10, ChatColor.RED, false);
 						PacketUtil.sendTitle(p, "", 10, 40, 10, ChatColor.AQUA, true);
