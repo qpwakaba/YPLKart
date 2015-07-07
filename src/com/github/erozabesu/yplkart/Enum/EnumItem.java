@@ -175,6 +175,7 @@ public enum EnumItem{
 		if(inv.getChestplate() != null)if(EnumItem.isKeyItem(inv.getChestplate()))inv.setChestplate(new ItemStack(Material.AIR));
 		if(inv.getLeggings() != null)if(EnumItem.isKeyItem(inv.getLeggings()))inv.setLeggings(new ItemStack(Material.AIR));
 		if(inv.getBoots() != null)if(EnumItem.isKeyItem(inv.getBoots()))inv.setBoots(new ItemStack(Material.AIR));
+		p.updateInventory();
 	}
 
 	public static void removeUnuseslotKeyItems(Player p){
@@ -185,6 +186,7 @@ public enum EnumItem{
 			if(isKeyItem(inv.getItem(j)))
 				inv.setItem(j, null);
 		}
+		p.updateInventory();
 	}
 
 	public static void addItem(Player p, ItemStack item){
