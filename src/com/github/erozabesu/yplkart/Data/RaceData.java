@@ -37,6 +37,7 @@ public final class RaceData{
 	private static int defaultminplayer = 3;
 	private static int defaultmaxplayer = 10;
 	private static int matchingtime = 30;
+	private static int menutime = 30;
 	private static int limittime = 300;
 
 	public RaceData(YPLKart plugin){
@@ -235,6 +236,15 @@ public final class RaceData{
 			return matchingtime;
 
 		return config.getInt(circuitname + ".matchingtime");
+	}
+
+	public static int getMenuTime(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return menutime;
+		if(config.getInt(circuitname + ".menutime") == 0)
+			return menutime;
+
+		return config.getInt(circuitname + ".menutime");
 	}
 
 	public static int getLimitTime(String circuitname){
@@ -469,6 +479,17 @@ public final class RaceData{
 			Location l = p.getLocation();
 			config.set(circuitname + ".matchingtime", second);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのマッチング時間を#White" + second + "秒#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
+	public static void setMenuTime(Player p, String circuitname, int second){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".menutime", second);
+			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのメニュー選択時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
