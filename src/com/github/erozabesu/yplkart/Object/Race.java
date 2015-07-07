@@ -279,12 +279,8 @@ public class Race {
 			RaceData.addKartRaceLapTime(getPlayer(), entry, currentmillisecond/1000);
 
 		//終了処理 順序に注意?
-		getPlayer().setWalkSpeed(0.2F);
-		getPlayer().setMaxHealth(20);
-		getPlayer().setHealth(20);
 		setStart(false);
-		this.character = null;
-		this.kart = null;
+		RaceManager.clearCharacterRaceData(this.id);
 		RaceManager.clearKartRaceData(this.id);
 		RaceManager.leaveRacingKart(getPlayer());
 		EnumItem.removeAllKeyItems(getPlayer());
