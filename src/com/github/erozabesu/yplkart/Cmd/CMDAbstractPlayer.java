@@ -41,6 +41,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit edit {circuit name}
 	//ka circuit setlap {circuit name} {number of laps}
 	//ka circuit setminplayer {circuit name} {number of player}
+	//ka circuit setmaxplayer {circuit name} {number of player}
 	//ka circuit setmatchingtime {circuit name} {number of second}
 	//ka circuit setposition {circuit name}
 	//ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch}
@@ -91,6 +92,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				RaceData.setMinPlayer(this.p, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("setmaxplayer")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(this.p);
+					return;
+				}
+				RaceData.setMaxPlayer(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
 				if(!Util.isNumber(args[3])){

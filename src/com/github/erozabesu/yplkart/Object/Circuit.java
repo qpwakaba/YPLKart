@@ -168,21 +168,33 @@ public class Circuit{
 	public void entryPlayer(UUID id){
 		if(!this.entry.contains(id))
 			this.entry.add(id);
+
+		if(this.reserveentry.contains(id))
+			this.reserveentry.remove(id);
 	}
 
 	public void entryPlayer(Player p){
 		if(!this.entry.contains(p.getUniqueId()))
 			this.entry.add(p.getUniqueId());
+
+		if(this.reserveentry.contains(p.getUniqueId()))
+			this.reserveentry.remove(p.getUniqueId());
 	}
 
 	public void entryReservePlayer(UUID id){
 		if(!this.reserveentry.contains(id))
 			this.reserveentry.add(id);
+
+		if(this.entry.contains(id))
+			this.entry.remove(id);
 	}
 
 	public void entryReservePlayer(Player p){
 		if(!this.reserveentry.contains(p.getUniqueId()))
 			this.reserveentry.add(p.getUniqueId());
+
+		if(this.entry.contains(p.getUniqueId()))
+			this.entry.remove(p.getUniqueId());
 	}
 
 	public void exitPlayer(UUID id){
@@ -362,6 +374,20 @@ public class Circuit{
 					matchingcountdown = 0;
 					matchingtask.cancel();
 					matchingtask = null;
+
+					//リザーブエントリーがあればエントリーに昇格する
+					Iterator<UUID> i = reserveentry.iterator();
+					UUID id = null;
+					while(i.hasNext()){
+						id = i.next();
+						if(!isFillPlayer()){
+							i.remove();
+							entryPlayer(id);
+						}else{
+							break;
+						}
+					}
+
 					runDetectReadyTask();
 				}
 			}
@@ -441,6 +467,12 @@ public class Circuit{
 
 	public boolean isMatching(){
 		return this.ismatching;
+	}
+
+	public boolean isFillPlayer(){
+		if(RaceData.getMaxPlayer(this.name) <= this.entry.size())
+			return true;
+		return false;
 	}
 
 	//レースが終了しているかどうか判定する

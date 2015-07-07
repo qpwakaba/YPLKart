@@ -34,8 +34,8 @@ public final class RaceData{
 	private static FileConfiguration config;
 
 	private static int numberoflaps = 3;
-	private static int minplayer = 3;
-	private static int maxplayer = 10;
+	private static int defaultminplayer = 3;
+	private static int defaultmaxplayer = 10;
 	private static int matchingtime = 30;
 	private static int limittime = 300;
 
@@ -212,11 +212,20 @@ public final class RaceData{
 
 	public static int getMinPlayer(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
-			return minplayer;
+			return defaultminplayer;
 		if(config.getInt(circuitname + ".minplayer") == 0)
-			return minplayer;
+			return defaultminplayer;
 
 		return config.getInt(circuitname + ".minplayer");
+	}
+
+	public static int getMaxPlayer(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return defaultmaxplayer;
+		if(config.getInt(circuitname + ".maxplayer") == 0)
+			return defaultmaxplayer;
+
+		return config.getInt(circuitname + ".maxplayer");
 	}
 
 	public static int getMatchingTime(String circuitname){
@@ -252,7 +261,7 @@ public final class RaceData{
 			return null;
 
 		List<Location> list = new ArrayList<Location>();
-		while(list.size() < maxplayer+3){
+		while(list.size() < defaultmaxplayer){
 			if(!Util.isSolidBlock(position))
 				list.add(position);
 			if(!Util.isSolidBlock(Util.getSideLocationfromYaw(position, 4)))
@@ -430,10 +439,25 @@ public final class RaceData{
 	public static void setMinPlayer(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else if(getMaxPlayer(circuitname) < amount){
+			Util.sendMessage(p, "[header]#Red最大プレイ人数を上回る数値は設定できません。現在最大プレイ人数は#White" + getMaxPlayer(circuitname) + "人#Redに設定されています");
 		}else{
 			Location l = p.getLocation();
 			config.set(circuitname + ".minplayer", amount);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
+	public static void setMaxPlayer(Player p, String circuitname, int amount){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else if(amount < getMinPlayer(circuitname)){
+			Util.sendMessage(p, "[header]#Red最小プレイ人数を下回る数値は設定できません。現在最小プレイ人数は#White" + getMinPlayer(circuitname) + "人#Redに設定されています");
+		}else{
+			Location l = p.getLocation();
+			config.set(circuitname + ".maxplayer", amount);
+			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最大プレイ人数を#White" + amount + "人#Greenに設定しました");
 			saveConfigFile();
 		}
 	}

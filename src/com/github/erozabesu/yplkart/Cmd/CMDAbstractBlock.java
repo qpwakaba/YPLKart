@@ -51,6 +51,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 				}
 				RaceData.setMinPlayer(null, args[2], Integer.valueOf(args[3]));
 				return;
+			}else if(args[1].equalsIgnoreCase("setmaxplayer")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(null);
+					return;
+				}
+				RaceData.setMaxPlayer(null, args[2], Integer.valueOf(args[3]));
+				return;
 			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
 				if(!Util.isNumber(args[3])){
 					messageInvalidNumber(null);
