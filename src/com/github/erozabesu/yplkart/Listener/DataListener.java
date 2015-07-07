@@ -122,6 +122,7 @@ public class DataListener extends RaceManager implements Listener {
 		Player p = e.getPlayer();
 		if(!isStandBy(p.getUniqueId()))return;
 		Race r = getRace(p);
+		if(r.getGoal())return;
 		if(r.getLapStepCool())return;
 
 		int lapcount = r.getLapCount();
