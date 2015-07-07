@@ -35,7 +35,10 @@ public class CMDAbstractConsole extends CMDAbstract{
 				return;
 			}
 		}else if(this.length == 3){
-			if(args[1].equalsIgnoreCase("delete")){
+			if(args[1].equalsIgnoreCase("info")){
+				Util.sendMessage(null, RaceData.getCircuitInformation(args[2]));
+				return;
+			}else if(args[1].equalsIgnoreCase("delete")){
 				RaceData.deleteCircuit(null, args[2]);
 				return;
 			}

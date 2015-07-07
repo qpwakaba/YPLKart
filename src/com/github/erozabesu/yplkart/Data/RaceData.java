@@ -402,6 +402,25 @@ public final class RaceData{
 		return null;
 	}
 
+	public static String getCircuitInformation(String circuitname){
+		if(!getCircuitSet().contains(circuitname))return "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません";
+
+		Location l = getPosition(circuitname);
+		String info = "#Aqua==========-[ #GoldCircuit Information #Aqua]-==========" + "\n" +
+						"    " + "#Greenサーキット名 ： #White" + Util.convertInitialUpperString(circuitname) + "\n" +
+						"    " + "#Green周回数 ： #White" + getNumberOfLaps(circuitname) + "\n" +
+						"    " + "#Green最小プレイ人数 ： #White" + getMinPlayer(circuitname) + "\n" +
+						"    " + "#Green最大プレイ人数 ： #White" + getMaxPlayer(circuitname) + "\n" +
+						"    " + "#Greenレースが自動終了するまでの時間 ： #White" + getLimitTime(circuitname) + "#Green (秒)\n" +
+						"    " + "#Greenキャラクター・カートを選択できる猶予時間 ： #White" + getMenuTime(circuitname) + "#Green (秒)\n" +
+						"    " + "#Greenレースへの参加・辞退を決定できる猶予時間 ： #White" + getMatchingTime(circuitname) + "#Green (秒)\n" +
+						"    " + "#Greenレース開始座標 ： " + "\n" +
+						"#Green" + "            " + "x #White" + l.getBlockX() + "#Green / y #White" + l.getBlockY() + "#Green / z #White" + l.getBlockZ() + "\n" +
+						"#Green" + "            " + "yaw #White" + l.getYaw() + "#Green / pitch #White" + l.getPitch() + "\n";
+
+		return info;
+	}
+
 	public static Set<String> getCircuitSet(){
 		return config.getKeys(false);
 	}

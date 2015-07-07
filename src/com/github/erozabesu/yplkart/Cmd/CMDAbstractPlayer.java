@@ -35,6 +35,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		Util.sendMessage(this.p, reference);
 	}
 
+	//ka circuit info {circuit name}
 	//ka circuit create {circuit name}
 	//ka circuit create {circuit name} {world} {x} {y} {z} {yaw} {pitch}
 	//ka circuit delete {circuit name}
@@ -70,7 +71,10 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				return;
 			}
 		}else if(this.length == 3){
-			if(args[1].equalsIgnoreCase("create")){
+			if(args[1].equalsIgnoreCase("info")){
+				Util.sendMessage(this.p, RaceData.getCircuitInformation(args[2]));
+				return;
+			}else if(args[1].equalsIgnoreCase("create")){
 				RaceData.createCircuit(this.p, args[2]);
 				return;
 			}else if(args[1].equalsIgnoreCase("delete")){
