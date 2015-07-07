@@ -562,7 +562,7 @@ public class Circuit{
 			while(i.hasNext()){
 				id = i.next();
 				if(RaceManager.isEntry(id)
-						&& RaceManager.getRace(id).getStart()
+						//&& RaceManager.getRace(id).getStart()
 						&& !RaceManager.getRace(id).getGoal())
 							return false;
 			}
