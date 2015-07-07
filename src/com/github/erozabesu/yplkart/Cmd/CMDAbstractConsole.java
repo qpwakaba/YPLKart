@@ -64,6 +64,13 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				RaceData.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
 				return;
+			}else if(args[1].equalsIgnoreCase("setmenutime")){
+				if(!Util.isNumber(args[3])){
+					messageInvalidNumber(null);
+					return;
+				}
+				RaceData.setMenuTime(null, args[2], Integer.valueOf(args[3]));
+				return;
 			}else if(args[1].equalsIgnoreCase("setlimittime")){
 				if(!Util.isNumber(args[3])){
 					messageInvalidNumber(null);
