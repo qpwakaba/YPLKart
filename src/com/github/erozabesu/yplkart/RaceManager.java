@@ -161,7 +161,7 @@ public class RaceManager {
 		r.setKart(kart);
 		r.recoveryKart();
 
-		Util.sendMessage(id, "#White" + kart.getName() + "カート#Greenに搭乗しました");
+		Util.sendMessage(id, "#Gold" + kart.getName() + "カート#Greenに搭乗しました");
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
