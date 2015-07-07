@@ -269,7 +269,8 @@ public class ItemListener extends RaceManager implements Listener{
 									}
 								}, 2 * 20L + 10L);
 
-								int denominator = getEntryPlayer(getRace(p).getEntry()).size();
+								int denominator = getRacingPlayer(getRace(p).getEntry()).size();
+								//TODO
 								denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
 								if(denominator == 0)denominator = 1;
 								int rank = getRank(p);
@@ -477,7 +478,7 @@ public class ItemListener extends RaceManager implements Listener{
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public void itemTeresa(Player user){
-		List<Player> entry = getEntryPlayer(getRace(user).getEntry());
+		List<Player> entry = getRacingPlayer(getRace(user).getEntry());
 		if(entry.size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
@@ -517,7 +518,8 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemThunder(Player user){
-		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
+		List<Player> list = getRacingPlayer(getRace(user).getEntry());
+		if(list.size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
 		}
@@ -525,7 +527,7 @@ public class ItemListener extends RaceManager implements Listener{
 		final World w = user.getWorld();
 
 		int launchdamage = Settings.ThunderHitDamage + getRace(user).getCharacter().getItemAdjustAttackDamage();
-		for (final Player p : getEntryPlayer(getRace(user).getEntry())){
+		for (final Player p : list){
 			if(p.getUniqueId() == user.getUniqueId())continue;
 			if(p.getNoDamageTicks() != 0)continue;
 
@@ -541,14 +543,15 @@ public class ItemListener extends RaceManager implements Listener{
 	}
 
 	public void itemGesso(Player user){
-		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
+		List<Player> list = getRacingPlayer(getRace(user).getEntry());
+		if(list.size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
 		}
 		ArrayList<Player> target = new ArrayList<Player>();
 		int rank = getRank(user);
 
-		for(Player entry : getEntryPlayer(getRace(user).getEntry())){
+		for(Player entry : list){
 			if(getRank(entry) < rank)
 				target.add(entry);
 		}
@@ -586,7 +589,7 @@ public class ItemListener extends RaceManager implements Listener{
 
 	public void itemRedturtle(Player user){
 		if(!isRacing(user.getUniqueId()))return;
-		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
+		if(getRacingPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
 		}
@@ -613,7 +616,7 @@ public class ItemListener extends RaceManager implements Listener{
 
 	public void itemThornedturtle(Player user){
 		if(!isRacing(user.getUniqueId()))return;
-		if(getEntryPlayer(getRace(user).getEntry()).size() <= 1){
+		if(getRacingPlayer(getRace(user).getEntry()).size() <= 1){
 			Util.sendMessage(user, "レース参加者が居ないため使用できません");
 			return;
 		}

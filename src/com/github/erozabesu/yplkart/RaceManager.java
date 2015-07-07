@@ -255,8 +255,6 @@ public class RaceManager {
 
 	public static List<Player> getEntryPlayer(String circuitname) {
 		if(circuit.get(circuitname) == null)return null;
-
-		List<Player> entryplayer = new ArrayList<Player>();
 		return circuit.get(circuitname).getEntryPlayer();
 	}
 
@@ -269,8 +267,17 @@ public class RaceManager {
 		return goalplayer;
 	}
 
-	public static Player getPlayerfromRank(String circuitname, int rank) {
+	public static List<Player> getRacingPlayer(String circuitname) {
+		ArrayList<Player> list = new ArrayList<Player>();
 		for (Player p : getEntryPlayer(circuitname)) {
+			if (!getRace(p).getGoal())
+				list.add(p);
+		}
+		return list;
+	}
+
+	public static Player getPlayerfromRank(String circuitname, int rank) {
+		for (Player p : getRacingPlayer(circuitname)) {
 			if (getRank(p) == rank)
 				return p;
 		}
@@ -281,9 +288,8 @@ public class RaceManager {
 	public static Integer getRank(Player p) {
 		HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
 
-		for(Player entryplayer : getEntryPlayer(getRace(p).getEntry())){
-			//if(!entryplayer.getUniqueId().equals(p.getUniqueId()))
-				count.put(entryplayer.getUniqueId(), getRace(entryplayer).getPassedCheckPoint().size());
+		for(Player entryplayer : getRacingPlayer(getRace(p).getEntry())){
+			count.put(entryplayer.getUniqueId(), getRace(entryplayer).getPassedCheckPoint().size());
 		}
 
 		List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(
