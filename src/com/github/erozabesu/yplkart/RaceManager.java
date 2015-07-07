@@ -177,17 +177,18 @@ public class RaceManager {
 
 			Player p = Bukkit.getPlayer(id);
 			if(p != null){
-				leaveRacingKart(p);
-				if(isStandBy(id)){
-					r.recoveryInventory();
-					r.recoveryPhysical();
-					p.teleport(r.getGoalPosition());
+				if(!r.getGoal()){
+					clearCharacterRaceData(id);
+					clearKartRaceData(id);
+					leaveRacingKart(p);
+					if(isStandBy(id)){
+						r.recoveryInventory();
+						r.recoveryPhysical();
+						p.teleport(r.getGoalPosition());
+					}
 				}
 				Util.sendMessage(id, "エントリーを取り消しました");
 			}
-
-			clearCharacterRaceData(id);
-			clearKartRaceData(id);
 
 			r.init();
 		}
