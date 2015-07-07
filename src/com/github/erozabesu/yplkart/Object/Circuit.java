@@ -18,6 +18,7 @@ import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
+import com.github.erozabesu.yplkart.Task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
@@ -27,6 +28,7 @@ public class Circuit{
 	private int limittime;
 	private int matchingcountdown;
 	private int matchingcountdownfortitle;
+	private int racestartcountdown;
 	private boolean isstarted;
 	private boolean ismatching;
 	private BukkitTask countuptask;
@@ -34,6 +36,7 @@ public class Circuit{
 	private BukkitTask detectreadytask;
 	private BukkitTask matchingtask;
 	private BukkitTask matchingtitlesendertask;
+	private BukkitTask racestarttask;
 	private List<UUID> entry;
 	private List<UUID> reserveentry;
 	private List<UUID> matchingaccept;
@@ -104,6 +107,7 @@ public class Circuit{
 		this.laptime = 0;
 		this.matchingcountdown = 0;
 		this.matchingcountdownfortitle = 0;
+		this.racestartcountdown = 0;
 		this.isstarted = false;
 		this.ismatching = false;
 		this.entry = new ArrayList<UUID>();
@@ -130,6 +134,10 @@ public class Circuit{
 		if(this.matchingtitlesendertask != null)
 			this.matchingtitlesendertask.cancel();
 		this.matchingtitlesendertask = null;
+
+		if(this.racestarttask != null)
+			this.racestarttask.cancel();
+		this.racestarttask = null;
 	}
 
 	public void endRace(){
@@ -364,6 +372,8 @@ public class Circuit{
 						setupRacer();
 						Scoreboards.startCircuit(name);
 						sendMessageEntryPlayer("#Blue" + Util.convertInitialUpperString(name) + "#Aquaのレースを開始します");
+
+						runRaceStartTask();
 						return;
 					}
 
@@ -416,6 +426,75 @@ public class Circuit{
 						PacketUtil.sendTitle(p, "レースの準備が整いました", 0, 25, 0, ChatColor.WHITE, false);
 						PacketUtil.sendTitle(p, "残り時間 : " + matchingcountdownfortitle + "秒", 0, 25, 0, ChatColor.YELLOW, true);
 					}
+				}
+			}
+		}, 0, 20);
+	}
+
+	/*
+	 * レース開始地点に参加者をテレポート後に起動
+	 * メニューを表示し、制限時間内にキャラクター・カートを選択させる
+	 * 制限時間経過後キャラクター・カートがnullだった場合はランダム選択させ、
+	 * レース開始のカウントダウンをスタートする
+	 * この間にログアウトしたプレイヤーがメニューアイテムを所持し続ける問題を回避するため、
+	 * 所持品のキーアイテム削除はプレイヤーがスタートブロックを踏んだ際に行う
+	 * カウントダウン終了と同時にstartフラグをtrueに切り替える
+	 */
+	public void runRaceStartTask(){
+		if(this.racestarttask != null)
+			this.racestarttask.cancel();
+
+		this.racestartcountdown = RaceData.getMenuTime(this.name) + 12;
+
+		this.racestarttask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+			public void run(){
+				racestartcountdown--;
+				if(12 < racestartcountdown){
+					for(Player p : getEntryPlayer()){
+						int count = racestartcountdown-12;
+						PacketUtil.sendTitle(p, "メニュー選択時間", 0, 25, 0, ChatColor.AQUA, false);
+						PacketUtil.sendTitle(p, "残り : " + count + "秒", 0, 25, 0, ChatColor.AQUA, true);
+					}
+				}else if(racestartcountdown == 12){
+					for(Player p : getEntryPlayer()){
+						EnumItem.removeAllKeyItems(p);
+						PacketUtil.sendTitle(p, "Standby", 10, 40, 10, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, "", 10, 40, 10, ChatColor.AQUA, true);
+					}
+				}else if(racestartcountdown == 10){
+					for(Player p : getEntryPlayer()){
+						PacketUtil.sendTitle(p, String.valueOf(RaceData.getNumberOfLaps(name)), 10, 40, 10, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, "Laps", 10, 40, 10, ChatColor.GOLD, true);
+					}
+				}else if(racestartcountdown == 8){
+					for(Player p : getEntryPlayer()){
+						PacketUtil.sendTitle(p, RaceData.getLimitTime(name) + " sec", 10, 40, 10, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, "Time Limit", 10, 40, 10, ChatColor.GOLD, true);
+					}
+				}else if(racestartcountdown == 6){
+					for(Player p : getEntryPlayer()){
+						PacketUtil.sendTitle(p, "Ready", 10, 20, 10, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, "", 10, 20, 10, ChatColor.AQUA, true);
+					}
+				}else if(0 < racestartcountdown && racestartcountdown < 4){
+					for(Player p : getEntryPlayer()){
+						p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
+						PacketUtil.sendTitle(p, String.valueOf(racestartcountdown), 0, 20, 0, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, "", 0, 20, 0, ChatColor.AQUA, true);
+					}
+				}else if(racestartcountdown == 0){
+					setStart(true);
+					for(Player p : getEntryPlayer()){
+						Util.createSignalFireworks(p.getLocation());
+						Util.createFlowerShower(p, 5);
+						p.playSound(p.getLocation(), Sound.AMBIENCE_THUNDER, 1.0F, 2.8F);
+						new SendExpandedTitleTask(p, 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+					}
+				}else if(racestartcountdown < 0){
+					racestartcountdown = 0;
+					racestarttask.cancel();
+					racestarttask = null;
+					return;
 				}
 			}
 		}, 0, 20);

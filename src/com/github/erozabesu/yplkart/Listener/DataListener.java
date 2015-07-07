@@ -295,9 +295,8 @@ public class DataListener extends RaceManager implements Listener {
 					if(RaceManager.isRacingKart(p.getVehicle()))
 						e.setCancelled(true);
 		}else if(isStandBy(p.getUniqueId()) && !isRacing(p.getUniqueId())){
-			if(!getRace(p).getStart())
-				if(e.getCause() != DamageCause.VOID)
-					e.setCancelled(true);
+			if(e.getCause() != DamageCause.VOID)
+				e.setCancelled(true);
 		}
 	}
 

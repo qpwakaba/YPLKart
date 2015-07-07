@@ -235,7 +235,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 		 * コースアウトを防ぐため、最寄のチェックポイントとの平面距離が3ブロック以内になるまで
 		 * 次のチェックポイントへは移動しない
 		 */
-		if(RaceManager.getRace((Player)human.getBukkitEntity()).getUsingKiller() != null){
+		if(RaceManager.getRace(human.getUniqueID()).getUsingKiller() != null){
 			Player p = (Player)human.getBukkitEntity();
 			Race r = RaceManager.getRace(p);
 //TODO CraftBukkit
@@ -299,6 +299,8 @@ public class CustomMinecart extends EntityMinecartRideable{
 			this.killerY = v.getY();
 			this.killerZ = v.getZ();
 		}else{
+			if(!RaceManager.isRacing(human.getUniqueID()))
+				return;
 //TODO CraftBukkit
 			float sideMotion = human.aX * 0.0F;//横方向への移動速度(+-0.98固定)
 			float forwardMotion = human.aY;//縦方向への移動速度(+-3.92固定)
