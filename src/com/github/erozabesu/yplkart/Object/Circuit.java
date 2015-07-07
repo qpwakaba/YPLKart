@@ -17,7 +17,7 @@ import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
-import com.github.erozabesu.yplkart.Task.SendCountDownTitleTask;
+import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class Circuit{
@@ -25,12 +25,14 @@ public class Circuit{
 	private int laptime;
 	private int limittime;
 	private int matchingcountdown;
+	private int matchingcountdownfortitle;
 	private boolean isstarted;
 	private boolean ismatching;
 	private BukkitTask countuptask;
 	private BukkitTask detectend;
 	private BukkitTask detectreadytask;
 	private BukkitTask matchingtask;
+	private BukkitTask matchingtitlesendertask;
 	private List<UUID> entry;
 	private List<UUID> reserveentry;
 	private List<UUID> matchingaccept;
@@ -96,6 +98,7 @@ public class Circuit{
 	public void init(){
 		this.laptime = 0;
 		this.matchingcountdown = 0;
+		this.matchingcountdownfortitle = 0;
 		this.isstarted = false;
 		this.ismatching = false;
 		this.entry = new ArrayList<UUID>();
@@ -118,6 +121,10 @@ public class Circuit{
 		if(this.matchingtask != null)
 			this.matchingtask.cancel();
 		this.matchingtask = null;
+
+		if(this.matchingtitlesendertask != null)
+			this.matchingtitlesendertask.cancel();
+		this.matchingtitlesendertask = null;
 	}
 
 	public void endRace(){
@@ -307,10 +314,10 @@ public class Circuit{
 		setMatching(true);
 		String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
 
+		runMatchingTitleSendTask();
 		for(UUID id : entry){
 			Player p = Bukkit.getPlayer(id);
 			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-			new SendCountDownTitleTask(p, this.matchingcountdown, "レースの準備が整いました", ChatColor.WHITE, ChatColor.YELLOW).runTaskTimer(YPLKart.getInstance(), 0, 1);
 			Util.sendMessageNoHeader(p, "#Aquaレースを開始する準備が整いました");
 			Util.sendMessageNoHeader(p, "#Aqua↓↓↓のチャットをクリックして参加を確定して下さい");
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + p.getName() + tellraw);
@@ -351,6 +358,33 @@ public class Circuit{
 					matchingtask.cancel();
 					matchingtask = null;
 					runDetectReadyTask();
+				}
+			}
+		}, 0, 20);
+	}
+
+	public void runMatchingTitleSendTask(){
+		if(this.matchingtitlesendertask != null)
+			this.matchingtitlesendertask.cancel();
+
+		this.matchingcountdownfortitle = RaceData.getMatchingTime(this.name) + 1;
+
+		this.matchingtitlesendertask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+			public void run(){
+				matchingcountdownfortitle--;
+				if(matchingcountdownfortitle < 0){
+					matchingcountdownfortitle = 0;
+					matchingtitlesendertask.cancel();
+					matchingtitlesendertask = null;
+					return;
+				}
+
+				for(UUID id : entry){
+					Player p = Bukkit.getPlayer(id);
+					if(p != null || RaceManager.isEntry(id)){
+						PacketUtil.sendTitle(p, "レースの準備が整いました", 0, 25, 0, ChatColor.WHITE, false);
+						PacketUtil.sendTitle(p, "残り時間 : " + matchingcountdownfortitle + "秒", 0, 25, 0, ChatColor.YELLOW, true);
+					}
 				}
 			}
 		}, 0, 20);
