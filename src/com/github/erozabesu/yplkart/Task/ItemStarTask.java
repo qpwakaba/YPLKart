@@ -69,9 +69,11 @@ public class ItemStarTask extends BukkitRunnable{
 		}
 		life++;
 
-		for(Player other : Util.getNearbyPlayers(this.p.getLocation(), 1.5)){
-			Util.addDamage(other, this.p, this.hitdamage);
-		}
+		if(life % 2 == 0)
+			for(Player other : Util.getNearbyPlayers(this.p.getLocation(), 1.5)){
+				if(!other.getUniqueId().equals(this.p.getUniqueId()))
+					Util.addDamage(other, this.p, this.hitdamage);
+			}
 
 		if(life % 20 == 0)
 			p.playSound(p.getLocation(), Sound.LEVEL_UP, 0.5F, 2.0F);
