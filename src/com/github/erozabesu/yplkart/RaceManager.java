@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -64,11 +65,12 @@ public class RaceManager {
 
 	public static void setMatchingCircuitData(UUID id){
 		Circuit c = getCircuit(id);
+		Player p = Bukkit.getPlayer(id);
+		if(p != null)
+			p.playSound(p.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 		if(c == null){
-			Util.sendMessage(id, "[header]#Redレースにエントリーしていません");
 			return;
 		}else if(!c.isMatching()){
-			Util.sendMessage(id, "[header]#Red現在そのレースには参加できません");
 			return;
 		}else if(isStandBy(id)){
 			return;
@@ -80,11 +82,12 @@ public class RaceManager {
 
 	public static void clearMatchingCircuitData(UUID id){
 		Circuit c = getCircuit(id);
+		Player p = Bukkit.getPlayer(id);
+		if(p != null)
+			p.playSound(p.getLocation(), Sound.CLICK, 1.0F, 0.9F);
 		if(c == null){
-			Util.sendMessage(id, "[header]#Redレースにエントリーしていません");
 			return;
 		}else if(!c.isMatching()){
-			Util.sendMessage(id, "[header]#Red現在そのレースには参加できません");
 			return;
 		}else if(isStandBy(id)){
 			return;
