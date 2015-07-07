@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -63,6 +64,9 @@ public class Circuit{
 	}
 
 	private void setupRacer(){
+		List<Location> position = RaceData.getPositionList(name);
+		int count = 0;
+
 		for(UUID id : entry){
 			if(Bukkit.getPlayer(id) != null){
 				if(Bukkit.getPlayer(id).isOnline()){
@@ -82,10 +86,11 @@ public class Circuit{
 					p.setExp(0);
 
 					p.leaveVehicle();
-					p.teleport(RaceData.getPosition(name));
+					p.teleport(position.get(count));
 					RaceManager.showCharacterSelectMenu(p);
 					EnumItem.addItem(p, EnumItem.Menu.getItem());
 
+					count++;
 					continue;
 				}
 			}

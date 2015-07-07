@@ -115,16 +115,18 @@ public class Util extends ReflectionUtil{
 		double z = Math.cos(Math.toRadians(yaw < 0 ? yaw+360 : yaw));
 
 		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
+		to.setYaw(yaw);
 		return to;
 	}
 
 	public static Location getSideLocationfromYaw(Location from, double offset){
 		Location fromadjust = adjustBlockLocation(from);
 		float yaw = fromadjust.getYaw();
-		double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw+180 : yaw));
-		double z = Math.cos(Math.toRadians(yaw < 0 ? yaw+180 : yaw));
+		double x = Math.cos(Math.toRadians(yaw));
+		double z = Math.sin(Math.toRadians(yaw));
 
 		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
+		to.setYaw(yaw);
 		return to;
 	}
 

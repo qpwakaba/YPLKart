@@ -35,6 +35,7 @@ public final class RaceData{
 
 	private static int numberoflaps = 3;
 	private static int minplayer = 3;
+	private static int maxplayer = 10;
 	private static int matchingtime = 30;
 	private static int limittime = 300;
 
@@ -243,6 +244,26 @@ public final class RaceData{
 			return null;
 
 		return new Location(Bukkit.getWorld(config.getString(circuitname + ".world")),config.getDouble(circuitname + ".x"),config.getDouble(circuitname + ".y"),config.getDouble(circuitname + ".z"),(float)config.getDouble(circuitname + ".yaw"),(float)config.getDouble(circuitname + ".pitch"));
+	}
+
+	public static List<Location> getPositionList(String circuitname){
+		Location position = getPosition(circuitname);
+		if(position == null)
+			return null;
+
+		List<Location> list = new ArrayList<Location>();
+		while(list.size() < maxplayer+3){
+			if(!Util.isSolidBlock(position))
+				list.add(position);
+			if(!Util.isSolidBlock(Util.getSideLocationfromYaw(position, 4)))
+				list.add(Util.getSideLocationfromYaw(position, 4));
+			if(!Util.isSolidBlock(Util.getSideLocationfromYaw(position, -4)))
+				list.add(Util.getSideLocationfromYaw(position, -4));
+
+			position = Util.getLocationfromYaw(position, 4);
+		}
+
+		return list;
 	}
 
 	public static String getRanking(UUID id, String circuitname){
