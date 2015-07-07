@@ -431,6 +431,7 @@ public class Util extends ReflectionUtil{
 		text = text.replace("{amount}", "{#Whiteamount#Green}");
 		text = text.replace("{number of player}", "{#Whitenumber of player#Green}");
 		text = text.replace("{number of second}", "{#Whitenumber of second#Green}");
+		text = text.replace("{number of laps}", "{#Whitenumber of laps#Green}");
 
 		return text;
 	}
