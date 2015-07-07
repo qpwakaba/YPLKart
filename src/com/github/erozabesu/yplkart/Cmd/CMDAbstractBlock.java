@@ -305,7 +305,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
-		Util.sendMessage(null, "コンフィグをリロードしました");
+		Util.sendMessage(null, "[header]コンフィグをリロードしました");
 	}
 
 	@Override
@@ -317,7 +317,6 @@ public class CMDAbstractBlock extends CMDAbstract{
 					other.getInventory().addItem(item);
 					messageAddItem(other, item);
 				}
-				Util.broadcastMessage("全プレイヤーに#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 			//ka {item} @?
 			}else{
 				Player other = Bukkit.getPlayer(args[1]);
@@ -334,7 +333,6 @@ public class CMDAbstractBlock extends CMDAbstract{
 					other.getInventory().addItem(item);
 					messageAddItem(other, item);
 				}
-				Util.broadcastMessage("全プレイヤーに#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 			//ka {item} @? 64
 			}else{
 				Player other = Bukkit.getPlayer(args[1]);

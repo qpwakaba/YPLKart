@@ -497,7 +497,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 			if(this.display){
 				DisplayKartData.deleteData(this.getCustomName());
-				Util.sendMessage(p, "ディスプレイ専用カートを削除しました");
+				Util.sendMessage(p, "[header]ディスプレイ専用カートを削除しました");
 			}
 
 			die();

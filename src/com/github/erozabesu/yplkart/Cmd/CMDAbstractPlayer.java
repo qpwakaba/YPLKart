@@ -528,7 +528,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
-		Util.sendMessage(this.p, "コンフィグをリロードしました");
+		Util.sendMessage(this.p, "[header]コンフィグをリロードしました");
 	}
 
 	@Override

@@ -329,9 +329,9 @@ public class Util extends ReflectionUtil{
 			}else{
 				p.setHealth(p.getMaxHealth());
 				if(executor != null)
-					broadcastMessageNoHeader(damaged.getName() + " killed by " + executor.getName());
+					broadcastMessage(damaged.getName() + " killed by " + executor.getName());
 				else
-					broadcastMessageNoHeader(damaged.getName() + " is dead");
+					broadcastMessage(damaged.getName() + " is dead");
 
 				final Race r = RaceManager.getRace(p);
 				new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
@@ -396,40 +396,6 @@ public class Util extends ReflectionUtil{
 		else if(adress instanceof UUID)
 			p = Bukkit.getPlayer((UUID) adress);
 
-		String header = "#Yellow[" + YPLKart.plname + "] #Green";
-		for (String line : replaceLine(message)) {
-			line = replacePatch(line);
-			line = replaceChatColor(header + line);
-
-			if (p != null)
-				p.sendMessage(line);
-			else
-				YPLKart.log.log(Level.INFO, ChatColor.stripColor(line));
-		}
-	}
-
-	public static void sendMessageNoHeader(Object adress, String message){
-		Player p = null;
-		if(adress instanceof Player)
-			p = (Player) adress;
-		else if(adress instanceof UUID)
-			p = Bukkit.getPlayer((UUID) adress);
-
-		for (String line : replaceLine(message)) {
-			line = replacePatch(line);
-			line = replaceChatColor(line);
-
-			if (p != null)
-				p.sendMessage(line);
-			else
-				YPLKart.log.log(Level.INFO, ChatColor.stripColor(line));
-		}
-	}
-
-	public static void sendMessageNoHeader(UUID id, String message){
-		Player p = Bukkit.getPlayer(id);
-		if(p == null)return;
-
 		for (String line : replaceLine(message)) {
 			line = replacePatch(line);
 			line = replaceChatColor(line);
@@ -447,13 +413,8 @@ public class Util extends ReflectionUtil{
 		}
 	}
 
-	public static void broadcastMessageNoHeader(String message){
-		for(Player p : Bukkit.getOnlinePlayers()){
-			sendMessageNoHeader(p, message);
-		}
-	}
-
 	private static String replacePatch(String text){
+		text = text.replace("[header]", "#Yellow[" + YPLKart.plname + "] #Green");
 		text = text.replace("{race type}", "{#Whiterace type#Green}");
 		text = text.replace("{circuit name}", "{#Whitecircuit name#Green}");
 		text = text.replace("{worldname}", "{#Whiteworldname#Green}");

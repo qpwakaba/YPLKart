@@ -102,7 +102,7 @@ public class DataListener extends RaceManager implements Listener {
 				if(entity.getLocation().distance(p.getLocation()) < 1.5){
 					p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
 					entity.remove();
-					Util.sendMessage(p, "チェックポイントを削除しました");
+					Util.sendMessage(p, "[header]チェックポイントを削除しました");
 					break;
 				}
 		}

@@ -106,7 +106,7 @@ public enum Permission {
 
 		if(nomessage)return false;
 
-		Util.sendMessage(p, "#Red権限を所有していません - " + perm.getPerm());
+		Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPerm());
 		return false;
 	}
 
@@ -126,12 +126,12 @@ public enum Permission {
 		if(nomessage)return false;
 
 		if(!targetother){
-			Util.sendMessage(p, "#Red権限を所有していません - " + perm.getPerm());
+			Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPerm());
 		}else{
 			if(perm.getPerm().contains("itemcmd")){
-				Util.sendMessage(p, "#Red権限を所有していません - " + perm.getPermItemCMDOther());
+				Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPermItemCMDOther());
 			}else
-				Util.sendMessage(p, "#Red権限を所有していません - " + perm.getPermBasicCMDOther());
+				Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPermBasicCMDOther());
 		}
 		return false;
 	}

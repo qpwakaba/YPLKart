@@ -189,114 +189,114 @@ public class CMD implements CommandExecutor{
 	}
 
 	protected void messageNoPlayer(Player p){
-		Util.sendMessage(p, "#Red指定したプレイヤーはログインしていません");
+		Util.sendMessage(p, "[header]#Red指定したプレイヤーはログインしていません");
 	}
 
 	protected void messageInvalidWorld(Player p){
-		Util.sendMessage(p, "#Red指定したワールドは存在しません");
+		Util.sendMessage(p, "[header]#Red指定したワールドは存在しません");
 	}
 
 	protected void messageInvalidNumber(Player p){
-		Util.sendMessage(p, "#Red数値を入力して下さい");
+		Util.sendMessage(p, "[header]#Red数値を入力して下さい");
 	}
 
 	protected void messageInvalidCircuit(Player p, String circuitname){
-		Util.sendMessage(p, "#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 	}
 
 	protected void messageInvalidCharacter(Player p){
-		Util.sendMessage(p, "#Redキャラクター名が正しくありません\n#White" + EnumCharacter.getCharacterList());
+		Util.sendMessage(p, "[header]#Redキャラクター名が正しくありません\n#White" + EnumCharacter.getCharacterList());
 	}
 
 	protected void messageInvalidKart(Player p){
-		Util.sendMessage(p, "#Redカート名が正しくありません\n#White" + EnumKarts.getKartList());
+		Util.sendMessage(p, "[header]#Redカート名が正しくありません\n#White" + EnumKarts.getKartList());
 	}
 
 	protected void messageDisplay(Player p, EnumKarts kart){
-		Util.sendMessage(p, "ディスプレイ専用の#White" + kart.getName() + "カート#Greenを設置しました");
+		Util.sendMessage(p, "[header]ディスプレイ専用の#White" + kart.getName() + "カート#Greenを設置しました");
 	}
 
 	protected void messageMenuAll(Player p){
-		Util.sendMessage(p, "全プレイヤーにメニューを表示しました");
+		Util.sendMessage(p, "[header]全プレイヤーにメニューを表示しました");
 	}
 
 	protected void messageMenuOther(Player p, Player other){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんにメニューを表示しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんにメニューを表示しました");
 	}
 
 	protected void messageEntryOther(Player p, Player other, String circuitname){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
 	}
 
 	protected void messageEntryAll(Player p, String circuitname){
-		Util.sendMessage(p, "全プレイヤーをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
+		Util.sendMessage(p, "[header]全プレイヤーをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
 	}
 
 	protected void messageExitAll(Player p){
-		Util.sendMessage(p, "全プレイヤーのエントリーを取り消しました");
+		Util.sendMessage(p, "[header]全プレイヤーのエントリーを取り消しました");
 	}
 
 	protected void messageExitOther(Player p, Player other){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんのエントリーを取り消しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのエントリーを取り消しました");
 	}
 
 	protected void messageCharacterAll(Player p, EnumCharacter character){
-		Util.sendMessage(p, "全プレイヤーのキャラクターを#White" + character.getName() + "#Greenにセットしました");
+		Util.sendMessage(p, "[header]全プレイヤーのキャラクターを#White" + character.getName() + "#Greenにセットしました");
 	}
 
 	protected void messageCharacterRandomAll(Player p){
-		Util.sendMessage(p, "全プレイヤーのキャラクターを#Whiteランダム#Greenにセットしました");
+		Util.sendMessage(p, "[header]全プレイヤーのキャラクターを#Whiteランダム#Greenにセットしました");
 	}
 
 	protected void messageCharacterOther(Player p, Player other, EnumCharacter character){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんのキャラクターを#White" + character.getName() + "#Greenにセットしました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのキャラクターを#White" + character.getName() + "#Greenにセットしました");
 	}
 
 	protected void messageCharacterResetAll(Player p){
-		Util.sendMessage(p, "全プレイヤーのキャラクター選択を取り消しました");
+		Util.sendMessage(p, "[header]全プレイヤーのキャラクター選択を取り消しました");
 	}
 
 	protected void messageCharacterResetOther(Player p, Player other){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんのキャラクター選択を取り消しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのキャラクター選択を取り消しました");
 	}
 
 	protected void messageRideAll(Player p, EnumKarts kart){
-		Util.sendMessage(p, "全プレイヤーを#White" + kart.getName() + "カート#Greenに搭乗させました");
+		Util.sendMessage(p, "[header]全プレイヤーを#White" + kart.getName() + "カート#Greenに搭乗させました");
 	}
 
 	protected void messageRideRandomAll(Player p){
-		Util.sendMessage(p, "全プレイヤーを#Whiteランダムカート#Greenに搭乗させました");
+		Util.sendMessage(p, "[header]全プレイヤーを#Whiteランダムカート#Greenに搭乗させました");
 	}
 
 	protected void messageRideOther(Player p, Player other, EnumKarts kart){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんを#White" + kart.getName() + "カート#Greenに搭乗させました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんを#White" + kart.getName() + "カート#Greenに搭乗させました");
 	}
 
 	protected void messageLeaveAll(Player p){
-		Util.sendMessage(p, "全プレイヤーの搭乗を解除しました");
+		Util.sendMessage(p, "[header]全プレイヤーの搭乗を解除しました");
 	}
 
 	protected void messageLeaveOther(Player p, Player other){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんの搭乗を解除しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんの搭乗を解除しました");
 	}
 
 	protected void messageRankingOther(Player p, Player other, String circuitname){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
 	}
 
 	protected void messageRankingAll(Player p, String circuitname){
-		Util.sendMessage(p, "全プレイヤーにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
+		Util.sendMessage(p, "[header]全プレイヤーにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
 	}
 
 	protected void messageAddItem(Player p, ItemStack item){
-		Util.sendMessage(p, "#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
+		Util.sendMessage(p, "[header]#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 	}
 
 	protected void messageAddItemOther(Player p, Player other, ItemStack item){
-		Util.sendMessage(p, "#White" + other.getName() + "#Greenさんに#White" +  item.getItemMeta().getDisplayName() + "#Greenを配布しました");
+		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんに#White" +  item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 	}
 
 	protected void messageAddItemAll(Player p, ItemStack item){
-		Util.sendMessage(p, "全プレイヤーに#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
+		Util.sendMessage(p, "[header]全プレイヤーに#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 	}
 }
