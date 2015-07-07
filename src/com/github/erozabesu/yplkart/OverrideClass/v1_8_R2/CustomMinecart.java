@@ -188,7 +188,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 		if (this.passenger != null) {
 			if (this.passenger.vehicle == this) {
-				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.COW_WALK, 1.0F, 0.05F+((float)this.speedStack/200));
+				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.COW_WALK, 0.2F, 0.05F+((float)this.speedStack/200));
 				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.GHAST_FIREBALL, 0.01F+((float)this.speedStack/400), 1.0F);
 				((Player)this.passenger.getBukkitEntity()).playSound(this.passenger.getBukkitEntity().getLocation(), Sound.FIZZ, 0.01F+((float)this.speedStack/400), 0.5F);
 			}
