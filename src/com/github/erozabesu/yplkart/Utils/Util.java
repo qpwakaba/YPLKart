@@ -329,9 +329,13 @@ public class Util extends ReflectionUtil{
 			}else{
 				p.setHealth(p.getMaxHealth());
 				if(executor != null)
-					broadcastMessage("#White" + damaged.getName() + " killed by " + executor.getName());
+					for(Player other : RaceManager.getCircuit(p.getUniqueId()).getEntryPlayer()){
+						sendMessage(other, "#White" + damaged.getName() + " killed by " + executor.getName());
+					}
 				else
-					broadcastMessage("#White" + damaged.getName() + " is dead");
+					for(Player other : RaceManager.getCircuit(p.getUniqueId()).getEntryPlayer()){
+						sendMessage(other, "#White" + damaged.getName() + " is dead");
+					}
 
 				final Race r = RaceManager.getRace(p);
 				new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1);
