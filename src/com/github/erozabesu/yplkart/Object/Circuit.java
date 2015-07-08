@@ -20,6 +20,7 @@ import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
+import com.github.erozabesu.yplkart.Enum.Permission;
 import com.github.erozabesu.yplkart.Task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
@@ -462,7 +463,7 @@ public class Circuit{
 						if(RaceManager.getRace(p).getCharacter() == null){
 							RaceManager.setCharacterRaceData(p.getUniqueId(), EnumCharacter.getRandomCharacter());
 						}
-						if(RaceManager.getRace(p).getKart() == null){
+						if(RaceManager.getRace(p).getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
 							RaceManager.setKartRaceData(p.getUniqueId(), EnumKarts.getRandomKart());
 						}
 						p.closeInventory();
