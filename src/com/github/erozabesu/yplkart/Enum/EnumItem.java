@@ -2,6 +2,7 @@ package com.github.erozabesu.yplkart.Enum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -17,39 +18,40 @@ import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 
 public enum EnumItem{
-	CheckPoint(					Material.NETHER_STAR,	(byte)0,	0,										1, 												64, "チェックポイントツール", ""),
-	MarioHat(					Material.REDSTONE_BLOCK,(byte)0,	0,										1, 												64, "赤い帽子", "ひげのおじさんになれる赤い帽子。"),
-	ItemBox(					Material.INK_SACK,		(byte)0,	0,										1, 												64, "アイテムボックスツール", "アイテムボックスを設置します。"),
-	ItemBoxTier2(				Material.INK_SACK,		(byte)0,	0,										1, 												64, "高級アイテムボックスツール", "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
-	ItemBoxFake(				Material.INK_SACK,		(byte)0,	0,										1, 												64, "にせアイテムボックスツール", "にせアイテムボックスを設置します。当たっても復活します。"),
-	Menu(						Material.GOLD_INGOT,	(byte)0,	0,										1, 												64, "メニューを開きます", ""),
+	CheckPoint(					Permission.op_cmd_circuit,			Material.NETHER_STAR,	(byte)0,	0,										1, 												64, "チェックポイントツール", ""),
+	MarioHat(					null,								Material.REDSTONE_BLOCK,(byte)0,	0,										1, 												64, "赤い帽子", "ひげのおじさんになれる赤い帽子。"),
+	ItemBox(					Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "アイテムボックスツール", "アイテムボックスを設置します。"),
+	ItemBoxTier2(				Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "高級アイテムボックスツール", "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
+	ItemBoxFake(				Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "にせアイテムボックスツール", "にせアイテムボックスを設置します。当たっても復活します。"),
+	Menu(						null,								Material.GOLD_INGOT,	(byte)0,	0,										1, 												64, "メニューを開きます", ""),
 
-	Star(						Material.NETHER_STAR,	(byte)0,	Settings.StarTier,						1, 												Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
-	StarMultiple(				Material.NETHER_STAR,	(byte)0,	Settings.StarMultipleTier,				Settings.StarMultipleDropAmount, 				Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
-	Mushroom(					Material.INK_SACK,		(byte)1,	Settings.MushroomTier,					1, 												Settings.MushroomMaxStackSize, "ダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
-	MushroomMultiple(			Material.INK_SACK,		(byte)1,	Settings.MushroomMultipleTier,			Settings.MushroomMultipleDropAmount, 			Settings.MushroomMaxStackSize, "ダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
-	PowerfullMushroom(			Material.INK_SACK,		(byte)2,	Settings.PowerfullMushroomTier,			1, 												Settings.PowerfullMushroomMaxStackSize, "パワフルダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
-	PowerfullMushroomMultiple(	Material.INK_SACK,		(byte)2,	Settings.PowerfullMushroomMultipleTier,	Settings.PowerfullMushroomMultipleDropAmount, 	Settings.PowerfullMushroomMaxStackSize, "パワフルダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
-	Turtle(						Material.INK_SACK,		(byte)3,	Settings.TurtleTier,					1, 												Settings.TurtleMaxStackSize, "ミドリこうら", "投げると直進し、当たったプレイヤーを爆破します。"),
-	TurtleMultiple(				Material.INK_SACK,		(byte)3,	Settings.TurtleMultipleTier,			Settings.TurtleMultipleDropAmount, 				Settings.TurtleMaxStackSize, "ミドリこうら", "投げると直進し、当たったプレイヤーを爆破します。"),
-	RedTurtle(					Material.INK_SACK,		(byte)4,	Settings.RedTurtleTier,					1, 												Settings.RedTurtleMaxStackSize, "アカこうら", "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
-	RedTurtleMultiple(			Material.INK_SACK,		(byte)4,	Settings.RedTurtleMultipleTier,			Settings.RedTurtleMultipleDropAmount, 			Settings.RedTurtleMaxStackSize, "アカこうら", "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
-	ThornedTurtle(				Material.INK_SACK,		(byte)5,	Settings.ThornedTurtleTier,				1, 												Settings.ThornedTurtleMaxStackSize, "トゲゾーこうら", "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
-	ThornedTurtleMultiple(		Material.INK_SACK,		(byte)5,	Settings.ThornedTurtleMultipleTier,		Settings.ThornedTurtleMultipleDropAmount, 		Settings.ThornedTurtleMaxStackSize, "トゲゾーこうら", "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
-	Banana(						Material.INK_SACK,		(byte)6,	Settings.BananaTier,					1, 												Settings.BananaMaxStackSize, "バナナ", "コースに設置でき、接触したプレイヤーを減速させます。"),
-	BananaMultiple(				Material.INK_SACK,		(byte)6,	Settings.BananaMultipleTier,			Settings.BananaMultipleDropAmount, 				Settings.BananaMaxStackSize, "バナナ", "コースに設置でき、接触したプレイヤーを減速させます。"),
-	FakeItembox(				Material.INK_SACK,		(byte)7,	Settings.FakeItemBoxTier,				1, 												Settings.FakeItemBoxMaxStackSize, "にせアイテムボックス","アイテムボックスにそっくりですが、触れると減速します。"),
-	FakeItemboxMultiple(		Material.INK_SACK,		(byte)7,	Settings.FakeItemBoxMultipleTier,		Settings.FakeItemBoxMultipleDropAmount, 		Settings.FakeItemBoxMaxStackSize, "にせアイテムボックス","アイテムボックスにそっくりですが、触れると減速します。"),
-	Thunder(					Material.INK_SACK,		(byte)8,	Settings.ThunderTier,					1, 												Settings.ThunderMaxStackSize, "サンダー","ライバルのプレイヤーが一定時間遅くなります。"),
-	ThunderMultiple(			Material.INK_SACK,		(byte)8,	Settings.ThunderMultipleTier,			Settings.ThunderMultipleDropAmount, 			Settings.ThunderMaxStackSize, "サンダー","ライバルのプレイヤーが一定時間遅くなります。"),
-	Teresa(						Material.INK_SACK,		(byte)9,	Settings.TeresaTier,					1, 												Settings.TeresaMaxStackSize, "テレサ", "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
-	TeresaMultiple(				Material.INK_SACK,		(byte)9,	Settings.TeresaMultipleTier,			Settings.TeresaMultipleDropAmount, 				Settings.TeresaMaxStackSize, "テレサ", "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
-	Gesso(						Material.INK_SACK,		(byte)10,	Settings.GessoTier,						1, 												Settings.GessoMaxStackSize, "ゲッソー", "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
-	GessoMultiple(				Material.INK_SACK,		(byte)10,	Settings.GessoMultipleTier,				Settings.GessoMultipleDropAmount, 				Settings.GessoMaxStackSize, "ゲッソー", "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
-	Killer(						Material.INK_SACK,		(byte)11,	Settings.KillerTier,					1, 												Settings.KillerMaxStackSize, "キラー", ""),
-	KillerMultiple(				Material.INK_SACK,		(byte)11,	Settings.KillerMultipleTier,			Settings.KillerMultipleDropAmount, 				Settings.KillerMaxStackSize, "キラー", "")
+	Star(						Permission.use_star,				Material.NETHER_STAR,	(byte)0,	Settings.StarTier,						1, 												Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
+	StarMultiple(				Permission.use_star,				Material.NETHER_STAR,	(byte)0,	Settings.StarMultipleTier,				Settings.StarMultipleDropAmount, 				Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
+	Mushroom(					Permission.use_mushroom,			Material.INK_SACK,		(byte)1,	Settings.MushroomTier,					1, 												Settings.MushroomMaxStackSize, "ダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
+	MushroomMultiple(			Permission.use_mushroom,			Material.INK_SACK,		(byte)1,	Settings.MushroomMultipleTier,			Settings.MushroomMultipleDropAmount, 			Settings.MushroomMaxStackSize, "ダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
+	PowerfullMushroom(			Permission.use_powerfullmushroom,	Material.INK_SACK,		(byte)2,	Settings.PowerfullMushroomTier,			1, 												Settings.PowerfullMushroomMaxStackSize, "パワフルダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
+	PowerfullMushroomMultiple(	Permission.use_powerfullmushroom,	Material.INK_SACK,		(byte)2,	Settings.PowerfullMushroomMultipleTier,	Settings.PowerfullMushroomMultipleDropAmount, 	Settings.PowerfullMushroomMaxStackSize, "パワフルダッシュキノコ", "一定時間プレイヤーのスピードが上がります。"),
+	Turtle(						Permission.use_turtle,				Material.INK_SACK,		(byte)3,	Settings.TurtleTier,					1, 												Settings.TurtleMaxStackSize, "ミドリこうら", "投げると直進し、当たったプレイヤーを爆破します。"),
+	TurtleMultiple(				Permission.use_turtle,				Material.INK_SACK,		(byte)3,	Settings.TurtleMultipleTier,			Settings.TurtleMultipleDropAmount, 				Settings.TurtleMaxStackSize, "ミドリこうら", "投げると直進し、当たったプレイヤーを爆破します。"),
+	RedTurtle(					Permission.use_redturtle,			Material.INK_SACK,		(byte)4,	Settings.RedTurtleTier,					1, 												Settings.RedTurtleMaxStackSize, "アカこうら", "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
+	RedTurtleMultiple(			Permission.use_redturtle,			Material.INK_SACK,		(byte)4,	Settings.RedTurtleMultipleTier,			Settings.RedTurtleMultipleDropAmount, 			Settings.RedTurtleMaxStackSize, "アカこうら", "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
+	ThornedTurtle(				Permission.use_thornedturtle,		Material.INK_SACK,		(byte)5,	Settings.ThornedTurtleTier,				1, 												Settings.ThornedTurtleMaxStackSize, "トゲゾーこうら", "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
+	ThornedTurtleMultiple(		Permission.use_thornedturtle,		Material.INK_SACK,		(byte)5,	Settings.ThornedTurtleMultipleTier,		Settings.ThornedTurtleMultipleDropAmount, 		Settings.ThornedTurtleMaxStackSize, "トゲゾーこうら", "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
+	Banana(						Permission.use_banana,				Material.INK_SACK,		(byte)6,	Settings.BananaTier,					1, 												Settings.BananaMaxStackSize, "バナナ", "コースに設置でき、接触したプレイヤーを減速させます。"),
+	BananaMultiple(				Permission.use_banana,				Material.INK_SACK,		(byte)6,	Settings.BananaMultipleTier,			Settings.BananaMultipleDropAmount, 				Settings.BananaMaxStackSize, "バナナ", "コースに設置でき、接触したプレイヤーを減速させます。"),
+	FakeItembox(				Permission.use_fakeitembox,			Material.INK_SACK,		(byte)7,	Settings.FakeItemBoxTier,				1, 												Settings.FakeItemBoxMaxStackSize, "にせアイテムボックス","アイテムボックスにそっくりですが、触れると減速します。"),
+	FakeItemboxMultiple(		Permission.use_fakeitembox,			Material.INK_SACK,		(byte)7,	Settings.FakeItemBoxMultipleTier,		Settings.FakeItemBoxMultipleDropAmount, 		Settings.FakeItemBoxMaxStackSize, "にせアイテムボックス","アイテムボックスにそっくりですが、触れると減速します。"),
+	Thunder(					Permission.use_thunder,				Material.INK_SACK,		(byte)8,	Settings.ThunderTier,					1, 												Settings.ThunderMaxStackSize, "サンダー","ライバルのプレイヤーが一定時間遅くなります。"),
+	ThunderMultiple(			Permission.use_thunder,				Material.INK_SACK,		(byte)8,	Settings.ThunderMultipleTier,			Settings.ThunderMultipleDropAmount, 			Settings.ThunderMaxStackSize, "サンダー","ライバルのプレイヤーが一定時間遅くなります。"),
+	Teresa(						Permission.use_teresa,				Material.INK_SACK,		(byte)9,	Settings.TeresaTier,					1, 												Settings.TeresaMaxStackSize, "テレサ", "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
+	TeresaMultiple(				Permission.use_teresa,				Material.INK_SACK,		(byte)9,	Settings.TeresaMultipleTier,			Settings.TeresaMultipleDropAmount, 				Settings.TeresaMaxStackSize, "テレサ", "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
+	Gesso(						Permission.use_gesso,				Material.INK_SACK,		(byte)10,	Settings.GessoTier,						1, 												Settings.GessoMaxStackSize, "ゲッソー", "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
+	GessoMultiple(				Permission.use_gesso,				Material.INK_SACK,		(byte)10,	Settings.GessoMultipleTier,				Settings.GessoMultipleDropAmount, 				Settings.GessoMaxStackSize, "ゲッソー", "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
+	Killer(						Permission.use_killer,				Material.INK_SACK,		(byte)11,	Settings.KillerTier,					1, 												Settings.KillerMaxStackSize, "キラー", ""),
+	KillerMultiple(				Permission.use_killer,				Material.INK_SACK,		(byte)11,	Settings.KillerMultipleTier,			Settings.KillerMultipleDropAmount, 				Settings.KillerMaxStackSize, "キラー", "")
 	;
 
+	private Permission perm;
 	private Material material;
 	private byte data;
 	private int tier;
@@ -58,7 +60,8 @@ public enum EnumItem{
 	private String name;
 	private String lore;
 
-	private EnumItem(Material material, byte data, int tier, int amount, int maxstack, String name, String lore){
+	private EnumItem(Permission perm, Material material, byte data, int tier, int amount, int maxstack, String name, String lore){
+		this.perm = perm;
 		this.material = material;
 		this.data = data;
 		this.tier = tier;
@@ -72,6 +75,10 @@ public enum EnumItem{
 		this.tier = tier;
 		this.amount = amount;
 		this.maxstack = maxstack;
+	}
+
+	public Permission getPermission(){
+		return this.perm;
 	}
 
 	public Material getType(){
@@ -139,20 +146,32 @@ public enum EnumItem{
 		return false;
 	}
 
-	public static ArrayList<ItemStack> getItemfromTier(int grade){
-		ArrayList<ItemStack> item = new ArrayList<ItemStack>();
+	public static ArrayList<EnumItem> getItemfromTier(int grade){
+		ArrayList<EnumItem> item = new ArrayList<EnumItem>();
 		for(EnumItem i : EnumItem.values()){
 			if(i.getTier() != 0)
 				if(i.getTier() <= grade)
 					if(grade-1 <= i.getTier())
-						item.add(i.getItem());
+						item.add(i);
 		}
 		return item;
 	}
 
-	public static ItemStack getRandomItemfromTier(int grade){
-		ArrayList<ItemStack> item = getItemfromTier(grade);
-		return item.get(new Random().nextInt(item.size()));
+	public static ItemStack getRandomItemfromTier(Player p, int grade){
+		ArrayList<EnumItem> itemlist = getItemfromTier(grade);
+		Iterator<EnumItem> i = itemlist.iterator();
+		EnumItem item;
+		while(i.hasNext()){
+			item = i.next();
+			if(!Permission.hasPermission(p, item.getPermission(), true)){
+				i.remove();
+				itemlist.remove(item);
+			}
+		}
+
+		if(itemlist.size() == 0)return null;
+
+		return itemlist.get(new Random().nextInt(itemlist.size())).getItem();
 	}
 
 	public static Boolean isKeyItem(ItemStack i){
