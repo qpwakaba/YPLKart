@@ -291,6 +291,12 @@ public class Util extends ReflectionUtil{
 		}
 	}
 
+	public static boolean isBoolean(String flag) {
+		if(flag.equalsIgnoreCase("true") || flag.equalsIgnoreCase("false"))
+			return true;
+		return false;
+	}
+
 	public static boolean isLoadedChunk(Location l){
 		Player player = getNearestPlayer(getNearbyPlayers(l, 100), l);
 		if(player == null)return false;
@@ -440,6 +446,7 @@ public class Util extends ReflectionUtil{
 		text = text.replace("{number of player}", "{#Whitenumber of player#Green}");
 		text = text.replace("{number of second}", "{#Whitenumber of second#Green}");
 		text = text.replace("{number of laps}", "{#Whitenumber of laps#Green}");
+		text = text.replace("{true or false}", "{#Whitetrue #Greenor #Whitefalse#Green}");
 
 		return text;
 	}

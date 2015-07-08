@@ -40,6 +40,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	//ka circuit create {circuit name} {world} {x} {y} {z} {yaw} {pitch}
 	//ka circuit delete {circuit name}
 	//ka circuit edit {circuit name}
+	//ka circuit broadcastgoal {circuit name} {true or false}
 	//ka circuit setlap {circuit name} {number of laps}
 	//ka circuit setminplayer {circuit name} {number of player}
 	//ka circuit setmaxplayer {circuit name} {number of player}
@@ -132,6 +133,13 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					return;
 				}
 				RaceData.setNumberOfLaps(this.p, args[2], Integer.valueOf(args[3]));
+				return;
+			}else if(args[1].equalsIgnoreCase("broadcastgoal")){
+				if(!Util.isBoolean(args[3])){
+					messageInvalidBoolean(this.p);
+					return;
+				}
+				RaceData.setBroadcastGoalMessage(this.p, args[2], Boolean.valueOf(args[3]));
 				return;
 			}
 		}else if(this.length == 9){

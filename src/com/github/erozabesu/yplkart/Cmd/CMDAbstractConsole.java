@@ -88,6 +88,13 @@ public class CMDAbstractConsole extends CMDAbstract{
 				}
 				RaceData.setNumberOfLaps(null, args[2], Integer.valueOf(args[3]));
 				return;
+			}else if(args[1].equalsIgnoreCase("broadcastgoal")){
+				if(!Util.isBoolean(args[3])){
+					messageInvalidBoolean(null);
+					return;
+				}
+				RaceData.setBroadcastGoalMessage(null, args[2], Boolean.valueOf(args[3]));
+				return;
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
