@@ -125,7 +125,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			p.getInventory().addItem(EnumItem.getCheckPointTool(EnumItem.CheckPoint, circuitname));
-			Util.sendMessage(p, "[header]サーキット：" + "#Gold" + circuitname + "#Greenのチェックポイントツールを配布しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenチェックポイントツールを配布しました");
 		}
 	}
 
@@ -161,7 +161,7 @@ public final class RaceData{
 			}
 
 			if(laptime < config.getDouble(path, 0)){
-				Util.sendMessage(p, "[header]記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
+				Util.sendMessage(p, getCircuitHeader(circuitname) + "記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
 				config.set(path, laptime);
 				saveConfigFile();
 				return;
@@ -180,7 +180,7 @@ public final class RaceData{
 			}
 
 			if(laptime < config.getDouble(path, 0)){
-				Util.sendMessage(p, "[header]記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
+				Util.sendMessage(p, getCircuitHeader(circuitname) + "記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
 				config.set(path, laptime);
 				saveConfigFile();
 				return;
@@ -192,7 +192,7 @@ public final class RaceData{
 		String ranking = RaceData.getRanking(id, circuitname);
 		String kartranking = RaceData.getKartRanking(id, circuitname);
 		if(ranking == null && kartranking == null)
-			Util.sendMessage(id, "[header]#Redサーキット : " + "#Yellow" + circuitname + " #Redのレースデータがありません");
+			Util.sendMessage(id, getCircuitHeader(circuitname) + " #Redレースの記録がありません");
 		else{
 			if(kartranking != null)
 				Util.sendMessage(id, kartranking);
@@ -202,6 +202,10 @@ public final class RaceData{
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static String getCircuitHeader(String circuitname){
+		return "#DarkAqua[#Aqua" + Util.convertInitialUpperString(circuitname) + "#DarkAqua] #Green";
+	}
 
 	public static int getNumberOfLaps(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
@@ -458,7 +462,7 @@ public final class RaceData{
 			config.set(circuitname + ".z", l.getZ());
 			config.set(circuitname + ".yaw", l.getYaw());
 			config.set(circuitname + ".pitch", l.getPitch());
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの開始座標を再設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green現在位置を開始座標として設定しました");
 			saveConfigFile();
 		}
 	}
@@ -473,7 +477,7 @@ public final class RaceData{
 			config.set(circuitname + ".z", z);
 			config.set(circuitname + ".yaw", yaw);
 			config.set(circuitname + ".pitch", pitch);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの開始座標を再設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green現在位置を開始座標として設定しました");
 			saveConfigFile();
 		}
 	}
@@ -483,7 +487,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			config.set(circuitname + ".numberoflaps", amount);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの周回数を#White" + amount + "周#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green周回数を#White" + amount + "周#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -492,10 +496,10 @@ public final class RaceData{
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else if(getMaxPlayer(circuitname) < amount){
-			Util.sendMessage(p, "[header]#Red最大プレイ人数を上回る数値は設定できません。現在最大プレイ人数は#White" + getMaxPlayer(circuitname) + "人#Redに設定されています");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Red最大プレイ人数を上回る数値は設定できません。現在最大プレイ人数は#White" + getMaxPlayer(circuitname) + "人#Redに設定されています");
 		}else{
 			config.set(circuitname + ".minplayer", amount);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green最小プレイ人数を#White" + amount + "人#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -504,10 +508,10 @@ public final class RaceData{
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else if(amount < getMinPlayer(circuitname)){
-			Util.sendMessage(p, "[header]#Red最小プレイ人数を下回る数値は設定できません。現在最小プレイ人数は#White" + getMinPlayer(circuitname) + "人#Redに設定されています");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Red最小プレイ人数を下回る数値は設定できません。現在最小プレイ人数は#White" + getMinPlayer(circuitname) + "人#Redに設定されています");
 		}else{
 			config.set(circuitname + ".maxplayer", amount);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最大プレイ人数を#White" + amount + "人#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green最大プレイ人数を#White" + amount + "人#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -517,7 +521,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			config.set(circuitname + ".matchingtime", second);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのマッチング時間を#White" + second + "秒#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenマッチング時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -527,7 +531,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			config.set(circuitname + ".menutime", second);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのメニュー選択時間を#White" + second + "秒#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenメニュー選択時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -537,7 +541,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			config.set(circuitname + ".limittime", second);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
@@ -547,7 +551,7 @@ public final class RaceData{
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
 			config.set(circuitname + ".broadcastgoalmessage", flag);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Green順位・ラップタイムのサーバー全体通知を#White" + flag + "#Greenに設定しました");
+			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green順位・ラップタイムのサーバー全体通知を#White" + flag + "#Greenに設定しました");
 			saveConfigFile();
 		}
 	}
