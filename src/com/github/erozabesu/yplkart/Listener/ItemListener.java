@@ -79,7 +79,7 @@ public class ItemListener extends RaceManager implements Listener{
 		final UUID id = p.getUniqueId();
 		if(EnumItem.CheckPoint.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, Permission.op_cmd_circuit, false)){
+			if(Permission.hasPermission(p, EnumItem.CheckPoint.getPermission(), false)){
 				try {
 					createCustomWitherSkull(p.getLocation(), p.getItemInHand().getItemMeta().getLore().get(0));
 				} catch (Exception ex) {
@@ -88,7 +88,7 @@ public class ItemListener extends RaceManager implements Listener{
 			}
 		}else if(EnumItem.ItemBox.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, Permission.op_cmd_itemboxtool, false)){
+			if(Permission.hasPermission(p, EnumItem.ItemBox.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -99,7 +99,7 @@ public class ItemListener extends RaceManager implements Listener{
 			}
 		}else if(EnumItem.ItemBoxTier2.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, Permission.op_cmd_itemboxtool, false)){
+			if(Permission.hasPermission(p, EnumItem.ItemBoxTier2.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -110,7 +110,7 @@ public class ItemListener extends RaceManager implements Listener{
 			}
 		}else if(EnumItem.ItemBoxFake.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, Permission.op_cmd_itemboxtool, false)){
+			if(Permission.hasPermission(p, EnumItem.ItemBoxFake.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -126,20 +126,20 @@ public class ItemListener extends RaceManager implements Listener{
 		if(isRacing(id)){
 			if(EnumItem.Mushroom.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_mushroom, false)){
+				if(Permission.hasPermission(p, EnumItem.Mushroom.getPermission(), false)){
 					Util.setItemDecrease(p);
 					setPositiveItemSpeed(p, Settings.MushroomEffectSecond, Settings.MushroomEffectLevel, Sound.EXPLODE);
 				}
 			}else if(EnumItem.PowerfullMushroom.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_powerfullmushroom, false)){
+				if(Permission.hasPermission(p, EnumItem.PowerfullMushroom.getPermission(), false)){
 					Util.setItemDecrease(p);
 					setPositiveItemSpeed(p, Settings.PowerfullMushroomEffectSecond, Settings.PowerfullMushroomEffectLevel, Sound.EXPLODE);
 					p.getWorld().playSound(p.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
 				}
 			}else if(EnumItem.Banana.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_banana, false)){
+				if(Permission.hasPermission(p, EnumItem.Banana.getPermission(), false)){
 					Util.setItemDecrease(p);
 					Location l = Util.getLocationfromYaw(p.getLocation().add(0,0.5,0), -5).getBlock().getLocation().add(0.5,0,0.5);
 
@@ -154,7 +154,7 @@ public class ItemListener extends RaceManager implements Listener{
 				}
 			}else if(EnumItem.FakeItembox.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_fakeitembox, false)){
+				if(Permission.hasPermission(p, EnumItem.FakeItembox.getPermission(), false)){
 					Util.setItemDecrease(p);
 					EnderCrystal endercrystal = p.getWorld().spawn(Util.getLocationfromYaw(p.getLocation().add(0,0.5,0), -5).getBlock().getLocation().add(0.5,0,0.5), EnderCrystal.class);
 					endercrystal.setCustomName(FakeItemBoxName);
@@ -164,35 +164,35 @@ public class ItemListener extends RaceManager implements Listener{
 				}
 			}else if(EnumItem.Thunder.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_thunder, false))
+				if(Permission.hasPermission(p, EnumItem.Thunder.getPermission(), false))
 					itemThunder(p);
 			}else if(EnumItem.Star.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_star, false))
+				if(Permission.hasPermission(p, EnumItem.Star.getPermission(), false))
 					new ItemStarTask(p).runTaskTimer(pl, 0, 1);
 			}else if(EnumItem.Teresa.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_teresa, false))
+				if(Permission.hasPermission(p, EnumItem.Teresa.getPermission(), false))
 					itemTeresa(p);
 			}else if(EnumItem.Turtle.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_turtle, false))
+				if(Permission.hasPermission(p, EnumItem.Turtle.getPermission(), false))
 					itemTurtle(p);
 			}else if(EnumItem.RedTurtle.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_redturtle, false))
+				if(Permission.hasPermission(p, EnumItem.RedTurtle.getPermission(), false))
 					itemRedturtle(p);
 			}else if(EnumItem.ThornedTurtle.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_thornedturtle, false))
+				if(Permission.hasPermission(p, EnumItem.ThornedTurtle.getPermission(), false))
 					itemThornedturtle(p);
 			}else if(EnumItem.Gesso.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_gesso, false))
+				if(Permission.hasPermission(p, EnumItem.Gesso.getPermission(), false))
 					itemGesso(p);
 			}else if(EnumItem.Killer.isSimilar(p.getItemInHand())){
 				e.setCancelled(true);
-				if(Permission.hasPermission(p, Permission.use_killer, false)){
+				if(Permission.hasPermission(p, EnumItem.Killer.getPermission(), false)){
 					itemKiller(p);
 				}
 			}
@@ -292,8 +292,13 @@ public class ItemListener extends RaceManager implements Listener{
 										tier++;
 
 								Inventory i = p.getInventory();
-								EnumItem.addItem(p, EnumItem.getRandomItemfromTier(tier));
-								Util.sendMessage(p, "アイテムゲット！");
+								ItemStack item = EnumItem.getRandomItemfromTier(p, tier);
+								if(item != null){
+									EnumItem.addItem(p, item);
+									Util.sendMessage(p, "アイテムゲット！");
+								}else{
+									Util.sendMessage(p, "#Red抽選対象の全てのアイテムにおいて使用権限を所有していなかったため、アイテムを獲得できませんでした");
+								}
 								p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 2.0F);
 								itemboxCool.put(p, true);
 								pl.getServer().getScheduler().runTaskLater(pl,new Runnable() {
