@@ -479,7 +479,7 @@ public class Circuit{
 					}
 				}else if(racestartcountdown == 8){
 					for(Player p : getEntryPlayer()){
-						PacketUtil.sendTitle(p, RaceData.getLimitTime(name) + " sec", 10, 40, 10, ChatColor.RED, false);
+						PacketUtil.sendTitle(p, String.valueOf(RaceData.getLimitTime(name)), 10, 40, 10, ChatColor.RED, false);
 						PacketUtil.sendTitle(p, "Time Limit", 10, 40, 10, ChatColor.GOLD, true);
 					}
 				}else if(racestartcountdown == 6){
