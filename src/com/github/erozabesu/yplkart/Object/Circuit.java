@@ -84,6 +84,7 @@ public class Circuit{
 					r.setEntry(name);
 					RaceManager.clearCharacterRaceData(id);
 					RaceManager.clearKartRaceData(id);
+					RaceManager.leaveRacingKart(p);
 					r.setStandBy(true);
 					r.savePlayerData();
 
