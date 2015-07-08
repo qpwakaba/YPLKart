@@ -705,16 +705,6 @@ public class ItemListener extends RaceManager implements Listener{
 					}, life*20);
 				}
 		}
-		/*if(r.getKart() == null){
-			Minecart cart = p.getWorld().spawn(p.getLocation(), Minecart.class);
-			cart.setDisplayBlock(new MaterialData(Material.TNT));
-			cart.setCustomName(EnumItem.Killer.getName());
-			cart.setCustomNameVisible(false);
-			cart.setPassenger(p);
-			Util.removeEntityCollision(cart);
-
-			new ItemAutoMoveProjectile(p, cart, life, Settings.KillerMovingDamage).runTaskTimer(pl, 0, 1);
-		}*/
 	}
 
 	public static void setNegativeItemSpeed(final Player p, int second, int level, Sound sound){
