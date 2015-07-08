@@ -463,11 +463,25 @@ public final class RaceData{
 		}
 	}
 
+	public static void setPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			config.set(circuitname + ".world", worldname);
+			config.set(circuitname + ".x", x);
+			config.set(circuitname + ".y", y);
+			config.set(circuitname + ".z", z);
+			config.set(circuitname + ".yaw", yaw);
+			config.set(circuitname + ".pitch", pitch);
+			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの開始座標を再設定しました");
+			saveConfigFile();
+		}
+	}
+
 	public static void setNumberOfLaps(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".numberoflaps", amount);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの周回数を#White" + amount + "周#Greenに設定しました");
 			saveConfigFile();
@@ -480,7 +494,6 @@ public final class RaceData{
 		}else if(getMaxPlayer(circuitname) < amount){
 			Util.sendMessage(p, "[header]#Red最大プレイ人数を上回る数値は設定できません。現在最大プレイ人数は#White" + getMaxPlayer(circuitname) + "人#Redに設定されています");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".minplayer", amount);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最小プレイ人数を#White" + amount + "人#Greenに設定しました");
 			saveConfigFile();
@@ -493,7 +506,6 @@ public final class RaceData{
 		}else if(amount < getMinPlayer(circuitname)){
 			Util.sendMessage(p, "[header]#Red最小プレイ人数を下回る数値は設定できません。現在最小プレイ人数は#White" + getMinPlayer(circuitname) + "人#Redに設定されています");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".maxplayer", amount);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの最大プレイ人数を#White" + amount + "人#Greenに設定しました");
 			saveConfigFile();
@@ -504,7 +516,6 @@ public final class RaceData{
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".matchingtime", second);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのマッチング時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
@@ -515,7 +526,6 @@ public final class RaceData{
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".menutime", second);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのメニュー選択時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
@@ -526,7 +536,6 @@ public final class RaceData{
 		if(!getCircuitSet().contains(circuitname)){
 			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
 		}else{
-			Location l = p.getLocation();
 			config.set(circuitname + ".limittime", second);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
 			saveConfigFile();
@@ -539,21 +548,6 @@ public final class RaceData{
 		}else{
 			config.set(circuitname + ".broadcastgoalmessage", flag);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Green順位・ラップタイムのサーバー全体通知を#White" + flag + "#Greenに設定しました");
-			saveConfigFile();
-		}
-	}
-
-	public static void setPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
-		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
-		}else{
-			config.set(circuitname + ".world", worldname);
-			config.set(circuitname + ".x", x);
-			config.set(circuitname + ".y", y);
-			config.set(circuitname + ".z", z);
-			config.set(circuitname + ".yaw", yaw);
-			config.set(circuitname + ".pitch", pitch);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenの開始座標を再設定しました");
 			saveConfigFile();
 		}
 	}
