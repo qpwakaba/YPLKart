@@ -205,11 +205,8 @@ public final class Settings{
 
 	public static void loadConfig() {
 //〓メイン
-		if(!config.contains("enable_this_plugin"))config.set("enable_this_plugin", EnableThisPlugin);
-		EnableThisPlugin = config.getBoolean("enable_this_plugin");
-
-		if(!config.contains("enable_scoreboard"))config.set("enable_scoreboard", EnableScoreboard);
-		EnableScoreboard = config.getBoolean("enable_scoreboard");
+		EnableThisPlugin = getBoolean("enable_this_plugin", EnableThisPlugin);
+		EnableScoreboard = getBoolean("enable_scoreboard", EnableScoreboard);
 
 		if(!config.contains("disabled_worlds")){
 			ArrayList<String> disworlds = new ArrayList<String>();
@@ -221,107 +218,44 @@ public final class Settings{
 
 //〓Permission
 
-		if(!config.contains("enable_permission.kart_ride"))config.set("enable_permission.kart_ride", EnablePermissionKartRide);
-		EnablePermissionKartRide = config.getBoolean("enable_permission.kart_ride");
+		EnablePermissionKartRide = 			getBoolean("enable_permission.kart_ride", EnablePermissionKartRide);
+		EnablePermissionKartDrift = 		getBoolean("enable_permission.kart_drift", EnablePermissionKartDrift);
 
-		if(!config.contains("enable_permission.kart_drift"))config.set("enable_permission.kart_drift", EnablePermissionKartDrift);
-		EnablePermissionKartDrift = config.getBoolean("enable_permission.kart_drift");
+		EnablePermissionCMDMenu = 			getBoolean("enable_permission.cmd_menu", EnablePermissionCMDMenu);
+		EnablePermissionCMDEntry = 			getBoolean("enable_permission.cmd_entry", EnablePermissionCMDEntry);
+		EnablePermissionCMDExit = 			getBoolean("enable_permission.cmd_exit", EnablePermissionCMDExit);
+		EnablePermissionCMDCharacter = 		getBoolean("enable_permission.cmd_character", EnablePermissionCMDCharacter);
+		EnablePermissionCMDCharacterReset = getBoolean("enable_permission.cmd_characterreset", EnablePermissionCMDCharacterReset);
+		EnablePermissionCMDRide = 			getBoolean("enable_permission.cmd_kart", EnablePermissionCMDRide);
+		EnablePermissionCMDLeave = 			getBoolean("enable_permission.cmd_leave", EnablePermissionCMDLeave);
+		EnablePermissionCMDRanking = 		getBoolean("enable_permission.cmd_ranking", EnablePermissionCMDRanking);
+		EnablePermissionCMDItem = 			getBoolean("enable_permission.cmd_item", EnablePermissionCMDItem);
 
-		if(!config.contains("enable_permission.cmd_menu"))config.set("enable_permission.cmd_menu", EnablePermissionCMDMenu);
-		EnablePermissionCMDMenu = config.getBoolean("enable_permission.cmd_menu");
+		EnablePermissionCMDOtherMenu = 				getBoolean("enable_permission.cmd_other_menu", EnablePermissionCMDOtherMenu);
+		EnablePermissionCMDOtherEntry = 			getBoolean("enable_permission.cmd_other_entry", EnablePermissionCMDOtherEntry);
+		EnablePermissionCMDOtherExit = 				getBoolean("enable_permission.cmd_other_exit", EnablePermissionCMDOtherExit);
+		EnablePermissionCMDOtherCharacter = 		getBoolean("enable_permission.cmd_other_character", EnablePermissionCMDOtherCharacter);
+		EnablePermissionCMDOtherCharacterReset = 	getBoolean("enable_permission.cmd_other_characterreset", EnablePermissionCMDOtherCharacterReset);
+		EnablePermissionCMDOtherRide = 				getBoolean("enable_permission.cmd_other_kart", EnablePermissionCMDOtherRide);
+		EnablePermissionCMDOtherLeave = 			getBoolean("enable_permission.cmd_other_leave", EnablePermissionCMDOtherLeave);
+		EnablePermissionCMDOtherRanking = 			getBoolean("enable_permission.cmd_other_ranking", EnablePermissionCMDOtherRanking);
+		EnablePermissionCMDOtherItem = 				getBoolean("enable_permission.cmd_other_item", EnablePermissionCMDOtherItem);
 
-		if(!config.contains("enable_permission.cmd_entry"))config.set("enable_permission.cmd_entry", EnablePermissionCMDEntry);
-		EnablePermissionCMDEntry = config.getBoolean("enable_permission.cmd_entry");
+		EnablePermissionUseItem = 			getBoolean("enable_permission.use_item", EnablePermissionUseItem);
+		EnablePermissionInteractObject = 	getBoolean("enable_permission.interact_object", EnablePermissionInteractObject);
 
-		if(!config.contains("enable_permission.cmd_exit"))config.set("enable_permission.cmd_exit", EnablePermissionCMDExit);
-		EnablePermissionCMDExit = config.getBoolean("enable_permission.cmd_exit");
-
-		if(!config.contains("enable_permission.cmd_character"))config.set("enable_permission.cmd_character", EnablePermissionCMDCharacter);
-		EnablePermissionCMDCharacter = config.getBoolean("enable_permission.cmd_character");
-
-		if(!config.contains("enable_permission.cmd_characterreset"))config.set("enable_permission.cmd_characterreset", EnablePermissionCMDCharacterReset);
-		EnablePermissionCMDCharacterReset = config.getBoolean("enable_permission.cmd_characterreset");
-
-		if(!config.contains("enable_permission.cmd_kart"))config.set("enable_permission.cmd_kart", EnablePermissionCMDRide);
-		EnablePermissionCMDRide = config.getBoolean("enable_permission.cmd_kart");
-
-		if(!config.contains("enable_permission.cmd_leave"))config.set("enable_permission.cmd_leave", EnablePermissionCMDLeave);
-		EnablePermissionCMDLeave = config.getBoolean("enable_permission.cmd_leave");
-
-		if(!config.contains("enable_permission.cmd_ranking"))config.set("enable_permission.cmd_ranking", EnablePermissionCMDRanking);
-		EnablePermissionCMDRanking = config.getBoolean("enable_permission.cmd_ranking");
-
-		if(!config.contains("enable_permission.cmd_item"))config.set("enable_permission.cmd_item", EnablePermissionCMDItem);
-		EnablePermissionCMDItem = config.getBoolean("enable_permission.cmd_item");
-
-//〓Other
-
-		if(!config.contains("enable_permission.cmd_other_menu"))config.set("enable_permission.cmd_other_menu", EnablePermissionCMDOtherMenu);
-		EnablePermissionCMDOtherMenu = config.getBoolean("enable_permission.cmd_other_menu");
-
-		if(!config.contains("enable_permission.cmd_other_entry"))config.set("enable_permission.cmd_other_entry", EnablePermissionCMDOtherEntry);
-		EnablePermissionCMDOtherEntry = config.getBoolean("enable_permission.cmd_other_entry");
-
-		if(!config.contains("enable_permission.cmd_other_unentry"))config.set("enable_permission.cmd_other_unentry", EnablePermissionCMDOtherExit);
-		EnablePermissionCMDOtherExit = config.getBoolean("enable_permission.cmd_other_unentry");
-
-		if(!config.contains("enable_permission.cmd_other_character"))config.set("enable_permission.cmd_other_character", EnablePermissionCMDOtherCharacter);
-		EnablePermissionCMDOtherCharacter = config.getBoolean("enable_permission.cmd_other_character");
-
-		if(!config.contains("enable_permission.cmd_other_characterreset"))config.set("enable_permission.cmd_other_characterreset", EnablePermissionCMDOtherCharacterReset);
-		EnablePermissionCMDOtherCharacterReset = config.getBoolean("enable_permission.cmd_other_characterreset");
-
-		if(!config.contains("enable_permission.cmd_other_kart"))config.set("enable_permission.cmd_other_kart", EnablePermissionCMDOtherRide);
-		EnablePermissionCMDOtherRide = config.getBoolean("enable_permission.cmd_other_kart");
-
-		if(!config.contains("enable_permission.cmd_other_leave"))config.set("enable_permission.cmd_other_leave", EnablePermissionCMDOtherLeave);
-		EnablePermissionCMDOtherLeave = config.getBoolean("enable_permission.cmd_other_leave");
-
-		if(!config.contains("enable_permission.cmd_other_ranking"))config.set("enable_permission.cmd_other_ranking", EnablePermissionCMDOtherRanking);
-		EnablePermissionCMDOtherRanking = config.getBoolean("enable_permission.cmd_other_ranking");
-
-		if(!config.contains("enable_permission.cmd_other_item"))config.set("enable_permission.cmd_other_item", EnablePermissionCMDOtherItem);
-		EnablePermissionCMDOtherItem = config.getBoolean("enable_permission.cmd_other_item");
-
-//〓
-		if(!config.contains("enable_permission.use_item"))config.set("enable_permission.use_item", EnablePermissionUseItem);
-		EnablePermissionUseItem = config.getBoolean("enable_permission.use_item");
-
-		if(!config.contains("enable_permission.interact_object"))config.set("enable_permission.interact_object", EnablePermissionInteractObject);
-		EnablePermissionInteractObject = config.getBoolean("enable_permission.interact_object");
-
-//〓OPPermission
-
-		if(!config.contains("enable_op_permission.kart_remove"))config.set("enable_op_permission.kart_remove", EnableOPPermissionKartRemove);
-		EnableOPPermissionKartRemove = config.getBoolean("enable_op_permission.kart_remove");
-
-		if(!config.contains("enable_op_permission.cmd_circuit"))config.set("enable_op_permission.cmd_circuit", EnableOPPermissionCMDCircuit);
-		EnableOPPermissionCMDCircuit = config.getBoolean("enable_op_permission.cmd_circuit");
-
-		if(!config.contains("enable_op_permission.cmd_display"))config.set("enable_op_permission.cmd_display", EnableOPPermissionCMDDisplay);
-		EnableOPPermissionCMDDisplay = config.getBoolean("enable_op_permission.cmd_display");
-
-		if(!config.contains("enable_op_permission.cmd_reload"))config.set("enable_op_permission.cmd_reload", EnableOPPermissionCMDReload);
-		EnableOPPermissionCMDReload = config.getBoolean("enable_op_permission.");
-
-		//if(!config.contains("enable_op_permission.cmd_checkpointtool"))config.set("enable_op_permission.cmd_checkpointtool", EnableOPPermissionCMDCheckPointTool);
-		//EnableOPPermissionCMDCheckPointTool = config.getBoolean("enable_op_permission.cmd_checkpointtool");
-
-		if(!config.contains("enable_op_permission.cmd_itemboxtool"))config.set("enable_op_permission.cmd_itemboxtool", EnableOPPermissionCMDItemBoxTool);
-		EnableOPPermissionCMDItemBoxTool = config.getBoolean("enable_op_permission.cmd_itemboxtool");
+		EnableOPPermissionKartRemove = 		getBoolean("enable_op_permission.kart_remove", EnableOPPermissionKartRemove);
+		EnableOPPermissionCMDCircuit = 		getBoolean("enable_op_permission.cmd_circuit", EnableOPPermissionCMDCircuit);
+		EnableOPPermissionCMDDisplay = 		getBoolean("enable_op_permission.cmd_display", EnableOPPermissionCMDDisplay);
+		EnableOPPermissionCMDReload = 		getBoolean("enable_op_permission.cmd_reload", EnableOPPermissionCMDReload);
+		EnableOPPermissionCMDItemBoxTool = 	getBoolean("enable_op_permission.cmd_itemboxtool", EnableOPPermissionCMDItemBoxTool);
 
 //〓セッティング
-		if(!config.contains("settings.start_block_id"))config.set("settings.start_block_id", StartBlock);
-		StartBlock = config.getString("settings.start_block_id");
 
-		if(!config.contains("settings.goal_block_id"))config.set("settings.goal_block_id", GoalBlock);
-		GoalBlock = config.getString("settings.goal_block_id");
-
-		if(!config.contains("settings.dirt_block_id"))config.set("settings.dirt_block_id", DirtBlock);
-		DirtBlock = config.getString("settings.dirt_block_id");
-
-		if(!config.contains("settings.item_slot"))config.set("settings.item_slot", ItemSlot);
-		ItemSlot = config.getInt("settings.item_slot");
+		StartBlock = 	getString("settings.start_block_id", StartBlock);
+		GoalBlock = 	getString("settings.goal_block_id", GoalBlock);
+		DirtBlock = 	getString("settings.dirt_block_id", DirtBlock);
+		ItemSlot = 		getInt("settings.item_slot", ItemSlot);
 
 //〓ジョブ カート
 		HumanClassSetting = getJobSetting(EnumCharacter.human, HumanClassSetting);
@@ -344,260 +278,116 @@ public final class Settings{
 		KartSetting7 = getKartSetting("custom_kart7", KartSetting7);
 		KartSetting8 = getKartSetting("custom_kart8", KartSetting8);
 
-		if(!config.contains("karts.custom_kart1.name"))config.set("karts.custom_kart1.name", KartName1);
-		KartName1 = config.getString("karts.custom_kart1.name");
-		if(!config.contains("karts.custom_kart2.name"))config.set("karts.custom_kart2.name", KartName2);
-		KartName2 = config.getString("karts.custom_kart2.name");
-		if(!config.contains("karts.custom_kart3.name"))config.set("karts.custom_kart3.name", KartName3);
-		KartName3 = config.getString("karts.custom_kart3.name");
-		if(!config.contains("karts.custom_kart4.name"))config.set("karts.custom_kart4.name", KartName4);
-		KartName4 = config.getString("karts.custom_kart4.name");
-		if(!config.contains("karts.custom_kart5.name"))config.set("karts.custom_kart5.name", KartName5);
-		KartName5 = config.getString("karts.custom_kart5.name");
-		if(!config.contains("karts.custom_kart6.name"))config.set("karts.custom_kart6.name", KartName6);
-		KartName6 = config.getString("karts.custom_kart6.name");
-		if(!config.contains("karts.custom_kart7.name"))config.set("karts.custom_kart7.name", KartName7);
-		KartName7 = config.getString("karts.custom_kart7.name");
-		if(!config.contains("karts.custom_kart8.name"))config.set("karts.custom_kart8.name", KartName8);
-		KartName8 = config.getString("karts.custom_kart8.name");
+		KartName1 = getString("karts.custom_kart1.name", KartName1);
+		KartName2 = getString("karts.custom_kart2.name", KartName2);
+		KartName3 = getString("karts.custom_kart3.name", KartName3);
+		KartName4 = getString("karts.custom_kart4.name", KartName4);
+		KartName5 = getString("karts.custom_kart5.name", KartName5);
+		KartName6 = getString("karts.custom_kart6.name", KartName6);
+		KartName7 = getString("karts.custom_kart7.name", KartName7);
+		KartName8 = getString("karts.custom_kart8.name", KartName8);
 
 //〓アイテム
-		if(!config.contains("item.dash_board.effect_level"))config.set("item.dash_board.effect_level", BoostRailEffectLevel);
-		BoostRailEffectLevel = config.getInt("item.dash_board.effect_level");
 
-		if(!config.contains("item.dash_board.effect_second"))config.set("item.dash_board.effect_second", BoostRailEffectSecond);
-		BoostRailEffectSecond = config.getInt("item.dash_board.effect_second");
-
-		if(!config.contains("item.tier1"))config.set("item.tier1", Tier1);
-		Tier1 = config.getInt("item.tier1");
-
-		if(!config.contains("item.tier2"))config.set("item.tier2", Tier2);
-		Tier2 = config.getInt("item.tier2");
-
-		if(!config.contains("item.tier3"))config.set("item.tier3", Tier3);
-		Tier3 = config.getInt("item.tier3");
+		BoostRailEffectLevel = getInt("item.dash_board.effect_level", BoostRailEffectLevel);
+		BoostRailEffectSecond = getInt("item.dash_board.effect_second", BoostRailEffectSecond);
+		Tier1 = getInt("item.tier1", Tier1);
+		Tier2 = getInt("item.tier2", Tier2);
+		Tier3 = getInt("item.tier3", Tier3);
 
 		//ダッシュきのこ
-		if(!config.contains("item.mushroom.tier"))config.set("item.mushroom.tier", MushroomTier);
-		MushroomTier = config.getInt("item.mushroom.tier");
-
-		if(!config.contains("item.mushroom.max_stack_size"))config.set("item.mushroom.max_stack_size", MushroomMaxStackSize);
-		MushroomMaxStackSize = config.getInt("item.mushroom.max_stack_size");
-
-		if(!config.contains("item.mushroom.effect_level"))config.set("item.mushroom.effect_level", MushroomEffectLevel);
-		MushroomEffectLevel = config.getInt("item.mushroom.effect_level");
-
-		if(!config.contains("item.mushroom.effect_second"))config.set("item.mushroom.effect_second", MushroomEffectSecond);
-		MushroomEffectSecond = config.getInt("item.mushroom.effect_second");
-
-		if(!config.contains("item.mushroom.multiple.tier"))config.set("item.mushroom.multiple.tier", MushroomMultipleTier);
-		MushroomMultipleTier = config.getInt("item.mushroom.multiple.tier");
-
-		if(!config.contains("item.mushroom.multiple.drop_amount"))config.set("item.mushroom.multiple.drop_amount", MushroomMultipleDropAmount);
-		MushroomMultipleDropAmount = config.getInt("item.mushroom.multiple.drop_amount");
+		MushroomTier = 					getInt("item.mushroom.tier", MushroomTier);
+		MushroomMaxStackSize = 			getInt("item.mushroom.max_stack_size", MushroomMaxStackSize);
+		MushroomEffectLevel = 			getInt("item.mushroom.effect_level", MushroomEffectLevel);
+		MushroomEffectSecond = 			getInt("item.mushroom.effect_second", MushroomEffectSecond);
+		MushroomMultipleTier = 			getInt("item.mushroom.multiple.tier", MushroomMultipleTier);
+		MushroomMultipleDropAmount = 	getInt("item.mushroom.multiple.drop_amount", MushroomMultipleDropAmount);
 
 		//パワフルダッシュきのこ
-		if(!config.contains("item.powerfull_mushroom.tier"))config.set("item.powerfull_mushroom.tier", PowerfullMushroomTier);
-		PowerfullMushroomTier = config.getInt("item.powerfull_mushroom.tier");
-
-		if(!config.contains("item.powerfull_mushroom.max_stack_size"))config.set("item.powerfull_mushroom.max_stack_size", PowerfullMushroomMaxStackSize);
-		PowerfullMushroomMaxStackSize = config.getInt("item.powerfull_mushroom.max_stack_size");
-
-		if(!config.contains("item.powerfull_mushroom.effect_level"))config.set("item.powerfull_mushroom.effect_level", MushroomEffectLevel);
-		PowerfullMushroomEffectLevel = config.getInt("item.powerfull_mushroom.effect_level");
-
-		if(!config.contains("item.powerfull_mushroom.effect_second"))config.set("item.powerfull_mushroom.effect_second", PowerfullMushroomEffectSecond);
-		PowerfullMushroomEffectSecond = config.getInt("item.powerfull_mushroom.effect_second");
-
-		if(!config.contains("item.powerfull_mushroom.multiple.tier"))config.set("item.powerfull_mushroom.multiple.tier", PowerfullMushroomMultipleTier);
-		PowerfullMushroomMultipleTier = config.getInt("item.powerfull_mushroom.multiple.tier");
-
-		if(!config.contains("item.powerfull_mushroom.multiple.drop_amount"))config.set("item.powerfull_mushroom.multiple.drop_amount", PowerfullMushroomMultipleDropAmount);
-		PowerfullMushroomMultipleDropAmount = config.getInt("item.powerfull_mushroom.multiple.drop_amount");
+		PowerfullMushroomTier = 				getInt("item.powerfull_mushroom.tier", PowerfullMushroomTier);
+		PowerfullMushroomMaxStackSize = 		getInt("item.powerfull_mushroom.max_stack_size", PowerfullMushroomMaxStackSize);
+		PowerfullMushroomEffectLevel = 			getInt("item.powerfull_mushroom.effect_level", PowerfullMushroomEffectLevel);
+		PowerfullMushroomEffectSecond = 		getInt("item.powerfull_mushroom.effect_second", PowerfullMushroomEffectSecond);
+		PowerfullMushroomMultipleTier = 		getInt("item.powerfull_mushroom.multiple.tier", PowerfullMushroomMultipleTier);
+		PowerfullMushroomMultipleDropAmount = 	getInt("item.powerfull_mushroom.multiple.drop_amount", PowerfullMushroomMultipleDropAmount);
 
 		//バナナ
-		if(!config.contains("item.banana.tier"))config.set("item.banana.tier", BananaTier);
-		BananaTier = config.getInt("item.banana.tier");
-
-		if(!config.contains("item.banana.max_stack_size"))config.set("item.banana.max_stack_size", BananaMaxStackSize);
-		BananaMaxStackSize = config.getInt("item.banana.max_stack_size");
-
-		if(!config.contains("item.banana.effect_level"))config.set("item.banana.effect_level", BananaEffectLevel);
-		BananaEffectLevel = config.getInt("item.banana.effect_level");
-
-		if(!config.contains("item.banana.effect_second"))config.set("item.banana.effect_second", BananaEffectSecond);
-		BananaEffectSecond = config.getInt("item.banana.effect_second");
-
-		if(!config.contains("item.banana.multiple.tier"))config.set("item.banana.multiple.tier", BananaMultipleTier);
-		BananaMultipleTier = config.getInt("item.banana.multiple.tier");
-
-		if(!config.contains("item.banana.multiple.drop_amount"))config.set("item.banana.multiple.drop_amount", BananaMultipleDropAmount);
-		BananaMultipleDropAmount = config.getInt("item.banana.multiple.drop_amount");
+		BananaTier = 				getInt("item.banana.tier", BananaTier);
+		BananaMaxStackSize = 		getInt("item.banana.max_stack_size", BananaMaxStackSize);
+		BananaEffectLevel = 		getInt("item.banana.effect_level", BananaEffectLevel);
+		BananaEffectSecond = 		getInt("item.banana.effect_second", BananaEffectSecond);
+		BananaMultipleTier = 		getInt("item.banana.multiple.tier", BananaMultipleTier);
+		BananaMultipleDropAmount = 	getInt("item.banana.multiple.drop_amount", BananaMultipleDropAmount);
 
 		//にせアイテムボックス
-		if(!config.contains("item.fakeitembox.tier"))config.set("item.fakeitembox.tier", FakeItemBoxTier);
-		FakeItemBoxTier = config.getInt("item.fakeitembox.tier");
-
-		if(!config.contains("item.fakeitembox.max_stack_size"))config.set("item.fakeitembox.max_stack_size", FakeItemBoxMaxStackSize);
-		FakeItemBoxMaxStackSize = config.getInt("item.fakeitembox.max_stack_size");
-
-		if(!config.contains("item.fakeitembox.hit_damage"))config.set("item.fakeitembox.hit_damage", FakeItemBoxHitDamage);
-		FakeItemBoxHitDamage = config.getInt("item.fakeitembox.hit_damage");
-
-		if(!config.contains("item.fakeitembox.multiple.tier"))config.set("item.fakeitembox.multiple.tier", FakeItemBoxMultipleTier);
-		FakeItemBoxMultipleTier = config.getInt("item.fakeitembox.multiple.tier");
-
-		if(!config.contains("item.fakeitembox.multiple.drop_amount"))config.set("item.fakeitembox.multiple.drop_amount", FakeItemBoxMultipleDropAmount);
-		FakeItemBoxMultipleDropAmount = config.getInt("item.fakeitembox.multiple.drop_amount");
+		FakeItemBoxTier = 				getInt("item.fakeitembox.tier", FakeItemBoxTier);
+		FakeItemBoxMaxStackSize = 		getInt("item.fakeitembox.max_stack_size", FakeItemBoxMaxStackSize);
+		FakeItemBoxHitDamage = 			getInt("item.fakeitembox.hit_damage", FakeItemBoxHitDamage);
+		FakeItemBoxMultipleTier = 		getInt("item.fakeitembox.multiple.tier", FakeItemBoxMultipleTier);
+		FakeItemBoxMultipleDropAmount = getInt("item.fakeitembox.multiple.drop_amount", FakeItemBoxMultipleDropAmount);
 
 		//ミドリこうら
-		if(!config.contains("item.turtle.tier"))config.set("item.turtle.tier", TurtleTier);
-		TurtleTier = config.getInt("item.turtle.tier");
-
-		if(!config.contains("item.turtle.max_stack_size"))config.set("item.turtle.max_stack_size", TurtleMaxStackSize);
-		TurtleMaxStackSize = config.getInt("item.turtle.max_stack_size");
-
-		if(!config.contains("item.turtle.hit_damage"))config.set("item.turtle.hit_damage", TurtleHitDamage);
-		TurtleHitDamage = config.getInt("item.turtle.hit_damage");
-
-		if(!config.contains("item.turtle.multiple.tier"))config.set("item.turtle.multiple.tier", TurtleMultipleTier);
-		TurtleMultipleTier = config.getInt("item.turtle.multiple.tier");
-
-		if(!config.contains("item.turtle.multiple.drop_amount"))config.set("item.turtle.multiple.drop_amount", TurtleMultipleDropAmount);
-		TurtleMultipleDropAmount = config.getInt("item.turtle.multiple.drop_amount");
+		TurtleTier = 				getInt("item.turtle.tier", TurtleTier);
+		TurtleMaxStackSize = 		getInt("item.turtle.max_stack_size", TurtleMaxStackSize);
+		TurtleHitDamage = 			getInt("item.turtle.hit_damage", TurtleHitDamage);
+		TurtleMultipleTier = 		getInt("item.turtle.multiple.tier", TurtleMultipleTier);
+		TurtleMultipleDropAmount = 	getInt("item.turtle.multiple.drop_amount", TurtleMultipleDropAmount);
 
 		//アカこうら
-		if(!config.contains("item.redturtle.tier"))config.set("item.redturtle.tier", RedTurtleTier);
-		RedTurtleTier = config.getInt("item.redturtle.tier");
-
-		if(!config.contains("item.redturtle.max_stack_size"))config.set("item.redturtle.max_stack_size", RedTurtleMaxStackSize);
-		RedTurtleMaxStackSize = config.getInt("item.redturtle.max_stack_size");
-
-		if(!config.contains("item.redturtle.hit_damage"))config.set("item.redturtle.hit_damage", RedTurtleHitDamage);
-		RedTurtleHitDamage = config.getInt("item.redturtle.hit_damage");
-
-		if(!config.contains("item.redturtle.multiple.tier"))config.set("item.redturtle.multiple.tier", RedTurtleMultipleTier);
-		RedTurtleMultipleTier = config.getInt("item.redturtle.multiple.tier");
-
-		if(!config.contains("item.redturtle.multiple.drop_amount"))config.set("item.redturtle.multiple.drop_amount", RedTurtleMultipleDropAmount);
-		RedTurtleMultipleDropAmount = config.getInt("item.redturtle.multiple.drop_amount");
+		RedTurtleTier = 				getInt("item.redturtle.tier", RedTurtleTier);
+		RedTurtleMaxStackSize = 		getInt("item.redturtle.max_stack_size", RedTurtleMaxStackSize);
+		RedTurtleHitDamage = 			getInt("item.redturtle.hit_damage", RedTurtleHitDamage);
+		RedTurtleMultipleTier = 		getInt("item.redturtle.multiple.tier", RedTurtleMultipleTier);
+		RedTurtleMultipleDropAmount = 	getInt("item.redturtle.multiple.drop_amount", RedTurtleMultipleDropAmount);
 
 		//トゲゾーうら
-		if(!config.contains("item.thornedturtle.tier"))config.set("item.thornedturtle.tier", ThornedTurtleTier);
-		ThornedTurtleTier = config.getInt("item.thornedturtle.tier");
-
-		if(!config.contains("item.thornedturtle.max_stack_size"))config.set("item.thornedturtle.max_stack_size", ThornedTurtleMaxStackSize);
-		ThornedTurtleMaxStackSize = config.getInt("item.thornedturtle.max_stack_size");
-
-		if(!config.contains("item.thornedturtle.hit_damage"))config.set("item.thornedturtle.hit_damage", ThornedTurtleHitDamage);
-		ThornedTurtleHitDamage = config.getInt("item.thornedturtle.hit_damage");
-
-		if(!config.contains("item.thornedturtle.moving_damage"))config.set("item.thornedturtle.moving_damage", ThornedTurtleMovingDamage);
-		ThornedTurtleMovingDamage = config.getInt("item.thornedturtle.moving_damage");
-
-		if(!config.contains("item.thornedturtle.multiple.tier"))config.set("item.thornedturtle.multiple.tier", ThornedTurtleMultipleTier);
-		ThornedTurtleMultipleTier = config.getInt("item.thornedturtle.multiple.tier");
-
-		if(!config.contains("item.thornedturtle.multiple.drop_amount"))config.set("item.thornedturtle.multiple.drop_amount", ThornedTurtleMultipleDropAmount);
-		ThornedTurtleMultipleDropAmount = config.getInt("item.thornedturtle.multiple.drop_amount");
+		ThornedTurtleTier = 				getInt("item.thornedturtle.tier", ThornedTurtleTier);
+		ThornedTurtleMaxStackSize = 		getInt("item.thornedturtle.max_stack_size", ThornedTurtleMaxStackSize);
+		ThornedTurtleHitDamage = 			getInt("item.thornedturtle.hit_damage", ThornedTurtleHitDamage);
+		ThornedTurtleMovingDamage = 		getInt("item.thornedturtle.moving_damage", ThornedTurtleMovingDamage);
+		ThornedTurtleMultipleTier = 		getInt("item.thornedturtle.multiple.tier", ThornedTurtleMultipleTier);
+		ThornedTurtleMultipleDropAmount = 	getInt("item.thornedturtle.multiple.drop_amount", ThornedTurtleMultipleDropAmount);
 
 		//ゲッソー
-		if(!config.contains("item.gesso.tier"))config.set("item.gesso.tier", GessoTier);
-		GessoTier = config.getInt("item.gesso.tier");
-
-		if(!config.contains("item.gesso.max_stack_size"))config.set("item.gesso.max_stack_size", GessoMaxStackSize);
-		GessoMaxStackSize = config.getInt("item.gesso.max_stack_size");
-
-		if(!config.contains("item.gesso.effect_level"))config.set("item.gesso.effect_level", GessoEffectLevel);
-		GessoEffectLevel = config.getInt("item.gesso.effect_level");
-
-		if(!config.contains("item.gesso.effect_second"))config.set("item.gesso.effect_second", GessoEffectSecond);
-		GessoEffectSecond = config.getInt("item.gesso.effect_second");
-
-		if(!config.contains("item.gesso.multiple.tier"))config.set("item.gesso.multiple.tier", GessoMultipleTier);
-		GessoMultipleTier = config.getInt("item.gesso.multiple.tier");
-
-		if(!config.contains("item.gesso.multiple.drop_amount"))config.set("item.gesso.multiple.drop_amount", GessoMultipleDropAmount);
-		GessoMultipleDropAmount = config.getInt("item.gesso.multiple.drop_amount");
+		GessoTier = 				getInt("item.gesso.tier", GessoTier);
+		GessoMaxStackSize = 		getInt("item.gesso.max_stack_size", GessoMaxStackSize);
+		GessoEffectLevel = 			getInt("item.gesso.effect_level", GessoEffectLevel);
+		GessoEffectSecond = 		getInt("item.gesso.effect_second", GessoEffectSecond);
+		GessoMultipleTier = 		getInt("item.gesso.multiple.tier", GessoMultipleTier);
+		GessoMultipleDropAmount = 	getInt("item.gesso.multiple.drop_amount", GessoMultipleDropAmount);
 
 		//サンダー
-		if(!config.contains("item.thunder.tier"))config.set("item.thunder.tier", ThunderTier);
-		ThunderTier = config.getInt("item.thunder.tier");
-
-		if(!config.contains("item.thunder.max_stack_size"))config.set("item.thunder.max_stack_size", ThunderMaxStackSize);
-		ThunderMaxStackSize = config.getInt("item.thunder.max_stack_size");
-
-		if(!config.contains("item.thunder.hit_damage"))config.set("item.thunder.hit_damage", ThunderHitDamage);
-		ThunderHitDamage = config.getInt("item.thunder.hit_damage");
-
-		if(!config.contains("item.thunder.effect_level"))config.set("item.thunder.effect_level", ThunderEffectLevel);
-		ThunderEffectLevel = config.getInt("item.thunder.effect_level");
-
-		if(!config.contains("item.thunder.effect_second"))config.set("item.thunder.effect_second", ThunderEffectSecond);
-		ThunderEffectSecond = config.getInt("item.thunder.effect_second");
-
-		if(!config.contains("item.thunder.multiple.tier"))config.set("item.thunder.multiple.tier", ThunderMultipleTier);
-		ThunderMultipleTier = config.getInt("item.thunder.multiple.tier");
-
-		if(!config.contains("item.thunder.multiple.drop_amount"))config.set("item.thunder.multiple.drop_amount", ThunderMultipleDropAmount);
-		ThunderMultipleDropAmount = config.getInt("item.thunder.multiple.drop_amount");
+		ThunderTier = 				getInt("item.thunder.tier", ThunderTier);
+		ThunderMaxStackSize = 		getInt("item.thunder.max_stack_size", ThunderMaxStackSize);
+		ThunderHitDamage = 			getInt("item.thunder.hit_damage", ThunderHitDamage);
+		ThunderEffectLevel = 		getInt("item.thunder.effect_level", ThunderEffectLevel);
+		ThunderEffectSecond = 		getInt("item.thunder.effect_second", ThunderEffectSecond);
+		ThunderMultipleTier = 		getInt("item.thunder.multiple.tier", ThunderMultipleTier);
+		ThunderMultipleDropAmount = getInt("item.thunder.multiple.drop_amount", ThunderMultipleDropAmount);
 
 		//スーパースター
-		if(!config.contains("item.star.tier"))config.set("item.star.tier", StarTier);
-		StarTier = config.getInt("item.star.tier");
-
-		if(!config.contains("item.star.hit_damage"))config.set("item.star.hit_damage", StarHitDamage);
-		StarHitDamage = config.getInt("item.star.hit_damage");
-
-		if(!config.contains("item.star.max_stack_size"))config.set("item.star.max_stack_size", StarMaxStackSize);
-		StarMaxStackSize = config.getInt("item.star.max_stack_size");
-
-		if(!config.contains("item.star.walk_speed"))config.set("item.star.walk_speed", StarWalkSpeed);
-		StarWalkSpeed = (float) config.getDouble("item.star.walk_speed");
-
-		if(!config.contains("item.star.effect_second"))config.set("item.star.effect_second", StarEffectSecond);
-		StarEffectSecond = config.getInt("item.star.effect_second");
-
-		if(!config.contains("item.star.multiple.tier"))config.set("item.star.multiple.tier", StarMultipleTier);
-		StarMultipleTier = config.getInt("item.star.multiple.tier");
-
-		if(!config.contains("item.star.multiple.drop_amount"))config.set("item.star.multiple.drop_amount", StarMultipleDropAmount);
-		StarMultipleDropAmount = config.getInt("item.star.multiple.drop_amount");
+		StarTier = 					getInt("item.star.tier", StarTier);
+		StarHitDamage = 			getInt("item.star.hit_damage", StarHitDamage);
+		StarMaxStackSize = 			getInt("item.star.max_stack_size", StarMaxStackSize);
+		StarWalkSpeed = 	(float) getDouble("item.star.walk_speed", StarWalkSpeed);
+		StarEffectSecond = 			getInt("item.star.effect_second", StarEffectSecond);
+		StarMultipleTier = 			getInt("item.star.multiple.tier", StarMultipleTier);
+		StarMultipleDropAmount = 	getInt("item.star.multiple.drop_amount", StarMultipleDropAmount);
 
 		//テレサ
-		if(!config.contains("item.teresa.tier"))config.set("item.teresa.tier", TeresaTier);
-		TeresaTier = config.getInt("item.teresa.tier");
-
-		if(!config.contains("item.teresa.max_stack_size"))config.set("item.teresa.max_stack_size", TeresaMaxStackSize);
-		TeresaMaxStackSize = config.getInt("item.teresa.max_stack_size");
-
-		if(!config.contains("item.teresa.effect_second"))config.set("item.teresa.effect_second", TeresaEffectSecond);
-		TeresaEffectSecond = config.getInt("item.teresa.effect_second");
-
-		if(!config.contains("item.teresa.multiple.tier"))config.set("item.teresa.multiple.tier", TeresaMultipleTier);
-		TeresaMultipleTier = config.getInt("item.teresa.multiple.tier");
-
-		if(!config.contains("item.teresa.multiple.drop_amount"))config.set("item.teresa.multiple.drop_amount", TeresaMultipleDropAmount);
-		TeresaMultipleDropAmount = config.getInt("item.teresa.multiple.drop_amount");
+		TeresaTier = 				getInt("item.teresa.tier", TeresaTier);
+		TeresaMaxStackSize = 		getInt("item.teresa.max_stack_size", TeresaMaxStackSize);
+		TeresaEffectSecond = 		getInt("item.teresa.effect_second", TeresaEffectSecond);
+		TeresaMultipleTier = 		getInt("item.teresa.multiple.tier", TeresaMultipleTier);
+		TeresaMultipleDropAmount = 	getInt("item.teresa.multiple.drop_amount", TeresaMultipleDropAmount);
 
 		//キラー
-		if(!config.contains("item.killer.tier"))config.set("item.killer.tier", KillerTier);
-		KillerTier = config.getInt("item.killer.tier");
-
-		if(!config.contains("item.killer.max_stack_size"))config.set("item.killer.max_stack_size", KillerMaxStackSize);
-		KillerMaxStackSize = config.getInt("item.killer.max_stack_size");
-
-		if(!config.contains("item.killer.effect_second"))config.set("item.killer.effect_second", KillerEffectSecond);
-		KillerEffectSecond = config.getInt("item.killer.effect_second");
-
-		if(!config.contains("item.killer.moving_damage"))config.set("item.killer.moving_damage", KillerMovingDamage);
-		KillerMovingDamage = config.getInt("item.killer.moving_damage");
-
-		if(!config.contains("item.killer.multiple.tier"))config.set("item.killer.multiple.tier", KillerMultipleTier);
-		KillerMultipleTier = config.getInt("item.killer.multiple.tier");
-
-		if(!config.contains("item.killer.multiple.drop_amount"))config.set("item.killer.multiple.drop_amount", KillerMultipleDropAmount);
-		KillerMultipleDropAmount = config.getInt("item.killer.multiple.drop_amount");
+		KillerTier = 				getInt("item.killer.tier", KillerTier);
+		KillerMaxStackSize = 		getInt("item.killer.max_stack_size", KillerMaxStackSize);
+		KillerEffectSecond = 		getInt("item.killer.effect_second", KillerEffectSecond);
+		KillerMovingDamage = 		getInt("item.killer.moving_damage", KillerMovingDamage);
+		KillerMultipleTier = 		getInt("item.killer.multiple.tier", KillerMultipleTier);
+		KillerMultipleDropAmount = 	getInt("item.killer.multiple.drop_amount", KillerMultipleDropAmount);
 
 		reloadPermissionMemver();
 		reloadItemMember();
@@ -712,77 +502,76 @@ public final class Settings{
 	}
 
 	private static void reloadPermissionMemver(){
-		Permission.kart_ride.reload(Settings.EnablePermissionKartRide, Settings.EnablePermissionKartRide);
-		Permission.kart_drift.reload(Settings.EnablePermissionKartDrift, Settings.EnablePermissionKartDrift);
-		Permission.op_kart_remove.reload(Settings.EnableOPPermissionKartRemove, Settings.EnableOPPermissionKartRemove);
+		Permission.kart_ride.reload(					EnablePermissionKartRide, 			EnablePermissionKartRide);
+		Permission.kart_drift.reload(					EnablePermissionKartDrift, 			EnablePermissionKartDrift);
+		Permission.op_kart_remove.reload(				EnableOPPermissionKartRemove, 		EnableOPPermissionKartRemove);
 
-		Permission.cmd_ka.reload(false, false);
-		Permission.cmd_entry.reload(Settings.EnablePermissionCMDEntry, Settings.EnablePermissionCMDOtherEntry);
-		Permission.cmd_exit.reload(Settings.EnablePermissionCMDExit, Settings.EnablePermissionCMDOtherExit);
-		Permission.cmd_character.reload(Settings.EnablePermissionCMDCharacter, Settings.EnablePermissionCMDOtherCharacter);
-		//Permission.cmd_characterreset.reload(Settings.EnablePermissionCMDCharacterReset, Settings.EnablePermissionCMDOtherCharacterReset);
-		Permission.cmd_ride.reload(Settings.EnablePermissionCMDRide, Settings.EnablePermissionCMDOtherRide);
-		Permission.cmd_leave.reload(Settings.EnablePermissionCMDLeave, Settings.EnablePermissionCMDOtherLeave);
-		Permission.cmd_ranking.reload(Settings.EnablePermissionCMDRanking, Settings.EnablePermissionCMDOtherRanking);
+		Permission.cmd_ka.reload(						false, false);
+		Permission.cmd_entry.reload(					EnablePermissionCMDEntry, 			EnablePermissionCMDOtherEntry);
+		Permission.cmd_exit.reload(						EnablePermissionCMDExit, 			EnablePermissionCMDOtherExit);
+		Permission.cmd_character.reload(				EnablePermissionCMDCharacter, 		EnablePermissionCMDOtherCharacter);
+		Permission.cmd_characterreset.reload(			EnablePermissionCMDCharacterReset, 	EnablePermissionCMDOtherCharacterReset);
+		Permission.cmd_ride.reload(						EnablePermissionCMDRide, 			EnablePermissionCMDOtherRide);
+		Permission.cmd_leave.reload(					EnablePermissionCMDLeave, 			EnablePermissionCMDOtherLeave);
+		Permission.cmd_ranking.reload(					EnablePermissionCMDRanking, 		EnablePermissionCMDOtherRanking);
 
-		Permission.op_cmd_reload.reload(Settings.EnableOPPermissionCMDReload, Settings.EnableOPPermissionCMDReload);
-		//Permission.op_cmd_checkpointtool.reload(Settings.EnableOPPermissionCMDCheckPointTool, Settings.EnableOPPermissionCMDCheckPointTool);
-		Permission.op_cmd_itemboxtool.reload(Settings.EnableOPPermissionCMDItemBoxTool, Settings.EnableOPPermissionCMDItemBoxTool);
+		Permission.op_cmd_reload.reload(				EnableOPPermissionCMDReload, 		EnableOPPermissionCMDReload);
+		Permission.op_cmd_itemboxtool.reload(			EnableOPPermissionCMDItemBoxTool, 	EnableOPPermissionCMDItemBoxTool);
 
-		Permission.itemcmd_mushroom.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_powerfullmushroom.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_banana.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_fakeitembox.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_thunder.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_star.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_turtle.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_redturtle.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_thornedturtle.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_teresa.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_gesso.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
-		Permission.itemcmd_killer.reload(Settings.EnablePermissionCMDItem, Settings.EnablePermissionCMDOtherItem);
+		Permission.itemcmd_mushroom.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_powerfullmushroom.reload(	EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_banana.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_fakeitembox.reload(			EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_thunder.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_star.reload(					EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_turtle.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_redturtle.reload(			EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_thornedturtle.reload(		EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_teresa.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_gesso.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+		Permission.itemcmd_killer.reload(				EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
 
-		Permission.use_mushroom.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_powerfullmushroom.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_banana.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_fakeitembox.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_thunder.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_star.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_turtle.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_redturtle.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_thornedturtle.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_teresa.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_gesso.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.use_killer.reload(Settings.EnablePermissionUseItem, Settings.EnablePermissionUseItem);
-		Permission.interact_boostrail.reload(Settings.EnablePermissionInteractObject, Settings.EnablePermissionInteractObject);
-		Permission.interact_banana.reload(Settings.EnablePermissionInteractObject, Settings.EnablePermissionInteractObject);
-		Permission.interact_itembox.reload(Settings.EnablePermissionInteractObject, Settings.EnablePermissionInteractObject);
-		Permission.interact_fakeitembox.reload(Settings.EnablePermissionInteractObject, Settings.EnablePermissionInteractObject);
+		Permission.use_mushroom.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_powerfullmushroom.reload(		EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_banana.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_fakeitembox.reload(				EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_thunder.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_star.reload(						EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_turtle.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_redturtle.reload(				EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_thornedturtle.reload(			EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_teresa.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_gesso.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.use_killer.reload(					EnablePermissionUseItem, EnablePermissionUseItem);
+		Permission.interact_boostrail.reload(			EnablePermissionInteractObject, EnablePermissionInteractObject);
+		Permission.interact_banana.reload(				EnablePermissionInteractObject, EnablePermissionInteractObject);
+		Permission.interact_itembox.reload(				EnablePermissionInteractObject, EnablePermissionInteractObject);
+		Permission.interact_fakeitembox.reload(			EnablePermissionInteractObject, EnablePermissionInteractObject);
 	}
 
 	public static void reloadItemMember(){
-		EnumItem.Star.reload(StarTier, 1, StarMaxStackSize);
-		EnumItem.StarMultiple.reload(StarMultipleTier, StarMultipleDropAmount, StarMaxStackSize);
-		EnumItem.Mushroom.reload(MushroomTier, 1, MushroomMaxStackSize);
-		EnumItem.MushroomMultiple.reload(MushroomMultipleTier, MushroomMultipleDropAmount, MushroomMaxStackSize);
-		EnumItem.PowerfullMushroom.reload(PowerfullMushroomTier, 1, PowerfullMushroomMaxStackSize);
-		EnumItem.PowerfullMushroomMultiple.reload(PowerfullMushroomMultipleTier, PowerfullMushroomMultipleDropAmount, PowerfullMushroomMaxStackSize);
-		EnumItem.Turtle.reload(TurtleTier, 1, TurtleMaxStackSize);
-		EnumItem.Turtle.reload(TurtleMultipleTier, TurtleMultipleDropAmount, TurtleMaxStackSize);
-		EnumItem.RedTurtle.reload(RedTurtleTier, 1, RedTurtleMaxStackSize);
-		EnumItem.RedTurtleMultiple.reload(RedTurtleMultipleTier, RedTurtleMultipleDropAmount, RedTurtleMaxStackSize);
-		EnumItem.ThornedTurtle.reload(ThornedTurtleTier, 1, ThornedTurtleMaxStackSize);
-		EnumItem.ThornedTurtleMultiple.reload(ThornedTurtleMultipleTier, ThornedTurtleMultipleDropAmount, ThornedTurtleMaxStackSize);
-		EnumItem.Banana.reload(BananaTier, 1, BananaMaxStackSize);
-		EnumItem.BananaMultiple.reload(BananaMultipleTier, BananaMultipleDropAmount, BananaMaxStackSize);
-		EnumItem.FakeItembox.reload(FakeItemBoxTier, 1, FakeItemBoxMaxStackSize);
-		EnumItem.FakeItemboxMultiple.reload(FakeItemBoxMultipleTier, FakeItemBoxMultipleDropAmount, FakeItemBoxMaxStackSize);
-		EnumItem.Thunder.reload(ThunderTier, 1, ThunderMaxStackSize);
-		EnumItem.ThunderMultiple.reload(ThunderMultipleTier, ThunderMultipleDropAmount, ThunderMaxStackSize);
-		EnumItem.Teresa.reload(TeresaTier, 1, TeresaMaxStackSize);
-		EnumItem.TeresaMultiple.reload(TeresaMultipleTier, TeresaMultipleDropAmount, TeresaMaxStackSize);
-		EnumItem.Gesso.reload(GessoTier, 1, GessoMaxStackSize);
-		EnumItem.GessoMultiple.reload(GessoMultipleTier, GessoMultipleDropAmount, GessoMaxStackSize);
+		EnumItem.Star.reload(						StarTier, 						1, 										StarMaxStackSize);
+		EnumItem.StarMultiple.reload(				StarMultipleTier, 				StarMultipleDropAmount, 				StarMaxStackSize);
+		EnumItem.Mushroom.reload(					MushroomTier, 					1, 										MushroomMaxStackSize);
+		EnumItem.MushroomMultiple.reload(			MushroomMultipleTier, 			MushroomMultipleDropAmount, 			MushroomMaxStackSize);
+		EnumItem.PowerfullMushroom.reload(			PowerfullMushroomTier, 			1, 										PowerfullMushroomMaxStackSize);
+		EnumItem.PowerfullMushroomMultiple.reload(	PowerfullMushroomMultipleTier, 	PowerfullMushroomMultipleDropAmount, 	PowerfullMushroomMaxStackSize);
+		EnumItem.Turtle.reload(						TurtleTier, 					1, 										TurtleMaxStackSize);
+		EnumItem.Turtle.reload(						TurtleMultipleTier, 			TurtleMultipleDropAmount, 				TurtleMaxStackSize);
+		EnumItem.RedTurtle.reload(					RedTurtleTier, 					1, 										RedTurtleMaxStackSize);
+		EnumItem.RedTurtleMultiple.reload(			RedTurtleMultipleTier, 			RedTurtleMultipleDropAmount, 			RedTurtleMaxStackSize);
+		EnumItem.ThornedTurtle.reload(				ThornedTurtleTier, 				1, 										ThornedTurtleMaxStackSize);
+		EnumItem.ThornedTurtleMultiple.reload(		ThornedTurtleMultipleTier, 		ThornedTurtleMultipleDropAmount, 		ThornedTurtleMaxStackSize);
+		EnumItem.Banana.reload(						BananaTier, 					1, 										BananaMaxStackSize);
+		EnumItem.BananaMultiple.reload(				BananaMultipleTier, 			BananaMultipleDropAmount, 				BananaMaxStackSize);
+		EnumItem.FakeItembox.reload(				FakeItemBoxTier, 				1, 										FakeItemBoxMaxStackSize);
+		EnumItem.FakeItemboxMultiple.reload(		FakeItemBoxMultipleTier, 		FakeItemBoxMultipleDropAmount, 			FakeItemBoxMaxStackSize);
+		EnumItem.Thunder.reload(					ThunderTier, 					1, 										ThunderMaxStackSize);
+		EnumItem.ThunderMultiple.reload(			ThunderMultipleTier, 			ThunderMultipleDropAmount, 				ThunderMaxStackSize);
+		EnumItem.Teresa.reload(						TeresaTier, 					1, 										TeresaMaxStackSize);
+		EnumItem.TeresaMultiple.reload(				TeresaMultipleTier, 			TeresaMultipleDropAmount, 				TeresaMaxStackSize);
+		EnumItem.Gesso.reload(						GessoTier, 						1, 										GessoMaxStackSize);
+		EnumItem.GessoMultiple.reload(				GessoMultipleTier, 				GessoMultipleDropAmount, 				GessoMaxStackSize);
 	}
 
 	//〓〓	ファイル保存		〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -801,6 +590,26 @@ public final class Settings{
 		} catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+
+	public static boolean getBoolean(String path, Boolean defaultvalue){
+		if(!config.contains(path))config.set(path, defaultvalue);
+		return config.getBoolean(path);
+	}
+
+	public static int getInt(String path, int defaultvalue){
+		if(!config.contains(path))config.set(path, defaultvalue);
+		return config.getInt(path);
+	}
+
+	public static double getDouble(String path, double defaultvalue){
+		if(!config.contains(path))config.set(path, defaultvalue);
+		return config.getDouble(path);
+	}
+
+	public static String getString(String path, String defaultvalue){
+		if(!config.contains(path))config.set(path, defaultvalue);
+		return config.getString(path);
 	}
 
 	public static boolean isStartBlock(Block b){
