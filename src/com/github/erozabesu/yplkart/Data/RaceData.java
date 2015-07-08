@@ -39,6 +39,7 @@ public final class RaceData{
 	private static int matchingtime = 30;
 	private static int menutime = 30;
 	private static int limittime = 300;
+	private static boolean broadcastboalmessage = false;
 
 	public RaceData(YPLKart plugin){
 		pl = plugin;
@@ -247,6 +248,13 @@ public final class RaceData{
 		return config.getInt(circuitname + ".menutime");
 	}
 
+	public static boolean getBroadcastGoalMessage(String circuitname){
+		if(!getCircuitSet().contains(circuitname))
+			return false;
+
+		return config.getBoolean(circuitname + ".broadcastgoalmessage", broadcastboalmessage);
+	}
+
 	public static int getLimitTime(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
 			return limittime;
@@ -414,6 +422,7 @@ public final class RaceData{
 						"    " + "#Greenレースが自動終了するまでの時間 ： #White" + getLimitTime(circuitname) + "#Green (秒)\n" +
 						"    " + "#Greenキャラクター・カートを選択できる猶予時間 ： #White" + getMenuTime(circuitname) + "#Green (秒)\n" +
 						"    " + "#Greenレースへの参加・辞退を決定できる猶予時間 ： #White" + getMatchingTime(circuitname) + "#Green (秒)\n" +
+						"    " + "#Green順位・ラップタイムのサーバー全体通知 ： #White" + getBroadcastGoalMessage(circuitname) + "\n" +
 						"    " + "#Greenレース開始座標 ： " + "\n" +
 						"#Green" + "            " + "x #White" + l.getBlockX() + "#Green / y #White" + l.getBlockY() + "#Green / z #White" + l.getBlockZ() + "\n" +
 						"#Green" + "            " + "yaw #White" + l.getYaw() + "#Green / pitch #White" + l.getPitch() + "\n";
@@ -520,6 +529,16 @@ public final class RaceData{
 			Location l = p.getLocation();
 			config.set(circuitname + ".limittime", second);
 			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenのレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
+			saveConfigFile();
+		}
+	}
+
+	public static void setBroadcastGoalMessage(Player p, String circuitname, boolean flag){
+		if(!getCircuitSet().contains(circuitname)){
+			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		}else{
+			config.set(circuitname + ".broadcastgoalmessage", flag);
+			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Green順位・ラップタイムのサーバー全体通知を#White" + flag + "#Greenに設定しました");
 			saveConfigFile();
 		}
 	}

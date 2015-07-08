@@ -31,6 +31,7 @@ public class CMD implements CommandExecutor{
 											+ "/ka circuit setlimittime {circuit name} {number of second} :\n"
 											+ "/ka circuit setposition {circuit name} :\n"
 											+ "/ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :\n"
+											+ "/ka circuit broadcastgoal {circuit name} {true or false} :\n"
 											+ "/ka circuit rename {circuit name} {new circuitname} :\n"
 											+ "/ka circuit list :";
 
@@ -201,6 +202,10 @@ public class CMD implements CommandExecutor{
 
 	protected void messageInvalidNumber(Player p){
 		Util.sendMessage(p, "[header]#Red数値を入力して下さい");
+	}
+
+	protected void messageInvalidBoolean(Player p){
+		Util.sendMessage(p, "[header]#Whitetrue#Red、もしくは#Whitefalse#Redと入力して下さい");
 	}
 
 	protected void messageInvalidCircuit(Player p, String circuitname){
