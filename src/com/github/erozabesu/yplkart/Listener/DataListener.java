@@ -116,6 +116,22 @@ public class DataListener extends RaceManager implements Listener {
 		getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
 	}
 
+	//スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
+	@EventHandler
+	public void cancelMove(PlayerMoveEvent e){
+		if(!Settings.isEnable(e.getFrom().getWorld()))return;
+		if(isStandBy(e.getPlayer().getUniqueId()) && !isRacing(e.getPlayer().getUniqueId())){
+			if(!e.getFrom().equals(e.getTo())){
+				Location from = e.getFrom();
+				Location to = e.getTo();
+
+				if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())return;
+				e.getPlayer().teleport(Util.adjustBlockLocation(from).add(0,1,0));
+				e.setCancelled(true);
+			}
+		}
+	}
+
 	@EventHandler
 	public void saveLapcount(PlayerMoveEvent e){
 		if(!Settings.isEnable(e.getFrom().getWorld()))return;
