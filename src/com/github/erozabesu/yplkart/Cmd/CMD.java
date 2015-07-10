@@ -5,14 +5,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
-import com.github.erozabesu.yplkart.Enum.EnumKarts;
-import com.github.erozabesu.yplkart.Enum.Permission;
-import com.github.erozabesu.yplkart.Utils.Util;
 
 public class CMD implements CommandExecutor{
 	CMDAbstract cmd;
@@ -157,154 +152,13 @@ public class CMD implements CommandExecutor{
 				this.cmd.reload();
 			else if(args[0].equalsIgnoreCase("item"))
 				this.cmd.additem(null, null);
-			else if(args[0].equalsIgnoreCase("mushroom"))
-				this.cmd.additem(EnumItem.Mushroom.getItem(), Permission.itemcmd_mushroom);
-			else if(args[0].equalsIgnoreCase("powerfullmushroom"))
-				this.cmd.additem(EnumItem.PowerfullMushroom.getItem(), Permission.itemcmd_powerfullmushroom);
-			else if(args[0].equalsIgnoreCase("turtle"))
-				this.cmd.additem(EnumItem.Turtle.getItem(), Permission.itemcmd_turtle);
-			else if(args[0].equalsIgnoreCase("redturtle"))
-				this.cmd.additem(EnumItem.RedTurtle.getItem(), Permission.itemcmd_redturtle);
-			else if(args[0].equalsIgnoreCase("thornedturtle"))
-				this.cmd.additem(EnumItem.ThornedTurtle.getItem(), Permission.itemcmd_thornedturtle);
-			else if(args[0].equalsIgnoreCase("banana"))
-				this.cmd.additem(EnumItem.Banana.getItem(), Permission.itemcmd_banana);
-			else if(args[0].equalsIgnoreCase("fakeitembox"))
-				this.cmd.additem(EnumItem.FakeItembox.getItem(), Permission.itemcmd_fakeitembox);
-			else if(args[0].equalsIgnoreCase("thunder"))
-				this.cmd.additem(EnumItem.Thunder.getItem(), Permission.itemcmd_thunder);
-			else if(args[0].equalsIgnoreCase("star"))
-				this.cmd.additem(EnumItem.Star.getItem(), Permission.itemcmd_star);
-			else if(args[0].equalsIgnoreCase("teresa"))
-				this.cmd.additem(EnumItem.Teresa.getItem(), Permission.itemcmd_teresa);
-			else if(args[0].equalsIgnoreCase("gesso"))
-				this.cmd.additem(EnumItem.Gesso.getItem(), Permission.itemcmd_gesso);
-			else if(args[0].equalsIgnoreCase("killer"))
-				this.cmd.additem(EnumItem.Killer.getItem(), Permission.itemcmd_killer);
-			else if(args[0].equalsIgnoreCase("itemboxtool"))
-				this.cmd.additem(EnumItem.ItemBox.getItem(), Permission.op_cmd_itemboxtool);
-			else if(args[0].equalsIgnoreCase("itemboxtooltier2"))
-				this.cmd.additem(EnumItem.ItemBoxTier2.getItem(), Permission.op_cmd_itemboxtool);
-			else if(args[0].equalsIgnoreCase("fakeitemboxtool"))
-				this.cmd.additem(EnumItem.ItemBoxFake.getItem(), Permission.op_cmd_itemboxtool);
+			else{
+				EnumItem item = null;
+				if((item = EnumItem.getEnumItem(args[0])) != null)
+					this.cmd.additem(item.getItem(), item.getPermission());
+			}
 			return true;
 		}
 		return false;
-	}
-
-	protected void messageNoPlayer(Player p){
-		Util.sendMessage(p, "[header]#Red指定したプレイヤーはログインしていません");
-	}
-
-	protected void messageInvalidWorld(Player p){
-		Util.sendMessage(p, "[header]#Red指定したワールドは存在しません");
-	}
-
-	protected void messageInvalidNumber(Player p){
-		Util.sendMessage(p, "[header]#Red数値を入力して下さい");
-	}
-
-	protected void messageInvalidBoolean(Player p){
-		Util.sendMessage(p, "[header]#Whitetrue#Red、もしくは#Whitefalse#Redと入力して下さい");
-	}
-
-	protected void messageInvalidCircuit(Player p, String circuitname){
-		Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
-	}
-
-	protected void messageInvalidCharacter(Player p){
-		Util.sendMessage(p, "[header]#Redキャラクター名が正しくありません\n#White" + EnumCharacter.getCharacterList());
-	}
-
-	protected void messageInvalidKart(Player p){
-		Util.sendMessage(p, "[header]#Redカート名が正しくありません\n#White" + EnumKarts.getKartList());
-	}
-
-	protected void messageDisplay(Player p, EnumKarts kart){
-		Util.sendMessage(p, "[header]ディスプレイ専用の#White" + kart.getName() + "カート#Greenを設置しました");
-	}
-
-	protected void messageMenuAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーにメニューを表示しました");
-	}
-
-	protected void messageMenuOther(Player p, Player other){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんにメニューを表示しました");
-	}
-
-	protected void messageEntryOther(Player p, Player other, String circuitname){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
-	}
-
-	protected void messageEntryAll(Player p, String circuitname){
-		Util.sendMessage(p, "[header]全プレイヤーをサーキット：#Gold" + circuitname + "#Greenにエントリーしました");
-	}
-
-	protected void messageExitAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーのエントリーを取り消しました");
-	}
-
-	protected void messageExitOther(Player p, Player other){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのエントリーを取り消しました");
-	}
-
-	protected void messageCharacterAll(Player p, EnumCharacter character){
-		Util.sendMessage(p, "[header]全プレイヤーのキャラクターを#White" + character.getName() + "#Greenにセットしました");
-	}
-
-	protected void messageCharacterRandomAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーのキャラクターを#Whiteランダム#Greenにセットしました");
-	}
-
-	protected void messageCharacterOther(Player p, Player other, EnumCharacter character){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのキャラクターを#White" + character.getName() + "#Greenにセットしました");
-	}
-
-	protected void messageCharacterResetAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーのキャラクター選択を取り消しました");
-	}
-
-	protected void messageCharacterResetOther(Player p, Player other){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんのキャラクター選択を取り消しました");
-	}
-
-	protected void messageRideAll(Player p, EnumKarts kart){
-		Util.sendMessage(p, "[header]全プレイヤーを#White" + kart.getName() + "カート#Greenに搭乗させました");
-	}
-
-	protected void messageRideRandomAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーを#Whiteランダムカート#Greenに搭乗させました");
-	}
-
-	protected void messageRideOther(Player p, Player other, EnumKarts kart){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんを#White" + kart.getName() + "カート#Greenに搭乗させました");
-	}
-
-	protected void messageLeaveAll(Player p){
-		Util.sendMessage(p, "[header]全プレイヤーの搭乗を解除しました");
-	}
-
-	protected void messageLeaveOther(Player p, Player other){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんの搭乗を解除しました");
-	}
-
-	protected void messageRankingOther(Player p, Player other, String circuitname){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
-	}
-
-	protected void messageRankingAll(Player p, String circuitname){
-		Util.sendMessage(p, "[header]全プレイヤーにサーキット：#Gold" + circuitname + "#Greenのランキングを表示しました");
-	}
-
-	protected void messageAddItem(Player p, ItemStack item){
-		Util.sendMessage(p, "[header]#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
-	}
-
-	protected void messageAddItemOther(Player p, Player other, ItemStack item){
-		Util.sendMessage(p, "[header]#White" + other.getName() + "#Greenさんに#White" +  item.getItemMeta().getDisplayName() + "#Greenを配布しました");
-	}
-
-	protected void messageAddItemAll(Player p, ItemStack item){
-		Util.sendMessage(p, "[header]全プレイヤーに#White" + item.getItemMeta().getDisplayName() + "#Greenを配布しました");
 	}
 }

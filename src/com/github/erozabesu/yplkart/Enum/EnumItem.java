@@ -3,6 +3,7 @@ package com.github.erozabesu.yplkart.Enum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -20,9 +21,9 @@ import com.github.erozabesu.yplkart.Data.Settings;
 public enum EnumItem{
 	CheckPoint(					Permission.op_cmd_circuit,			Material.NETHER_STAR,	(byte)0,	0,										1, 												64, "チェックポイントツール", ""),
 	MarioHat(					null,								Material.REDSTONE_BLOCK,(byte)0,	0,										1, 												64, "赤い帽子", "ひげのおじさんになれる赤い帽子。"),
-	ItemBox(					Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "アイテムボックスツール", "アイテムボックスを設置します。"),
-	ItemBoxTier2(				Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "高級アイテムボックスツール", "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
-	ItemBoxFake(				Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "にせアイテムボックスツール", "にせアイテムボックスを設置します。当たっても復活します。"),
+	ItemBoxTool(				Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "アイテムボックスツール", "アイテムボックスを設置します。"),
+	ItemBoxToolTier2(			Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "高級アイテムボックスツール", "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
+	FakeItemBoxTool(			Permission.op_cmd_itemboxtool,		Material.INK_SACK,		(byte)0,	0,										1, 												64, "にせアイテムボックスツール", "にせアイテムボックスを設置します。当たっても復活します。"),
 	Menu(						null,								Material.GOLD_INGOT,	(byte)0,	0,										1, 												64, "メニューを開きます", ""),
 
 	Star(						Permission.use_star,				Material.NETHER_STAR,	(byte)0,	Settings.StarTier,						1, 												Settings.StarMaxStackSize, "スーパースター","一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
@@ -59,6 +60,7 @@ public enum EnumItem{
 	private int maxstack;
 	private String name;
 	private String lore;
+	private static List<String> ignorelist = Arrays.asList("CheckPoint", "MarioHat", "Menu", "Multiple");
 
 	private EnumItem(Permission perm, Material material, byte data, int tier, int amount, int maxstack, String name, String lore){
 		this.perm = perm;
@@ -129,7 +131,7 @@ public enum EnumItem{
 
 	public Boolean isSimilar(ItemStack i){
 		if(i == null)return false;
-		if(getName().equalsIgnoreCase("チェックポイントツール")){
+		if(getName().equalsIgnoreCase(CheckPoint.getName())){
 			if(i.getType().equals(getType()))
 				if(i.getData().getData() == getData())
 					if(i.getItemMeta().hasDisplayName() && i.getItemMeta().hasLore())
@@ -144,6 +146,43 @@ public enum EnumItem{
 							return true;
 		}
 		return false;
+	}
+
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static String getItemList(){
+		String list = null;
+		for(EnumItem item : values()){
+			if(ignorelist.contains(item.name()))continue;
+			if(list == null)
+				list = item.name();
+			else
+				list += ", " + item.name();
+		}
+		return list;
+	}
+
+	public static List<String> getItemArrayList(){
+		List<String> list = new ArrayList<String>();
+		for(EnumItem item : values()){
+			if(ignorelist.contains(item.name()))continue;
+			list.add(item.name());
+		}
+		return list;
+	}
+
+	public static EnumItem getEnumItem(String name){
+		for(EnumItem item : values()){
+			if(item.name().equalsIgnoreCase(name))
+				return item;
+			else if(item.name().equalsIgnoreCase(name.toLowerCase()))
+				return item;
+			else if(item.name().toLowerCase().equalsIgnoreCase(name))
+				return item;
+			else if(item.name().toLowerCase().equalsIgnoreCase(name.toLowerCase()))
+				return item;
+		}
+		return null;
 	}
 
 	public static ArrayList<EnumItem> getItemfromTier(int grade){
@@ -174,6 +213,17 @@ public enum EnumItem{
 		return itemlist.get(new Random().nextInt(itemlist.size())).getItem();
 	}
 
+	public static ItemStack getCheckPointTool(EnumItem item, String circuitname){
+		ItemStack i = new ItemStack(item.getType(), item.getAmount(), (short)0, item.getData());
+		ItemMeta meta = i.getItemMeta();
+		meta.setDisplayName(ChatColor.GREEN + item.getName());
+		meta.setLore(Arrays.asList(circuitname));
+		i.setItemMeta(meta);
+		return i;
+	}
+
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
 	public static Boolean isKeyItem(ItemStack i){
 		for(EnumItem item : values()){
 			if(item.isSimilar(i))
@@ -181,6 +231,8 @@ public enum EnumItem{
 		}
 		return false;
 	}
+
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static void removeAllKeyItems(Player p){
 		PlayerInventory inv = p.getInventory();
@@ -217,14 +269,7 @@ public enum EnumItem{
 		p.updateInventory();
 	}
 
-	public static ItemStack getCheckPointTool(EnumItem item, String circuitname){
-		ItemStack i = new ItemStack(item.getType(), item.getAmount(), (short)0, item.getData());
-		ItemMeta meta = i.getItemMeta();
-		meta.setDisplayName(ChatColor.GREEN + item.getName());
-		meta.setLore(Arrays.asList(circuitname));
-		i.setItemMeta(meta);
-		return i;
-	}
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	private static void adjustInventoryfromMaxstacksize(Player p){
 		Inventory inv = p.getInventory();
