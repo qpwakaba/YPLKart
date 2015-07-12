@@ -277,7 +277,6 @@ public class Race {
 
 		new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!" + ChatColor.GOLD, "O", 1, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		String message = Message.titleGoalRank.getMessage(new Object[]{new Number[]{RaceManager.getGoalPlayer(entry).size(), (double)(currentmillisecond/1000)}});
-		System.out.println(message);
 		PacketUtil.sendTitle(getPlayer(), message, 10, 100, 10, true);
 		setPoint(getPassedCheckPoint().size() + (RaceManager.getRacingPlayer(entry).size())*10);
 
