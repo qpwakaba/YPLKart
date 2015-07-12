@@ -76,9 +76,9 @@ public final class RaceData{
 			config.set(circuitname + ".z", l.getZ());
 			config.set(circuitname + ".yaw", l.getYaw());
 			config.set(circuitname + ".pitch", l.getPitch());
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenを作成しました");
+			Message.cmdCircuitCreate.sendMessage(p, circuitname);
 		}else{
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは既に作成済みです");
+			Message.cmdCircuitAlreadyExist.sendMessage(p, circuitname);
 		}
 		saveConfigFile();
 	}
@@ -91,9 +91,9 @@ public final class RaceData{
 			config.set(circuitname + ".z", z);
 			config.set(circuitname + ".yaw", yaw);
 			config.set(circuitname + ".pitch", pitch);
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenを作成しました");
+			Message.cmdCircuitCreate.sendMessage(p, circuitname);
 		}else{
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは既に作成済みです");
+			Message.cmdCircuitAlreadyExist.sendMessage(p, circuitname);
 		}
 		saveConfigFile();
 	}
@@ -109,44 +109,44 @@ public final class RaceData{
 					}
 				}
 				saveConfigFile();
-				Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + circuitname + "#Greenを削除しました");
+				Message.cmdCircuitDelete.sendMessage(p, circuitname);
 				return;
 			}
 		}
-		Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+		Message.invalidCircuit.sendMessage(p, circuitname);
 	}
 
 	public static void listCricuit(Player p){
-		Util.sendMessage(p, "[header]#GoldCircuit List：\n" + getCircuitList());
+		Message.cmdCircuitList.sendMessage(p);
 	}
 
 	public static void editCircuit(Player p, String circuitname){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p, circuitname);
 		}else{
 			p.getInventory().addItem(EnumItem.getCheckPointTool(EnumItem.CheckPoint, circuitname));
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenチェックポイントツールを配布しました");
+			Message.cmdCircuitEdit.sendMessage(p, circuitname);
 		}
 	}
 
-	public static void renameCircuit(Player p, String name, String newname){
-		if(!getCircuitSet().contains(name)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + name + "#Redは存在しません");
+	public static void renameCircuit(Player p, String circuitname, String newname){
+		if(!getCircuitSet().contains(circuitname)){
+			Message.invalidCircuit.sendMessage(p, circuitname);
 		}else if(getCircuitSet().contains(newname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + newname + "#Redは既に作成済みです");
+			Message.cmdCircuitAlreadyExist.sendMessage(p, newname);
 		}else{
 			for(World w : Bukkit.getWorlds()){
 				for(Entity e : w.getEntities()){
-					if(RaceManager.isCustomWitherSkull(e, name))
-						e.setCustomName(e.getCustomName().replace(name, newname));
+					if(RaceManager.isCustomWitherSkull(e, circuitname))
+						e.setCustomName(e.getCustomName().replace(circuitname, newname));
 				}
 			}
 
-			config.set(newname, config.get(name));
-			config.set(name, null);
+			config.set(newname, config.get(circuitname));
+			config.set(circuitname, null);
 			saveConfigFile();
 
-			Util.sendMessage(p, "[header]#Greenサーキット：" + "#Gold" + name + "#Greenの名称を#Gold" + newname + "#Greenに変更しました");
+			Message.cmdCircuitRename.sendMessage(p, newname);
 		}
 	}
 
@@ -161,7 +161,7 @@ public final class RaceData{
 			}
 
 			if(laptime < config.getDouble(path, 0)){
-				Util.sendMessage(p, getCircuitHeader(circuitname) + "記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
+				Message.raceHighScore.sendMessage(p, new Object[]{circuitname, new Object[]{config.getDouble(path), laptime}});
 				config.set(path, laptime);
 				saveConfigFile();
 				return;
@@ -180,7 +180,7 @@ public final class RaceData{
 			}
 
 			if(laptime < config.getDouble(path, 0)){
-				Util.sendMessage(p, getCircuitHeader(circuitname) + "記録更新！#Yellow" + config.getDouble(path) + "#Green秒 --> #Yellow" + laptime + "#Green秒");
+				Message.raceHighScore.sendMessage(p, new Object[]{circuitname, new Object[]{config.getDouble(path), laptime}});
 				config.set(path, laptime);
 				saveConfigFile();
 				return;
@@ -192,20 +192,28 @@ public final class RaceData{
 		String ranking = RaceData.getRanking(id, circuitname);
 		String kartranking = RaceData.getKartRanking(id, circuitname);
 		if(ranking == null && kartranking == null)
-			Util.sendMessage(id, getCircuitHeader(circuitname) + " #Redレースの記録がありません");
+			Message.cmdCircuitRankingNoScoreData.sendMessage(id, circuitname);
 		else{
 			if(kartranking != null)
-				Util.sendMessage(id, kartranking);
+				Message.sendAbsolute(id, kartranking);
 			if(ranking != null)
-				Util.sendMessage(id, ranking);
+				Message.sendAbsolute(id, kartranking);
 		}
 	}
 
-	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+	public static void sendCircuitInformation(Object adress, String circuitname){
+		if(!getCircuitSet().contains(circuitname)){
+			Message.invalidCircuit.sendMessage(adress);
+		}
 
-	public static String getCircuitHeader(String circuitname){
-		return "#DarkAqua[#Aqua" + Util.convertInitialUpperString(circuitname) + "#DarkAqua] #Green";
+		Location l = getPosition(circuitname);
+		boolean flag = getBroadcastGoalMessage(circuitname);
+		Number[] numberdata = {getNumberOfLaps(circuitname), getMinPlayer(circuitname), getMaxPlayer(circuitname), getLimitTime(circuitname), getMenuTime(circuitname), getMatchingTime(circuitname), l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch()};
+
+		Message.tableCircuitInformation.sendMessage(adress, new Object[]{circuitname, flag, numberdata});
 	}
+
+	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	public static int getNumberOfLaps(String circuitname){
 		if(!getCircuitSet().contains(circuitname))
@@ -414,26 +422,6 @@ public final class RaceData{
 		return null;
 	}
 
-	public static String getCircuitInformation(String circuitname){
-		if(!getCircuitSet().contains(circuitname))return "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません";
-
-		Location l = getPosition(circuitname);
-		String info = "#Aqua==========-[ #GoldCircuit Information #Aqua]-==========" + "\n" +
-						"    " + "#Greenサーキット名 ： #White" + Util.convertInitialUpperString(circuitname) + "\n" +
-						"    " + "#Green周回数 ： #White" + getNumberOfLaps(circuitname) + "\n" +
-						"    " + "#Green最小プレイ人数 ： #White" + getMinPlayer(circuitname) + "\n" +
-						"    " + "#Green最大プレイ人数 ： #White" + getMaxPlayer(circuitname) + "\n" +
-						"    " + "#Greenレースが自動終了するまでの時間 ： #White" + getLimitTime(circuitname) + "#Green (秒)\n" +
-						"    " + "#Greenキャラクター・カートを選択できる猶予時間 ： #White" + getMenuTime(circuitname) + "#Green (秒)\n" +
-						"    " + "#Greenレースへの参加・辞退を決定できる猶予時間 ： #White" + getMatchingTime(circuitname) + "#Green (秒)\n" +
-						"    " + "#Green順位・ラップタイムのサーバー全体通知 ： #White" + getBroadcastGoalMessage(circuitname) + "\n" +
-						"    " + "#Greenレース開始座標 ： " + "\n" +
-						"#Green" + "            " + "x #White" + l.getBlockX() + "#Green / y #White" + l.getBlockY() + "#Green / z #White" + l.getBlockZ() + "\n" +
-						"#Green" + "            " + "yaw #White" + l.getYaw() + "#Green / pitch #White" + l.getPitch() + "\n";
-
-		return info;
-	}
-
 	public static Set<String> getCircuitSet(){
 		return config.getKeys(false);
 	}
@@ -442,9 +430,9 @@ public final class RaceData{
 		String names = null;
 		for(String circuitname : getCircuitSet()){
 			if(names == null)
-				names = "#White" + circuitname + "#Green / ";
+				names = circuitname;
 			else
-				names += "#White" + circuitname + "#Green / ";
+				names += " , " + circuitname;
 		}
 		return names;
 	}
@@ -453,7 +441,7 @@ public final class RaceData{
 
 	public static void setPosition(Player p, String circuitname){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			Location l = p.getLocation();
 			config.set(circuitname + ".world", l.getWorld().getName());
@@ -462,14 +450,14 @@ public final class RaceData{
 			config.set(circuitname + ".z", l.getZ());
 			config.set(circuitname + ".yaw", l.getYaw());
 			config.set(circuitname + ".pitch", l.getPitch());
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green現在位置を開始座標として設定しました");
+			Message.cmdCircuitSetPosition.sendMessage(p, circuitname);
 			saveConfigFile();
 		}
 	}
 
 	public static void setPosition(Player p, String circuitname, String worldname, double x, double y, double z, float yaw, float pitch){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".world", worldname);
 			config.set(circuitname + ".x", x);
@@ -477,81 +465,81 @@ public final class RaceData{
 			config.set(circuitname + ".z", z);
 			config.set(circuitname + ".yaw", yaw);
 			config.set(circuitname + ".pitch", pitch);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green現在位置を開始座標として設定しました");
+			Message.cmdCircuitSetPosition.sendMessage(p, circuitname);
 			saveConfigFile();
 		}
 	}
 
 	public static void setNumberOfLaps(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".numberoflaps", amount);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green周回数を#White" + amount + "周#Greenに設定しました");
+			Message.cmdCircuitSetLap.sendMessage(p, new Object[]{circuitname, amount});
 			saveConfigFile();
 		}
 	}
 
 	public static void setMinPlayer(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else if(getMaxPlayer(circuitname) < amount){
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Red最大プレイ人数を上回る数値は設定できません。現在最大プレイ人数は#White" + getMaxPlayer(circuitname) + "人#Redに設定されています");
+			Message.cmdCircuitOutOfMaxPlayer.sendMessage(p, new Object[]{circuitname, getMaxPlayer(circuitname)});
 		}else{
 			config.set(circuitname + ".minplayer", amount);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green最小プレイ人数を#White" + amount + "人#Greenに設定しました");
+			Message.cmdCircuitSetMinPlayer.sendMessage(p, new Object[]{circuitname, amount});
 			saveConfigFile();
 		}
 	}
 
 	public static void setMaxPlayer(Player p, String circuitname, int amount){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else if(amount < getMinPlayer(circuitname)){
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Red最小プレイ人数を下回る数値は設定できません。現在最小プレイ人数は#White" + getMinPlayer(circuitname) + "人#Redに設定されています");
+			Message.cmdCircuitOutOfMinPlayer.sendMessage(p, new Object[]{circuitname, getMinPlayer(circuitname)});
 		}else{
 			config.set(circuitname + ".maxplayer", amount);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green最大プレイ人数を#White" + amount + "人#Greenに設定しました");
+			Message.cmdCircuitSetMaxPlayer.sendMessage(p, new Object[]{circuitname, amount});
 			saveConfigFile();
 		}
 	}
 
 	public static void setMatchingTime(Player p, String circuitname, int second){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".matchingtime", second);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenマッチング時間を#White" + second + "秒#Greenに設定しました");
+			Message.cmdCircuitSetMatchingTime.sendMessage(p, new Object[]{circuitname, second});
 			saveConfigFile();
 		}
 	}
 
 	public static void setMenuTime(Player p, String circuitname, int second){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".menutime", second);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenメニュー選択時間を#White" + second + "秒#Greenに設定しました");
+			Message.cmdCircuitSetMenuTime.sendMessage(p, new Object[]{circuitname, second});
 			saveConfigFile();
 		}
 	}
 
 	public static void setLimitTime(Player p, String circuitname, int second){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".limittime", second);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Greenレース終了までの制限時間を#White" + second + "秒#Greenに設定しました");
+			Message.cmdCircuitSetLimitTime.sendMessage(p, new Object[]{circuitname, second});
 			saveConfigFile();
 		}
 	}
 
 	public static void setBroadcastGoalMessage(Player p, String circuitname, boolean flag){
 		if(!getCircuitSet().contains(circuitname)){
-			Util.sendMessage(p, "[header]#Redサーキット：" + "#Gold" + circuitname + "#Redは存在しません");
+			Message.invalidCircuit.sendMessage(p);
 		}else{
 			config.set(circuitname + ".broadcastgoalmessage", flag);
-			Util.sendMessage(p, getCircuitHeader(circuitname) + "#Green順位・ラップタイムのサーバー全体通知を#White" + flag + "#Greenに設定しました");
+			Message.cmdCircuitSetBroadcastGoalMessage.sendMessage(p, new Object[]{circuitname, flag});
 			saveConfigFile();
 		}
 	}
@@ -573,7 +561,6 @@ public final class RaceData{
 			pl.saveResource(filename, true);
 			configFile = new File(datafolder, filename);
 			config = YamlConfiguration.loadConfiguration(configFile);
-			Util.sendMessage(null, "[header]" + filename + ".ymlを生成しました");
 		}
 	}
 

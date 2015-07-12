@@ -1,10 +1,10 @@
 package com.github.erozabesu.yplkart.Task;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
 public class SendCountDownTitleTask extends BukkitRunnable{
@@ -12,18 +12,14 @@ public class SendCountDownTitleTask extends BukkitRunnable{
 	int maxlife = 0;
 	Player p;
 	String text;
-	ChatColor color;
-	ChatColor subcolor;
 
-	public SendCountDownTitleTask(Player p, int maxlife, String text, ChatColor color, ChatColor subcolor){
+	public SendCountDownTitleTask(Player p, int maxlife, String text){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;
-		this.color = color;
-		this.subcolor = subcolor;
 
-		PacketUtil.sendTitle(p, text, 0, 25, 0, color, false);
-		PacketUtil.sendTitle(p, "残り時間 : " + maxlife + "秒", 0, 25, 0, subcolor, true);
+		PacketUtil.sendTitle(p, text, 0, 25, 0, false);
+		PacketUtil.sendTitle(p, Message.titleCountDown.getMessage(maxlife), 0, 25, 0, true);
 	}
 
 	@Override
@@ -47,8 +43,8 @@ public class SendCountDownTitleTask extends BukkitRunnable{
 
 		if(life % 20 == 0){
 			if(((int)(maxlife-life)/20) != 0){
-				PacketUtil.sendTitle(p, text, 0, 25, 0, color, false);
-				PacketUtil.sendTitle(p, "残り時間 : " + ((int)(maxlife-life)/20) + "秒", 0, 25, 0, subcolor, true);
+				PacketUtil.sendTitle(p, text, 0, 25, 0, false);
+				PacketUtil.sendTitle(p, Message.titleCountDown.getMessage((maxlife-life)/20), 0, 25, 0, true);
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
@@ -32,7 +33,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 	void ka() {
 		if(!Permission.hasCMDPermission(this.p, Permission.cmd_ka, false, false))return;
 
-		Util.sendMessage(this.p, reference);
+		Message.reference.sendMessage(this.p);
 	}
 
 	//ka circuit info {circuit name}
@@ -73,7 +74,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			}
 		}else if(this.length == 3){
 			if(args[1].equalsIgnoreCase("info")){
-				Util.sendMessage(this.p, RaceData.getCircuitInformation(args[2]));
+				RaceData.sendCircuitInformation(this.p, args[2]);
 				return;
 			}else if(args[1].equalsIgnoreCase("create")){
 				RaceData.createCircuit(this.p, args[2]);
@@ -94,49 +95,49 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				return;
 			}else if(args[1].equalsIgnoreCase("setminplayer")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setMinPlayer(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmaxplayer")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setMaxPlayer(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setMatchingTime(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmenutime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setMenuTime(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setlimittime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setLimitTime(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setlap")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(this.p);
+					Message.invalidNumber.sendMessage(this.p);
 					return;
 				}
 				RaceData.setNumberOfLaps(this.p, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("broadcastgoal")){
 				if(!Util.isBoolean(args[3])){
-					messageInvalidBoolean(this.p);
+					Message.invalidBoolean.sendMessage(this.p);
 					return;
 				}
 				RaceData.setBroadcastGoalMessage(this.p, args[2], Boolean.valueOf(args[3]));
@@ -144,11 +145,11 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			}
 		}else if(this.length == 9){
 			if(Bukkit.getWorld(args[3]) == null){
-				messageInvalidWorld(this.p);
+				Message.invalidWorld.sendMessage(this.p);
 				return;
 			}
 			if(!Util.isNumber(args[4]) || !Util.isNumber(args[5]) || !Util.isNumber(args[6]) || !Util.isNumber(args[7]) || !Util.isNumber(args[8])){
-				messageInvalidNumber(this.p);
+				Message.invalidNumber.sendMessage(this.p);
 				return;
 			}
 			//0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z
@@ -161,7 +162,8 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				return;
 			}
 		}
-		Util.sendMessage(this.p, "===========================================\n" + this.referenceCircuitIngame + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
+		Message.referenceCircuitIngame.sendMessage(this.p);
+		Message.referenceCircuitOutgame.sendMessage(this.p);
 	}
 
 	//ka display {kart name}
@@ -178,20 +180,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			else
 				kart = EnumKarts.getKartfromString(args[1]);
 			if(kart == null){
-				messageInvalidKart(this.p);
+				Message.invalidKart.sendMessage(this.p);
 				return;
 			}
 
 			RaceManager.createDisplayMinecart(this.p.getLocation(), kart, null);
-			messageDisplay(this.p, kart);
+			Message.cmdDisplayCreate.sendMessage(this.p, kart);
 		}else if (length == 8){
 			if(!Permission.hasCMDPermission(this.p, Permission.op_cmd_display, false, false))return;
 			if(Bukkit.getWorld(args[2]) == null){
-				messageInvalidWorld(this.p);
+				Message.invalidWorld.sendMessage(this.p);
 				return;
 			}
 			if(!Util.isNumber(args[3]) || !Util.isNumber(args[4]) || !Util.isNumber(args[5]) || !Util.isNumber(args[6]) || !Util.isNumber(args[7])){
-				messageInvalidNumber(this.p);
+				Message.invalidNumber.sendMessage(this.p);
 				return;
 			}
 			EnumKarts kart = null;
@@ -200,14 +202,15 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			else
 				kart = EnumKarts.getKartfromString(args[1]);
 			if(kart == null){
-				messageInvalidKart(this.p);
+				Message.invalidKart.sendMessage(this.p);
 				return;
 			}
 
 			RaceManager.createDisplayMinecart(new Location(Bukkit.getWorld(args[2]), Double.valueOf(args[3]), Double.valueOf(args[4]), Double.valueOf(args[5]), Float.valueOf(args[6]), Float.valueOf(args[7])), kart, null);
-			messageDisplay(this.p, kart);
+			Message.cmdDisplayCreate.sendMessage(this.p, kart);
 		}else{
-			Util.sendMessage(this.p, "===========================================\n" + referenceDisplayIngame + "\n" + "#GoldKart List :\n" + "#White" + EnumKarts.getKartList());
+			Message.referenceDisplayIngame.sendMessage(this.p);
+			Message.referenceDisplayOutgame.sendMessage(this.p);
 		}
 	}
 
@@ -226,16 +229,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.showCharacterSelectMenu(other);
 				}
-				messageMenuAll(this.p);
+				Message.cmdMenuAll.sendMessage(this.p);
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+				if(!Util.isOnline(args[1])){
+					Message.invalidPlayer.sendMessage(this.p);
+					return;
+				}
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.showCharacterSelectMenu(other);
-				messageMenuOther(this.p, other);
+				Message.cmdMenuOther.sendMessage(this.p, other);
 			}
 		}else{
-			Util.sendMessage(this.p, referenceMenu + "\n" + referenceMenuOther);
+			Message.referenceMenu.sendMessage(this.p);
+			Message.referenceMenuOther.sendMessage(this.p);
 		}
 	}
 
@@ -248,7 +255,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		if (this.length == 2){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_entry, false, false))return;
 			if(!RaceData.isCircuit(args[1])){
-				messageInvalidCircuit(this.p, args[1]);
+				Message.invalidCircuit.sendMessage(this.p, args[1]);
 				return;
 			}
 
@@ -258,29 +265,26 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		}else if(this.length == 3){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_entry, true, false))return;
 			if(!RaceData.isCircuit(args[2])){
-				messageInvalidCircuit(this.p, args[2]);
+				Message.invalidCircuit.sendMessage(this.p, args[1]);
 				return;
 			}
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
 				}
-				messageEntryAll(this.p, args[2]);
+				Message.cmdEntryAll.sendMessage(this.p, args[2]);
 			}else{
 				if(!Util.isOnline(args[1])){
-					messageNoPlayer(this.p);
+					Message.invalidPlayer.sendMessage(this.p);
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
-				messageEntryOther(this.p, other, args[2]);
+				Message.cmdEntryOther.sendMessage(this.p, new Object[]{other, args[2]});
 				RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
 			}
 		}else{
-			Util.sendMessage(this.p, "===========================================\n"
-									+ referenceEntry + "\n"
-									+ referenceEntryOther + "\n"
-									+ "#GoldCircuit List :\n"
-									+ "#White" + RaceData.getCircuitList());
+			Message.referenceEntry.sendMessage(this.p);
+			Message.referenceEntryOther.sendMessage(this.p);
 		}
 	}
 
@@ -299,16 +303,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.clearEntryRaceData(other.getUniqueId());
 				}
-				messageExitAll(this.p);
+				Message.cmdExitAll.sendMessage(this.p);
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+				if(!Util.isOnline(args[1])){
+					Message.invalidPlayer.sendMessage(this.p);
+					return;
+				}
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.clearEntryRaceData(other.getUniqueId());
-				messageExitOther(this.p, other);
+				Message.cmdExitOther.sendMessage(this.p, other);
 			}
 		}else{
-			Util.sendMessage(this.p, referenceExit + "\n" + referenceExitOther);
+			Message.referenceExit.sendMessage(this.p);
+			Message.referenceExitOther.sendMessage(this.p);
 		}
 	}
 
@@ -328,7 +336,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			}else{
 				EnumCharacter character = EnumCharacter.getClassfromString(args[1]);
 				if(character == null){
-					messageInvalidCharacter(this.p);
+					Message.invalidCharacter.sendMessage(this.p);
 					return;
 				}
 				RaceManager.setCharacterRaceData(this.id, character);
@@ -344,40 +352,41 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					for(Player other : Bukkit.getOnlinePlayers()){
 						RaceManager.setCharacterRaceData(other.getUniqueId(), EnumCharacter.getRandomCharacter());
 					}
-					messageCharacterRandomAll(this.p);
+					Message.cmdCharacterRandomAll.sendMessage(this.p);
 				}else{
 					if(!Util.isOnline(args[1])){
-						messageNoPlayer(this.p);
+						Message.invalidPlayer.sendMessage(this.p);
 						return;
 					}
 					EnumCharacter character = EnumCharacter.getRandomCharacter();
 					Player other = Bukkit.getPlayer(args[1]);
 					RaceManager.setCharacterRaceData(other.getUniqueId(), character);
-					messageCharacterOther(this.p, other, character);
+					Message.cmdCharacterOther.sendMessage(this.p, new Object[]{other, character});
 				}
 			}else{
 				EnumCharacter character = EnumCharacter.getClassfromString(args[2]);
 				if(character == null){
-					messageInvalidCharacter(this.p);
+					Message.invalidCharacter.sendMessage(this.p);
 					return;
 				}
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
 						RaceManager.setCharacterRaceData(other.getUniqueId(), character);
 					}
-					messageCharacterAll(this.p, character);
+					Message.cmdCharacterAll.sendMessage(this.p, character);
 				}else{
 					if(!Util.isOnline(args[1])){
-						messageNoPlayer(this.p);
+						Message.invalidPlayer.sendMessage(this.p);
 						return;
 					}
 					Player other = Bukkit.getPlayer(args[1]);
 					RaceManager.setCharacterRaceData(other.getUniqueId(), character);
-					messageCharacterOther(this.p, other, character);
+					Message.cmdCharacterOther.sendMessage(this.p, new Object[]{other, character});
 				}
 			}
 		}else{
-			Util.sendMessage(this.p, "===========================================\n" + referenceCharacter + "\n" + referenceCharacterOther + "\n" + "#GoldCharacter List :\n" + "#White" + EnumCharacter.getCharacterList());
+			Message.referenceCharacter.sendMessage(this.p);
+			Message.referenceCharacterOther.sendMessage(this.p);
 		}
 	}
 
@@ -396,16 +405,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceManager.clearCharacterRaceData(other.getUniqueId());
 				}
-				messageCharacterResetAll(this.p);
+				Message.cmdCharacterResetAll.sendMessage(this.p);
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+				if(!Util.isOnline(args[1])){
+					Message.invalidPlayer.sendMessage(this.p);
+					return;
+				}
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.clearCharacterRaceData(other.getUniqueId());
-				messageCharacterResetOther(this.p, other);
+				Message.cmdCharacterResetOther.sendMessage(this.p, other);
 			}
 		}else{
-			Util.sendMessage(this.p, referenceCharacterReset + "\n" + referenceCharacterResetOther);
+			Message.referenceCharacterReset.sendMessage(this.p);
+			Message.referenceCharacterResetOther.sendMessage(this.p);
 		}
 	}
 
@@ -426,7 +439,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			}else{
 				EnumKarts kart = EnumKarts.getKartfromString(args[1]);
 				if(kart == null){
-					messageInvalidKart(this.p);
+					Message.invalidKart.sendMessage(this.p);
 					return;
 				}
 				RaceManager.setKartRaceData(this.id, kart);
@@ -443,7 +456,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 			else
 				kart = EnumKarts.getKartfromString(args[2]);
 			if(kart == null){
-				messageInvalidKart(this.p);
+				Message.invalidKart.sendMessage(this.p);
 				return;
 			}
 
@@ -452,20 +465,21 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					RaceManager.setKartRaceData(other.getUniqueId(), kart);
 				}
 				if(args[2].equalsIgnoreCase("random"))
-					messageRideRandomAll(this.p);
+					Message.cmdRideRandomAll.sendMessage(this.p);
 				else
-					messageRideAll(this.p, kart);
+					Message.cmdRideAll.sendMessage(this.p, kart);
 			}else{
 				if(!Util.isOnline(args[1])){
-					messageNoPlayer(this.p);
+					Message.invalidPlayer.sendMessage(this.p);
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.setKartRaceData(other.getUniqueId(), kart);
-				messageRideOther(this.p, other, kart);
+				Message.cmdRideOther.sendMessage(this.p, new Object[]{other, kart});
 			}
 		}else{
-			Util.sendMessage(this.p, "===========================================\n" + referenceRide + "\n" + referenceRideOther + "\n" + "#GoldKart List :\n" + "#White" + EnumKarts.getKartList());
+			Message.referenceRide.sendMessage(this.p);
+			Message.referenceRideOther.sendMessage(this.p);
 		}
 	}
 
@@ -489,17 +503,21 @@ public class CMDAbstractPlayer extends CMDAbstract{
 					RaceManager.leaveRacingKart(other);
 					RaceManager.clearKartRaceData(this.id);
 				}
-				messageLeaveAll(this.p);
+				Message.cmdLeaveAll.sendMessage(this.p);
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+				if(!Util.isOnline(args[1])){
+					Message.invalidPlayer.sendMessage(this.p);
+					return;
+				}
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.leaveRacingKart(other);
 				RaceManager.clearKartRaceData(other.getUniqueId());
-				messageLeaveOther(this.p, other);
+				Message.cmdLeaveOther.sendMessage(this.p, other);
 			}
 		}else{
-			Util.sendMessage(this.p, referenceLeave + "\n" + referenceLeaveOther);
+			Message.referenceLeave.sendMessage(this.p);
+			Message.referenceLeaveOther.sendMessage(this.p);
 		}
 	}
 
@@ -513,7 +531,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				RaceData.listCricuit(this.p);
 			}else{
 				if(!RaceData.isCircuit(args[1])){
-					messageInvalidCircuit(this.p, args[1]);
+					Message.invalidCircuit.sendMessage(this.p, args[1]);
 					return;
 				}
 
@@ -524,25 +542,26 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		}else if(this.length == 3){
 			if(!Permission.hasCMDPermission(this.p, Permission.cmd_ranking, true, false))return;
 			if(!RaceData.isCircuit(args[2])){
-				messageInvalidCircuit(this.p, args[2]);
+				Message.invalidCircuit.sendMessage(this.p, args[2]);
 				return;
 			}
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					RaceData.sendRanking(other.getUniqueId(), args[2]);
 				}
-				messageRankingAll(this.p, args[2]);
+				Message.cmdRankingAll.sendMessage(this.p, args[2]);
 			}else{
 				if(!Util.isOnline(args[1])){
-					messageNoPlayer(this.p);
+					Message.invalidPlayer.sendMessage(this.p);
 					return;
 				}
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceData.sendRanking(other.getUniqueId(), args[2]);
-				messageRankingOther(this.p, other, args[2]);
+				Message.cmdRankingOther.sendMessage(this.p, new Object[]{other, args[2]});
 			}
 		}else{
-			Util.sendMessage(this.p, "===========================================\n" + referenceRanking + "\n" + referenceRankingOther + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
+			Message.referenceRanking.sendMessage(this.p);
+			Message.referenceRankingOther.sendMessage(this.p);
 		}
 	}
 
@@ -556,19 +575,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
-		Util.sendMessage(this.p, "[header]コンフィグをリロードしました");
+		Message.cmdReload.sendMessage(this.p);
 	}
 
 	@Override
 	void additem(ItemStack item, Permission permission){
 		//ka {item}
 		if(item == null && permission == null){
-			Util.sendMessage(this.p, "===========================================\n" + referenceAddItem + "\n" + referenceAddItemOther + "\n" + "#GoldItem List :\n" + "#White" + itemlist);
+			Message.referenceAddItem.sendMessage(null);
+			Message.referenceAddItemOther.sendMessage(null);
 		}else if(length == 1){
 			if(!Permission.hasCMDPermission(this.p, permission, false, false))return;
 
 			this.p.getInventory().addItem(item);
-			messageAddItem(this.p, item);
+			Message.cmdItem.sendMessage(this.p, item);
 		}else if (length == 2){
 			//ka {item} 64
 			if(Util.isNumber(args[1])){
@@ -576,7 +596,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 
 				item.setAmount(Integer.valueOf(args[1]));
 				this.p.getInventory().addItem(item);
-				messageAddItem(this.p, item);
+				Message.cmdItem.sendMessage(this.p, item);
 			}else{
 				if(permission.isOpPerm()){
 					if(!Permission.hasPermission(this.p, permission, false))return;
@@ -587,17 +607,20 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				if(args[1].equalsIgnoreCase("all")){
 					for(Player other : Bukkit.getOnlinePlayers()){
 						other.getInventory().addItem(item);
-						messageAddItem(other, item);
+						Message.cmdItem.sendMessage(other, item);
 					}
-					messageAddItemAll(this.p, item);
+					Message.cmdItemAll.sendMessage(this.p, item);
 				//ka {item} {player}
 				}else{
-					if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+					if(!Util.isOnline(args[1])){
+						Message.invalidPlayer.sendMessage(this.p);
+						return;
+					}
 
 					Player other = Bukkit.getPlayer(args[1]);
 					other.getInventory().addItem(item);
-					messageAddItem(other, item);
-					messageAddItemOther(this.p, other, item);
+					Message.cmdItem.sendMessage(other, item);
+					Message.cmdItemOther.sendMessage(this.p, new Object[]{other, item});
 				}
 			}
 		}else if(length == 3){
@@ -605,27 +628,34 @@ public class CMDAbstractPlayer extends CMDAbstract{
 				if(!Permission.hasPermission(this.p, permission, false))return;
 			}else
 				if(!Permission.hasCMDPermission(this.p, permission, true, false))return;
-			if(!Util.isNumber(args[2])){Util.sendMessage(this.p, referenceAddItemOther);return;}
+			if(!Util.isNumber(args[2])){
+				Message.referenceAddItemOther.sendMessage(this.p);
+				return;
+			}
 			item.setAmount(Integer.valueOf(args[2]));
 
 			//ka {item} all 64
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					other.getInventory().addItem(item);
-					messageAddItem(other, item);
+					Message.cmdItem.sendMessage(other, item);
 				}
-				messageAddItemAll(this.p, item);
+				Message.cmdItemAll.sendMessage(this.p, item);
 			//ka {item} {player} 64
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(this.p);return;}
+				if(!Util.isOnline(args[1])){
+					Message.invalidPlayer.sendMessage(this.p);
+					return;
+				}
 
 				Player other = Bukkit.getPlayer(args[1]);
 				other.getInventory().addItem(item);
-				messageAddItem(other, item);
-				messageAddItemOther(this.p, other, item);
+				Message.cmdItem.sendMessage(other, item);
+				Message.cmdItemOther.sendMessage(this.p, new Object[]{other, item});
 			}
 		}else{
-			Util.sendMessage(this.p, referenceAddItem + "\n" + referenceAddItemOther);
+			Message.referenceAddItem.sendMessage(this.p);
+			Message.referenceAddItemOther.sendMessage(this.p);
 		}
 	}
 }

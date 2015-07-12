@@ -24,6 +24,7 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.Permission;
@@ -500,7 +501,7 @@ public class CustomMinecart extends EntityMinecartRideable{
 
 			if(this.display){
 				DisplayKartData.deleteData(this.getCustomName());
-				Util.sendMessage(p, "[header]ディスプレイ専用カートを削除しました");
+				Message.cmdDisplayDelete.sendMessage(p);
 			}
 //TODO CraftBukkit
 			this.O();

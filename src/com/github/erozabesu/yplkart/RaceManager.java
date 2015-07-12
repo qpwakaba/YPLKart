@@ -23,6 +23,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
@@ -76,7 +77,7 @@ public class RaceManager {
 			return;
 		}else{
 			c.acceptMatching(id);
-			Util.sendMessage(id, "#Aquaレース参加を承認しました。準備が整うまでお待ち下さい");
+			Message.raceAccept.sendMessage(p, c);
 		}
 	}
 
@@ -101,23 +102,23 @@ public class RaceManager {
 	public static void setEntryRaceData(UUID id, String circuitname){
 		if(isEntry(id)){
 			String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
-			Util.sendMessage(id, "#Red既に#Blue" + oldcircuitname + "#Redのレースにエントリーしています。他のレースにエントリーしたい場合は現在のエントリーを取り消して下さい");
+			Message.raceEntryAlready.sendMessage(id, oldcircuitname);
 		}else{
 			Circuit c = setupCircuit(circuitname);
 			if(c.isFillPlayer()){
 				c.entryReservePlayer(id);
-				Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既に規定人数が満たされているため、次回開催されるレースにエントリーされました");
+				Message.raceEntryFull.sendMessage(id, c);
 			}else{
 				getRace(id).setEntry(circuitname);
 
 				if(c.isStarted()){
 					c.entryReservePlayer(id);
-					Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました。既にレースが開始されているため、次回開催されるレースにエントリーされました");
+					Message.raceEntryAlreadyStart.sendMessage(id, c);
 				}else{
 					c.entryPlayer(id);
 					Scoreboards.entryCircuit(id);
 
-					Util.sendMessage(id, "#Gold" + circuitname + "#Greenのレースにエントリーしました");
+					Message.raceEntry.sendMessage(id, c);
 
 					if(c.isMatching())
 						setMatchingCircuitData(id);
@@ -128,11 +129,11 @@ public class RaceManager {
 
 	public static void setCharacterRaceData(UUID id, EnumCharacter character){
 		if(!isStandBy(id)){
-			Util.sendMessage(id, "#Redレースが開始されるまでキャラクター選択はできません");
+			Message.raceNotStarted.sendMessage(id, getCircuit(id));
 			return;
 		}
 		if(Bukkit.getPlayer(id) == null){
-			Util.sendMessage(null, "#Redオフラインプレイヤーへのキャラクター選択はできません");
+			Message.invalidPlayer.sendMessage(null, id);
 			return;
 		}
 
@@ -146,25 +147,24 @@ public class RaceManager {
 
 		PacketUtil.disguise(p, null, character);
 		EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
-		Util.sendMessage(id, "キャラクター" + "#Gold" + character.getName() + "#Greenを選択しました");
+		Message.raceCharacter.sendMessage(id, new Object[]{character, getCircuit(r.getEntry())});
 	}
 
 	public static void setKartRaceData(UUID id, EnumKarts kart){
 		if(!isStandBy(id)){
-			Util.sendMessage(id, "#Redレースが開始されるまでカート選択はできません");
+			Message.raceNotStarted.sendMessage(id, getCircuit(id));
 			return;
 		}
 		if(Bukkit.getPlayer(id) == null){
-			Util.sendMessage(null, "#Redオフラインプレイヤーへのカート選択はできません");
+			Message.invalidPlayer.sendMessage(null, id);
 			return;
 		}
 
-		Player p = Bukkit.getPlayer(id);
 		Race r = getRace(id);
 		r.setKart(kart);
 		r.recoveryKart();
 
-		Util.sendMessage(id, "#Gold" + kart.getName() + "カート#Greenに搭乗しました");
+		Message.raceKart.sendMessage(id, new Object[]{kart, getCircuit(r.getEntry())});
 	}
 
 	// 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -172,8 +172,10 @@ public class RaceManager {
 	public static void clearEntryRaceData(UUID id){
 		if(isEntry(id)){
 			Scoreboards.exitCircuit(id);
-			getCircuit(id).exitPlayer(id);
+
 			Race r = getRace(id);
+			Circuit c = getCircuit(id);
+			c.exitPlayer(id);
 
 			Player p = Bukkit.getPlayer(id);
 			if(p != null){
@@ -187,7 +189,7 @@ public class RaceManager {
 						p.teleport(r.getGoalPosition());
 					}
 				}
-				Util.sendMessage(id, "エントリーを取り消しました");
+				Message.raceExit.sendMessage(id, c);
 			}
 
 			r.init();
@@ -202,7 +204,7 @@ public class RaceManager {
 		if(p != null){
 			getRace(id).recoveryPhysical();
 			PacketUtil.returnPlayer(p);
-			Util.sendMessage(id, "キャラクター選択を取り消しました");
+			Message.raceCharacterReset.sendMessage(id, getCircuit(id));
 		}
 	}
 
@@ -210,7 +212,7 @@ public class RaceManager {
 		if(getRace(id).getKart() == null)return;
 
 		if(Bukkit.getPlayer(id) != null)
-			Util.sendMessage(id, "搭乗を解除しました");
+			Message.raceLeave.sendMessage(id, getCircuit(id));
 		getRace(id).setKart(null);
 	}
 
@@ -296,14 +298,11 @@ public class RaceManager {
 			count.put(entryplayer.getUniqueId(), getRace(entryplayer).getPassedCheckPoint().size());
 		}
 
-		List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(
-				count.entrySet());
+		List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(count.entrySet());
 		Collections.sort(entry, new Comparator<Map.Entry<UUID, Integer>>() {
 			@Override
-			public int compare(Entry<UUID, Integer> entry1,
-					Entry<UUID, Integer> entry2) {
-				return entry2.getValue().compareTo(entry1
-						.getValue());
+			public int compare(Entry<UUID, Integer> entry1, Entry<UUID, Integer> entry2) {
+				return entry2.getValue().compareTo(entry1.getValue());
 			}
 		});
 

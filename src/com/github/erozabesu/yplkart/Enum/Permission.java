@@ -3,8 +3,8 @@ package com.github.erozabesu.yplkart.Enum;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Utils.Util;
 
 public enum Permission {
 	kart_ride(					YPLKart.plname + ".kart.ride", 					Settings.EnablePermissionKartRide, 				Settings.EnablePermissionKartRide),
@@ -106,7 +106,7 @@ public enum Permission {
 
 		if(nomessage)return false;
 
-		Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPerm());
+		Message.noPermission.sendMessage(p, perm.getPerm());
 		return false;
 	}
 
@@ -126,12 +126,12 @@ public enum Permission {
 		if(nomessage)return false;
 
 		if(!targetother){
-			Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPerm());
+			Message.noPermission.sendMessage(p, perm.getPerm());
 		}else{
 			if(perm.getPerm().contains("itemcmd")){
-				Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPermItemCMDOther());
+				Message.noPermission.sendMessage(p, perm.getPermItemCMDOther());
 			}else
-				Util.sendMessage(p, "[header]#Red権限を所有していません - " + perm.getPermBasicCMDOther());
+				Message.noPermission.sendMessage(p, perm.getPermBasicCMDOther());
 		}
 		return false;
 	}

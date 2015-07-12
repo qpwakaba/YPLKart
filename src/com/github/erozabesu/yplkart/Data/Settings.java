@@ -15,7 +15,6 @@ import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
 import com.github.erozabesu.yplkart.Enum.EnumKarts;
 import com.github.erozabesu.yplkart.Enum.Permission;
-import com.github.erozabesu.yplkart.Utils.Util;
 
 public final class Settings{
 	public static YPLKart pl;
@@ -451,12 +450,10 @@ public final class Settings{
 
 	//〓〓	ファイル生成		〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 	public static void CreateConfig() {
-		//pl.log.info(Strings.str_configloadstart);
 		if(!(configFile.exists())){
 			pl.saveResource(filename, true);
 			configFile = new File(datafolder, filename);
 			config = YamlConfiguration.loadConfiguration(configFile);
-			Util.sendMessage(null, "[header]" + filename + ".ymlを生成しました");
 		}
 	}
 

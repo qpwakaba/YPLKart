@@ -1,13 +1,21 @@
 package com.github.erozabesu.yplkart.Utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,6 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -29,22 +38,23 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.Message;
+import com.github.erozabesu.yplkart.Object.Circuit;
 import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil{
-	public static Class<?> CraftBlock;
-	public static Class<?> CraftMaterial;
+	private static String OperatingSystem = System.getProperty("os.name").toLowerCase();
+	private static Class<?> CraftBlock = getBukkitClass("Block");
+	private static Class<?> CraftMaterial = getBukkitClass("Material");
 
-	public static Method Block_getById;
-	public static Method Block_getMaterial;
-	public static Method Material_isSolid;
+	private static Method Block_getById;
+	private static Method Block_getMaterial;
+	private static Method Material_isSolid;
 
 	public Util(){
 		try {
-			CraftBlock = getBukkitClass("Block");
-			CraftMaterial = getBukkitClass("Material");
 			Block_getById = CraftBlock.getMethod("getById", int.class);
 			Block_getMaterial = CraftBlock.getMethod("getMaterial");
 			Material_isSolid = CraftMaterial.getMethod("isSolid");
@@ -58,6 +68,14 @@ public class Util extends ReflectionUtil{
 		Random random = new Random();
 		num = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
 		return num;
+	}
+
+	public static ChatColor getChatColorfromText(String text){
+		String color = ChatColor.getLastColors(text);
+		if(color == null)return ChatColor.WHITE;
+		if(color.length() == 0)return ChatColor.WHITE;
+
+		return ChatColor.getByChar(color.substring(1));
 	}
 
 	public static Vector getVectorLocationToLocation(Location second_location,Location first_location){
@@ -245,23 +263,12 @@ public class Util extends ReflectionUtil{
 		}
 	}
 
-	/*public static void setBlock(final Location l, Material m, byte data){
-		Block b = l.getBlock();
-		if(b.getType().equals(Material.AIR)){
-			b.setType(m);
-			b.setData(data);
-			RaceData.addJammerBlock(b);
-		}else{
-			l.setY(l.getY() + 1);
-			if(b.getType().equals(Material.AIR)){
-				b.setType(m);
-				b.setData(data);
-				RaceData.addJammerBlock(b);
-			}
-		}
-	}*/
-
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+	public static boolean isWindows() {
+		return OperatingSystem.startsWith("windows");
+	}
+
 
 	public static Boolean isOnline(String name){
 		for(Player online : Bukkit.getOnlinePlayers()){
@@ -333,15 +340,13 @@ public class Util extends ReflectionUtil{
 			if(1 <= p.getHealth() - damage){
 				p.setHealth(p.getHealth()-damage);
 			}else{
+				Circuit c = RaceManager.getCircuit(p.getUniqueId());
 				p.setHealth(p.getMaxHealth());
 				if(executor != null)
-					for(Player other : RaceManager.getCircuit(p.getUniqueId()).getEntryPlayer()){
-						sendMessage(other, "#White" + damaged.getName() + " killed by " + executor.getName());
-					}
+					c.sendMessageEntryPlayer(Message.racePlayerKill, new Object[]{c, new Player[]{(Player)damaged, (Player)executor}});
 				else
-					for(Player other : RaceManager.getCircuit(p.getUniqueId()).getEntryPlayer()){
-						sendMessage(other, "#White" + damaged.getName() + " is dead");
-					}
+					c.sendMessageEntryPlayer(Message.racePlayerDead, new Object[]{c, (Player)damaged});
+
 
 				final Race r = RaceManager.getRace(p);
 
@@ -358,7 +363,7 @@ public class Util extends ReflectionUtil{
 					}, r.getCharacter().getDeathPenaltySecond() * 20)
 				);
 				r.setDeathPenaltyTitleSendTask(
-					new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1)
+					new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
 				);
 			}
 		}else{
@@ -403,119 +408,42 @@ public class Util extends ReflectionUtil{
 
 	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-	public static void sendMessage(Object adress, String message){
-		Player p = null;
-		if(adress instanceof Player)
-			p = (Player) adress;
-		else if(adress instanceof UUID)
-			p = Bukkit.getPlayer((UUID) adress);
-
-		for (String line : replaceLine(message)) {
-			line = replacePatch("#Green" + line);
-			line = replaceChatColor(line);
-
-			if (p != null)
-				p.sendMessage(line);
-			else
-				YPLKart.log.log(Level.INFO, ChatColor.stripColor(line));
-		}
-	}
-
-	public static void broadcastMessage(String message){
-		for(Player p : Bukkit.getOnlinePlayers()){
-			sendMessage(p, message);
-		}
-	}
-
-	private static String replacePatch(String text){
-		text = text.replace("[header]", "#Yellow[" + YPLKart.plname + "] #Green");
-		text = text.replace("{race type}", "{#Whiterace type#Green}");
-		text = text.replace("{circuit name}", "{#Whitecircuit name#Green}");
-		text = text.replace("{worldname}", "{#Whiteworldname#Green}");
-		text = text.replace("{x}", "{#Whitex#Green}");
-		text = text.replace("{y}", "{#Whitey#Green}");
-		text = text.replace("{z}", "{#Whitez#Green}");
-		text = text.replace("{yaw}", "{#Whiteyaw#Green}");
-		text = text.replace("{pitch}", "{#Whitepitch#Green}");
-		text = text.replace("{new circuitname}", "{#Whitenew circuitname#Green}");
-		text = text.replace("{player name}", "{#Whiteplayer name#Green}");
-		text = text.replace("{character name}", "{#Whitecharacter name#Green}");
-		text = text.replace("{kart name}", "{#Whitekart name#Green}");
-		text = text.replace("{item name}", "{#Whiteitem name#Green}");
-		text = text.replace("{amount}", "{#Whiteamount#Green}");
-		text = text.replace("{number of player}", "{#Whitenumber of player#Green}");
-		text = text.replace("{number of second}", "{#Whitenumber of second#Green}");
-		text = text.replace("{number of laps}", "{#Whitenumber of laps#Green}");
-		text = text.replace("{true or false}", "{#Whitetrue #Greenor #Whitefalse#Green}");
-
-		return text;
-	}
-
-	public static String replaceChatColor(String text){
-		text = text.replace("#Black", ChatColor.BLACK.toString());
-		text = text.replace("#White", ChatColor.WHITE.toString());
-		text = text.replace("#Gray", ChatColor.GRAY.toString());
-		text = text.replace("#DarkGray", ChatColor.DARK_GRAY.toString());
-		text = text.replace("#Red", ChatColor.RED.toString());
-		text = text.replace("#DarkRed", ChatColor.DARK_RED.toString());
-		text = text.replace("#Green", ChatColor.GREEN.toString());
-		text = text.replace("#DarkGreen", ChatColor.DARK_GREEN.toString());
-		text = text.replace("#Blue", ChatColor.BLUE.toString());
-		text = text.replace("#DarkBlue", ChatColor.DARK_BLUE.toString());
-		text = text.replace("#Yellow", ChatColor.YELLOW.toString());
-		text = text.replace("#Gold", ChatColor.GOLD.toString());
-		text = text.replace("#LightPurple", ChatColor.LIGHT_PURPLE.toString());
-		text = text.replace("#DarkPurple", ChatColor.DARK_PURPLE.toString());
-		text = text.replace("#Aqua", ChatColor.AQUA.toString());
-		text = text.replace("#DarkAqua", ChatColor.DARK_AQUA.toString());
-		text = text.replace("#Magic", ChatColor.MAGIC.toString());
-		return text;
-	}
-
-	public static List<String> replaceLine(String message){
-		List<String> newtext = new ArrayList<String>();
-		for (String line : message.split("\n")){
-			newtext.add(line);
-		}
-		return newtext;
-	}
-
 	public static String convertSignNumber(int number){
-		return 0 <= number ? "#Gold+" + String.valueOf(number) : "#Blue" + String.valueOf(number);
+		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
 	}
 
 	public static String convertSignNumber(float number){
-		return 0 <= number ? "#Gold+" + String.valueOf(number) : "#Blue" + String.valueOf(number);
+		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
 	}
 
 	public static String convertSignNumber(double number){
-		return 0 <= number ? "#Gold+" + String.valueOf(number) : "#Blue" + String.valueOf(number);
+		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
 	}
 
 	public static String convertSignNumberR(int number){
 		String text = "";
 		if(number == 0)
-			text = "#Gold+" + String.valueOf(number);
+			text = "<gold>+" + String.valueOf(number);
 		else
-			text = 0 < number ? "#Blue+" + String.valueOf(number) : "#Gold" + String.valueOf(number);
+			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
 		return text;
 	}
 
 	public static String convertSignNumberR(float number){
 		String text = "";
 		if(number == 0)
-			text = "#Gold+" + String.valueOf(number);
+			text = "<gold>+" + String.valueOf(number);
 		else
-			text = 0 < number ? "#Blue+" + String.valueOf(number) : "#Gold" + String.valueOf(number);
+			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
 		return text;
 	}
 
 	public static String convertSignNumberR(double number){
 		String text = "";
 		if(number == 0)
-			text = "#Gold+" + String.valueOf(number);
+			text = "<gold>+" + String.valueOf(number);
 		else
-			text = 0 < number ? "#Blue+" + String.valueOf(number) : "#Gold" + String.valueOf(number);
+			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
 		return text;
 	}
 
@@ -526,6 +454,8 @@ public class Util extends ReflectionUtil{
 
 		return initial + other;
 	}
+
+	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
 	//ブロック、非生物エンティティに影響しない爆発を発生
 	public static void createSafeExplosion(Player executor, Location l, int damage, int range){
@@ -571,6 +501,151 @@ public class Util extends ReflectionUtil{
 			} catch (Exception ex){
 				ex.printStackTrace();
 			}
+		}
+	}
+
+	/*
+	 * 各OSのデフォルトの文字コードに変換しリソースを保管します
+	 */
+	public static boolean copyResource(String filename){
+		InputStream input = YPLKart.getInstance().getResource(filename);
+		if(input == null)return false;
+
+		FileOutputStream output = null;
+		BufferedReader reader = null;
+		BufferedWriter writer = null;
+
+		try {
+			output = new FileOutputStream(new File(YPLKart.getInstance().getDataFolder(), filename));
+			writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+			reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.newLine();
+            }
+            writer.flush();
+            return true;
+		} catch (Exception e) {
+			return false;
+			//e.printStackTrace();
+		} finally{
+			if(input != null)
+				try {
+					input.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(output != null)
+				try {
+					output.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(writer != null)
+				try {
+					writer.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+		}
+	}
+
+	/*
+	 * 各OSのデフォルトの文字コードに変換し、コンフィグを最新の内容に上書き保存します
+	 */
+	public static void saveConfiguration(File file, FileConfiguration config, List<String> ignorelist){
+		//コンフィグファイルが無い場合新規作成します
+		if(!file.exists()){
+			if(!copyResource(file.getName()))return;
+			file = new File(YPLKart.getInstance().getDataFolder(), file.getName());
+		}
+		List<String> continuetext = new ArrayList<String>();
+		FileInputStream input =  null;
+		FileOutputStream output = null;
+		BufferedReader reader = null;
+		BufferedWriter writer = null;
+
+		try {
+			input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
+			reader = new BufferedReader(new InputStreamReader(input, Charset.defaultCharset()));
+
+			//新しいファイルにコメントアウトしている行のみ引き継ぐ
+			String line;
+			while((line = reader.readLine()) != null) {
+				if(line.startsWith("#"))
+					continuetext.add(line);
+			}
+
+			file.delete();
+			file.createNewFile();
+
+			file.createNewFile();
+			output = new FileOutputStream(file);
+			writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+
+
+			for(String continueline : continuetext) {
+				writer.write(continueline);
+				writer.newLine();
+			}
+
+			boolean continueflag = false;
+			for(String configkey : config.getKeys(true)){
+				continueflag = false;
+				for(String ignore : ignorelist){
+					if(configkey.startsWith(ignore)){
+						continueflag = true;
+						break;
+					}
+				}
+				if(continueflag)continue;
+
+				writer.write(configkey + " : \"" + config.get(configkey) + "\"");
+				writer.newLine();
+			}
+
+			writer.flush();
+		} catch (Exception e) {
+			//e.printStackTrace();
+		} finally{
+			if(input != null)
+				try {
+					input.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(output != null)
+				try {
+					output.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(writer != null)
+				try {
+					writer.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
+
+			if(reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					//e.printStackTrace();
+				}
 		}
 	}
 }
