@@ -1,4 +1,8 @@
 #Color Tags :
+#	<black>,<white>,<gray>,<darkgray>,<red>,<darkRed>,<green>,<darkgreen>
+#	<blue>,<darkblue>,<yellow>,<gold>,<lightpurple>,<darkpurple>,<aqua>,<darkaqua>
+#Font Tags :
+#	<magic>,<bold>,<italic>,<reset>,<strikethrough>,<underline>
 #Available Tags :
 #	<br> : end a line and start a new line
 #	<plugin> : replace to this plugin name.
