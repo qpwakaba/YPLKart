@@ -401,6 +401,11 @@ public enum Message{
 		text = text.replace("<aqua>", ChatColor.AQUA.toString());
 		text = text.replace("<darkaqua>", ChatColor.DARK_AQUA.toString());
 		text = text.replace("<magic>", ChatColor.MAGIC.toString());
+		text = text.replace("<bold>", ChatColor.BOLD.toString());
+		text = text.replace("<italic>", ChatColor.ITALIC.toString());
+		text = text.replace("<reset>", ChatColor.RESET.toString());
+		text = text.replace("<strikethrough>", ChatColor.STRIKETHROUGH.toString());
+		text = text.replace("<underline>", ChatColor.UNDERLINE.toString());
 		return text;
 	}
 
