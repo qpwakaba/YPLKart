@@ -24,7 +24,11 @@ import com.github.erozabesu.yplkart.Utils.Util;
 
 public enum Message{
 	messageVersion("1.0"),
-	//コンフィグファイルからメッセージが取得できなかった際に読み込まれるデフォルトメッセージ郡です
+
+	/*
+	 * メッセージファイルからメッセージが取得できなかった際に読み込まれるデフォルトメッセージ郡です
+	 * ファイルに記述が無い項目は自動で追記し保存します
+	 */
 	header(						"<yellow>[<plugin>] "),
 	circuitheader(				"<darkaqua>[<aqua><circuitname><darkaqua>] "),
 	noPermission(				"<header><red>権限を所有していません - <perm>"),
