@@ -330,6 +330,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
+		Message.reloadConfig();
 		Message.cmdReload.sendMessage(null);
 	}
 
