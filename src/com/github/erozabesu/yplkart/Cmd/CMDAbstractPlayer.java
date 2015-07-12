@@ -575,6 +575,7 @@ public class CMDAbstractPlayer extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
+		Message.reloadConfig();
 		Message.cmdReload.sendMessage(this.p);
 	}
 

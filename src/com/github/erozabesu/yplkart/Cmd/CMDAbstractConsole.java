@@ -417,6 +417,7 @@ public class CMDAbstractConsole extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
+		Message.reloadConfig();
 		Message.cmdReload.sendMessage(null);
 	}
 
