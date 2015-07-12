@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Utils.Util;
 
@@ -111,27 +112,26 @@ public enum EnumCharacter {
 	}
 
 	public String getParameter(){
-		String text = "";
-		text += "#DarkAqua " + "#Green体力 : #Yellow"						 + getMaxHealth() + "\n";
-		text += "#DarkAqua " + "#Green速さ : #Yellow"						 + getWalkSpeed() + "\n";
-		text += "#DarkAqua " + "#Greenアイテムスロット : #Yellow"			 + ((int)getItemAdjustMaxSlotSize() + Settings.ItemSlot) + "\n";
-		text += "#DarkAqua " + "#Green最大スタック数 : #Yellow"				 + Util.convertSignNumber(getItemAdjustMaxStackSize()) + "\n";
-		text += "#DarkAqua " + "#Green妨害アイテム威力補正 : #Yellow"						 + Util.convertSignNumber(getItemAdjustAttackDamage()) + "\n";
-		text += "#DarkAqua " + "#Greenリスキル耐性 : #Yellow"				 + getDeathPenaltyAntiReskillSecond() + "\n";
-		text += "#DarkAqua " + "#Greenデスペナルティの長さ : #Blue"			 + getDeathPenaltySecond() + "\n";
-		text += "#DarkAqua " + "#Greenデスペナルティ時の速さ : #Blue"		 + getDeathPenaltyWalkSpeed() + "\n";
-		text += "#DarkAqua " + "#Green速度強化アイテム補正(LV) : #Yellow"	 + Util.convertSignNumber(getItemAdjustPositiveEffectLevel()) + "\n";
-		text += "#DarkAqua " + "#Green速度強化アイテム補正(秒) : #Yellow"	 + Util.convertSignNumber(getItemAdjustPositiveEffectSecond()) + "\n";
-		text += "#DarkAqua " + "#Green速度低下アイテム補正(LV) : #Yellow"	 + Util.convertSignNumberR(getItemAdjustNegativeEffectLevel()) + "\n";
-		text += "#DarkAqua " + "#Green速度低下アイテム補正(秒) : #Yellow"	 + Util.convertSignNumberR(getItemAdjustNegativeEffectSecond()) + "\n";
-		return text;
+		return Message.tableCharacterParameter.getMessage(new String[]{
+				String.valueOf(getMaxHealth()),
+				String.valueOf(getWalkSpeed()),
+				String.valueOf(getItemAdjustMaxSlotSize() + Settings.ItemSlot),
+				Util.convertSignNumber(getItemAdjustMaxStackSize()),
+				Util.convertSignNumber(getItemAdjustAttackDamage()),
+				String.valueOf(getDeathPenaltyAntiReskillSecond()),
+				String.valueOf(getDeathPenaltySecond()),
+				String.valueOf(getDeathPenaltyWalkSpeed()),
+				Util.convertSignNumber(getItemAdjustPositiveEffectLevel()),
+				Util.convertSignNumber(getItemAdjustPositiveEffectSecond()),
+				Util.convertSignNumberR(getItemAdjustNegativeEffectLevel()),
+				Util.convertSignNumberR(getItemAdjustNegativeEffectSecond())});
 	}
 
 	public ItemStack getMenuItem(){
 		ItemStack item = new ItemStack(getType());
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(getName());
-		meta.setLore(Util.replaceLine(Util.replaceChatColor(getParameter())));
+		meta.setLore(Message.replaceLine(Message.replaceChatColor(getParameter())));
 
 		item.setItemMeta(meta);
 

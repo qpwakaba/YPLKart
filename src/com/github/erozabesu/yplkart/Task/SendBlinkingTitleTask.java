@@ -1,6 +1,5 @@
 package com.github.erozabesu.yplkart.Task;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -11,15 +10,13 @@ public class SendBlinkingTitleTask extends BukkitRunnable{
 	int maxlife = 0;
 	Player p;
 	String text;
-	ChatColor color;
 
-	public SendBlinkingTitleTask(Player p, int maxlife, String text, ChatColor color){
+	public SendBlinkingTitleTask(Player p, int maxlife, String text){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;
-		this.color = color;
 
-		PacketUtil.sendTitle(p, text, 10, 0, 10, color, false);
+		PacketUtil.sendTitle(p, text, 10, 0, 10, false);
 	}
 
 	@Override
@@ -32,7 +29,7 @@ public class SendBlinkingTitleTask extends BukkitRunnable{
 		}
 
 		if(life % 20 == 0){
-			PacketUtil.sendTitle(p, text, 10, 0, 10, color, false);
+			PacketUtil.sendTitle(p, text, 10, 0, 10, false);
 		}
 	}
 }

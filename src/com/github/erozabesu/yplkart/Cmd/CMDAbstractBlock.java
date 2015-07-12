@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
@@ -24,8 +25,8 @@ public class CMDAbstractBlock extends CMDAbstract{
 
 	@Override
 	void ka(){
-		if(Bukkit.getPlayer(args[0]).isOnline())
-			Util.sendMessage(Bukkit.getPlayer(args[0]), reference);
+		if(Bukkit.getPlayer(args[0]) != null)
+			Message.reference.sendMessage(Bukkit.getPlayer(args[0]));
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 			}
 		}else if(this.length == 3){
 			if(args[1].equalsIgnoreCase("info")){
-				Util.sendMessage(null, RaceData.getCircuitInformation(args[2]));
+				RaceData.sendCircuitInformation(null, args[2]);
 				return;
 			}else if(args[1].equalsIgnoreCase("delete")){
 				RaceData.deleteCircuit(null, args[2]);
@@ -49,49 +50,49 @@ public class CMDAbstractBlock extends CMDAbstract{
 				return;
 			}else if(args[1].equalsIgnoreCase("setminplayer")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setMinPlayer(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmaxplayer")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setMaxPlayer(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmatchingtime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setmenutime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setMenuTime(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setlimittime")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setLimitTime(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("setlap")){
 				if(!Util.isNumber(args[3])){
-					messageInvalidNumber(null);
+					Message.invalidNumber.sendMessage(null);
 					return;
 				}
 				RaceData.setNumberOfLaps(null, args[2], Integer.valueOf(args[3]));
 				return;
 			}else if(args[1].equalsIgnoreCase("broadcastgoal")){
 				if(!Util.isBoolean(args[3])){
-					messageInvalidBoolean(null);
+					Message.invalidBoolean.sendMessage(null);
 					return;
 				}
 				RaceData.setBroadcastGoalMessage(null, args[2], Boolean.valueOf(args[3]));
@@ -187,7 +188,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 					RaceManager.clearEntryRaceData(other.getUniqueId());
 				}
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
+				if(!Util.isOnline(args[1]))return;
 
 				Player other = Bukkit.getPlayer(args[1]);
 				RaceManager.clearEntryRaceData(other.getUniqueId());
@@ -242,7 +243,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 					RaceManager.clearCharacterRaceData(other.getUniqueId());
 				}
 			}else{
-				if(!Util.isOnline(args[1])){messageNoPlayer(null);return;}
+				if(!Util.isOnline(args[1]))return;
 
 				RaceManager.clearCharacterRaceData(Bukkit.getPlayer(args[1]).getUniqueId());
 			}
@@ -311,13 +312,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 
 		if(this.length == 3){
 			if(!RaceData.isCircuit(args[2])){
-				messageInvalidCircuit(other, args[2]);
+				Message.invalidCircuit.sendMessage(null, args[2]);
 				return;
 			}
 
 			RaceData.sendRanking(other.getUniqueId(), args[2]);
 		}else{
-			Util.sendMessage(null, "===========================================\n" + referenceRankingOther + "\n" + "#GoldCircuit List :\n" + "#White" + RaceData.getCircuitList());
+			Message.referenceRankingOther.sendMessage(null);
 		}
 	}
 
@@ -329,7 +330,7 @@ public class CMDAbstractBlock extends CMDAbstract{
 		RaceManager.endAllCircuit();
 
 		Settings.reloadConfig();
-		Util.sendMessage(null, "[header]コンフィグをリロードしました");
+		Message.cmdReload.sendMessage(null);
 	}
 
 	@Override
@@ -339,13 +340,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					other.getInventory().addItem(item);
-					messageAddItem(other, item);
+					Message.cmdItem.sendMessage(other, item);
 				}
 			//ka {item} @?
 			}else{
 				Player other = Bukkit.getPlayer(args[1]);
 				other.getInventory().addItem(item);
-				messageAddItem(other, item);
+				Message.cmdItem.sendMessage(other, item);
 			}
 		}else if(length == 3){
 			if(!Util.isNumber(args[2]))return;
@@ -355,13 +356,13 @@ public class CMDAbstractBlock extends CMDAbstract{
 			if(args[1].equalsIgnoreCase("all")){
 				for(Player other : Bukkit.getOnlinePlayers()){
 					other.getInventory().addItem(item);
-					messageAddItem(other, item);
+					Message.cmdItem.sendMessage(other, item);
 				}
 			//ka {item} @? 64
 			}else{
 				Player other = Bukkit.getPlayer(args[1]);
 				other.getInventory().addItem(item);
-				messageAddItem(other, item);
+				Message.cmdItem.sendMessage(other, item);
 			}
 		}else{
 		}

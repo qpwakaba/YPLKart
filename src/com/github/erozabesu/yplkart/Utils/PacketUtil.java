@@ -130,9 +130,9 @@ public class PacketUtil extends ReflectionUtil{
 		}
 	}
 
-	public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, ChatColor color, boolean issubtitle){
+	public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, boolean issubtitle){
 		try {
-			Object titlesendpacket = getTitlePacket(text, color, issubtitle);
+			Object titlesendpacket = getTitlePacket(text, issubtitle);
 			Object titlelengthpacket = getTitleLengthPacket(fadein, length, fadeout);
 
 			sendPacket(p, titlesendpacket);
@@ -229,7 +229,10 @@ public class PacketUtil extends ReflectionUtil{
 		return packet;
 	}
 
-	private static Object getTitlePacket(String text, ChatColor color, boolean issubtitle) throws Exception{
+	private static Object getTitlePacket(String text, boolean issubtitle) throws Exception{
+		ChatColor color = Util.getChatColorfromText(text);
+		text = ChatColor.stripColor(text);
+
 		Class<?> chatserializer = null;
 		Class<?> enumtitleaction = null;
 

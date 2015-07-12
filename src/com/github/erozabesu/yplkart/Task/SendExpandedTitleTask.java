@@ -1,6 +1,5 @@
 package com.github.erozabesu.yplkart.Task;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -13,19 +12,17 @@ public class SendExpandedTitleTask extends BukkitRunnable{
 	String text;
 	String expandcharacter;
 	int characterposition;
-	ChatColor color;
 	boolean issubtitle;
 
-	public SendExpandedTitleTask(Player p, int maxlife, String text, String expandcharacter, int characterposition, ChatColor color, boolean issubtitle){
+	public SendExpandedTitleTask(Player p, int maxlife, String text, String expandcharacter, int characterposition, boolean issubtitle){
 		this.p = p;
 		this.maxlife = maxlife*20;
 		this.text = text;
 		this.expandcharacter = expandcharacter;
 		this.characterposition = characterposition;
-		this.color = color;
 		this.issubtitle = issubtitle;
 
-		PacketUtil.sendTitle(p, text, 0, 10, 0, color, issubtitle);
+		PacketUtil.sendTitle(p, text, 0, 10, 0, issubtitle);
 	}
 
 	@Override
@@ -40,7 +37,7 @@ public class SendExpandedTitleTask extends BukkitRunnable{
 		if(life % 2 == 0){
 			text = text.substring(0, this.characterposition) + this.expandcharacter + text.substring(this.characterposition, this.text.length());
 
-			PacketUtil.sendTitle(p, text, 0, 10, 5, color, issubtitle);
+			PacketUtil.sendTitle(p, text, 0, 10, 5, issubtitle);
 		}
 	}
 }

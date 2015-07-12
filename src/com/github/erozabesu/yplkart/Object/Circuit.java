@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitTask;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
@@ -26,6 +27,7 @@ import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class Circuit{
+	private final Circuit circuit = this;
 	private String name;
 	private int laptime;
 	private int limittime;
@@ -145,7 +147,7 @@ public class Circuit{
 	}
 
 	public void endRace(){
-		sendMessageEntryPlayer("#Blue" + Util.convertInitialUpperString(name) + "#Aquaのレースが終了しました");
+		sendMessageEntryPlayer(Message.raceEnd, new Object[]{circuit});
 		Iterator<UUID> i = entry.iterator();
 		UUID id;
 		while(i.hasNext()){
@@ -288,15 +290,15 @@ public class Circuit{
 					if(laptime % 20 == 0){
 						int remaintime = limittime - laptime/20;
 						if(remaintime == 60){
-							sendMessageEntryPlayer("#Gray======== #Aqua残り時間#White60秒#Aqua！ #Gray========");
+							sendMessageEntryPlayer(Message.raceTimeLimitAlert, new Object[]{circuit, (int)60});
 						}else if(remaintime == 30){
-							sendMessageEntryPlayer("#Gray======== #Aqua残り時間#White30秒#Aqua！ #Gray========");
+							sendMessageEntryPlayer(Message.raceTimeLimitAlert, new Object[]{circuit, (int)30});
 						}else if(remaintime == 10){
-							sendMessageEntryPlayer("#Gray======== #Red残り時間#White10秒#Aqua！ #Gray========");
+							sendMessageEntryPlayer(Message.raceTimeLimitAlert, new Object[]{circuit, (int)10});
 						}else if(0 < remaintime && remaintime < 10){
-							sendMessageEntryPlayer("#Gray========       #White" + remaintime + "#Red！        #Gray========");
+							sendMessageEntryPlayer(Message.raceTimeLimitCountDown, new Object[]{circuit, remaintime});
 						}else if(remaintime == 0){
-							sendMessageEntryPlayer("#Gray======== #Redタイムアップ！  #Gray========");
+							sendMessageEntryPlayer(Message.raceTimeUp, new Object[]{circuit});
 							endRace();
 						}
 					}
@@ -347,8 +349,7 @@ public class Circuit{
 		for(UUID id : entry){
 			Player p = Bukkit.getPlayer(id);
 			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-			Util.sendMessage(p, "#Aquaレースを開始する準備が整いました");
-			Util.sendMessage(p, "#Aqua↓↓↓のチャットをクリックして参加を確定して下さい");
+			Message.raceReady.sendMessage(p, circuit);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + p.getName() + tellraw);
 		}
 
@@ -375,14 +376,14 @@ public class Circuit{
 
 						setupRacer();
 						Scoreboards.startCircuit(name);
-						sendMessageEntryPlayer("#Blue" + Util.convertInitialUpperString(name) + "#Aquaのレースを開始します");
+						sendMessageEntryPlayer(Message.raceStart, new Object[]{circuit});
 
 						runRaceStartTask();
 						return;
 					}
 
 					//マッチングに失敗した場合
-					sendMessageEntryPlayer("#Aqua辞退者が出たため再マッチングを行います。規定人数が揃うまでお待ち下さい");
+					sendMessageEntryPlayer(Message.raceMatchingFailed, new Object[]{circuit});
 					setMatching(false);
 					matchingaccept.clear();
 					matchingcountdown = 0;
@@ -427,8 +428,8 @@ public class Circuit{
 				for(UUID id : entry){
 					Player p = Bukkit.getPlayer(id);
 					if(p != null || RaceManager.isEntry(id)){
-						PacketUtil.sendTitle(p, "レースの準備が整いました", 0, 25, 0, ChatColor.WHITE, false);
-						PacketUtil.sendTitle(p, "残り時間 : " + matchingcountdownfortitle + "秒", 0, 25, 0, ChatColor.YELLOW, true);
+						PacketUtil.sendTitle(p, Message.titleRacePrepared.getMessage(), 0, 25, 0, false);
+						PacketUtil.sendTitle(p, Message.titleCountDown.getMessage(matchingcountdownfortitle), 0, 25, 0, true);
 					}
 				}
 			}
@@ -456,8 +457,8 @@ public class Circuit{
 				if(12 < racestartcountdown){
 					for(Player p : getEntryPlayer()){
 						int count = racestartcountdown-12;
-						PacketUtil.sendTitle(p, "メニュー選択時間", 0, 25, 0, ChatColor.AQUA, false);
-						PacketUtil.sendTitle(p, "残り : " + count + "秒", 0, 25, 0, ChatColor.AQUA, true);
+						PacketUtil.sendTitle(p, Message.titleRaceMenu.getMessage(), 0, 25, 0, false);
+						PacketUtil.sendTitle(p, Message.titleCountDown.getMessage(count), 0, 25, 0, true);
 					}
 				}else if(racestartcountdown == 12){
 					for(Player p : getEntryPlayer()){
@@ -469,29 +470,29 @@ public class Circuit{
 						}
 						p.closeInventory();
 						EnumItem.removeAllKeyItems(p);
-						PacketUtil.sendTitle(p, "Standby", 10, 40, 10, ChatColor.RED, false);
-						PacketUtil.sendTitle(p, "", 10, 40, 10, ChatColor.AQUA, true);
+						PacketUtil.sendTitle(p, Message.titleRaceStandby.getMessage(), 10, 40, 10, false);
+						PacketUtil.sendTitle(p, Message.titleRaceStandbySub.getMessage(), 10, 40, 10, true);
 					}
 				}else if(racestartcountdown == 10){
 					for(Player p : getEntryPlayer()){
-						PacketUtil.sendTitle(p, String.valueOf(RaceData.getNumberOfLaps(name)), 10, 40, 10, ChatColor.RED, false);
-						PacketUtil.sendTitle(p, "Laps", 10, 40, 10, ChatColor.GOLD, true);
+						PacketUtil.sendTitle(p, Message.titleRaceLaps.getMessage(RaceData.getNumberOfLaps(name)), 10, 40, 10, false);
+						PacketUtil.sendTitle(p, Message.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
 					}
 				}else if(racestartcountdown == 8){
 					for(Player p : getEntryPlayer()){
-						PacketUtil.sendTitle(p, String.valueOf(RaceData.getLimitTime(name)), 10, 40, 10, ChatColor.RED, false);
-						PacketUtil.sendTitle(p, "Time Limit", 10, 40, 10, ChatColor.GOLD, true);
+						PacketUtil.sendTitle(p, Message.titleRaceTimeLimit.getMessage(RaceData.getLimitTime(name)), 10, 40, 10, false);
+						PacketUtil.sendTitle(p, Message.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
 					}
 				}else if(racestartcountdown == 6){
 					for(Player p : getEntryPlayer()){
-						PacketUtil.sendTitle(p, "Ready", 10, 20, 10, ChatColor.RED, false);
-						PacketUtil.sendTitle(p, "", 10, 20, 10, ChatColor.AQUA, true);
+						PacketUtil.sendTitle(p, Message.titleRaceReady.getMessage(), 10, 20, 10, false);
+						PacketUtil.sendTitle(p, Message.titleRaceReadySub.getMessage(), 10, 20, 10, true);
 					}
 				}else if(0 < racestartcountdown && racestartcountdown < 4){
 					for(Player p : getEntryPlayer()){
 						p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
-						PacketUtil.sendTitle(p, String.valueOf(racestartcountdown), 0, 20, 0, ChatColor.RED, false);
-						PacketUtil.sendTitle(p, "", 0, 20, 0, ChatColor.AQUA, true);
+						PacketUtil.sendTitle(p, Message.titleRaceStartCountDown.getMessage(racestartcountdown), 0, 20, 0, false);
+						PacketUtil.sendTitle(p, Message.titleRaceStartCountDownSub.getMessage(), 0, 20, 0, true);
 					}
 				}else if(racestartcountdown == 0){
 					setStart(true);
@@ -499,7 +500,7 @@ public class Circuit{
 						Util.createSignalFireworks(p.getLocation());
 						Util.createFlowerShower(p, 5);
 						p.playSound(p.getLocation(), Sound.AMBIENCE_THUNDER, 1.0F, 2.8F);
-						new SendExpandedTitleTask(p, 1, "START!!!", "A", 2, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+						new SendExpandedTitleTask(p, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
 					}
 				}else if(racestartcountdown < 0){
 					racestartcountdown = 0;
@@ -511,9 +512,9 @@ public class Circuit{
 		}, 0, 20);
 	}
 
-	public void sendMessageEntryPlayer(String message){
+	public void sendMessageEntryPlayer(Message message, Object[] object){
 		for(Player p : getEntryPlayer()){
-			Util.sendMessage(p, message);
+			message.sendMessage(p, object);
 		}
 	}
 

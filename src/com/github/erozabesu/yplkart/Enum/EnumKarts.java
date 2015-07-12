@@ -10,8 +10,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Utils.Util;
 
 public enum EnumKarts{
 	Kart1(Settings.KartName1, Material.HUGE_MUSHROOM_2, (byte)0, Settings.KartSetting1, Material.BOWL, (byte)0),
@@ -92,23 +92,23 @@ public enum EnumKarts{
 	}
 
 	public String getParameter(){
-		String text = "";
-		text += "#DarkAqua " + "#Green重量 : #Yellow"							 + getWeight() + "\n";
-		text += "#DarkAqua " + "#Green最高速度 : #Yellow"						 + getMaxSpeed() + "\n";
-		text += "#DarkAqua " + "#Green加速 : #Yellow"							 + getAcceleration() + "\n";
-		text += "#DarkAqua " + "#Greenカーブ性能 : #Yellow"					 + getDefaultCorneringPower() + "\n";
-		text += "#DarkAqua " + "#Greenドリフト時のカーブ性能 : #Yellow"		 + getDriftCorneringPower() + "\n";
-		text += "#DarkAqua " + "#Greenドリフト時の減速率 : #Yellow"				 + getDriftSpeedDecrease() + "\n";
-		text += "#DarkAqua " + "#Greenダート走行時の減速率 : #Yellow"			 + getSpeedOnDirt() + "\n";
-		text += "#DarkAqua " + "#Green乗り越えられるブロックの高さ : #Yellow"	 + getClimbableHeight() + "\n";
-		return text;
+		return Message.tableKartParameter.getMessage(new String[]{
+				String.valueOf(getWeight()),
+				String.valueOf(getMaxSpeed()),
+				String.valueOf(getAcceleration()),
+				String.valueOf(getDefaultCorneringPower()),
+				String.valueOf(getDriftCorneringPower()),
+				String.valueOf(getDriftSpeedDecrease()),
+				String.valueOf(getSpeedOnDirt()),
+				String.valueOf(getClimbableHeight())
+		});
 	}
 
 	public ItemStack getMenuItem(){
 		ItemStack item = new ItemStack(getItemMaterial(), 1, (short)0, getItemData());
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(getName());
-		meta.setLore(Util.replaceLine(Util.replaceChatColor(getParameter())));
+		meta.setLore(Message.replaceLine(Message.replaceChatColor(getParameter())));
 
 		item.setItemMeta(meta);
 

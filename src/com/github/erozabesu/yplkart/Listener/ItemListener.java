@@ -42,6 +42,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
 import com.github.erozabesu.yplkart.Enum.EnumItem;
@@ -86,9 +87,9 @@ public class ItemListener extends RaceManager implements Listener{
 					ex.printStackTrace();
 				}
 			}
-		}else if(EnumItem.ItemBox.isSimilar(p.getItemInHand())){
+		}else if(EnumItem.ItemBoxTool.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, EnumItem.ItemBox.getPermission(), false)){
+			if(Permission.hasPermission(p, EnumItem.ItemBoxTool.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -97,9 +98,9 @@ public class ItemListener extends RaceManager implements Listener{
 					b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 				}
 			}
-		}else if(EnumItem.ItemBoxTier2.isSimilar(p.getItemInHand())){
+		}else if(EnumItem.ItemBoxToolTier2.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, EnumItem.ItemBoxTier2.getPermission(), false)){
+			if(Permission.hasPermission(p, EnumItem.ItemBoxToolTier2.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -108,9 +109,9 @@ public class ItemListener extends RaceManager implements Listener{
 					b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 				}
 			}
-		}else if(EnumItem.ItemBoxFake.isSimilar(p.getItemInHand())){
+		}else if(EnumItem.FakeItemBoxTool.isSimilar(p.getItemInHand())){
 			e.setCancelled(true);
-			if(Permission.hasPermission(p, EnumItem.ItemBoxFake.getPermission(), false)){
+			if(Permission.hasPermission(p, EnumItem.FakeItemBoxTool.getPermission(), false)){
 				if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 					Block b = e.getClickedBlock().getRelative(e.getBlockFace());
 					EnderCrystal endercrystal = b.getWorld().spawn(b.getLocation().add(0.5,0,0.5), EnderCrystal.class);
@@ -217,7 +218,7 @@ public class ItemListener extends RaceManager implements Listener{
 							entity.remove();
 
 							if(p.getNoDamageTicks()==0){
-								Util.sendMessage(p, "バナナに引っ掛かった！");
+								Message.raceInteractBanana.sendMessage(p, RaceManager.getCircuit(id));
 								setNegativeItemSpeed(p, Settings.BananaEffectSecond, Settings.BananaEffectLevel, Sound.SLIME_WALK);
 							}
 						}
@@ -229,7 +230,7 @@ public class ItemListener extends RaceManager implements Listener{
 							entity.remove();
 
 							if(p.getNoDamageTicks()==0){
-								Util.sendMessage(p, "偽アイテムブロックだ！");
+								Message.raceInteractFakeItemBox.sendMessage(p, RaceManager.getCircuit(id));
 								Util.createSafeExplosion(null, p.getLocation(), Settings.FakeItemBoxHitDamage, 1);
 							}
 						}
@@ -247,7 +248,7 @@ public class ItemListener extends RaceManager implements Listener{
 							}, 2 * 20L + 10L);
 
 							if(p.getNoDamageTicks()==0){
-								Util.sendMessage(p, "偽アイテムブロックだ！");
+								Message.raceInteractBanana.sendMessage(p, RaceManager.getCircuit(id));
 								Util.createSafeExplosion(null, p.getLocation(), Settings.FakeItemBoxHitDamage, 1);
 							}
 						}
@@ -295,9 +296,9 @@ public class ItemListener extends RaceManager implements Listener{
 								ItemStack item = EnumItem.getRandomItemfromTier(p, tier);
 								if(item != null){
 									EnumItem.addItem(p, item);
-									Util.sendMessage(p, "アイテムゲット！");
+									Message.raceInteractItemBox.sendMessage(p, new Object[]{getCircuit(id), item});
 								}else{
-									Util.sendMessage(p, "#Red抽選対象の全てのアイテムにおいて使用権限を所有していなかったため、アイテムを獲得できませんでした");
+									Message.raceInteractItemBoxFailed.sendMessage(p, getCircuit(id));
 								}
 								p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 2.0F);
 								itemboxCool.put(p, true);
@@ -362,22 +363,22 @@ public class ItemListener extends RaceManager implements Listener{
 		if(!(e.getDamager() instanceof Player))return;
 		Player p = (Player)e.getDamager();
 		if(p.getItemInHand() == null)return;
-		if(EnumItem.ItemBox.isSimilar(p.getItemInHand())){
+		if(EnumItem.ItemBoxTool.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxName)){
 				e.getEntity().remove();
-				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
+				Message.itemRemoveItemBox.sendMessage(p);
 				e.setCancelled(true);
 			}
-		}else if(EnumItem.ItemBoxTier2.isSimilar(p.getItemInHand())){
+		}else if(EnumItem.ItemBoxToolTier2.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameTier2)){
 				e.getEntity().remove();
-				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
+				Message.itemRemoveItemBox.sendMessage(p);
 				e.setCancelled(true);
 			}
-		}else if(EnumItem.ItemBoxFake.isSimilar(p.getItemInHand())){
+		}else if(EnumItem.FakeItemBoxTool.isSimilar(p.getItemInHand())){
 			if(e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameFake) || e.getEntity().getCustomName().equalsIgnoreCase(FakeItemBoxName)){
 				e.getEntity().remove();
-				Util.sendMessage(p, "[header]" + e.getEntity().getCustomName() + "を削除しました");
+				Message.itemRemoveItemBox.sendMessage(p);
 				e.setCancelled(true);
 			}
 		}
@@ -484,7 +485,7 @@ public class ItemListener extends RaceManager implements Listener{
 	public void itemTeresa(Player user){
 		List<Player> entry = getRacingPlayer(getRace(user).getEntry());
 		if(entry.size() <= 1){
-			Util.sendMessage(user, "レース参加者が居ないため使用できません");
+			Message.itemNoPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 		Util.setItemDecrease(user);
@@ -501,16 +502,16 @@ public class ItemListener extends RaceManager implements Listener{
 		}
 
 		if(targetitem.isEmpty() || 0 < target.getNoDamageTicks()){
-			Util.sendMessage(user, "アイテムを持っていなかった！");
+			Message.itemTeresaNoItem.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			user.playSound(user.getLocation(), Sound.BURP, 1.0F, 0.5F);
 		}else{
-			ItemStack levy = targetitem.get(new Random().nextInt(targetitem.size()));
-			targetinv.remove(levy);
-			Util.sendMessage(user, "ライバルから" + levy.getItemMeta().getDisplayName() + "を盗んだ！");
+			ItemStack rob = targetitem.get(new Random().nextInt(targetitem.size()));
+			targetinv.remove(rob);
+			Message.itemTeresaRob.sendMessage(user, new Object[]{getCircuit(user.getUniqueId()), rob});
 			user.playSound(user.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-			Util.sendMessage(target, levy.getItemMeta().getDisplayName() + "を盗まれた！");
+			Message.itemTeresaRobbed.sendMessage(target, new Object[]{getCircuit(user.getUniqueId()), rob});
 			target.playSound(user.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-			EnumItem.addItem(user, levy);
+			EnumItem.addItem(user, rob);
 			user.updateInventory();
 			target.updateInventory();
 		}
@@ -524,7 +525,7 @@ public class ItemListener extends RaceManager implements Listener{
 	public void itemThunder(Player user){
 		List<Player> list = getRacingPlayer(getRace(user).getEntry());
 		if(list.size() <= 1){
-			Util.sendMessage(user, "レース参加者が居ないため使用できません");
+			Message.itemNoPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 		Util.setItemDecrease(user);
@@ -549,7 +550,7 @@ public class ItemListener extends RaceManager implements Listener{
 	public void itemGesso(Player user){
 		List<Player> list = getRacingPlayer(getRace(user).getEntry());
 		if(list.size() <= 1){
-			Util.sendMessage(user, "レース参加者が居ないため使用できません");
+			Message.itemNoPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 		ArrayList<Player> target = new ArrayList<Player>();
@@ -560,7 +561,7 @@ public class ItemListener extends RaceManager implements Listener{
 				target.add(entry);
 		}
 		if(target.isEmpty()){
-			Util.sendMessage(user, "自分より上位のプレイヤーが居ないため使用できません");
+			Message.itemNoHigherPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 
@@ -594,12 +595,12 @@ public class ItemListener extends RaceManager implements Listener{
 	public void itemRedturtle(Player user){
 		if(!isRacing(user.getUniqueId()))return;
 		if(getRacingPlayer(getRace(user).getEntry()).size() <= 1){
-			Util.sendMessage(user, "レース参加者が居ないため使用できません");
+			Message.itemNoPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 		if(getRank(user) == 0)return;
 		if(getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius+20, getRace(user)) == null){
-			Util.sendMessage(user, "#Red周囲に未通過のチェックポイントがないため使用できません");
+			Message.itemNoCheckpoint.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 
@@ -621,17 +622,17 @@ public class ItemListener extends RaceManager implements Listener{
 	public void itemThornedturtle(Player user){
 		if(!isRacing(user.getUniqueId()))return;
 		if(getRacingPlayer(getRace(user).getEntry()).size() <= 1){
-			Util.sendMessage(user, "レース参加者が居ないため使用できません");
+			Message.itemNoPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 		int rank = getRank(user);
 		if(rank == 0)return;
 		else if(rank == 1){
-			Util.sendMessage(user, "1位のプレイヤーはトゲゾーこうらを使えません");
+			Message.itemHighestPlayer.sendMessage(user, new Object[]{getCircuit(user.getUniqueId()), EnumItem.ThornedTurtle.getItem()});
 			return;
 		}
 		if(getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius+20, getRace(user)) == null){
-			Util.sendMessage(user, "#Red周囲に未通過のチェックポイントがないため使用できません");
+			Message.itemNoCheckpoint.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 
@@ -645,44 +646,44 @@ public class ItemListener extends RaceManager implements Listener{
 		new ItemDyedTurtleTask(user, getPlayerfromRank(getRace(user).getEntry(), 1), turtle, true, false).runTaskTimer(pl, 0, 1);
 	}
 
-	public void itemKiller(final Player p){
-		if(!isRacing(p.getUniqueId()))return;
-		if(getRank(p) == 0)return;
+	public void itemKiller(final Player user){
+		if(!isRacing(user.getUniqueId()))return;
+		if(getRank(user) == 0)return;
 
-		Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(p.getLocation(), checkPointDetectRadius+20, getRace(p));
+		Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius+20, getRace(user));
 
 		if(unpassedcheckpoint == null){
-			Util.sendMessage(p, "#Red周囲に未通過のチェックポイントがないため使用できません");
+			Message.itemNoCheckpoint.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 
-		final Race r = getRace(p);
+		final Race r = getRace(user);
 
 		if(r.getUsingKiller() != null){
-			Util.sendMessage(p, "#Red既に使用中です");
+			Message.itemAlreadyUsing.sendMessage(user, new Object[]{getCircuit(user.getUniqueId())});
 			return;
 		}
 
-		Util.setItemDecrease(p);
+		Util.setItemDecrease(user);
 
 		EnumCharacter job = r.getCharacter();
 
 		int life = Settings.KillerEffectSecond + job.getItemAdjustPositiveEffectSecond();
-		new SendCountDownTitleTask(p, life, "⚠ AUTO CONTROL ⚠", ChatColor.RED, ChatColor.YELLOW).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		new SendCountDownTitleTask(user, life, Message.titleUsingKiller.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1);
 		r.setUsingKiller(life, unpassedcheckpoint);
 
 		if(r.getKart() == null){
 			EnumKarts kart = EnumKarts.Kart1;
 
 			try {
-				Minecart minecart = createCustomMinecart(p.getLocation(), kart);
+				Minecart minecart = createCustomMinecart(user.getLocation(), kart);
 				minecart.setDisplayBlock(new MaterialData(Material.HUGE_MUSHROOM_1, (byte) 9));
-				minecart.setPassenger(p);
+				minecart.setPassenger(user);
 				Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 					public void run(){
 						try {
-							if(p.getVehicle() != null){
-								leaveRacingKart(p);
+							if(user.getVehicle() != null){
+								leaveRacingKart(user);
 							}
 						}catch (Exception ex) {
 							ex.printStackTrace();
@@ -693,15 +694,15 @@ public class ItemListener extends RaceManager implements Listener{
 				ex.printStackTrace();
 			}
 		}else{
-			if(p.getVehicle() != null)
-				if(p.getVehicle() instanceof Minecart){
-					((Minecart)p.getVehicle()).setDisplayBlock(new MaterialData(Material.HUGE_MUSHROOM_1, (byte) 9));
+			if(user.getVehicle() != null)
+				if(user.getVehicle() instanceof Minecart){
+					((Minecart)user.getVehicle()).setDisplayBlock(new MaterialData(Material.HUGE_MUSHROOM_1, (byte) 9));
 					Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
 						public void run(){
 							try {
-								if(p.getVehicle() != null)
-									if(p.getVehicle() instanceof Minecart)
-									((Minecart)p.getVehicle()).setDisplayBlock(new MaterialData(r.getKart().getDisplayBlock(), r.getKart().getDisplayData()));
+								if(user.getVehicle() != null)
+									if(user.getVehicle() instanceof Minecart)
+									((Minecart)user.getVehicle()).setDisplayBlock(new MaterialData(r.getKart().getDisplayBlock(), r.getKart().getDisplayData()));
 
 							}catch (Exception ex) {
 								ex.printStackTrace();

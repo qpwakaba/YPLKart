@@ -33,6 +33,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
@@ -102,7 +103,7 @@ public class DataListener extends RaceManager implements Listener {
 				if(entity.getLocation().distance(p.getLocation()) < 1.5){
 					p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
 					entity.remove();
-					Util.sendMessage(p, "[header]チェックポイントを削除しました");
+					Message.itemRemoveCheckPoint.sendMessage(p);
 					break;
 				}
 		}
@@ -152,7 +153,7 @@ public class DataListener extends RaceManager implements Listener {
 					if(lapcount == 0){
 						r.setStart(true, e.getFrom(), e.getTo());
 					}else{
-						Util.sendMessage(p, (lapcount + 1) + "周目突入！");
+						Message.raceUpdateLap.sendMessage(p, new Object[]{(lapcount + 1), RaceManager.getCircuit(r.getEntry())});
 					}
 					r.setLapCount(lapcount + 1);
 				}
@@ -161,7 +162,7 @@ public class DataListener extends RaceManager implements Listener {
 		}else if(r.getLastStepBlock().equalsIgnoreCase(Settings.GoalBlock)){
 			if(Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.StartBlock)){
 				//逆走
-				Util.sendMessage(p, "逆走");
+				Message.raceReverseRun.sendMessage(p, RaceManager.getCircuit(r.getEntry()));
 				if(lapcount <= 0)
 					r.setLapCount(0);
 				else{
@@ -270,7 +271,7 @@ public class DataListener extends RaceManager implements Listener {
 					p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
 					r.recoveryKart();
 					r.setDeathPenaltyTitleSendTask(
-						new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), "DEATH PENALTY", ChatColor.RED).runTaskTimer(YPLKart.getInstance(), 0, 1)
+						new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
 					);
 			}
 		});
@@ -327,7 +328,6 @@ public class DataListener extends RaceManager implements Listener {
 		if(!isStandBy(p.getUniqueId()))return;
 		Race r = getRace(p);
 
-		Util.sendMessage(p, "デスペナルティ！");
 		RaceManager.leaveRacingKart(p);
 		r.setLastYaw(p.getLocation().getYaw());
 
@@ -354,7 +354,7 @@ public class DataListener extends RaceManager implements Listener {
 		Race r = getRace(p);
 		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
 			if(r.getCharacter() == null){
-				Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
 				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
 					public void run(){
 						showCharacterSelectMenu(p);
@@ -363,7 +363,7 @@ public class DataListener extends RaceManager implements Listener {
 				return;
 			}
 			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
-				Util.sendMessage(p, "#Redカートを選択して下さい");
+				Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
 				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
 					public void run(){
 						showKartSelectMenu(p);
@@ -373,7 +373,7 @@ public class DataListener extends RaceManager implements Listener {
 			}
 		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
 			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
-				Util.sendMessage(p, "#Redカートを選択して下さい");
+				Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
 				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
 					public void run(){
 						showKartSelectMenu(p);
@@ -382,7 +382,7 @@ public class DataListener extends RaceManager implements Listener {
 				return;
 			}
 			if(r.getCharacter() == null){
-				Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+				Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
 				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
 					public void run(){
 						showCharacterSelectMenu(p);
@@ -429,7 +429,7 @@ public class DataListener extends RaceManager implements Listener {
 			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
 				if(isStandBy(id)){
 					if(r.getCharacter() == null){
-						Util.sendMessage(p, "#Redキャラクターを選択して下さい");
+						Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
 					}else{
 						p.closeInventory();
 
@@ -466,7 +466,7 @@ public class DataListener extends RaceManager implements Listener {
 			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
 				if(isStandBy(id)){
 					if(r.getKart() == null){
-						Util.sendMessage(p, "#Redカートを選択して下さい");
+						Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
 					}else{
 						p.closeInventory();
 

@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Enum.EnumCharacter;
@@ -274,16 +275,19 @@ public class Race {
 
 		double currentmillisecond = RaceManager.getCircuit(entry).getLapMilliSeconds();
 
-		new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!", "O", 1, ChatColor.GOLD, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
-		PacketUtil.sendTitle(getPlayer(), RaceManager.getGoalPlayer(entry).size() + "位  " + currentmillisecond/1000 + "秒", 10, 100, 10, ChatColor.GREEN, true);
+		new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!" + ChatColor.GOLD, "O", 1, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+		String message = Message.titleGoalRank.getMessage(new Object[]{new Number[]{RaceManager.getGoalPlayer(entry).size(), (double)(currentmillisecond/1000)}});
+		System.out.println(message);
+		PacketUtil.sendTitle(getPlayer(), message, 10, 100, 10, true);
 		setPoint(getPassedCheckPoint().size() + (RaceManager.getRacingPlayer(entry).size())*10);
-		String message = getPlayer().getName() + "さん#Yellow" + String.valueOf(RaceManager.getGoalPlayer(entry).size()) + "位#Greenでゴール！ #WhiteTime : #Yellow" + currentmillisecond/1000 + "#White秒";
-		if(RaceData.getBroadcastGoalMessage(entry))
-			Util.broadcastMessage(message);
-		else{
-			Circuit c = RaceManager.getCircuit(entry);
-			if(c != null)
-				c.sendMessageEntryPlayer(message);
+
+		Circuit c = RaceManager.getCircuit(entry);
+		if(RaceData.getBroadcastGoalMessage(entry)){
+			for(Player p : Bukkit.getOnlinePlayers()){
+				Message.raceGoal.sendMessage(p, new Object[]{getPlayer(), c, new Number[]{RaceManager.getGoalPlayer(entry).size(), (double)(currentmillisecond/1000)}});
+			}
+		}else{
+			c.sendMessageEntryPlayer(Message.raceGoal, new Object[]{getPlayer(), c, new Number[]{RaceManager.getGoalPlayer(entry).size(), (double)(currentmillisecond/1000)}});
 		}
 
 		if(getKart() == null)
