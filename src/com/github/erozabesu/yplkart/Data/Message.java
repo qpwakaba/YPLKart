@@ -201,7 +201,7 @@ public enum Message{
 	raceUpdateLap(				"<circuitheader><white><number><green>周目突入！"),
 	raceReverseRun(				"<circuitheader><red>逆走"),
 	racePlayerDead(				"<circuitheader><white><player> is dead"),
-	racePlayerKill(				"<circuitheader><white><player> is dead"),
+	racePlayerKill(				"<circuitheader><white><player1> killed by <player2>"),
 
 	raceEntry(					"<circuitheader><green>エントリーしました"),
 	raceEntryAlready(			"<circuitheader><red>既にエントリーしています。他のレースにエントリーしたい場合は現在のエントリーを取り消して下さい"),
@@ -511,6 +511,8 @@ public enum Message{
 
 		createConfig();
 
+		updatePatch();
+
 		for(Message message : values()){
 			String newmessage = getData(message.name(), message.getDefaultMessage());
 
@@ -540,5 +542,13 @@ public enum Message{
 		configFile = new File(datafolder, filename);
 		config = YamlConfiguration.loadConfiguration(configFile);
 		loadConfig();
+	}
+
+	private static void updatePatch(){
+		String version = getData(messageVersion.name(), messageVersion.getDefaultMessage());
+		if(version.equalsIgnoreCase("1.0")){
+			config.set(messageVersion.name(), "1.1");
+			config.set(racePlayerKill.name(), "<circuitheader><white><player1> was killed by <player2>");
+		}
 	}
 }
