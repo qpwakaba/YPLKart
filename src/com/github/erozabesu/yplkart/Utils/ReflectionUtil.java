@@ -103,7 +103,7 @@ public class ReflectionUtil{
 		return null;
 	}
 
-	public static Object getCraftEntityClass(World w, String classname){
+	public static Object getCraftEntityfromClassName(World w, String classname){
 		Class<?> entityclass = getBukkitClass(classname);
 		try {
 			return entityclass.getConstructor(getBukkitClass("World")).newInstance(getCraftWorld(w));

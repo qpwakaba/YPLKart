@@ -180,11 +180,18 @@ public enum Message{
 	cmdItemAll(							"<header><green>全プレイヤーに<white><item><green>を配布しました"),
 	cmdReload(							"<header><green>コンフィグをリロードしました"),
 
-	raceStart(					"<circuitheader><green>レースを開始します"),
-	raceEnd(					"<circuitheader><green>レースが終了しました"),
+	/*buttonAccept(			"参加する"),
+	buttonAcceptHover(		"レースへの参加を承認します"),
+	buttonAcceptHover2(		"承認した参加者が規定人数を満たせばレースが開始されます"),
+	buttonDeny(				"辞退する"),
+	buttonDenyHover(		"レースの参加を辞退し、エントリーを取り消します"),
+	buttonDenyHover2(		"辞退する"),*/
 	raceReady(					"<circuitheader><green>レースを開始する準備が整いました<br><circuitheader><green>↓↓↓のチャットをクリックして参加を確定して下さい"),
 	raceMatchingFailed(			"<circuitheader><green>辞退者が出たため再マッチングを行います。規定人数が揃うまでお待ち下さい"),
 	raceAccept(					"<circuitheader><green>レース参加を承認しました。準備が整うまでお待ち下さい"),
+
+	raceStart(					"<circuitheader><green>レースを開始します"),
+	raceEnd(					"<circuitheader><green>レースが終了しました"),
 	raceTimeLimitAlert(			"<circuitheader><red>-------- <aqua>残り時間<white><number>秒<aqua>！ <red>--------"),
 	raceTimeLimitCountDown(		"<circuitheader><red>--------        <aqua><white><number><aqua>！       <red>--------"),
 	raceTimeUp(					"<circuitheader><red>-------- <aqua>タイムアップ！  <red>--------"),

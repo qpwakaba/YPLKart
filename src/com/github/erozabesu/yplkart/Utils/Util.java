@@ -70,7 +70,7 @@ public class Util extends ReflectionUtil{
 		return num;
 	}
 
-	public static ChatColor getChatColorfromText(String text){
+	public static ChatColor getChatColorFromText(String text){
 		String color = ChatColor.getLastColors(text);
 		if(color == null)return ChatColor.WHITE;
 		if(color.length() == 0)return ChatColor.WHITE;
