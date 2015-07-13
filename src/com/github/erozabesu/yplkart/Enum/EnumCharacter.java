@@ -13,22 +13,84 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public enum EnumCharacter {
-    Human("Human", "EntityHuman", Settings.HumanClassSetting, Material.SUGAR, Sound.BURP, 1.0F, 1.0F),
-    Creeper("Creeper", "EntityCreeper", Settings.CreeperClassSetting, Material.MELON_SEEDS, Sound.CREEPER_HISS, 1.0F,
+    Human(
+            "Human",
+            "EntityHuman",
+            Settings.HumanClassSetting,
+            Material.SUGAR, Sound.BURP,
+            1.0F,
             1.0F),
-    Zombie("Zombie", "EntityZombie", Settings.ZombieClassSetting, Material.PUMPKIN_SEEDS, Sound.ZOMBIE_DEATH, 1.0F,
+    Creeper(
+            "Creeper",
+            "EntityCreeper",
+            Settings.CreeperClassSetting,
+            Material.MELON_SEEDS,
+            Sound.CREEPER_HISS,
+            1.0F,
             1.0F),
-    Skeleton("Skeleton", "EntitySkeleton", Settings.SkeletonClassSetting, Material.BLAZE_ROD, Sound.SKELETON_DEATH,
+    Zombie(
+            "Zombie",
+            "EntityZombie",
+            Settings.ZombieClassSetting,
+            Material.PUMPKIN_SEEDS,
+            Sound.ZOMBIE_DEATH,
+            1.0F,
+            1.0F),
+    Skeleton(
+            "Skeleton",
+            "EntitySkeleton",
+            Settings.SkeletonClassSetting,
+            Material.BLAZE_ROD,
+            Sound.SKELETON_DEATH,
             1.0F, 1.0F),
-    Spider("Spider", "EntitySpider", Settings.SpiderClassSetting, Material.GOLD_NUGGET, Sound.SPIDER_IDLE, 1.0F, 1.0F),
-    Enderman("Enderman", "EntityEnderman", Settings.EndermanClassSetting, Material.NETHER_STALK, Sound.ENDERMAN_DEATH,
-            1.0F, 1.0F),
-    Witch("Witch", "EntityWitch", Settings.WitchClassSetting, Material.NETHER_BRICK_ITEM, Sound.VILLAGER_DEATH, 1.0F,
+    Spider(
+            "Spider",
+            "EntitySpider",
+            Settings.SpiderClassSetting,
+            Material.GOLD_NUGGET,
+            Sound.SPIDER_IDLE,
+            1.0F,
+            1.0F),
+    Enderman(
+            "Enderman",
+            "EntityEnderman",
+            Settings.EndermanClassSetting,
+            Material.NETHER_STALK,
+            Sound.ENDERMAN_DEATH,
+            1.0F,
+            1.0F),
+    Witch(
+            "Witch",
+            "EntityWitch",
+            Settings.WitchClassSetting,
+            Material.NETHER_BRICK_ITEM,
+            Sound.VILLAGER_DEATH,
+            1.0F,
             4.0F),
-    Pig("Pig", "EntityPig", Settings.PigClassSetting, Material.QUARTZ, Sound.PIG_DEATH, 1.0F, 1.0F),
-    Squid("Squid", "EntitySquid", Settings.SquidClassSetting, Material.PRISMARINE_SHARD, Sound.SLIME_WALK, 1.0F, 1.0F),
-    Villager("Villager", "EntityVillager", Settings.VillagerClassSetting, Material.PRISMARINE_CRYSTALS,
-            Sound.VILLAGER_DEATH, 1.0F, 1.0F);
+    Pig(
+            "Pig",
+            "EntityPig",
+            Settings.PigClassSetting,
+            Material.QUARTZ,
+            Sound.PIG_DEATH,
+            1.0F,
+            1.0F),
+    Squid(
+            "Squid",
+            "EntitySquid",
+            Settings.SquidClassSetting,
+            Material.PRISMARINE_SHARD,
+            Sound.SLIME_WALK,
+            1.0F,
+            1.0F),
+    Villager(
+            "Villager",
+            "EntityVillager",
+            Settings.VillagerClassSetting,
+            Material.PRISMARINE_CRYSTALS,
+            Sound.VILLAGER_DEATH,
+            1.0F,
+            1.0F);
 
     private double[] classsetting;
     private String name;
