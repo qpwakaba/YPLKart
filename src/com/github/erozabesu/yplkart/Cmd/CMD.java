@@ -12,6 +12,7 @@ public class CMD implements CommandExecutor {
     CMDAbstract cmd;
 
     public CMD() {
+        // Do nothing
     }
 
     @Override
