@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.Cmd.CMD;
@@ -22,11 +21,6 @@ import com.github.erozabesu.yplkart.Utils.Util;
 
 public class YPLKart extends JavaPlugin {
     public static String plname;
-
-    public static FileConfiguration cConfig;
-    public static File cConfigFile;
-    public static FileConfiguration Config;
-    public static File ConfigFile;
 
     private VaultConnection vaultConnection;
 
