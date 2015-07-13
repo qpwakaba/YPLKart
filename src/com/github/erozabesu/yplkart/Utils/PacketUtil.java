@@ -124,7 +124,7 @@ public class PacketUtil extends ReflectionUtil{
 			return;
 		}
 		try {
-			Object disguise = getCraftEntityfromClassName(p.getWorld(), job.getCraftClassName());
+			Object disguise = getCraftEntityFromClassName(p.getWorld(), job.getCraftClassName());
 			Location loc = p.getLocation();
 
 			Entity_setLocation.invoke(disguise, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
@@ -172,7 +172,7 @@ public class PacketUtil extends ReflectionUtil{
 	}
 
 	public static Object getDisguisePacket(Player p, EnumCharacter job) throws Exception{
-		Object craftentity = getCraftEntityfromClassName(p.getWorld(), job.getCraftClassName());
+		Object craftentity = getCraftEntityFromClassName(p.getWorld(), job.getCraftClassName());
 		Location loc = p.getLocation();
 
 		Entity_setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
