@@ -35,21 +35,23 @@ public class YPLKart extends JavaPlugin{
 		CMD CMDExecutor = new CMD();
 		getCommand("ka").setExecutor(CMDExecutor);
 
+		new ReflectionUtil();
+		new Util();
+		new PacketUtil();
+
 		new DataListener(this);
 		new ItemListener(this);
 		new NettyListener(this);
 		new Settings(this);
 		new RaceData(this);
 		new DisplayKartData(this);
-		new ReflectionUtil();
-		new Util();
-		new PacketUtil();
 
 		Message.reloadConfig();
 
 		for(World w : Bukkit.getWorlds()){
 			DisplayKartData.respawnKart(w);
 		}
+
 
 		Message.sendAbsolute(null, "[" + plname + "] v." + YPLKart.getInstance().getDescription().getVersion() + " Plugin has been Enabled");
 	}

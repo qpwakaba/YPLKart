@@ -1,28 +1,53 @@
 package com.github.erozabesu.yplkart.Utils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class ReflectionUtil{
+	private static String bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+	private static String bukkitPackage = "net.minecraft.server." + getBukkitVersion();
+	private static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
+	private static String yplkartPackage = "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
+
+	private static Class<?> World = getBukkitClass("World");
+	private static Class<?> CraftWorld = getCraftClass("CraftWorld");
+	private static Class<?> CraftItemStack = getCraftClass("inventory.CraftItemStack");
+
+	private static HashMap<String, Constructor<?>> BukkitEntity_Constructor = new HashMap<String, Constructor<?>>();
+	private static HashMap<String, Method> CraftEntity_getHandle = new HashMap<String, Method>();
+	public static Method CraftWorld_getHandle;
+	private static Method static_CraftItemStack_asNMSCopy;
+
+	public ReflectionUtil(){
+		try {
+			CraftWorld_getHandle = CraftWorld.getMethod("getHandle");
+			static_CraftItemStack_asNMSCopy = CraftItemStack.getMethod("asNMSCopy", ItemStack.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static String getBukkitVersion(){
-		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+		return bukkitVersion;
 	}
 
 	public static String getBukkitPackageName(){
-		return "net.minecraft.server." + getBukkitVersion();
+		return bukkitPackage;
 	}
 
 	public static String getCraftPackageName(){
-		return "org.bukkit.craftbukkit." + getBukkitVersion();
+		return craftPackage;
 	}
 
 	public static String getYPLKartPackageName(){
-		return "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
+		return yplkartPackage;
 	}
 
 	public static Class<?> getBukkitClass(String s){
@@ -84,29 +109,30 @@ public class ReflectionUtil{
 		}
 	}
 
-	public static Object getPlayerNBT(Player p) throws Exception{
-		Class nbtclass = getBukkitClass("NBTTagCompound");
-		Object nbt = nbtclass.newInstance();
-		Object entityplayer = getCraftEntity(p);
-
-		entityplayer.getClass().getMethod("b", nbtclass).invoke(entityplayer, nbt);
-		entityplayer.getClass().getMethod("a", nbtclass).invoke(entityplayer, nbt);
-		return nbt;
-	}
-
 	public static Object getCraftEntity(Entity entity){
 		try {
-			return entity.getClass().getMethod("getHandle").invoke(entity);
+			Method getHandle = CraftEntity_getHandle.get(entity.getClass().getSimpleName());
+			if(getHandle == null){
+				getHandle = entity.getClass().getMethod("getHandle");
+				CraftEntity_getHandle.put(entity.getClass().getSimpleName(), getHandle);
+			}
+
+			return getHandle.invoke(entity);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static Object getCraftEntityfromClassName(World w, String classname){
-		Class<?> entityclass = getBukkitClass(classname);
+	public static Object getCraftEntityFromClassName(World w, String classname){
 		try {
-			return entityclass.getConstructor(getBukkitClass("World")).newInstance(getCraftWorld(w));
+			Constructor<?> con = BukkitEntity_Constructor.get(classname);
+			if(con == null){
+				con = getBukkitClass(classname).getConstructor(World);
+				BukkitEntity_Constructor.put(classname, con);
+			}
+
+			return con.newInstance(getCraftWorld(w));
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -115,8 +141,8 @@ public class ReflectionUtil{
 
 	public static Object getCraftWorld(World w){
 		try {
-			return (getCraftClass("CraftWorld")).getMethod("getHandle").invoke(w);
-		}catch (Exception e) {
+			return CraftWorld_getHandle.invoke(w);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -124,7 +150,7 @@ public class ReflectionUtil{
 
 	public static Object getCraftItemStack(ItemStack item){
 		try {
-			return getCraftClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+			return static_CraftItemStack_asNMSCopy.invoke(null, item);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
