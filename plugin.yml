@@ -1,6 +1,7 @@
 name: YPLKart
 main: com.github.erozabesu.yplkart.YPLKart
 version: 1.3.0
+softdepend: [Vault]
 commands:
   ka:
     description: Basic command.Display command reference.
