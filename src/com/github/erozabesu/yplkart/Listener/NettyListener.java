@@ -57,8 +57,10 @@ public class NettyListener implements Listener{
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) throws Exception{
-    	playerEntityId.remove(e.getPlayer().getEntityId());
-    	remove(e.getPlayer());
+    	Player p = e.getPlayer();
+    	playerEntityId.remove(p.getEntityId());
+    	remove(p);
+    	PacketUtil.removeData(p.getUniqueId());
     }
 
     @EventHandler
