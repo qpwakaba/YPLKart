@@ -17,60 +17,61 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.OverrideClass.PlayerChannelHandler;
 import com.github.erozabesu.yplkart.Utils.PacketUtil;
 
-public class NettyListener implements Listener{
-	private static YPLKart pl;
-	public static HashMap<Integer, String> playerEntityId = new HashMap<Integer, String>();
-	public NettyListener(YPLKart plugin) {
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		pl = plugin;
-	}
+public class NettyListener implements Listener {
+    private static YPLKart pl;
+    public static HashMap<Integer, String> playerEntityId = new HashMap<Integer, String>();
 
-	public static void inject(Player p) throws Exception{
+    public NettyListener(YPLKart plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        pl = plugin;
+    }
+
+    public static void inject(Player p) throws Exception {
         Channel channel = PacketUtil.getChannel(p);
         PlayerChannelHandler pch = new PlayerChannelHandler();
-        if(channel.pipeline().get(PlayerChannelHandler.class) == null){
+        if (channel.pipeline().get(PlayerChannelHandler.class) == null) {
             channel.pipeline().addBefore("packet_handler", YPLKart.plname, pch);
         }
     }
 
-    public static void remove(Player p) throws Exception{
+    public static void remove(Player p) throws Exception {
         final Channel channel = PacketUtil.getChannel(p);
-        if(channel.pipeline().get(PlayerChannelHandler.class) != null){
+        if (channel.pipeline().get(PlayerChannelHandler.class) != null) {
             channel.pipeline().remove(PlayerChannelHandler.class);
         }
     }
 
     @EventHandler
-    public void onPluginDisable(PluginDisableEvent e) throws Exception{
-    	if(e.getPlugin().equals(pl)){
-    		for(Player player: Bukkit.getOnlinePlayers()) {
-    			remove(player);
-    		}
-    	}
-    }
-
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) throws Exception{
-		playerEntityId.put(e.getPlayer().getEntityId(), e.getPlayer().getUniqueId().toString());
-		inject(e.getPlayer());
-	}
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) throws Exception{
-    	Player p = e.getPlayer();
-    	playerEntityId.remove(p.getEntityId());
-    	remove(p);
-    	PacketUtil.removeData(p.getUniqueId());
+    public void onPluginDisable(PluginDisableEvent e) throws Exception {
+        if (e.getPlugin().equals(pl)) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                remove(player);
+            }
+        }
     }
 
     @EventHandler
-    public void onPluginEnable(PluginEnableEvent e) throws Exception{
-    	if(e.getPlugin().equals(pl)){
-    		playerEntityId.clear();
-    		for(Player p: Bukkit.getOnlinePlayers()){
-    			playerEntityId.put(p.getEntityId(), p.getUniqueId().toString());
-    			inject(p);
-    		}
-    	}
+    public void onPlayerJoin(PlayerJoinEvent e) throws Exception {
+        playerEntityId.put(e.getPlayer().getEntityId(), e.getPlayer().getUniqueId().toString());
+        inject(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) throws Exception {
+        Player p = e.getPlayer();
+        playerEntityId.remove(p.getEntityId());
+        remove(p);
+        PacketUtil.removeData(p.getUniqueId());
+    }
+
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent e) throws Exception {
+        if (e.getPlugin().equals(pl)) {
+            playerEntityId.clear();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                playerEntityId.put(p.getEntityId(), p.getUniqueId().toString());
+                inject(p);
+            }
+        }
     }
 }

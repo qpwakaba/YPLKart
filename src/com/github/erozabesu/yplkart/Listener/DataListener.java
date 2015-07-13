@@ -47,442 +47,490 @@ import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class DataListener extends RaceManager implements Listener {
-	private YPLKart pl;
-	public DataListener(YPLKart plugin){
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		pl = plugin;
-	}
+    private YPLKart pl;
 
-	@EventHandler
-	public void onChunkLoad(ChunkLoadEvent e){
-		if(!Settings.isEnable(e.getWorld()))return;
-		DisplayKartData.respawnKart(e.getChunk());
-	}
+    public DataListener(YPLKart plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        pl = plugin;
+    }
 
-	@EventHandler
-	public void onWorldLoad(WorldLoadEvent e){
-		if(!Settings.isEnable(e.getWorld()))return;
-		DisplayKartData.respawnKart(e.getWorld());
-	}
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent e) {
+        if (!Settings.isEnable(e.getWorld()))
+            return;
+        DisplayKartData.respawnKart(e.getChunk());
+    }
 
-	//ドリフト
-	//カートに乗っている間はコマンド以外の手段では搭乗解除不可
-	//leaveはゴール時、コマンド実行時のみ
-	@EventHandler
-	public void onVehicleExit(VehicleExitEvent e){
-		if(!(e.getExited() instanceof Player))return;
-		if(!Settings.isEnable(e.getExited().getWorld()))return;
-		if(!RaceManager.isRacingKart(e.getVehicle()))return;
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent e) {
+        if (!Settings.isEnable(e.getWorld()))
+            return;
+        DisplayKartData.respawnKart(e.getWorld());
+    }
 
-		Player p = (Player) e.getExited();
-		if(!getRace(p).getCMDFroceLeave()){
-			e.setCancelled(true);
-			return;
-		}
-	}
+    //ドリフト
+    //カートに乗っている間はコマンド以外の手段では搭乗解除不可
+    //leaveはゴール時、コマンド実行時のみ
+    @EventHandler
+    public void onVehicleExit(VehicleExitEvent e) {
+        if (!(e.getExited() instanceof Player))
+            return;
+        if (!Settings.isEnable(e.getExited().getWorld()))
+            return;
+        if (!RaceManager.isRacingKart(e.getVehicle()))
+            return;
 
-	//レース用カートを右クリックした場合キャンセル
-	@EventHandler
-	public void interactKart(PlayerInteractEntityEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(RaceManager.isRacingKart(e.getRightClicked())){
-			e.setCancelled(true);
-			return;
-		}
-	}
+        Player p = (Player) e.getExited();
+        if (!getRace(p).getCMDFroceLeave()) {
+            e.setCancelled(true);
+            return;
+        }
+    }
 
-	@EventHandler
-	public void removeCheckPoint(PlayerMoveEvent e){
-		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		Player p = e.getPlayer();
-		if(!EnumItem.CheckPoint.isSimilar(p.getItemInHand()))return;
+    //レース用カートを右クリックした場合キャンセル
+    @EventHandler
+    public void interactKart(PlayerInteractEntityEvent e) {
+        if (!Settings.isEnable(e.getPlayer().getWorld()))
+            return;
+        if (RaceManager.isRacingKart(e.getRightClicked())) {
+            e.setCancelled(true);
+            return;
+        }
+    }
 
-		List<Entity> list = p.getNearbyEntities(1, 1, 1);
-		for(Entity entity : list){
-			if(isCustomWitherSkull(entity, p.getItemInHand().getItemMeta().getLore().get(0)))
-				if(entity.getLocation().distance(p.getLocation()) < 1.5){
-					p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
-					entity.remove();
-					Message.itemRemoveCheckPoint.sendMessage(p);
-					break;
-				}
-		}
-	}
+    @EventHandler
+    public void removeCheckPoint(PlayerMoveEvent e) {
+        if (!Settings.isEnable(e.getFrom().getWorld()))
+            return;
+        Player p = e.getPlayer();
+        if (!EnumItem.CheckPoint.isSimilar(p.getItemInHand()))
+            return;
 
-	@EventHandler
-	public void saveLastStepBlock(PlayerMoveEvent e){
-		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(!isStandBy(e.getPlayer().getUniqueId()))return;
+        List<Entity> list = p.getNearbyEntities(1, 1, 1);
+        for (Entity entity : list) {
+            if (isCustomWitherSkull(entity, p.getItemInHand().getItemMeta().getLore().get(0)))
+                if (entity.getLocation().distance(p.getLocation()) < 1.5) {
+                    p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
+                    entity.remove();
+                    Message.itemRemoveCheckPoint.sendMessage(p);
+                    break;
+                }
+        }
+    }
 
-		getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
-	}
+    @EventHandler
+    public void saveLastStepBlock(PlayerMoveEvent e) {
+        if (!Settings.isEnable(e.getFrom().getWorld()))
+            return;
+        if (!isStandBy(e.getPlayer().getUniqueId()))
+            return;
 
-	//スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
-	@EventHandler
-	public void cancelMove(PlayerMoveEvent e){
-		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		if(isStandBy(e.getPlayer().getUniqueId()) && !isRacing(e.getPlayer().getUniqueId())){
-			if(!e.getFrom().equals(e.getTo())){
-				Location from = e.getFrom();
-				Location to = e.getTo();
+        getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
+    }
 
-				if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())return;
-				e.getPlayer().teleport(Util.adjustBlockLocation(from).add(0,1,0));
-				e.setCancelled(true);
-			}
-		}
-	}
+    //スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
+    @EventHandler
+    public void cancelMove(PlayerMoveEvent e) {
+        if (!Settings.isEnable(e.getFrom().getWorld()))
+            return;
+        if (isStandBy(e.getPlayer().getUniqueId()) && !isRacing(e.getPlayer().getUniqueId())) {
+            if (!e.getFrom().equals(e.getTo())) {
+                Location from = e.getFrom();
+                Location to = e.getTo();
 
-	@EventHandler
-	public void saveLapcount(PlayerMoveEvent e){
-		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		Player p = e.getPlayer();
-		if(!isStandBy(p.getUniqueId()))return;
-		Race r = getRace(p);
-		if(r.getGoal())return;
-		if(r.getLapStepCool())return;
+                if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+                    return;
+                e.getPlayer().teleport(Util.adjustBlockLocation(from).add(0, 1, 0));
+                e.setCancelled(true);
+            }
+        }
+    }
 
-		int lapcount = r.getLapCount();
+    @EventHandler
+    public void saveLapcount(PlayerMoveEvent e) {
+        if (!Settings.isEnable(e.getFrom().getWorld()))
+            return;
+        Player p = e.getPlayer();
+        if (!isStandBy(p.getUniqueId()))
+            return;
+        Race r = getRace(p);
+        if (r.getGoal())
+            return;
+        if (r.getLapStepCool())
+            return;
 
-		if(r.getLastStepBlock().equalsIgnoreCase(Settings.StartBlock)){
-			if(Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.GoalBlock)){
-				//正常ルート
-				if(lapcount== RaceData.getNumberOfLaps(r.getEntry())){
-					r.setGoal();
-				}else{
-					if(lapcount == 0){
-						r.setStart(true, e.getFrom(), e.getTo());
-					}else{
-						Message.raceUpdateLap.sendMessage(p, new Object[]{(lapcount + 1), RaceManager.getCircuit(r.getEntry())});
-					}
-					r.setLapCount(lapcount + 1);
-				}
-				r.setCool();
-			}
-		}else if(r.getLastStepBlock().equalsIgnoreCase(Settings.GoalBlock)){
-			if(Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.StartBlock)){
-				//逆走
-				Message.raceReverseRun.sendMessage(p, RaceManager.getCircuit(r.getEntry()));
-				if(lapcount <= 0)
-					r.setLapCount(0);
-				else{
-					r.setLapCount(lapcount - 1);
-				}
-				r.setCool();
-			}
-		}
-	}
+        int lapcount = r.getLapCount();
 
-	@EventHandler
-	public void RunningRank(PlayerMoveEvent e) {//順位
-		if(!Settings.isEnable(e.getFrom().getWorld()))return;
-		Player p = e.getPlayer();
-		if(!isRacing(p.getUniqueId()))return;
-		if(getRace(p).getLapCount() < 1)return;
+        if (r.getLastStepBlock().equalsIgnoreCase(Settings.StartBlock)) {
+            if (Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.GoalBlock)) {
+                //正常ルート
+                if (lapcount == RaceData.getNumberOfLaps(r.getEntry())) {
+                    r.setGoal();
+                } else {
+                    if (lapcount == 0) {
+                        r.setStart(true, e.getFrom(), e.getTo());
+                    } else {
+                        Message.raceUpdateLap.sendMessage(p,
+                                new Object[] { (lapcount + 1), RaceManager.getCircuit(r.getEntry()) });
+                    }
+                    r.setLapCount(lapcount + 1);
+                }
+                r.setCool();
+            }
+        } else if (r.getLastStepBlock().equalsIgnoreCase(Settings.GoalBlock)) {
+            if (Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.StartBlock)) {
+                //逆走
+                Message.raceReverseRun.sendMessage(p, RaceManager.getCircuit(r.getEntry()));
+                if (lapcount <= 0)
+                    r.setLapCount(0);
+                else {
+                    r.setLapCount(lapcount - 1);
+                }
+                r.setCool();
+            }
+        }
+    }
 
-		Race r = getRace(p);
+    @EventHandler
+    public void RunningRank(PlayerMoveEvent e) {//順位
+        if (!Settings.isEnable(e.getFrom().getWorld()))
+            return;
+        Player p = e.getPlayer();
+        if (!isRacing(p.getUniqueId()))
+            return;
+        if (getRace(p).getLapCount() < 1)
+            return;
 
-		ArrayList<String> checkpoint = getNearbyCheckpointID(e.getPlayer().getLocation(), checkPointDetectRadius, r.getEntry());
-		if(checkpoint == null)return;
+        Race r = getRace(p);
 
-		Iterator<String> i = checkpoint.iterator();
-		String id;
-		String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
-		while(i.hasNext()){
-			id = i.next();
-			r.addPassedCheckPoint(lap + id);
-			r.setLastPassedCheckPoint(id);
-		}
-	}
+        ArrayList<String> checkpoint = getNearbyCheckpointID(e.getPlayer().getLocation(), checkPointDetectRadius,
+                r.getEntry());
+        if (checkpoint == null)
+            return;
 
-	@EventHandler
-	public void onRegainHealth(EntityRegainHealthEvent e){
-		if(!Settings.isEnable(e.getEntity().getWorld()))return;
-		if(!(e.getEntity() instanceof Player))return;
-		if(!isRacing(((Player)e.getEntity()).getUniqueId()))return;
-		e.setCancelled(true);
-	}
+        Iterator<String> i = checkpoint.iterator();
+        String id;
+        String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+        while (i.hasNext()) {
+            id = i.next();
+            r.addPassedCheckPoint(lap + id);
+            r.setLastPassedCheckPoint(id);
+        }
+    }
 
-	@EventHandler
-	public void onJoin(PlayerJoinEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
+    @EventHandler
+    public void onRegainHealth(EntityRegainHealthEvent e) {
+        if (!Settings.isEnable(e.getEntity().getWorld()))
+            return;
+        if (!(e.getEntity() instanceof Player))
+            return;
+        if (!isRacing(((Player) e.getEntity()).getUniqueId()))
+            return;
+        e.setCancelled(true);
+    }
 
-		final Player p = e.getPlayer();
-		if(isStandBy(p.getUniqueId())){
-			Race r = getRace(p);
-			p.teleport(r.getGoalPositionOnQuit());
-			Scoreboards.showBoard(p.getUniqueId());
-			r.recoveryPhysicalOnQuit();
-			r.recoveryInventoryOnQuit();
-			r.recoveryKart();
-		}
-	}
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (!Settings.isEnable(e.getPlayer().getWorld()))
+            return;
 
-	@EventHandler
-	public void onQuit(PlayerQuitEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
+        final Player p = e.getPlayer();
+        if (isStandBy(p.getUniqueId())) {
+            Race r = getRace(p);
+            p.teleport(r.getGoalPositionOnQuit());
+            Scoreboards.showBoard(p.getUniqueId());
+            r.recoveryPhysicalOnQuit();
+            r.recoveryInventoryOnQuit();
+            r.recoveryKart();
+        }
+    }
 
-		Player p = e.getPlayer();
-		Race r = getRace(p);
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        if (!Settings.isEnable(e.getPlayer().getWorld()))
+            return;
 
-		//ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
-		//ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
-		if(p.getVehicle() != null)
-			if(RaceManager.isDisplayKart(p.getVehicle()))
-				p.leaveVehicle();
+        Player p = e.getPlayer();
+        Race r = getRace(p);
 
-		//ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、
-		//レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
-		//再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
-		if(isStandBy(p.getUniqueId())){
-			Scoreboards.hideBoard(p.getUniqueId());
+        //ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
+        //ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
+        if (p.getVehicle() != null)
+            if (RaceManager.isDisplayKart(p.getVehicle()))
+                p.leaveVehicle();
 
-			r.savePlayerDataOnQuit();
-			r.saveInventoryOnQuit();
+        //ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、
+        //レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
+        //再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
+        if (isStandBy(p.getUniqueId())) {
+            Scoreboards.hideBoard(p.getUniqueId());
 
-			leaveRacingKart(p);
-			r.recoveryInventory();
-			r.recoveryPhysical();
-			p.teleport(r.getGoalPosition());
+            r.savePlayerDataOnQuit();
+            r.saveInventoryOnQuit();
 
-			//ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
-			if(r.getGoal()){
-				p.teleport(r.getGoalPosition());
-				r.init();
-			}
-		}else if(isEntry(p.getUniqueId()) && !isStandBy(p.getUniqueId())){
-			RaceManager.clearEntryRaceData(p.getUniqueId());
-		}
-	}
+            leaveRacingKart(p);
+            r.recoveryInventory();
+            r.recoveryPhysical();
+            p.teleport(r.getGoalPosition());
 
-	@EventHandler
-	public void onRespawn(PlayerRespawnEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isStandBy(e.getPlayer().getUniqueId()))return;
+            //ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
+            if (r.getGoal()) {
+                p.teleport(r.getGoalPosition());
+                r.init();
+            }
+        } else if (isEntry(p.getUniqueId()) && !isStandBy(p.getUniqueId())) {
+            RaceManager.clearEntryRaceData(p.getUniqueId());
+        }
+    }
 
-		final Player p = e.getPlayer();
-		final Race r = getRace(p);
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        if (!Settings.isEnable(e.getPlayer().getWorld()))
+            return;
+        if (!isStandBy(e.getPlayer().getUniqueId()))
+            return;
 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable(){
-			public void run(){
-					p.setSprinting(true);
-					p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-					p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
-					p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
-					r.recoveryKart();
-					r.setDeathPenaltyTitleSendTask(
-						new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(), Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
-					);
-			}
-		});
+        final Player p = e.getPlayer();
+        final Race r = getRace(p);
 
-		r.setDeathPenaltyTask(
-			Bukkit.getScheduler().runTaskLater(pl, new Runnable(){
-				public void run(){
-					p.setWalkSpeed(r.getCharacter().getWalkSpeed());
-					p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-					p.setSprinting(true);
-					r.setDeathPenaltyTask(null);
-				}
-			}, r.getCharacter().getDeathPenaltySecond() * 20 + 3)
-		);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
+            public void run() {
+                p.setSprinting(true);
+                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+                p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
+                p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
+                r.recoveryKart();
+                r.setDeathPenaltyTitleSendTask(
+                        new SendBlinkingTitleTask(p, r.getCharacter().getDeathPenaltySecond(),
+                                Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
+                        );
+            }
+        });
 
-		if(r.getLastPassedCheckPoint() != null){
-			Location respawn = r.getLastPassedCheckPoint().getLocation().add(0, - checkPointHeight,0);
-			e.setRespawnLocation(new Location(respawn.getWorld(), respawn.getX(), respawn.getY(), respawn.getZ(), r.getLastYaw(), 0));
-		}
-	}
+        r.setDeathPenaltyTask(
+                Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
+                    public void run() {
+                        p.setWalkSpeed(r.getCharacter().getWalkSpeed());
+                        p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+                        p.setSprinting(true);
+                        r.setDeathPenaltyTask(null);
+                    }
+                }, r.getCharacter().getDeathPenaltySecond() * 20 + 3)
+                );
 
-	//キラー使用中の窒素ダメージを無効
-	//カート搭乗中の落下ダメージを無効
-	//スタンバイ状態～レース開始までのダメージを無効
-	@EventHandler
-	public void onPlayerDamage(EntityDamageEvent e){
-		if(!Settings.isEnable(e.getEntity().getWorld()))return;
-		if(!(e.getEntity() instanceof Player))return;
-		if(e.getCause() == DamageCause.VOID)return;
-		Player p = (Player) e.getEntity();
+        if (r.getLastPassedCheckPoint() != null) {
+            Location respawn = r.getLastPassedCheckPoint().getLocation().add(0, -checkPointHeight, 0);
+            e.setRespawnLocation(new Location(respawn.getWorld(), respawn.getX(), respawn.getY(), respawn.getZ(), r
+                    .getLastYaw(), 0));
+        }
+    }
 
-		if(isRacing(p.getUniqueId())){
-			if(getRace(p).getUsingKiller() != null){
-				if(e.getCause() == DamageCause.SUFFOCATION){
-					e.setCancelled(true);
-					return;
-				}
-			}
-			if(e.getCause() == DamageCause.FALL)
-				if(p.getVehicle() != null)
-					if(RaceManager.isRacingKart(p.getVehicle()))
-						e.setCancelled(true);
-		}else if(isStandBy(p.getUniqueId()) && !isRacing(p.getUniqueId())){
-			if(e.getCause() != DamageCause.VOID)
-				e.setCancelled(true);
-		}
-	}
+    //キラー使用中の窒素ダメージを無効
+    //カート搭乗中の落下ダメージを無効
+    //スタンバイ状態～レース開始までのダメージを無効
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent e) {
+        if (!Settings.isEnable(e.getEntity().getWorld()))
+            return;
+        if (!(e.getEntity() instanceof Player))
+            return;
+        if (e.getCause() == DamageCause.VOID)
+            return;
+        Player p = (Player) e.getEntity();
 
-	@EventHandler
-	public void onDeath(PlayerDeathEvent e){
-		if(!Settings.isEnable(e.getEntity().getWorld()))return;
-		final Player p = (Player)e.getEntity();
+        if (isRacing(p.getUniqueId())) {
+            if (getRace(p).getUsingKiller() != null) {
+                if (e.getCause() == DamageCause.SUFFOCATION) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+            if (e.getCause() == DamageCause.FALL)
+                if (p.getVehicle() != null)
+                    if (RaceManager.isRacingKart(p.getVehicle()))
+                        e.setCancelled(true);
+        } else if (isStandBy(p.getUniqueId()) && !isRacing(p.getUniqueId())) {
+            if (e.getCause() != DamageCause.VOID)
+                e.setCancelled(true);
+        }
+    }
 
-		if(!isStandBy(p.getUniqueId()))return;
-		Race r = getRace(p);
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        if (!Settings.isEnable(e.getEntity().getWorld()))
+            return;
+        final Player p = (Player) e.getEntity();
 
-		RaceManager.leaveRacingKart(p);
-		r.setLastYaw(p.getLocation().getYaw());
+        if (!isStandBy(p.getUniqueId()))
+            return;
+        Race r = getRace(p);
 
-		if(p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))return;
-		e.getDrops().clear();
-		//r.saveInventory();
-		e.setKeepInventory(true);
+        RaceManager.leaveRacingKart(p);
+        r.setLastYaw(p.getLocation().getYaw());
 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(YPLKart.getInstance(), new Runnable(){
-			public void run(){
-				if(p.isDead())
-					PacketUtil.skipRespawnScreen(p);
-			}
-		});
-	}
+        if (p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))
+            return;
+        e.getDrops().clear();
+        //r.saveInventory();
+        e.setKeepInventory(true);
 
-	//エントリー中の場合、キャラクター・カートが未選択の場合はメニューを閉じさせません
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent e){
-		if(!Settings.isEnable(e.getPlayer().getWorld()))return;
-		if(!isStandBy(((Player) e.getPlayer()).getUniqueId()))return;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                if (p.isDead())
+                    PacketUtil.skipRespawnScreen(p);
+            }
+        });
+    }
 
-		final Player p = (Player) e.getPlayer();
-		Race r = getRace(p);
-		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
-			if(r.getCharacter() == null){
-				Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
-				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-					public void run(){
-						showCharacterSelectMenu(p);
-					}
-				});
-				return;
-			}
-			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
-				Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
-				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-					public void run(){
-						showKartSelectMenu(p);
-					}
-				});
-				return;
-			}
-		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
-			if(r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)){
-				Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
-				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-					public void run(){
-						showKartSelectMenu(p);
-					}
-				});
-				return;
-			}
-			if(r.getCharacter() == null){
-				Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
-				Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable(){
-					public void run(){
-						showCharacterSelectMenu(p);
-					}
-				});
-				return;
-			}
-		}
-	}
+    //エントリー中の場合、キャラクター・カートが未選択の場合はメニューを閉じさせません
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent e) {
+        if (!Settings.isEnable(e.getPlayer().getWorld()))
+            return;
+        if (!isStandBy(((Player) e.getPlayer()).getUniqueId()))
+            return;
 
-	//エントリー中：cancel
-	//インベントリネーム一致：cancel
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e){
-		if(!Settings.isEnable(e.getWhoClicked().getWorld()))return;
-		if(!(e.getWhoClicked() instanceof Player))return;
+        final Player p = (Player) e.getPlayer();
+        Race r = getRace(p);
+        if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
+            if (r.getCharacter() == null) {
+                Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
+                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+                        showCharacterSelectMenu(p);
+                    }
+                });
+                return;
+            }
+            if (r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)) {
+                Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
+                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+                        showKartSelectMenu(p);
+                    }
+                });
+                return;
+            }
+        } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
+            if (r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)) {
+                Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
+                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+                        showKartSelectMenu(p);
+                    }
+                });
+                return;
+            }
+            if (r.getCharacter() == null) {
+                Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
+                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+                        showCharacterSelectMenu(p);
+                    }
+                });
+                return;
+            }
+        }
+    }
 
-		//召集後はインベントリの操作をさせない
-		if(isStandBy(((Player) e.getWhoClicked()).getUniqueId())){
-			e.setCancelled(true);
-			((Player)e.getWhoClicked()).updateInventory();
-		}
+    //エントリー中：cancel
+    //インベントリネーム一致：cancel
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (!Settings.isEnable(e.getWhoClicked().getWorld()))
+            return;
+        if (!(e.getWhoClicked() instanceof Player))
+            return;
 
-		Player p = (Player) e.getWhoClicked();
-		UUID id = p.getUniqueId();
-		Race r = getRace(p);
-		if(e.getInventory().getName().equalsIgnoreCase("Character Select Menu")){
-			e.setCancelled(true);
-			p.updateInventory();
+        //召集後はインベントリの操作をさせない
+        if (isStandBy(((Player) e.getWhoClicked()).getUniqueId())) {
+            e.setCancelled(true);
+            ((Player) e.getWhoClicked()).updateInventory();
+        }
 
-			ItemStack item = e.getCurrentItem();
-			if(item == null)return;
+        Player p = (Player) e.getWhoClicked();
+        UUID id = p.getUniqueId();
+        Race r = getRace(p);
+        if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
+            e.setCancelled(true);
+            p.updateInventory();
 
-			String clicked = item.hasItemMeta() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
-			if(clicked == null)return;
+            ItemStack item = e.getCurrentItem();
+            if (item == null)
+                return;
 
-			//キャンセルボタン
-			if(EnumSelectMenu.CharacterCancel.equalsIgnoreCase(clicked)){
-				p.closeInventory();
-			//ランダムボタン
-			}else if(EnumSelectMenu.CharacterRandom.equalsIgnoreCase(clicked)){
-				RaceManager.setCharacterRaceData(id, EnumCharacter.getRandomCharacter());
-			//ネクストプレビューボタン
-			}else if(EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked) || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)){
-				if(isStandBy(id)){
-					if(r.getCharacter() == null){
-						Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
-					}else{
-						p.closeInventory();
+            String clicked = item.hasItemMeta() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
+            if (clicked == null)
+                return;
 
-						//kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
-						if(r.getKart() != null)
-							RaceManager.showKartSelectMenu(p);
-					}
-				}else{
-					p.closeInventory();
-					RaceManager.showKartSelectMenu(p);
-				}
-			//キャラクター選択
-			}else if(EnumCharacter.getClassfromString(clicked) != null){
-				RaceManager.setCharacterRaceData(id, EnumCharacter.getClassfromString(clicked));
-			}
-			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
-		}else if(e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")){
-			e.setCancelled(true);
-			p.updateInventory();
+            //キャンセルボタン
+            if (EnumSelectMenu.CharacterCancel.equalsIgnoreCase(clicked)) {
+                p.closeInventory();
+                //ランダムボタン
+            } else if (EnumSelectMenu.CharacterRandom.equalsIgnoreCase(clicked)) {
+                RaceManager.setCharacterRaceData(id, EnumCharacter.getRandomCharacter());
+                //ネクストプレビューボタン
+            } else if (EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked)
+                    || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)) {
+                if (isStandBy(id)) {
+                    if (r.getCharacter() == null) {
+                        Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
+                    } else {
+                        p.closeInventory();
 
-			ItemStack item = e.getCurrentItem();
-			if(item == null)return;
+                        //kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
+                        if (r.getKart() != null)
+                            RaceManager.showKartSelectMenu(p);
+                    }
+                } else {
+                    p.closeInventory();
+                    RaceManager.showKartSelectMenu(p);
+                }
+                //キャラクター選択
+            } else if (EnumCharacter.getClassfromString(clicked) != null) {
+                RaceManager.setCharacterRaceData(id, EnumCharacter.getClassfromString(clicked));
+            }
+            p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
+        } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
+            e.setCancelled(true);
+            p.updateInventory();
 
-			String clicked = item.hasItemMeta() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
-			if(clicked == null)return;
+            ItemStack item = e.getCurrentItem();
+            if (item == null)
+                return;
 
-			//キャンセルボタン
-			if(EnumSelectMenu.KartCancel.equalsIgnoreCase(clicked)){
-				p.closeInventory();
-			//ランダムボタン
-			}else if(EnumSelectMenu.KartRandom.equalsIgnoreCase(clicked)){
-				RaceManager.setKartRaceData(id, EnumKarts.getRandomKart());
-			//ネクストプレビューボタン
-			}else if(EnumSelectMenu.KartNext.equalsIgnoreCase(clicked) || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)){
-				if(isStandBy(id)){
-					if(r.getKart() == null){
-						Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
-					}else{
-						p.closeInventory();
+            String clicked = item.hasItemMeta() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
+            if (clicked == null)
+                return;
 
-						//character == nullの場合はonInventoryCloseで強制的にメニューが表示される
-						if(r.getCharacter() != null)
-							RaceManager.showCharacterSelectMenu(p);
-					}
-				}else{
-					p.closeInventory();
-					RaceManager.showCharacterSelectMenu(p);
-				}
-			//カート選択
-			}else if(EnumKarts.getKartfromString(clicked) != null){
-				RaceManager.setKartRaceData(id, EnumKarts.getKartfromString(clicked));
-			}
-			p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
-		}
-	}
+            //キャンセルボタン
+            if (EnumSelectMenu.KartCancel.equalsIgnoreCase(clicked)) {
+                p.closeInventory();
+                //ランダムボタン
+            } else if (EnumSelectMenu.KartRandom.equalsIgnoreCase(clicked)) {
+                RaceManager.setKartRaceData(id, EnumKarts.getRandomKart());
+                //ネクストプレビューボタン
+            } else if (EnumSelectMenu.KartNext.equalsIgnoreCase(clicked)
+                    || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)) {
+                if (isStandBy(id)) {
+                    if (r.getKart() == null) {
+                        Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
+                    } else {
+                        p.closeInventory();
+
+                        //character == nullの場合はonInventoryCloseで強制的にメニューが表示される
+                        if (r.getCharacter() != null)
+                            RaceManager.showCharacterSelectMenu(p);
+                    }
+                } else {
+                    p.closeInventory();
+                    RaceManager.showCharacterSelectMenu(p);
+                }
+                //カート選択
+            } else if (EnumKarts.getKartfromString(clicked) != null) {
+                RaceManager.setKartRaceData(id, EnumKarts.getKartfromString(clicked));
+            }
+            p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
+        }
+    }
 }

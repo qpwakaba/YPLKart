@@ -20,61 +20,62 @@ import com.github.erozabesu.yplkart.Utils.PacketUtil;
 import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
-public class YPLKart extends JavaPlugin{
-	public static String plname;
+public class YPLKart extends JavaPlugin {
+    public static String plname;
 
-	public static FileConfiguration cConfig;
-	public static File cConfigFile;
-	public static FileConfiguration Config;
-	public static File ConfigFile;
+    public static FileConfiguration cConfig;
+    public static File cConfigFile;
+    public static FileConfiguration Config;
+    public static File ConfigFile;
 
-	private VaultConnection vaultConnection;
+    private VaultConnection vaultConnection;
 
-	@Override
-	public void onEnable(){
-		plname = this.getDescription().getName();
-		CMD CMDExecutor = new CMD();
-		getCommand("ka").setExecutor(CMDExecutor);
+    @Override
+    public void onEnable() {
+        plname = this.getDescription().getName();
+        CMD CMDExecutor = new CMD();
+        getCommand("ka").setExecutor(CMDExecutor);
 
-		new ReflectionUtil();
-		new Util();
-		new PacketUtil();
+        new ReflectionUtil();
+        new Util();
+        new PacketUtil();
 
-		new DataListener(this);
-		new ItemListener(this);
-		new NettyListener(this);
-		new Settings(this);
-		new RaceData(this);
-		new DisplayKartData(this);
+        new DataListener(this);
+        new ItemListener(this);
+        new NettyListener(this);
+        new Settings(this);
+        new RaceData(this);
+        new DisplayKartData(this);
 
-		Message.reloadConfig();
+        Message.reloadConfig();
 
-		for(World w : Bukkit.getWorlds()){
-			DisplayKartData.respawnKart(w);
-		}
+        for (World w : Bukkit.getWorlds()) {
+            DisplayKartData.respawnKart(w);
+        }
 
-		if (getServer().getPluginManager().isPluginEnabled("Vault")) {
-			this.vaultConnection = VaultConnection.setupConnection(getServer().getPluginManager().getPlugin("Vault"));
-		}
+        if (getServer().getPluginManager().isPluginEnabled("Vault")) {
+            this.vaultConnection = VaultConnection.setupConnection(getServer().getPluginManager().getPlugin("Vault"));
+        }
 
-		Message.sendAbsolute(null, "[" + plname + "] v." + YPLKart.getInstance().getDescription().getVersion() + " Plugin has been Enabled");
-	}
+        Message.sendAbsolute(null, "[" + plname + "] v." + YPLKart.getInstance().getDescription().getVersion()
+                + " Plugin has been Enabled");
+    }
 
-	@Override
-	public void onDisable(){
-		Scoreboards.clearBoard();
-		RaceManager.endAllCircuit();
-	}
+    @Override
+    public void onDisable() {
+        Scoreboards.clearBoard();
+        RaceManager.endAllCircuit();
+    }
 
-	public static YPLKart getInstance(){
-		return (YPLKart) Bukkit.getPluginManager().getPlugin("YPLKart");
-	}
+    public static YPLKart getInstance() {
+        return (YPLKart) Bukkit.getPluginManager().getPlugin("YPLKart");
+    }
 
-	public VaultConnection getVaultConnection(){
-		return this.vaultConnection;
-	}
+    public VaultConnection getVaultConnection() {
+        return this.vaultConnection;
+    }
 
-	public static File getPluginFile(){
-		return getInstance().getFile();
-	}
+    public static File getPluginFile() {
+        return getInstance().getFile();
+    }
 }

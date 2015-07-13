@@ -44,481 +44,506 @@ import com.github.erozabesu.yplkart.Object.Race;
 import com.github.erozabesu.yplkart.Task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 
-public class Util extends ReflectionUtil{
-	private static String OperatingSystem = System.getProperty("os.name").toLowerCase();
-	private static Class<?> CraftBlock = getBukkitClass("Block");
-	private static Class<?> CraftMaterial = getBukkitClass("Material");
-
-	private static Method Block_getById;
-	private static Method Block_getMaterial;
-	private static Method Material_isSolid;
-
-	public Util(){
-		try {
-			Block_getById = CraftBlock.getMethod("getById", int.class);
-			Block_getMaterial = CraftBlock.getMethod("getMaterial");
-			Material_isSolid = CraftMaterial.getMethod("isSolid");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static int getRandom(int value){
-		int num;
-		Random random = new Random();
-		num = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
-		return num;
-	}
-
-	public static ChatColor getChatColorFromText(String text){
-		String color = ChatColor.getLastColors(text);
-		if(color == null)return ChatColor.WHITE;
-		if(color.length() == 0)return ChatColor.WHITE;
-
-		return ChatColor.getByChar(color.substring(1));
-	}
-
-	public static Vector getVectorLocationToLocation(Location second_location,Location first_location){
-		Vector vector = second_location.toVector().subtract(first_location.toVector());
-		return vector.normalize();
-	}
-
-	public static float getYawfromVector(Vector v) {
-		double dx = v.getX();
-		double dz = v.getZ();
-		double yaw = 0;
-		// Set yaw
-		if (dx != 0) {
-			// Set yaw start value based on dx
-			if (dx < 0) {
-				yaw = 1.5 * Math.PI;
-			} else {
-				yaw = 0.5 * Math.PI;
-			}
-			yaw -= Math.atan(dz / dx);
-		} else if (dz < 0) {
-			yaw = Math.PI;
-		}
-		return (float) (-yaw * 180 / Math.PI - 90);
-	}
-
-	public static String getStepBlock(Location l){
-		Block b = l.getBlock();
-		if(b.getType() == Material.AIR){
-			b = b.getLocation().add(0,-1,0).getBlock();
-			if(b.getType() == Material.AIR){
-				b = b.getLocation().add(0,-1,0).getBlock();
-			}
-		}
-
-		return String.valueOf(b.getTypeId()) + ":" + String.valueOf(b.getData());
-	}
-
-	public static Material getStepMaterial(Location l){
-		Block b = l.add(0,1,0).getBlock();
-		if(b.getType() == Material.AIR){
-			b = b.getLocation().add(0,-1,0).getBlock();
-			if(b.getType() == Material.AIR){
-				b = b.getLocation().add(0,-1,0).getBlock();
-			}
-		}
-
-		return b.getType();
-	}
-
-	public static Location getLocationfromYaw(Location from, double offset){
-		Location fromadjust = adjustBlockLocation(from);
-		float yaw = fromadjust.getYaw();
-		double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw+360 : yaw));
-		double z = Math.cos(Math.toRadians(yaw < 0 ? yaw+360 : yaw));
-
-		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
-		to.setYaw(yaw);
-		return to;
-	}
-
-	public static Location getSideLocationfromYaw(Location from, double offset){
-		Location fromadjust = adjustBlockLocation(from);
-		float yaw = fromadjust.getYaw();
-		double x = Math.cos(Math.toRadians(yaw));
-		double z = Math.sin(Math.toRadians(yaw));
-
-		Location to = new Location(fromadjust.getWorld(), fromadjust.getX()+x*offset, fromadjust.getY(), fromadjust.getZ()+z*offset);
-		to.setYaw(yaw);
-		return to;
-	}
-
-	//指定半径内の高さ１ブロック内の座標を直方体で取得
-	public static ArrayList<Location> getSquareLocation(Location loc, double r){
-		ArrayList<Location> square = new ArrayList<Location>();
-		double cx = loc.getX();
-		double cz = loc.getZ();
-		for (double x = cx - r; x <= cx + r; x++) {
-			for (double z = cz - r; z <= cz + r; z++) {
-				Location cylLocation = new Location(loc.getWorld(), x, loc.getBlockY(), z);
-				square.add(cylLocation);
-			}
-		}
-		return square;
-	}
-
-	public static ArrayList<Entity> getNearbyEntities(Location l, double radius) {
-		ArrayList<Entity> entities = new ArrayList<Entity>();
-		for (Entity entity : l.getWorld().getEntities()) {
-			if (l.distanceSquared(entity.getLocation()) <= radius * radius) {
-				entities.add(entity);
-			}
-		}
-		return entities;
-	}
-
-	public static ArrayList<LivingEntity> getNearbyLivingEntities(Location l, double radius){
-		ArrayList<Entity> entity = getNearbyEntities(l,radius);
-		ArrayList<LivingEntity> livingentity = new ArrayList<LivingEntity>();
-		for(Entity e : entity){
-			if(e instanceof LivingEntity)
-				livingentity.add((LivingEntity) e);
-		}
-		return livingentity;
-	}
-
-	public static ArrayList<Player> getNearbyPlayers(Location l, double radius){
-		ArrayList<Entity> entity = getNearbyEntities(l,radius);
-		ArrayList<Player> livingentity = new ArrayList<Player>();
-		for(Entity e : entity){
-			if(e instanceof Player)
-				livingentity.add((Player) e);
-		}
-		return livingentity;
-	}
-
-	public static Entity getNearestEntity(List<Entity> entities, Location l){
-		Iterator<Entity> i = entities.iterator();
-		Entity e = null;
-		Entity temp;
-		while(i.hasNext()){
-			temp = i.next();
-			if(e != null)
-				if(e.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
-					if(e.getLocation().distance(l) < temp.getLocation().distance(l))continue;
-			e = temp;
-		}
-
-		return e;
-	}
-
-	public static Player getNearestPlayer(ArrayList<Player> players, Location l){
-		if(players == null)return null;
-
-		Iterator<Player> i = players.iterator();
-		Player p = null;
-		Player temp;
-		while(i.hasNext()){
-			temp = i.next();
-			if(p != null)
-				if(p.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
-					if(p.getLocation().distance(l) < temp.getLocation().distance(l))continue;
-			p = temp;
-		}
-
-		return p;
-	}
-
-	public static ArrayList<Entity> getAllVehicle(Entity e){
-		ArrayList<Entity> entity = new ArrayList<Entity>();
-
-		Entity vehicle = e.getVehicle() != null ? e.getVehicle() : null;
-		while(vehicle != null){
-			entity.add(vehicle);
-			vehicle = vehicle.getVehicle() != null ? vehicle.getVehicle() : null;
-		}
-
-		return entity;
-	}
-
-	public static ArrayList<Entity> getAllPassenger(Entity e){
-		ArrayList<Entity> entity = new ArrayList<Entity>();
-
-		Entity passenger = e.getPassenger() != null ? e.getPassenger() : null;
-		while(passenger != null){
-			entity.add(passenger);
-			passenger = passenger.getPassenger() != null ? passenger.getPassenger() : null;
-		}
-		return entity;
-	}
-
-	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static void setPotionEffect(Player p, PotionEffectType effect, int second, int level){
-		p.removePotionEffect(effect);
-		p.addPotionEffect(new PotionEffect(effect, second*20, level));
-	}
-
-	public static void setItemDecrease(Player p){
-		int i = p.getItemInHand().getAmount();
-		if (i == 1) {
-			p.setItemInHand(null);
-		}else if (i > 1){
-			p.getItemInHand().setAmount(i - 1);
-		}
-	}
-
-	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static boolean isWindows() {
-		return OperatingSystem.startsWith("windows");
-	}
-
-
-	public static Boolean isOnline(String name){
-		for(Player online : Bukkit.getOnlinePlayers()){
-			if(name.equalsIgnoreCase(online.getName())){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean isNumber(String number) {
-		try {
-			Integer.parseInt(number);
-			return true;
-		} catch (NumberFormatException e) {
-			try {
-				Float.parseFloat(number);
-				return true;
-			} catch (NumberFormatException ee) {
-			    try {
-			        Double.parseDouble(number);
-			        return true;
-			    } catch (NumberFormatException eee) {
-			        return false;
-			    }
-			}
-		}
-	}
-
-	public static boolean isBoolean(String flag) {
-		if(flag.equalsIgnoreCase("true") || flag.equalsIgnoreCase("false"))
-			return true;
-		return false;
-	}
-
-	public static boolean isLoadedChunk(Location l){
-		Player player = getNearestPlayer(getNearbyPlayers(l, 100), l);
-		if(player == null)return false;
-
-		return true;
-	}
-
-	public static Boolean isSolidBlock(Location l){
-		try {
-			return (Boolean) Material_isSolid.invoke(Block_getMaterial.invoke(Block_getById.invoke(CraftBlock, l.getBlock().getTypeId())));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static Boolean isSlabBlock(Location l){
-		int id = l.getBlock().getTypeId();
-		if(id == 44 || id == 126 || id == 182)return true;
-		return false;
-	}
-
-	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static void addDamage(Entity damaged, Entity executor, int damage){
-		if(!(damaged instanceof LivingEntity))return;
-		if(damaged instanceof Player){
-			final Player p = (Player)damaged;
-			if(0 < p.getNoDamageTicks())return;
-			if(!RaceManager.isRacing(p.getUniqueId()))return;
-
-			p.playEffect(EntityEffect.HURT);
-
-			if(1 <= p.getHealth() - damage){
-				p.setHealth(p.getHealth()-damage);
-			}else{
-				Circuit c = RaceManager.getCircuit(p.getUniqueId());
-				p.setHealth(p.getMaxHealth());
-				if(executor != null)
-					c.sendMessageEntryPlayer(Message.racePlayerKill, new Object[]{c, new Player[]{(Player)damaged, (Player)executor}});
-				else
-					c.sendMessageEntryPlayer(Message.racePlayerDead, new Object[]{c, (Player)damaged});
-
-
-				final Race r = RaceManager.getRace(p);
-
-				p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
-				p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
-				p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-				r.setDeathPenaltyTask(
-					Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
-						public void run(){
-							p.setWalkSpeed(r.getCharacter().getWalkSpeed());
-							p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-							p.setSprinting(true);
-						}
-					}, r.getCharacter().getDeathPenaltySecond() * 20)
-				);
-				r.setDeathPenaltyTitleSendTask(
-					new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(), Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
-				);
-			}
-		}else{
-			((LivingEntity)damaged).damage(damage, executor);
-		}
-	}
-
-	public static void removeEntityCollision(Entity e){
-		try{
-			Object craftentity = getCraftEntity(e);
-			Field nmsField;
-			for(Field f : craftentity.getClass().getFields()){
-				if(!f.getName().equalsIgnoreCase("noclip"))continue;
-				nmsField = f;
-				nmsField.setAccessible(true);
-				nmsField.setBoolean(craftentity, true);
-				return;
-			}
-		}catch(Exception exception){
-		}
-	}
-
-	public static void removeEntityVerticalMotion(Entity e){
-		try{
-			Object craftentity = getCraftEntity(e);
-			Field nmsField;
-			for(Field f : craftentity.getClass().getFields()){
-				if(!f.getName().equalsIgnoreCase("motY"))continue;
-				nmsField = f;
-				nmsField.setAccessible(true);
-				nmsField.setDouble(craftentity, f.getDouble(craftentity) + 0.03999999910593033D);
-				return;
-			}
-		}catch(Exception exception){
-		}
-	}
-
-	public static Location adjustBlockLocation(Location old){
-		Location value = old.getBlock().getLocation();
-		return new Location(old.getWorld(), value.getX()+0.5, value.getY(), value.getZ()+0.5, old.getYaw(), old.getPitch());
-	}
-
-	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	public static String convertSignNumber(int number){
-		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
-	}
-
-	public static String convertSignNumber(float number){
-		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
-	}
-
-	public static String convertSignNumber(double number){
-		return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
-	}
-
-	public static String convertSignNumberR(int number){
-		String text = "";
-		if(number == 0)
-			text = "<gold>+" + String.valueOf(number);
-		else
-			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
-		return text;
-	}
-
-	public static String convertSignNumberR(float number){
-		String text = "";
-		if(number == 0)
-			text = "<gold>+" + String.valueOf(number);
-		else
-			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
-		return text;
-	}
-
-	public static String convertSignNumberR(double number){
-		String text = "";
-		if(number == 0)
-			text = "<gold>+" + String.valueOf(number);
-		else
-			text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
-		return text;
-	}
-
-
-	public static String convertInitialUpperString(String string){
-		String initial = string.substring(0, 1).toUpperCase();
-		String other = string.substring(1, string.length()).toLowerCase();
-
-		return initial + other;
-	}
-
-	//〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-	//ブロック、非生物エンティティに影響しない爆発を発生
-	public static void createSafeExplosion(Player executor, Location l, int damage, int range){
-		Particle.sendToLocation("CLOUD", l, 0, 0, 0, 1, 10);
-		Particle.sendToLocation("SMOKE_NORMAL", l, 0, 0, 0, 1, 10);
-		l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
-		ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
-		for(LivingEntity damaged : entities){
-			if(executor != null)
-				if(damaged.getUniqueId() == executor.getUniqueId())continue;
-			if(0 < damaged.getNoDamageTicks())continue;
-			if(damaged.isDead())continue;
-			if(!(damaged instanceof Player))continue;
-			if(!RaceManager.isRacing(((Player)damaged).getUniqueId()))continue;
-
-			Vector v = Util.getVectorLocationToLocation(l, damaged.getLocation());
-			v.setX(v.clone().multiply(-1).getX());
-			v.setY(0);
-			v.setZ(v.clone().multiply(-1).getZ());
-			damaged.setVelocity(v);
-
-			addDamage(damaged, executor, damage);
-		}
-	}
-
-	public static void createFlowerShower(Player p, int maxlife){
-		new FlowerShowerTask(p,maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
-	}
-
-	public static void createSignalFireworks(Location l){
-		World w = l.getWorld();
-		FireworkEffect effect = FireworkEffect.builder().withColor(Color.GREEN).withFade(Color.LIME).with(Type.BALL_LARGE).build();
-		FireworkEffect effect2 = FireworkEffect.builder().withColor(Color.YELLOW).withFade(Color.ORANGE).with(Type.STAR).build();
-		FireworkEffect effect3 = FireworkEffect.builder().withColor(Color.RED).withFade(Color.PURPLE).with(Type.CREEPER).build();
-		FireworkEffect effect4 = FireworkEffect.builder().withColor(Color.AQUA).withFade(Color.BLUE).with(Type.BURST).build();
-
-		for(int i = 0; i <= 2; i++){
-			try {
-				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect);
-				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect2);
-				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect3);
-				FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect4);
-			} catch (Exception ex){
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	/*
-	 * 各OSのデフォルトの文字コードに変換しリソースを保管します
-	 */
-	public static boolean copyResource(String filename){
-		InputStream input = YPLKart.getInstance().getResource(filename);
-		if(input == null)return false;
-
-		FileOutputStream output = null;
-		BufferedReader reader = null;
-		BufferedWriter writer = null;
-
-		try {
-			output = new FileOutputStream(new File(YPLKart.getInstance().getDataFolder(), filename));
-			writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
-			reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
+public class Util extends ReflectionUtil {
+    private static String OperatingSystem = System.getProperty("os.name").toLowerCase();
+    private static Class<?> CraftBlock = getBukkitClass("Block");
+    private static Class<?> CraftMaterial = getBukkitClass("Material");
+
+    private static Method Block_getById;
+    private static Method Block_getMaterial;
+    private static Method Material_isSolid;
+
+    public Util() {
+        try {
+            Block_getById = CraftBlock.getMethod("getById", int.class);
+            Block_getMaterial = CraftBlock.getMethod("getMaterial");
+            Material_isSolid = CraftMaterial.getMethod("isSolid");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int getRandom(int value) {
+        int num;
+        Random random = new Random();
+        num = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
+        return num;
+    }
+
+    public static ChatColor getChatColorFromText(String text) {
+        String color = ChatColor.getLastColors(text);
+        if (color == null)
+            return ChatColor.WHITE;
+        if (color.length() == 0)
+            return ChatColor.WHITE;
+
+        return ChatColor.getByChar(color.substring(1));
+    }
+
+    public static Vector getVectorLocationToLocation(Location second_location, Location first_location) {
+        Vector vector = second_location.toVector().subtract(first_location.toVector());
+        return vector.normalize();
+    }
+
+    public static float getYawfromVector(Vector v) {
+        double dx = v.getX();
+        double dz = v.getZ();
+        double yaw = 0;
+        // Set yaw
+        if (dx != 0) {
+            // Set yaw start value based on dx
+            if (dx < 0) {
+                yaw = 1.5 * Math.PI;
+            } else {
+                yaw = 0.5 * Math.PI;
+            }
+            yaw -= Math.atan(dz / dx);
+        } else if (dz < 0) {
+            yaw = Math.PI;
+        }
+        return (float) (-yaw * 180 / Math.PI - 90);
+    }
+
+    public static String getStepBlock(Location l) {
+        Block b = l.getBlock();
+        if (b.getType() == Material.AIR) {
+            b = b.getLocation().add(0, -1, 0).getBlock();
+            if (b.getType() == Material.AIR) {
+                b = b.getLocation().add(0, -1, 0).getBlock();
+            }
+        }
+
+        return String.valueOf(b.getTypeId()) + ":" + String.valueOf(b.getData());
+    }
+
+    public static Material getStepMaterial(Location l) {
+        Block b = l.add(0, 1, 0).getBlock();
+        if (b.getType() == Material.AIR) {
+            b = b.getLocation().add(0, -1, 0).getBlock();
+            if (b.getType() == Material.AIR) {
+                b = b.getLocation().add(0, -1, 0).getBlock();
+            }
+        }
+
+        return b.getType();
+    }
+
+    public static Location getLocationfromYaw(Location from, double offset) {
+        Location fromadjust = adjustBlockLocation(from);
+        float yaw = fromadjust.getYaw();
+        double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
+        double z = Math.cos(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
+
+        Location to = new Location(fromadjust.getWorld(), fromadjust.getX() + x * offset, fromadjust.getY(),
+                fromadjust.getZ() + z * offset);
+        to.setYaw(yaw);
+        return to;
+    }
+
+    public static Location getSideLocationfromYaw(Location from, double offset) {
+        Location fromadjust = adjustBlockLocation(from);
+        float yaw = fromadjust.getYaw();
+        double x = Math.cos(Math.toRadians(yaw));
+        double z = Math.sin(Math.toRadians(yaw));
+
+        Location to = new Location(fromadjust.getWorld(), fromadjust.getX() + x * offset, fromadjust.getY(),
+                fromadjust.getZ() + z * offset);
+        to.setYaw(yaw);
+        return to;
+    }
+
+    //指定半径内の高さ１ブロック内の座標を直方体で取得
+    public static ArrayList<Location> getSquareLocation(Location loc, double r) {
+        ArrayList<Location> square = new ArrayList<Location>();
+        double cx = loc.getX();
+        double cz = loc.getZ();
+        for (double x = cx - r; x <= cx + r; x++) {
+            for (double z = cz - r; z <= cz + r; z++) {
+                Location cylLocation = new Location(loc.getWorld(), x, loc.getBlockY(), z);
+                square.add(cylLocation);
+            }
+        }
+        return square;
+    }
+
+    public static ArrayList<Entity> getNearbyEntities(Location l, double radius) {
+        ArrayList<Entity> entities = new ArrayList<Entity>();
+        for (Entity entity : l.getWorld().getEntities()) {
+            if (l.distanceSquared(entity.getLocation()) <= radius * radius) {
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public static ArrayList<LivingEntity> getNearbyLivingEntities(Location l, double radius) {
+        ArrayList<Entity> entity = getNearbyEntities(l, radius);
+        ArrayList<LivingEntity> livingentity = new ArrayList<LivingEntity>();
+        for (Entity e : entity) {
+            if (e instanceof LivingEntity)
+                livingentity.add((LivingEntity) e);
+        }
+        return livingentity;
+    }
+
+    public static ArrayList<Player> getNearbyPlayers(Location l, double radius) {
+        ArrayList<Entity> entity = getNearbyEntities(l, radius);
+        ArrayList<Player> livingentity = new ArrayList<Player>();
+        for (Entity e : entity) {
+            if (e instanceof Player)
+                livingentity.add((Player) e);
+        }
+        return livingentity;
+    }
+
+    public static Entity getNearestEntity(List<Entity> entities, Location l) {
+        Iterator<Entity> i = entities.iterator();
+        Entity e = null;
+        Entity temp;
+        while (i.hasNext()) {
+            temp = i.next();
+            if (e != null)
+                if (e.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
+                    if (e.getLocation().distance(l) < temp.getLocation().distance(l))
+                        continue;
+            e = temp;
+        }
+
+        return e;
+    }
+
+    public static Player getNearestPlayer(ArrayList<Player> players, Location l) {
+        if (players == null)
+            return null;
+
+        Iterator<Player> i = players.iterator();
+        Player p = null;
+        Player temp;
+        while (i.hasNext()) {
+            temp = i.next();
+            if (p != null)
+                if (p.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
+                    if (p.getLocation().distance(l) < temp.getLocation().distance(l))
+                        continue;
+            p = temp;
+        }
+
+        return p;
+    }
+
+    public static ArrayList<Entity> getAllVehicle(Entity e) {
+        ArrayList<Entity> entity = new ArrayList<Entity>();
+
+        Entity vehicle = e.getVehicle() != null ? e.getVehicle() : null;
+        while (vehicle != null) {
+            entity.add(vehicle);
+            vehicle = vehicle.getVehicle() != null ? vehicle.getVehicle() : null;
+        }
+
+        return entity;
+    }
+
+    public static ArrayList<Entity> getAllPassenger(Entity e) {
+        ArrayList<Entity> entity = new ArrayList<Entity>();
+
+        Entity passenger = e.getPassenger() != null ? e.getPassenger() : null;
+        while (passenger != null) {
+            entity.add(passenger);
+            passenger = passenger.getPassenger() != null ? passenger.getPassenger() : null;
+        }
+        return entity;
+    }
+
+    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static void setPotionEffect(Player p, PotionEffectType effect, int second, int level) {
+        p.removePotionEffect(effect);
+        p.addPotionEffect(new PotionEffect(effect, second * 20, level));
+    }
+
+    public static void setItemDecrease(Player p) {
+        int i = p.getItemInHand().getAmount();
+        if (i == 1) {
+            p.setItemInHand(null);
+        } else if (i > 1) {
+            p.getItemInHand().setAmount(i - 1);
+        }
+    }
+
+    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static boolean isWindows() {
+        return OperatingSystem.startsWith("windows");
+    }
+
+    public static Boolean isOnline(String name) {
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (name.equalsIgnoreCase(online.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNumber(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (NumberFormatException e) {
+            try {
+                Float.parseFloat(number);
+                return true;
+            } catch (NumberFormatException ee) {
+                try {
+                    Double.parseDouble(number);
+                    return true;
+                } catch (NumberFormatException eee) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    public static boolean isBoolean(String flag) {
+        if (flag.equalsIgnoreCase("true") || flag.equalsIgnoreCase("false"))
+            return true;
+        return false;
+    }
+
+    public static boolean isLoadedChunk(Location l) {
+        Player player = getNearestPlayer(getNearbyPlayers(l, 100), l);
+        if (player == null)
+            return false;
+
+        return true;
+    }
+
+    public static Boolean isSolidBlock(Location l) {
+        try {
+            return (Boolean) Material_isSolid.invoke(Block_getMaterial.invoke(Block_getById.invoke(CraftBlock, l
+                    .getBlock().getTypeId())));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Boolean isSlabBlock(Location l) {
+        int id = l.getBlock().getTypeId();
+        if (id == 44 || id == 126 || id == 182)
+            return true;
+        return false;
+    }
+
+    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static void addDamage(Entity damaged, Entity executor, int damage) {
+        if (!(damaged instanceof LivingEntity))
+            return;
+        if (damaged instanceof Player) {
+            final Player p = (Player) damaged;
+            if (0 < p.getNoDamageTicks())
+                return;
+            if (!RaceManager.isRacing(p.getUniqueId()))
+                return;
+
+            p.playEffect(EntityEffect.HURT);
+
+            if (1 <= p.getHealth() - damage) {
+                p.setHealth(p.getHealth() - damage);
+            } else {
+                Circuit c = RaceManager.getCircuit(p.getUniqueId());
+                p.setHealth(p.getMaxHealth());
+                if (executor != null)
+                    c.sendMessageEntryPlayer(Message.racePlayerKill, new Object[] { c,
+                            new Player[] { (Player) damaged, (Player) executor } });
+                else
+                    c.sendMessageEntryPlayer(Message.racePlayerDead, new Object[] { c, (Player) damaged });
+
+                final Race r = RaceManager.getRace(p);
+
+                p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
+                p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
+                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+                r.setDeathPenaltyTask(
+                        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                            public void run() {
+                                p.setWalkSpeed(r.getCharacter().getWalkSpeed());
+                                p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+                                p.setSprinting(true);
+                            }
+                        }, r.getCharacter().getDeathPenaltySecond() * 20)
+                        );
+                r.setDeathPenaltyTitleSendTask(
+                        new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(),
+                                Message.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
+                        );
+            }
+        } else {
+            ((LivingEntity) damaged).damage(damage, executor);
+        }
+    }
+
+    public static void removeEntityCollision(Entity e) {
+        try {
+            Object craftentity = getCraftEntity(e);
+            Field nmsField;
+            for (Field f : craftentity.getClass().getFields()) {
+                if (!f.getName().equalsIgnoreCase("noclip"))
+                    continue;
+                nmsField = f;
+                nmsField.setAccessible(true);
+                nmsField.setBoolean(craftentity, true);
+                return;
+            }
+        } catch (Exception exception) {
+        }
+    }
+
+    public static void removeEntityVerticalMotion(Entity e) {
+        try {
+            Object craftentity = getCraftEntity(e);
+            Field nmsField;
+            for (Field f : craftentity.getClass().getFields()) {
+                if (!f.getName().equalsIgnoreCase("motY"))
+                    continue;
+                nmsField = f;
+                nmsField.setAccessible(true);
+                nmsField.setDouble(craftentity, f.getDouble(craftentity) + 0.03999999910593033D);
+                return;
+            }
+        } catch (Exception exception) {
+        }
+    }
+
+    public static Location adjustBlockLocation(Location old) {
+        Location value = old.getBlock().getLocation();
+        return new Location(old.getWorld(), value.getX() + 0.5, value.getY(), value.getZ() + 0.5, old.getYaw(),
+                old.getPitch());
+    }
+
+    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static String convertSignNumber(int number) {
+        return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
+    }
+
+    public static String convertSignNumber(float number) {
+        return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
+    }
+
+    public static String convertSignNumber(double number) {
+        return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
+    }
+
+    public static String convertSignNumberR(int number) {
+        String text = "";
+        if (number == 0)
+            text = "<gold>+" + String.valueOf(number);
+        else
+            text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
+        return text;
+    }
+
+    public static String convertSignNumberR(float number) {
+        String text = "";
+        if (number == 0)
+            text = "<gold>+" + String.valueOf(number);
+        else
+            text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
+        return text;
+    }
+
+    public static String convertSignNumberR(double number) {
+        String text = "";
+        if (number == 0)
+            text = "<gold>+" + String.valueOf(number);
+        else
+            text = 0 < number ? "<blue>+" + String.valueOf(number) : "<gold>" + String.valueOf(number);
+        return text;
+    }
+
+    public static String convertInitialUpperString(String string) {
+        String initial = string.substring(0, 1).toUpperCase();
+        String other = string.substring(1, string.length()).toLowerCase();
+
+        return initial + other;
+    }
+
+    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    //ブロック、非生物エンティティに影響しない爆発を発生
+    public static void createSafeExplosion(Player executor, Location l, int damage, int range) {
+        Particle.sendToLocation("CLOUD", l, 0, 0, 0, 1, 10);
+        Particle.sendToLocation("SMOKE_NORMAL", l, 0, 0, 0, 1, 10);
+        l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
+        ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
+        for (LivingEntity damaged : entities) {
+            if (executor != null)
+                if (damaged.getUniqueId() == executor.getUniqueId())
+                    continue;
+            if (0 < damaged.getNoDamageTicks())
+                continue;
+            if (damaged.isDead())
+                continue;
+            if (!(damaged instanceof Player))
+                continue;
+            if (!RaceManager.isRacing(((Player) damaged).getUniqueId()))
+                continue;
+
+            Vector v = Util.getVectorLocationToLocation(l, damaged.getLocation());
+            v.setX(v.clone().multiply(-1).getX());
+            v.setY(0);
+            v.setZ(v.clone().multiply(-1).getZ());
+            damaged.setVelocity(v);
+
+            addDamage(damaged, executor, damage);
+        }
+    }
+
+    public static void createFlowerShower(Player p, int maxlife) {
+        new FlowerShowerTask(p, maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
+    }
+
+    public static void createSignalFireworks(Location l) {
+        World w = l.getWorld();
+        FireworkEffect effect = FireworkEffect.builder().withColor(Color.GREEN).withFade(Color.LIME)
+                .with(Type.BALL_LARGE).build();
+        FireworkEffect effect2 = FireworkEffect.builder().withColor(Color.YELLOW).withFade(Color.ORANGE)
+                .with(Type.STAR).build();
+        FireworkEffect effect3 = FireworkEffect.builder().withColor(Color.RED).withFade(Color.PURPLE)
+                .with(Type.CREEPER).build();
+        FireworkEffect effect4 = FireworkEffect.builder().withColor(Color.AQUA).withFade(Color.BLUE).with(Type.BURST)
+                .build();
+
+        for (int i = 0; i <= 2; i++) {
+            try {
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect2);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect3);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect4);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /*
+     * 各OSのデフォルトの文字コードに変換しリソースを保管します
+     */
+    public static boolean copyResource(String filename) {
+        InputStream input = YPLKart.getInstance().getResource(filename);
+        if (input == null)
+            return false;
+
+        FileOutputStream output = null;
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
+        try {
+            output = new FileOutputStream(new File(YPLKart.getInstance().getDataFolder(), filename));
+            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+            reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -527,125 +552,126 @@ public class Util extends ReflectionUtil{
             }
             writer.flush();
             return true;
-		} catch (Exception e) {
-			return false;
-			//e.printStackTrace();
-		} finally{
-			if(input != null)
-				try {
-					input.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
+        } catch (Exception e) {
+            return false;
+            //e.printStackTrace();
+        } finally {
+            if (input != null)
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			if(output != null)
-				try {
-					output.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
+            if (output != null)
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			if(writer != null)
-				try {
-					writer.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			if(reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
-		}
-	}
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
+        }
+    }
 
-	/*
-	 * 各OSのデフォルトの文字コードに変換し、コンフィグを最新の内容に上書き保存します
-	 */
-	public static void saveConfiguration(File file, FileConfiguration config, List<String> ignorelist){
-		//コンフィグファイルが無い場合新規作成します
-		if(!file.exists()){
-			if(!copyResource(file.getName()))return;
-			file = new File(YPLKart.getInstance().getDataFolder(), file.getName());
-		}
-		List<String> continuetext = new ArrayList<String>();
-		FileInputStream input =  null;
-		FileOutputStream output = null;
-		BufferedReader reader = null;
-		BufferedWriter writer = null;
+    /*
+     * 各OSのデフォルトの文字コードに変換し、コンフィグを最新の内容に上書き保存します
+     */
+    public static void saveConfiguration(File file, FileConfiguration config, List<String> ignorelist) {
+        //コンフィグファイルが無い場合新規作成します
+        if (!file.exists()) {
+            if (!copyResource(file.getName()))
+                return;
+            file = new File(YPLKart.getInstance().getDataFolder(), file.getName());
+        }
+        List<String> continuetext = new ArrayList<String>();
+        FileInputStream input = null;
+        FileOutputStream output = null;
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
 
-		try {
-			input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
-			reader = new BufferedReader(new InputStreamReader(input, Charset.defaultCharset()));
+        try {
+            input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
+            reader = new BufferedReader(new InputStreamReader(input, Charset.defaultCharset()));
 
-			//新しいファイルにコメントアウトしている行のみ引き継ぐ
-			String line;
-			while((line = reader.readLine()) != null) {
-				if(line.startsWith("#"))
-					continuetext.add(line);
-			}
+            //新しいファイルにコメントアウトしている行のみ引き継ぐ
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("#"))
+                    continuetext.add(line);
+            }
 
-			file.delete();
-			file.createNewFile();
+            file.delete();
+            file.createNewFile();
 
-			file.createNewFile();
-			output = new FileOutputStream(file);
-			writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+            file.createNewFile();
+            output = new FileOutputStream(file);
+            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
 
+            for (String continueline : continuetext) {
+                writer.write(continueline);
+                writer.newLine();
+            }
 
-			for(String continueline : continuetext) {
-				writer.write(continueline);
-				writer.newLine();
-			}
+            boolean continueflag = false;
+            for (String configkey : config.getKeys(true)) {
+                continueflag = false;
+                for (String ignore : ignorelist) {
+                    if (configkey.startsWith(ignore)) {
+                        continueflag = true;
+                        break;
+                    }
+                }
+                if (continueflag)
+                    continue;
 
-			boolean continueflag = false;
-			for(String configkey : config.getKeys(true)){
-				continueflag = false;
-				for(String ignore : ignorelist){
-					if(configkey.startsWith(ignore)){
-						continueflag = true;
-						break;
-					}
-				}
-				if(continueflag)continue;
+                writer.write(configkey + " : \"" + config.get(configkey) + "\"");
+                writer.newLine();
+            }
 
-				writer.write(configkey + " : \"" + config.get(configkey) + "\"");
-				writer.newLine();
-			}
+            writer.flush();
+        } catch (Exception e) {
+            //e.printStackTrace();
+        } finally {
+            if (input != null)
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			writer.flush();
-		} catch (Exception e) {
-			//e.printStackTrace();
-		} finally{
-			if(input != null)
-				try {
-					input.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
+            if (output != null)
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			if(output != null)
-				try {
-					output.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
 
-			if(writer != null)
-				try {
-					writer.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
-
-			if(reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-					//e.printStackTrace();
-				}
-		}
-	}
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                }
+        }
+    }
 }
