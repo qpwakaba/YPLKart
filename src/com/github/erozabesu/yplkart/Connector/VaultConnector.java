@@ -14,7 +14,7 @@ public class VaultConnector {
         // Do nothing
     }
 
-    public static VaultConnector setupConnection(Plugin plugin) {
+    public static VaultConnector loadPlugin(Plugin plugin) {
         if (plugin == null) {
             return null;
         }

@@ -7,7 +7,7 @@ import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.Cmd.CMD;
-import com.github.erozabesu.yplkart.Connection.VaultConnection;
+import com.github.erozabesu.yplkart.Connector.VaultConnector;
 import com.github.erozabesu.yplkart.Data.DisplayKartData;
 import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.RaceData;
@@ -22,7 +22,7 @@ import com.github.erozabesu.yplkart.Utils.Util;
 public class YPLKart extends JavaPlugin {
     public static String plname;
 
-    private VaultConnection vaultConnection;
+    private VaultConnector vaultConnection;
 
     @Override
     public void onEnable() {
@@ -48,7 +48,7 @@ public class YPLKart extends JavaPlugin {
         }
 
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
-            this.vaultConnection = VaultConnection.setupConnection(getServer().getPluginManager().getPlugin("Vault"));
+            this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
         }
 
         Message.sendAbsolute(null, "[" + plname + "] v." + YPLKart.getInstance().getDescription().getVersion()
@@ -65,7 +65,7 @@ public class YPLKart extends JavaPlugin {
         return (YPLKart) Bukkit.getPluginManager().getPlugin("YPLKart");
     }
 
-    public VaultConnection getVaultConnection() {
+    public VaultConnector getVaultConnector() {
         return this.vaultConnection;
     }
 
