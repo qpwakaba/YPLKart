@@ -539,7 +539,7 @@ public class RaceManager {
         inv.setItem(31, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
 
         if (Permission.hasPermission(p, Permission.KART_RIDE, true)) {
-            inv.setItem(30, EnumSelectMenu.CHARACTER_PREVIEW.getMenuItem());
+            inv.setItem(30, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
             inv.setItem(32, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
         }
         p.openInventory(inv);
@@ -557,7 +557,7 @@ public class RaceManager {
         inv.setItem(23, EnumKarts.KART7.getMenuItem());
         inv.setItem(25, EnumKarts.KART8.getMenuItem());
         inv.setItem(31, EnumSelectMenu.KART_RANDOM.getMenuItem());
-        inv.setItem(30, EnumSelectMenu.KART_PREVIEW.getMenuItem());
+        inv.setItem(30, EnumSelectMenu.KART_PREVIOUS.getMenuItem());
         inv.setItem(32, EnumSelectMenu.KART_NEXT.getMenuItem());
         p.openInventory(inv);
     }

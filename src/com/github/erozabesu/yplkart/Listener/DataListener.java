@@ -471,7 +471,7 @@ public class DataListener extends RaceManager implements Listener {
                 RaceManager.setCharacterRaceData(id, EnumCharacter.getRandomCharacter());
                 //ネクストプレビューボタン
             } else if (EnumSelectMenu.CHARACTER_NEXT.equalsIgnoreCase(clicked)
-                    || EnumSelectMenu.CHARACTER_PREVIEW.equalsIgnoreCase(clicked)) {
+                    || EnumSelectMenu.CHARACTER_PREVIOUS.equalsIgnoreCase(clicked)) {
                 if (isStandBy(id)) {
                     if (r.getCharacter() == null) {
                         Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
@@ -511,7 +511,7 @@ public class DataListener extends RaceManager implements Listener {
                 RaceManager.setKartRaceData(id, EnumKarts.getRandomKart());
                 //ネクストプレビューボタン
             } else if (EnumSelectMenu.KART_NEXT.equalsIgnoreCase(clicked)
-                    || EnumSelectMenu.KART_PREVIEW.equalsIgnoreCase(clicked)) {
+                    || EnumSelectMenu.KART_PREVIOUS.equalsIgnoreCase(clicked)) {
                 if (isStandBy(id)) {
                     if (r.getKart() == null) {
                         Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));

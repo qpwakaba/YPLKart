@@ -8,12 +8,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 public enum EnumSelectMenu {
     CHARACTER_CANCEL(ChatColor.GOLD + "選択画面を閉じます", Material.DIAMOND, (byte) 0),
     CHARACTER_RANDOM(ChatColor.GOLD + "キャラクターをランダムに選択します", Material.IRON_INGOT, (byte) 0),
-    CHARACTER_PREVIEW(ChatColor.GOLD + "カート選択画面に移動します", Material.COAL, (byte) 0),
+    CHARACTER_PREVIOUS(ChatColor.GOLD + "カート選択画面に移動します", Material.COAL, (byte) 0),
     CHARACTER_NEXT(ChatColor.GOLD + "カート選択画面に移動します", Material.COAL, (byte) 1),
 
     KART_CANCEL(ChatColor.GOLD + "選択画面を閉じます", Material.DIAMOND, (byte) 0),
     KART_RANDOM(ChatColor.GOLD + "カートをランダムに選択します", Material.IRON_INGOT, (byte) 0),
-    KART_PREVIEW(ChatColor.GOLD + "キャラクター選択画面に移動します", Material.COAL, (byte) 0),
+    KART_PREVIOUS(ChatColor.GOLD + "キャラクター選択画面に移動します", Material.COAL, (byte) 0),
     KART_NEXT(ChatColor.GOLD + "キャラクター選択画面に移動します", Material.COAL, (byte) 1);
 
     private String name;
