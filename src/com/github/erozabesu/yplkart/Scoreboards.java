@@ -3,9 +3,8 @@ package com.github.erozabesu.yplkart;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;

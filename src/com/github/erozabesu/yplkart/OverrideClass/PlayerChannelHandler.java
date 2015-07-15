@@ -34,7 +34,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
              * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
              */
             if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")) {
-                int id = (int) ReflectionUtil.getFieldValue(msg, "a");
+                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
                 if (NettyListener.playerEntityId.get(id) == null) {
                     super.write(ctx, msg, promise);
                     return;
@@ -51,7 +51,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                         Iterator i = watchableobject.iterator();
                         while (i.hasNext()) {
                             Object w = i.next();
-                            int index = (int) w.getClass().getMethod("a").invoke(w);
+                            int index = (Integer) w.getClass().getMethod("a").invoke(w);
                             if (index == 10 || index == 16 || index == 17 || index == 18) {
                                 i.remove();
                             }

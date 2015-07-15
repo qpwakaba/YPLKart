@@ -461,7 +461,7 @@ public enum Message {
                 basemessage = basemessage.replace("<text" + tagnumber + ">", text[i]);
             }
         } else if (object instanceof Boolean) {
-            basemessage = basemessage.replace("<flag>", String.valueOf((boolean) object));
+            basemessage = basemessage.replace("<flag>", String.valueOf(object));
         } else if (object instanceof Player) {
             basemessage = basemessage.replace("<player>", ((Player) object).getName());
         } else if (object instanceof Player[]) {

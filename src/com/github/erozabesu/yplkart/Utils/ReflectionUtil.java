@@ -11,11 +11,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 public class ReflectionUtil {
-    private static String bukkitVersion = 
+    private static String bukkitVersion =
             Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
     private static String bukkitPackage = "net.minecraft.server." + getBukkitVersion();
     private static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
-    private static String yplkartPackage = 
+    private static String yplkartPackage =
             "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
 
     private static Class<?> NMSWorld = getBukkitClass("World");
@@ -94,11 +94,11 @@ public class ReflectionUtil {
     }
 
     public static Field getField(Class<?> clazz, String name) {
-        for (Field f : clazz.getFields()) {
-            if (!f.getName().equalsIgnoreCase(name))
+        for (Field field : clazz.getFields()) {
+            if (!field.getName().equalsIgnoreCase(name))
                 continue;
-            f.setAccessible(true);
-            return f;
+            field.setAccessible(true);
+            return field;
         }
         return null;
     }
