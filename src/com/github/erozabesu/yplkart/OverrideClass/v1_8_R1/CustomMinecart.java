@@ -343,7 +343,7 @@ public class CustomMinecart extends EntityMinecartRideable {
             }
 
             //コーナリング性能
-            if (Permission.hasPermission((Player) human.getBukkitEntity(), Permission.kart_drift, true)) {
+            if (Permission.hasPermission((Player) human.getBukkitEntity(), Permission.KART_DRIFT, true)) {
                 //TODO CraftBukkit
                 this.yaw = human.isSneaking() ? this.yaw - human.aX * this.corneringPowerDrift : this.yaw - human.aX
                         * this.corneringPower;
@@ -518,7 +518,7 @@ public class CustomMinecart extends EntityMinecartRideable {
                 return false;
 
             Player p = (Player) damagesource.getEntity().getBukkitEntity();
-            if (!Permission.hasPermission(p, Permission.op_kart_remove, false))
+            if (!Permission.hasPermission(p, Permission.OP_KART_REMOVE, false))
                 return false;
 
             if (this.passenger != null)

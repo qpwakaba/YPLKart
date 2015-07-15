@@ -44,7 +44,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
                     if (r.getCharacter() == null) {
                         super.write(ctx, msg, promise);
-                    } else if (r.getCharacter().equals(EnumCharacter.Human)) {
+                    } else if (r.getCharacter().equals(EnumCharacter.HUMAN)) {
                         super.write(ctx, msg, promise);
                     } else {
                         List<Object> watchableobject = (List<Object>) ReflectionUtil.getFieldValue(msg, "b");
@@ -65,7 +65,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                 //Human以外のキャラクターを選択している場合パケットを偽装
                 if (r.getCharacter() == null) {
                     super.write(ctx, msg, promise);
-                } else if (r.getCharacter().equals(EnumCharacter.Human)) {
+                } else if (r.getCharacter().equals(EnumCharacter.HUMAN)) {
                     super.write(ctx, msg, promise);
                 } else {
                     super.write(ctx, PacketUtil.getDisguisePacket(p, r.getCharacter()), promise);

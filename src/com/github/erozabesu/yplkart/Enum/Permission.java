@@ -7,184 +7,184 @@ import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
 
 public enum Permission {
-    kart_ride(
+    KART_RIDE(
             YPLKart.plname + ".kart.ride",
             Settings.EnablePermissionKartRide,
             Settings.EnablePermissionKartRide),
-    kart_drift(
+    KART_DRIFT(
             YPLKart.plname + ".kart.drift",
             Settings.EnablePermissionKartDrift,
             Settings.EnablePermissionKartDrift),
-    op_kart_remove(
+    OP_KART_REMOVE(
             YPLKart.plname + ".op.kart.remove",
             Settings.EnableOPPermissionKartRemove,
             Settings.EnableOPPermissionKartRemove),
 
-    cmd_ka(
+    CMD_KA(
             YPLKart.plname + ".cmd.ka",
             false,
             false),
-    cmd_menu(
+    CMD_MENU(
             YPLKart.plname + ".cmd.menu",
             Settings.EnablePermissionCMDMenu,
             Settings.EnablePermissionCMDOtherMenu),
-    cmd_entry(
+    CMD_ENTRY(
             YPLKart.plname + ".cmd.entry",
             Settings.EnablePermissionCMDEntry,
             Settings.EnablePermissionCMDOtherEntry),
-    cmd_exit(
+    CMD_EXIT(
             YPLKart.plname + ".cmd.exit",
             Settings.EnablePermissionCMDExit,
             Settings.EnablePermissionCMDOtherExit),
-    cmd_ride(
+    CMD_RIDE(
             YPLKart.plname + ".cmd.kart",
             Settings.EnablePermissionCMDRide,
             Settings.EnablePermissionCMDOtherRide),
-    cmd_leave(
+    CMD_LEAVE(
             YPLKart.plname + ".cmd.leave",
             Settings.EnablePermissionCMDLeave,
             Settings.EnablePermissionCMDOtherLeave),
-    cmd_character(
+    CMD_CHARACTER(
             YPLKart.plname + ".cmd.character",
             Settings.EnablePermissionCMDCharacter,
             Settings.EnablePermissionCMDOtherCharacter),
-    cmd_characterreset(
+    CMD_CHARACTERRESET(
             YPLKart.plname + ".cmd.characterreset",
             Settings.EnablePermissionCMDCharacterReset,
             Settings.EnablePermissionCMDOtherCharacterReset),
-    cmd_ranking(
+    CMD_RANKING(
             YPLKart.plname + ".cmd.ranking",
             Settings.EnablePermissionCMDRanking,
             Settings.EnablePermissionCMDOtherRanking),
 
-    op_cmd_circuit(
+    OP_CMD_CIRCUIT(
             YPLKart.plname + ".op.cmd.circuit",
             Settings.EnableOPPermissionCMDCircuit,
             Settings.EnableOPPermissionCMDCircuit),
-    op_cmd_display(
+    OP_CMD_DISPLAY(
             YPLKart.plname + ".op.cmd.display",
             Settings.EnableOPPermissionCMDDisplay,
             Settings.EnableOPPermissionCMDDisplay),
-    op_cmd_reload(
+    OP_CMD_RELOAD(
             YPLKart.plname + ".op.cmd.reload",
             Settings.EnableOPPermissionCMDReload,
             Settings.EnableOPPermissionCMDReload),
-    op_cmd_itemboxtool(
+    OP_CMD_ITEMBOX(
             YPLKart.plname + ".op.cmd.itemboxtool",
             Settings.EnableOPPermissionCMDItemBoxTool,
             Settings.EnableOPPermissionCMDItemBoxTool),
 
-    itemcmd_mushroom(
+    ITEMCMD_MUSHROOM(
             YPLKart.plname + ".itemcmd.mushroom",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_powerfullmushroom(
+    ITEMCMD_POWERFULLMUSHROOM(
             YPLKart.plname + ".itemcmd.goldenmushroom",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_banana(
+    ITEMCMD_BANANA(
             YPLKart.plname + ".itemcmd.banana",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_fakeitembox(
+    ITEMCMD_FAKEITEMBOX(
             YPLKart.plname + ".itemcmd.fakeitembox",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_thunder(
+    ITEMCMD_THUNDER(
             YPLKart.plname + ".itemcmd.thunder",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_star(
+    ITEMCMD_STAR(
             YPLKart.plname + ".itemcmd.star",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_turtle(
+    ITEMCMD_TURTLE(
             YPLKart.plname + ".itemcmd.turtle",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_redturtle(
+    ITEMCMD_REDTURTLE(
             YPLKart.plname + ".itemcmd.redturtle",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_thornedturtle(
+    ITEMCMD_THORNEDTURTLE(
             YPLKart.plname + ".itemcmd.thornedturtle",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_teresa(
+    ITEMCMD_TERESA(
             YPLKart.plname + ".itemcmd.teresa",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_gesso(
+    ITEMCMD_GESSO(
             YPLKart.plname + ".itemcmd.gesso",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
-    itemcmd_killer(
+    ITEMCMD_KILLER(
             YPLKart.plname + ".itemcmd.killer",
             Settings.EnablePermissionCMDItem,
             Settings.EnablePermissionCMDOtherItem),
 
-    use_mushroom(
+    USE_MUSHROOM(
             YPLKart.plname + ".use.mushroom",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_powerfullmushroom(
+    USE_POWERFULLMUSHROOM(
             YPLKart.plname + ".use.powerfullmushroom",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_banana(
+    USE_BANANA(
             YPLKart.plname + ".use.banana",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_turtle(
+    USE_TURTLE(
             YPLKart.plname + ".use.turtle",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_redturtle(
+    USE_REDTURTLE(
             YPLKart.plname + ".use.redturtle",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_thornedturtle(
+    USE_THORNEDTURTLE(
             YPLKart.plname + ".use.thornedturtle",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_fakeitembox(
+    USE_FAKEITEMBOX(
             YPLKart.plname + ".use.fakeitembox",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_teresa(
+    USE_TERESA(
             YPLKart.plname + ".use.teresa",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_gesso(
+    USE_GESSO(
             YPLKart.plname + ".use.gesso",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_killer(
+    USE_KILLER(
             YPLKart.plname + ".use.killer",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_thunder(
+    USE_THUNDER(
             YPLKart.plname + ".use.thunder",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
-    use_star(
+    USE_STAR(
             YPLKart.plname + ".use.star",
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
 
-    interact_dashboard(
+    INTERACT_DASHBOARD(
             YPLKart.plname + ".interact.dashboard",
             Settings.EnablePermissionInteractObject,
             Settings.EnablePermissionInteractObject),
-    interact_banana(
+    INTERACT_BANANA(
             YPLKart.plname + ".interact.banana",
             Settings.EnablePermissionInteractObject,
             Settings.EnablePermissionInteractObject),
-    interact_itembox(
+    INTERACT_ITEMBOX(
             YPLKart.plname + ".interact.itembox",
             Settings.EnablePermissionInteractObject,
             Settings.EnablePermissionInteractObject),
-    interact_fakeitembox(
+    INTERACT_FAKEITEMBOX(
             YPLKart.plname + ".interact.fakeitembox",
             Settings.EnablePermissionInteractObject,
             Settings.EnablePermissionInteractObject);

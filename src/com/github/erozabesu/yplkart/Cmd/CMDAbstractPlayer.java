@@ -31,7 +31,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
 
     @Override
     void ka() {
-        if (!Permission.hasCMDPermission(this.p, Permission.cmd_ka, false, false))
+        if (!Permission.hasCMDPermission(this.p, Permission.CMD_KA, false, false))
             return;
 
         Message.reference.sendMessage(this.p);
@@ -67,7 +67,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             }
         }
 
-        if (!Permission.hasCMDPermission(this.p, Permission.op_cmd_circuit, false, false))
+        if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_CIRCUIT, false, false))
             return;
         if (this.length == 2) {
             if (args[1].equalsIgnoreCase("list")) {
@@ -178,7 +178,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void display() {
         if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.op_cmd_display, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_DISPLAY, false, false))
                 return;
             EnumKarts kart = null;
             if (args[1].equalsIgnoreCase("random"))
@@ -193,7 +193,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             RaceManager.createDisplayMinecart(this.p.getLocation(), kart, null);
             Message.cmdDisplayCreate.sendMessage(this.p, kart);
         } else if (length == 8) {
-            if (!Permission.hasCMDPermission(this.p, Permission.op_cmd_display, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_DISPLAY, false, false))
                 return;
             if (Bukkit.getWorld(args[2]) == null) {
                 Message.invalidWorld.sendMessage(this.p);
@@ -230,11 +230,11 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void menu() {
         if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_menu, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_MENU, false, false))
                 return;
             RaceManager.showCharacterSelectMenu(this.p);
         } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_menu, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_MENU, true, false))
                 return;
 
             if (args[1].equalsIgnoreCase("all")) {
@@ -265,7 +265,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
     void entry() {
         //ka entry {circuit name}
         if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_entry, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_ENTRY, false, false))
                 return;
             if (!RaceData.isCircuit(args[1])) {
                 Message.invalidCircuit.sendMessage(this.p, args[1]);
@@ -276,7 +276,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             //ka entry {player name} {circuit name}
             //ka entry all {circuit name}
         } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_entry, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_ENTRY, true, false))
                 return;
             if (!RaceData.isCircuit(args[2])) {
                 Message.invalidCircuit.sendMessage(this.p, args[1]);
@@ -308,11 +308,11 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void exit() {
         if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_exit, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_EXIT, false, false))
                 return;
             RaceManager.clearEntryRaceData(this.id);
         } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_exit, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_EXIT, true, false))
                 return;
 
             if (args[1].equalsIgnoreCase("all")) {
@@ -345,7 +345,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void character() {
         if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_character, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTER, false, false))
                 return;
             if (args[1].equalsIgnoreCase("random")) {
                 RaceManager.setCharacterRaceData(this.id, EnumCharacter.getRandomCharacter());
@@ -363,7 +363,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             //ka character {player} random
             //ka character all random
         } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_character, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTER, true, false))
                 return;
             if (args[2].equalsIgnoreCase("random")) {
                 if (args[1].equalsIgnoreCase("all")) {
@@ -414,11 +414,11 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void characterreset() {
         if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_characterreset, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTERRESET, false, false))
                 return;
             RaceManager.clearCharacterRaceData(this.id);
         } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_characterreset, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTERRESET, true, false))
                 return;
 
             if (args[1].equalsIgnoreCase("all")) {
@@ -453,7 +453,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
         //ka ride {kart name}
         //ka ride random
         if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_ride, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RIDE, false, false))
                 return;
             if (args[1].equalsIgnoreCase("random")) {
                 RaceManager.setKartRaceData(this.id, EnumKarts.getRandomKart());
@@ -470,7 +470,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             //ka ride all random
             //ka ride {player name} random
         } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_ride, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RIDE, true, false))
                 return;
             EnumKarts kart = null;
             if (args[2].equalsIgnoreCase("random"))
@@ -512,14 +512,14 @@ public class CMDAbstractPlayer extends CMDAbstract {
     void leave() {
         //ka leave
         if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_leave, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_LEAVE, false, false))
                 return;
             RaceManager.leaveRacingKart(this.p);
             RaceManager.clearKartRaceData(this.id);
             //ka leave {player}
             //ka leave all
         } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_leave, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_LEAVE, true, false))
                 return;
 
             if (args[1].equalsIgnoreCase("all")) {
@@ -550,7 +550,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
         //ka ranking {circuit name}
         //ka ranking list
         if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_ranking, false, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RANKING, false, false))
                 return;
             if (args[1].equalsIgnoreCase("list")) {
                 RaceData.listCricuit(this.p);
@@ -565,7 +565,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
             //ka ranking {player name} 	{circuit name}
             //ka ranking all 			{circuit name}
         } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.cmd_ranking, true, false))
+            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RANKING, true, false))
                 return;
             if (!RaceData.isCircuit(args[2])) {
                 Message.invalidCircuit.sendMessage(this.p, args[2]);
@@ -593,7 +593,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
 
     @Override
     void reload() {
-        if (!Permission.hasCMDPermission(this.p, Permission.op_cmd_reload, false, false))
+        if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_RELOAD, false, false))
             return;
 
         for (Player other : Bukkit.getOnlinePlayers()) {

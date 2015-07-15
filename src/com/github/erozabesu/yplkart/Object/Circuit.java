@@ -97,7 +97,7 @@ public class Circuit {
                     p.leaveVehicle();
                     p.teleport(position.get(count));
                     RaceManager.showCharacterSelectMenu(p);
-                    EnumItem.addItem(p, EnumItem.Menu.getItem());
+                    EnumItem.addItem(p, EnumItem.MENU.getItem());
 
                     count++;
                     continue;
@@ -469,7 +469,7 @@ public class Circuit {
                             RaceManager.setCharacterRaceData(p.getUniqueId(), EnumCharacter.getRandomCharacter());
                         }
                         if (RaceManager.getRace(p).getKart() == null
-                                && Permission.hasPermission(p, Permission.kart_ride, true)) {
+                                && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                             RaceManager.setKartRaceData(p.getUniqueId(), EnumKarts.getRandomKart());
                         }
                         p.closeInventory();

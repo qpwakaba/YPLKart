@@ -19,8 +19,8 @@ import com.github.erozabesu.yplkart.Data.RaceData;
 import com.github.erozabesu.yplkart.Data.Settings;
 
 public enum EnumItem {
-    CheckPoint(
-            Permission.op_cmd_circuit,
+    CHECKPOINT_TOOL(
+            Permission.OP_CMD_CIRCUIT,
             Material.NETHER_STAR,
             (byte) 0,
             0,
@@ -28,7 +28,7 @@ public enum EnumItem {
             64,
             "チェックポイントツール",
             ""),
-    MarioHat(
+    MARIO_HAT(
             null,
             Material.REDSTONE_BLOCK,
             (byte) 0,
@@ -37,8 +37,8 @@ public enum EnumItem {
             64,
             "赤い帽子",
             "ひげのおじさんになれる赤い帽子。"),
-    ItemBoxTool(
-            Permission.op_cmd_itemboxtool,
+    ITEMBOX_TOOL(
+            Permission.OP_CMD_ITEMBOX,
             Material.INK_SACK,
             (byte) 0,
             0,
@@ -46,8 +46,8 @@ public enum EnumItem {
             64,
             "アイテムボックスツール",
             "アイテムボックスを設置します。"),
-    ItemBoxToolTier2(
-            Permission.op_cmd_itemboxtool,
+    ITEMBOX_TOOL_TIER2(
+            Permission.OP_CMD_ITEMBOX,
             Material.INK_SACK,
             (byte) 0,
             0,
@@ -55,8 +55,8 @@ public enum EnumItem {
             64,
             "高級アイテムボックスツール",
             "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
-    FakeItemBoxTool(
-            Permission.op_cmd_itemboxtool,
+    FAKE_ITEMBOX_TOOL(
+            Permission.OP_CMD_ITEMBOX,
             Material.INK_SACK,
             (byte) 0,
             0,
@@ -64,7 +64,7 @@ public enum EnumItem {
             64,
             "にせアイテムボックスツール",
             "にせアイテムボックスを設置します。当たっても復活します。"),
-    Menu(
+    MENU(
             null,
             Material.GOLD_INGOT,
             (byte) 0,
@@ -74,8 +74,8 @@ public enum EnumItem {
             "メニューを開きます",
             ""),
 
-    Star(
-            Permission.use_star,
+    STAR(
+            Permission.USE_STAR,
             Material.NETHER_STAR,
             (byte) 0,
             Settings.StarTier,
@@ -83,8 +83,8 @@ public enum EnumItem {
             Settings.StarMaxStackSize,
             "スーパースター",
             "一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
-    StarMultiple(
-            Permission.use_star,
+    STAR_MULTIPLE(
+            Permission.USE_STAR,
             Material.NETHER_STAR,
             (byte) 0,
             Settings.StarMultipleTier,
@@ -92,8 +92,8 @@ public enum EnumItem {
             Settings.StarMaxStackSize,
             "スーパースター",
             "一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
-    Mushroom(
-            Permission.use_mushroom,
+    MUSHROOM(
+            Permission.USE_MUSHROOM,
             Material.INK_SACK,
             (byte) 1,
             Settings.MushroomTier,
@@ -101,8 +101,8 @@ public enum EnumItem {
             Settings.MushroomMaxStackSize,
             "ダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
-    MushroomMultiple(
-            Permission.use_mushroom,
+    MUSHROOM_MULTIPLE(
+            Permission.USE_MUSHROOM,
             Material.INK_SACK,
             (byte) 1,
             Settings.MushroomMultipleTier,
@@ -110,8 +110,8 @@ public enum EnumItem {
             Settings.MushroomMaxStackSize,
             "ダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
-    PowerfullMushroom(
-            Permission.use_powerfullmushroom,
+    POWERFULL_MUSHROOM(
+            Permission.USE_POWERFULLMUSHROOM,
             Material.INK_SACK,
             (byte) 2,
             Settings.PowerfullMushroomTier,
@@ -119,8 +119,8 @@ public enum EnumItem {
             Settings.PowerfullMushroomMaxStackSize,
             "パワフルダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
-    PowerfullMushroomMultiple(
-            Permission.use_powerfullmushroom,
+    POWERFULL_MUSHROOM_MULTIPLE(
+            Permission.USE_POWERFULLMUSHROOM,
             Material.INK_SACK,
             (byte) 2,
             Settings.PowerfullMushroomMultipleTier,
@@ -128,8 +128,8 @@ public enum EnumItem {
             Settings.PowerfullMushroomMaxStackSize,
             "パワフルダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
-    Turtle(
-            Permission.use_turtle,
+    TURTLE(
+            Permission.USE_TURTLE,
             Material.INK_SACK,
             (byte) 3,
             Settings.TurtleTier,
@@ -137,8 +137,8 @@ public enum EnumItem {
             Settings.TurtleMaxStackSize,
             "ミドリこうら",
             "投げると直進し、当たったプレイヤーを爆破します。"),
-    TurtleMultiple(
-            Permission.use_turtle,
+    TURTLE_MULTIPLE(
+            Permission.USE_TURTLE,
             Material.INK_SACK,
             (byte) 3,
             Settings.TurtleMultipleTier,
@@ -146,8 +146,8 @@ public enum EnumItem {
             Settings.TurtleMaxStackSize,
             "ミドリこうら",
             "投げると直進し、当たったプレイヤーを爆破します。"),
-    RedTurtle(
-            Permission.use_redturtle,
+    RED_TURTLE(
+            Permission.USE_REDTURTLE,
             Material.INK_SACK,
             (byte) 4,
             Settings.RedTurtleTier,
@@ -155,8 +155,8 @@ public enum EnumItem {
             Settings.RedTurtleMaxStackSize,
             "アカこうら",
             "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
-    RedTurtleMultiple(
-            Permission.use_redturtle,
+    RED_TURTLE_MULTIPLE(
+            Permission.USE_REDTURTLE,
             Material.INK_SACK,
             (byte) 4,
             Settings.RedTurtleMultipleTier,
@@ -164,8 +164,8 @@ public enum EnumItem {
             Settings.RedTurtleMaxStackSize,
             "アカこうら",
             "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
-    ThornedTurtle(
-            Permission.use_thornedturtle,
+    THORNED_TURTLE(
+            Permission.USE_THORNEDTURTLE,
             Material.INK_SACK,
             (byte) 5,
             Settings.ThornedTurtleTier,
@@ -173,8 +173,8 @@ public enum EnumItem {
             Settings.ThornedTurtleMaxStackSize,
             "トゲゾーこうら",
             "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
-    ThornedTurtleMultiple(
-            Permission.use_thornedturtle,
+    THORNED_TURTLE_MULTIPLE(
+            Permission.USE_THORNEDTURTLE,
             Material.INK_SACK,
             (byte) 5,
             Settings.ThornedTurtleMultipleTier,
@@ -182,8 +182,8 @@ public enum EnumItem {
             Settings.ThornedTurtleMaxStackSize,
             "トゲゾーこうら",
             "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
-    Banana(
-            Permission.use_banana,
+    BANANA(
+            Permission.USE_BANANA,
             Material.INK_SACK,
             (byte) 6,
             Settings.BananaTier,
@@ -191,8 +191,8 @@ public enum EnumItem {
             Settings.BananaMaxStackSize,
             "バナナ",
             "コースに設置でき、接触したプレイヤーを減速させます。"),
-    BananaMultiple(
-            Permission.use_banana,
+    BANANA_MULTIPLE(
+            Permission.USE_BANANA,
             Material.INK_SACK,
             (byte) 6,
             Settings.BananaMultipleTier,
@@ -200,8 +200,8 @@ public enum EnumItem {
             Settings.BananaMaxStackSize,
             "バナナ",
             "コースに設置でき、接触したプレイヤーを減速させます。"),
-    FakeItembox(
-            Permission.use_fakeitembox,
+    FAKE_ITEMBOX(
+            Permission.USE_FAKEITEMBOX,
             Material.INK_SACK,
             (byte) 7,
             Settings.FakeItemBoxTier,
@@ -209,8 +209,8 @@ public enum EnumItem {
             Settings.FakeItemBoxMaxStackSize,
             "にせアイテムボックス",
             "アイテムボックスにそっくりですが、触れると減速します。"),
-    FakeItemboxMultiple(
-            Permission.use_fakeitembox,
+    FAKE_ITEMBOX_MULTIPLE(
+            Permission.USE_FAKEITEMBOX,
             Material.INK_SACK,
             (byte) 7,
             Settings.FakeItemBoxMultipleTier,
@@ -218,8 +218,8 @@ public enum EnumItem {
             Settings.FakeItemBoxMaxStackSize,
             "にせアイテムボックス",
             "アイテムボックスにそっくりですが、触れると減速します。"),
-    Thunder(
-            Permission.use_thunder,
+    THUNDER(
+            Permission.USE_THUNDER,
             Material.INK_SACK,
             (byte) 8,
             Settings.ThunderTier,
@@ -227,8 +227,8 @@ public enum EnumItem {
             Settings.ThunderMaxStackSize,
             "サンダー",
             "ライバルのプレイヤーが一定時間遅くなります。"),
-    ThunderMultiple(
-            Permission.use_thunder,
+    THUNDER_MULTIPLE(
+            Permission.USE_THUNDER,
             Material.INK_SACK,
             (byte) 8,
             Settings.ThunderMultipleTier,
@@ -236,8 +236,8 @@ public enum EnumItem {
             Settings.ThunderMaxStackSize,
             "サンダー",
             "ライバルのプレイヤーが一定時間遅くなります。"),
-    Teresa(
-            Permission.use_teresa,
+    TERESA(
+            Permission.USE_TERESA,
             Material.INK_SACK,
             (byte) 9,
             Settings.TeresaTier,
@@ -245,8 +245,8 @@ public enum EnumItem {
             Settings.TeresaMaxStackSize,
             "テレサ",
             "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
-    TeresaMultiple(
-            Permission.use_teresa,
+    TERESA_MULTIPLE(
+            Permission.USE_TERESA,
             Material.INK_SACK,
             (byte) 9,
             Settings.TeresaMultipleTier,
@@ -254,8 +254,8 @@ public enum EnumItem {
             Settings.TeresaMaxStackSize,
             "テレサ",
             "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
-    Gesso(
-            Permission.use_gesso,
+    GESSO(
+            Permission.USE_GESSO,
             Material.INK_SACK,
             (byte) 10,
             Settings.GessoTier,
@@ -263,8 +263,8 @@ public enum EnumItem {
             Settings.GessoMaxStackSize,
             "ゲッソー",
             "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
-    GessoMultiple(
-            Permission.use_gesso,
+    GESSO_MULTIPLE(
+            Permission.USE_GESSO,
             Material.INK_SACK,
             (byte) 10,
             Settings.GessoMultipleTier,
@@ -272,8 +272,8 @@ public enum EnumItem {
             Settings.GessoMaxStackSize,
             "ゲッソー",
             "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
-    Killer(
-            Permission.use_killer,
+    KILLER(
+            Permission.USE_KILLER,
             Material.INK_SACK,
             (byte) 11,
             Settings.KillerTier,
@@ -281,8 +281,8 @@ public enum EnumItem {
             Settings.KillerMaxStackSize,
             "キラー",
             ""),
-    KillerMultiple(
-            Permission.use_killer,
+    KILLER_MULTIPLE(
+            Permission.USE_KILLER,
             Material.INK_SACK,
             (byte) 11,
             Settings.KillerMultipleTier,
@@ -299,7 +299,7 @@ public enum EnumItem {
     private int maxstack;
     private String name;
     private String lore;
-    private static List<String> ignorelist = Arrays.asList("CheckPoint", "MarioHat", "Menu", "Multiple");
+    private static List<String> ignorelist = Arrays.asList("CHECKPOINT", "MARIO_HAT", "MENU", "MULTIPLE");
 
     private EnumItem(Permission perm, Material material, byte data, int tier, int amount, int maxstack, String name,
             String lore) {
@@ -372,7 +372,7 @@ public enum EnumItem {
     public Boolean isSimilar(ItemStack i) {
         if (i == null)
             return false;
-        if (getName().equalsIgnoreCase(CheckPoint.getName())) {
+        if (getName().equalsIgnoreCase(CHECKPOINT_TOOL.getName())) {
             if (i.getType().equals(getType()))
                 if (i.getData().getData() == getData())
                     if (i.getItemMeta().hasDisplayName() && i.getItemMeta().hasLore())

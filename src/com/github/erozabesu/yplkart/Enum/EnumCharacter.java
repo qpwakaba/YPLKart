@@ -13,14 +13,14 @@ import com.github.erozabesu.yplkart.Data.Settings;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public enum EnumCharacter {
-    Human(
+    HUMAN(
             "Human",
             "EntityHuman",
             Settings.HumanClassSetting,
             Material.SUGAR, Sound.BURP,
             1.0F,
             1.0F),
-    Creeper(
+    CREEPER(
             "Creeper",
             "EntityCreeper",
             Settings.CreeperClassSetting,
@@ -28,7 +28,7 @@ public enum EnumCharacter {
             Sound.CREEPER_HISS,
             1.0F,
             1.0F),
-    Zombie(
+    ZOMBIE(
             "Zombie",
             "EntityZombie",
             Settings.ZombieClassSetting,
@@ -36,14 +36,14 @@ public enum EnumCharacter {
             Sound.ZOMBIE_DEATH,
             1.0F,
             1.0F),
-    Skeleton(
+    SKELETON(
             "Skeleton",
             "EntitySkeleton",
             Settings.SkeletonClassSetting,
             Material.BLAZE_ROD,
             Sound.SKELETON_DEATH,
             1.0F, 1.0F),
-    Spider(
+    SPIDER(
             "Spider",
             "EntitySpider",
             Settings.SpiderClassSetting,
@@ -51,7 +51,7 @@ public enum EnumCharacter {
             Sound.SPIDER_IDLE,
             1.0F,
             1.0F),
-    Enderman(
+    ENDERMAN(
             "Enderman",
             "EntityEnderman",
             Settings.EndermanClassSetting,
@@ -59,7 +59,7 @@ public enum EnumCharacter {
             Sound.ENDERMAN_DEATH,
             1.0F,
             1.0F),
-    Witch(
+    WITCH(
             "Witch",
             "EntityWitch",
             Settings.WitchClassSetting,
@@ -67,7 +67,7 @@ public enum EnumCharacter {
             Sound.VILLAGER_DEATH,
             1.0F,
             4.0F),
-    Pig(
+    PIG(
             "Pig",
             "EntityPig",
             Settings.PigClassSetting,
@@ -75,7 +75,7 @@ public enum EnumCharacter {
             Sound.PIG_DEATH,
             1.0F,
             1.0F),
-    Squid(
+    SQUID(
             "Squid",
             "EntitySquid",
             Settings.SquidClassSetting,
@@ -83,7 +83,7 @@ public enum EnumCharacter {
             Sound.SLIME_WALK,
             1.0F,
             1.0F),
-    Villager(
+    VILLAGER(
             "Villager",
             "EntityVillager",
             Settings.VillagerClassSetting,
@@ -138,25 +138,25 @@ public enum EnumCharacter {
     //Java6だとswitchにstringは使えない
     public static EnumCharacter getClassfromString(String value) {
         if (value.equalsIgnoreCase(human))
-            return EnumCharacter.Human;
+            return EnumCharacter.HUMAN;
         if (value.equalsIgnoreCase(creeper))
-            return EnumCharacter.Creeper;
+            return EnumCharacter.CREEPER;
         if (value.equalsIgnoreCase(zombie))
-            return EnumCharacter.Zombie;
+            return EnumCharacter.ZOMBIE;
         if (value.equalsIgnoreCase(skeleton))
-            return EnumCharacter.Skeleton;
+            return EnumCharacter.SKELETON;
         if (value.equalsIgnoreCase(spider))
-            return EnumCharacter.Spider;
+            return EnumCharacter.SPIDER;
         if (value.equalsIgnoreCase(enderman))
-            return EnumCharacter.Enderman;
+            return EnumCharacter.ENDERMAN;
         if (value.equalsIgnoreCase(witch))
-            return EnumCharacter.Witch;
+            return EnumCharacter.WITCH;
         if (value.equalsIgnoreCase(pig))
-            return EnumCharacter.Pig;
+            return EnumCharacter.PIG;
         if (value.equalsIgnoreCase(squid))
-            return EnumCharacter.Squid;
+            return EnumCharacter.SQUID;
         if (value.equalsIgnoreCase(villager))
-            return EnumCharacter.Villager;
+            return EnumCharacter.VILLAGER;
         return null;
     }
 

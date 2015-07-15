@@ -119,7 +119,7 @@ public class PacketUtil extends ReflectionUtil {
         if (job == null) {
             return;
         }
-        if (job.getCraftClassName().equalsIgnoreCase(EnumCharacter.Human.getCraftClassName())) {
+        if (job.getCraftClassName().equalsIgnoreCase(EnumCharacter.HUMAN.getCraftClassName())) {
             returnPlayer(p);
             return;
         }

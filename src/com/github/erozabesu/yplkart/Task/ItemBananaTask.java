@@ -31,7 +31,7 @@ public class ItemBananaTask extends BukkitRunnable {
                     circuit.removeJammerEntity(this.banana);
 
                     FallingBlock b = l.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
-                    b.setCustomName(EnumItem.Banana.getName());
+                    b.setCustomName(EnumItem.BANANA.getName());
                     b.setCustomNameVisible(false);
                     b.setDropItem(false);
                     Util.removeEntityCollision(b);

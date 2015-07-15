@@ -81,18 +81,18 @@ public class ItemListener extends RaceManager implements Listener {
 
         final Player p = e.getPlayer();
         final UUID id = p.getUniqueId();
-        if (EnumItem.CheckPoint.isSimilar(p.getItemInHand())) {
+        if (EnumItem.CHECKPOINT_TOOL.isSimilar(p.getItemInHand())) {
             e.setCancelled(true);
-            if (Permission.hasPermission(p, EnumItem.CheckPoint.getPermission(), false)) {
+            if (Permission.hasPermission(p, EnumItem.CHECKPOINT_TOOL.getPermission(), false)) {
                 try {
                     createCustomWitherSkull(p.getLocation(), p.getItemInHand().getItemMeta().getLore().get(0));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
-        } else if (EnumItem.ItemBoxTool.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
             e.setCancelled(true);
-            if (Permission.hasPermission(p, EnumItem.ItemBoxTool.getPermission(), false)) {
+            if (Permission.hasPermission(p, EnumItem.ITEMBOX_TOOL.getPermission(), false)) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     Block b = e.getClickedBlock().getRelative(e.getBlockFace());
                     EnderCrystal endercrystal = b.getWorld()
@@ -102,9 +102,9 @@ public class ItemListener extends RaceManager implements Listener {
                     b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                 }
             }
-        } else if (EnumItem.ItemBoxToolTier2.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.ITEMBOX_TOOL_TIER2.isSimilar(p.getItemInHand())) {
             e.setCancelled(true);
-            if (Permission.hasPermission(p, EnumItem.ItemBoxToolTier2.getPermission(), false)) {
+            if (Permission.hasPermission(p, EnumItem.ITEMBOX_TOOL_TIER2.getPermission(), false)) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     Block b = e.getClickedBlock().getRelative(e.getBlockFace());
                     EnderCrystal endercrystal = b.getWorld()
@@ -114,9 +114,9 @@ public class ItemListener extends RaceManager implements Listener {
                     b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                 }
             }
-        } else if (EnumItem.FakeItemBoxTool.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.FAKE_ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
             e.setCancelled(true);
-            if (Permission.hasPermission(p, EnumItem.FakeItemBoxTool.getPermission(), false)) {
+            if (Permission.hasPermission(p, EnumItem.FAKE_ITEMBOX_TOOL.getPermission(), false)) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     Block b = e.getClickedBlock().getRelative(e.getBlockFace());
                     EnderCrystal endercrystal = b.getWorld()
@@ -126,34 +126,34 @@ public class ItemListener extends RaceManager implements Listener {
                     b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                 }
             }
-        } else if (EnumItem.Menu.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.MENU.isSimilar(p.getItemInHand())) {
             e.setCancelled(true);
             showCharacterSelectMenu(p);
         }
         if (isRacing(id)) {
-            if (EnumItem.Mushroom.isSimilar(p.getItemInHand())) {
+            if (EnumItem.MUSHROOM.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Mushroom.getPermission(), false)) {
+                if (Permission.hasPermission(p, EnumItem.MUSHROOM.getPermission(), false)) {
                     Util.setItemDecrease(p);
                     setPositiveItemSpeed(p, Settings.MushroomEffectSecond, Settings.MushroomEffectLevel, Sound.EXPLODE);
                 }
-            } else if (EnumItem.PowerfullMushroom.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.POWERFULL_MUSHROOM.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.PowerfullMushroom.getPermission(), false)) {
+                if (Permission.hasPermission(p, EnumItem.POWERFULL_MUSHROOM.getPermission(), false)) {
                     Util.setItemDecrease(p);
                     setPositiveItemSpeed(p, Settings.PowerfullMushroomEffectSecond,
                             Settings.PowerfullMushroomEffectLevel, Sound.EXPLODE);
                     p.getWorld().playSound(p.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
                 }
-            } else if (EnumItem.Banana.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.BANANA.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Banana.getPermission(), false)) {
+                if (Permission.hasPermission(p, EnumItem.BANANA.getPermission(), false)) {
                     Util.setItemDecrease(p);
                     Location l = Util.getFrontBackLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                             .add(0.5, 0, 0.5);
 
                     FallingBlock b = p.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
-                    b.setCustomName(EnumItem.Banana.getName());
+                    b.setCustomName(EnumItem.BANANA.getName());
                     b.setCustomNameVisible(false);
                     b.setDropItem(false);
                     Util.removeEntityCollision(b);
@@ -161,9 +161,9 @@ public class ItemListener extends RaceManager implements Listener {
                     new ItemBananaTask(RaceManager.getCircuit(id), b, l).runTaskTimer(pl, 0, 1);
                     p.getWorld().playSound(p.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
                 }
-            } else if (EnumItem.FakeItembox.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.FAKE_ITEMBOX.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.FakeItembox.getPermission(), false)) {
+                if (Permission.hasPermission(p, EnumItem.FAKE_ITEMBOX.getPermission(), false)) {
                     Util.setItemDecrease(p);
                     EnderCrystal endercrystal = p.getWorld().spawn(
                             Util.getFrontBackLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
@@ -173,37 +173,37 @@ public class ItemListener extends RaceManager implements Listener {
                     RaceManager.getCircuit(id).addJammerEntity(endercrystal);
                     p.getWorld().playEffect(p.getLocation(), Effect.CLICK1, 0);
                 }
-            } else if (EnumItem.Thunder.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.THUNDER.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Thunder.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.THUNDER.getPermission(), false))
                     itemThunder(p);
-            } else if (EnumItem.Star.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.STAR.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Star.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.STAR.getPermission(), false))
                     new ItemStarTask(p).runTaskTimer(pl, 0, 1);
-            } else if (EnumItem.Teresa.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.TERESA.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Teresa.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.TERESA.getPermission(), false))
                     itemTeresa(p);
-            } else if (EnumItem.Turtle.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.TURTLE.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Turtle.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.TURTLE.getPermission(), false))
                     itemTurtle(p);
-            } else if (EnumItem.RedTurtle.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.RED_TURTLE.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.RedTurtle.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.RED_TURTLE.getPermission(), false))
                     itemRedturtle(p);
-            } else if (EnumItem.ThornedTurtle.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.THORNED_TURTLE.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.ThornedTurtle.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.THORNED_TURTLE.getPermission(), false))
                     itemThornedturtle(p);
-            } else if (EnumItem.Gesso.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.GESSO.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Gesso.getPermission(), false))
+                if (Permission.hasPermission(p, EnumItem.GESSO.getPermission(), false))
                     itemGesso(p);
-            } else if (EnumItem.Killer.isSimilar(p.getItemInHand())) {
+            } else if (EnumItem.KILLER.isSimilar(p.getItemInHand())) {
                 e.setCancelled(true);
-                if (Permission.hasPermission(p, EnumItem.Killer.getPermission(), false)) {
+                if (Permission.hasPermission(p, EnumItem.KILLER.getPermission(), false)) {
                     itemKiller(p);
                 }
             }
@@ -224,8 +224,8 @@ public class ItemListener extends RaceManager implements Listener {
         for (final Entity entity : entities) {
             if (entity.getCustomName() != null) {
                 if (entity instanceof FallingBlock) {
-                    if (entity.getCustomName().equalsIgnoreCase(EnumItem.Banana.getName())) {
-                        if (Permission.hasPermission(p, Permission.interact_banana, false)) {
+                    if (entity.getCustomName().equalsIgnoreCase(EnumItem.BANANA.getName())) {
+                        if (Permission.hasPermission(p, Permission.INTERACT_BANANA, false)) {
                             RaceManager.getCircuit(id).removeJammerEntity(entity);
                             entity.remove();
 
@@ -239,7 +239,7 @@ public class ItemListener extends RaceManager implements Listener {
                 } else if (entity instanceof EnderCrystal) {
                     //偽アイテムボックス
                     if (entity.getCustomName().equalsIgnoreCase(FakeItemBoxName)) {
-                        if (Permission.hasPermission(p, Permission.interact_fakeitembox, false)) {
+                        if (Permission.hasPermission(p, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
 
                             if (p.getNoDamageTicks() == 0) {
@@ -249,7 +249,7 @@ public class ItemListener extends RaceManager implements Listener {
                         }
                         //偽アイテムボックス復活するタイプ
                     } else if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameFake)) {
-                        if (Permission.hasPermission(p, Permission.interact_fakeitembox, false)) {
+                        if (Permission.hasPermission(p, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
 
                             pl.getServer().getScheduler().runTaskLater(pl, new Runnable() {
@@ -267,7 +267,7 @@ public class ItemListener extends RaceManager implements Listener {
                             }
                         }
                     } else if (entity.getCustomName().contains(ItemBoxName)) {
-                        if (Permission.hasPermission(p, Permission.interact_itembox, false)) {
+                        if (Permission.hasPermission(p, Permission.INTERACT_ITEMBOX, false)) {
                             if (itemboxCool.get(p) == null)
                                 itemboxCool.put(p, false);
                             if (!itemboxCool.get(p)) {
@@ -345,7 +345,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         if (Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_BASE
                 || Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_STICKY_BASE) {
-            if (Permission.hasPermission(p, Permission.interact_dashboard, false)) {
+            if (Permission.hasPermission(p, Permission.INTERACT_DASHBOARD, false)) {
                 if (boostRailCool.get(p) != null)
                     if (boostRailCool.get(p))
                         return;
@@ -390,19 +390,19 @@ public class ItemListener extends RaceManager implements Listener {
         Player p = (Player) e.getDamager();
         if (p.getItemInHand() == null)
             return;
-        if (EnumItem.ItemBoxTool.isSimilar(p.getItemInHand())) {
+        if (EnumItem.ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
             if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxName)) {
                 e.getEntity().remove();
                 Message.itemRemoveItemBox.sendMessage(p);
                 e.setCancelled(true);
             }
-        } else if (EnumItem.ItemBoxToolTier2.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.ITEMBOX_TOOL_TIER2.isSimilar(p.getItemInHand())) {
             if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameTier2)) {
                 e.getEntity().remove();
                 Message.itemRemoveItemBox.sendMessage(p);
                 e.setCancelled(true);
             }
-        } else if (EnumItem.FakeItemBoxTool.isSimilar(p.getItemInHand())) {
+        } else if (EnumItem.FAKE_ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
             if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameFake)
                     || e.getEntity().getCustomName().equalsIgnoreCase(FakeItemBoxName)) {
                 e.getEntity().remove();
@@ -437,7 +437,7 @@ public class ItemListener extends RaceManager implements Listener {
             if (entity.getCustomName().contains(ItemBoxName))
                 e.setCancelled(true);
         } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(EnumItem.Banana.getName()))
+            if (entity.getCustomName().contains(EnumItem.BANANA.getName()))
                 e.setCancelled(true);
         }
     }
@@ -454,7 +454,7 @@ public class ItemListener extends RaceManager implements Listener {
             if (entity.getCustomName().contains(ItemBoxName))
                 e.setCancelled(true);
         } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(EnumItem.Banana.getName()))
+            if (entity.getCustomName().contains(EnumItem.BANANA.getName()))
                 e.setCancelled(true);
         }
     }
@@ -471,7 +471,7 @@ public class ItemListener extends RaceManager implements Listener {
             if (entity.getCustomName().contains(ItemBoxName))
                 e.setCancelled(true);
         } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(EnumItem.Banana.getName()))
+            if (entity.getCustomName().contains(EnumItem.BANANA.getName()))
                 e.setCancelled(true);
         }
     }
@@ -488,7 +488,7 @@ public class ItemListener extends RaceManager implements Listener {
             if (entity.getCustomName().contains(ItemBoxName))
                 e.setCancelled(true);
         } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(EnumItem.Banana.getName()))
+            if (entity.getCustomName().contains(EnumItem.BANANA.getName()))
                 e.setCancelled(true);
         }
     }
@@ -501,10 +501,10 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         if (e.getEntity().getCustomName() == null)
             return;
-        if (e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.RedTurtle.getName())
-                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.ThornedTurtle.getName())
-                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.Turtle.getName())
-                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.Banana.getName()))
+        if (e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.RED_TURTLE.getName())
+                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.THORNED_TURTLE.getName())
+                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.TURTLE.getName())
+                || e.getEntity().getCustomName().equalsIgnoreCase(EnumItem.BANANA.getName()))
             e.setCancelled(true);
     }
 
@@ -524,7 +524,7 @@ public class ItemListener extends RaceManager implements Listener {
         if (!isStandBy(e.getPlayer().getUniqueId()))
             return;
 
-        if (EnumItem.Menu.isSimilar(e.getItemDrop().getItemStack()))
+        if (EnumItem.MENU.isSimilar(e.getItemDrop().getItemStack()))
             e.setCancelled(true);
         else
             e.getItemDrop().remove();
@@ -646,7 +646,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         Util.setItemDecrease(p);
         FallingBlock b = p.getWorld().spawnFallingBlock(p.getLocation(), Material.HUGE_MUSHROOM_1, (byte) 7);
-        b.setCustomName(EnumItem.Turtle.getName());
+        b.setCustomName(EnumItem.TURTLE.getName());
         b.setCustomNameVisible(false);
         b.setDropItem(false);
 
@@ -671,7 +671,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         FallingBlock turtle = user.getWorld().spawnFallingBlock(user.getEyeLocation(), Material.HUGE_MUSHROOM_1,
                 (byte) 5);
-        turtle.setCustomName(EnumItem.RedTurtle.getName());
+        turtle.setCustomName(EnumItem.RED_TURTLE.getName());
         turtle.setCustomNameVisible(false);
         turtle.setDropItem(false);
 
@@ -697,7 +697,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         else if (rank == 1) {
             Message.itemHighestPlayer.sendMessage(user, new Object[] { getCircuit(user.getUniqueId()),
-                    EnumItem.ThornedTurtle.getItem() });
+                    EnumItem.THORNED_TURTLE.getItem() });
             return;
         }
         if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRace(user)) == null) {
@@ -709,7 +709,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         FallingBlock turtle = user.getWorld().spawnFallingBlock(user.getEyeLocation(), Material.HUGE_MUSHROOM_1,
                 (byte) 6);
-        turtle.setCustomName(EnumItem.ThornedTurtle.getName());
+        turtle.setCustomName(EnumItem.THORNED_TURTLE.getName());
         turtle.setCustomNameVisible(false);
         turtle.setDropItem(false);
 
@@ -748,7 +748,7 @@ public class ItemListener extends RaceManager implements Listener {
         r.setUsingKiller(life, unpassedcheckpoint);
 
         if (r.getKart() == null) {
-            EnumKarts kart = EnumKarts.Kart1;
+            EnumKarts kart = EnumKarts.KART1;
 
             try {
                 Minecart minecart = createCustomMinecart(user.getLocation(), kart);

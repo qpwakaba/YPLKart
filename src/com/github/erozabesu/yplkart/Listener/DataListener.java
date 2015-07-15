@@ -103,7 +103,7 @@ public class DataListener extends RaceManager implements Listener {
         if (!Settings.isEnable(e.getFrom().getWorld()))
             return;
         Player p = e.getPlayer();
-        if (!EnumItem.CheckPoint.isSimilar(p.getItemInHand()))
+        if (!EnumItem.CHECKPOINT_TOOL.isSimilar(p.getItemInHand()))
             return;
 
         List<Entity> list = p.getNearbyEntities(1, 1, 1);
@@ -402,7 +402,7 @@ public class DataListener extends RaceManager implements Listener {
                 });
                 return;
             }
-            if (r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)) {
+            if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                 Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
@@ -412,7 +412,7 @@ public class DataListener extends RaceManager implements Listener {
                 return;
             }
         } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
-            if (r.getKart() == null && Permission.hasPermission(p, Permission.kart_ride, true)) {
+            if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                 Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
@@ -464,14 +464,14 @@ public class DataListener extends RaceManager implements Listener {
                 return;
 
             //キャンセルボタン
-            if (EnumSelectMenu.CharacterCancel.equalsIgnoreCase(clicked)) {
+            if (EnumSelectMenu.CHARACTER_CANCEL.equalsIgnoreCase(clicked)) {
                 p.closeInventory();
                 //ランダムボタン
-            } else if (EnumSelectMenu.CharacterRandom.equalsIgnoreCase(clicked)) {
+            } else if (EnumSelectMenu.CHARACTER_RANDOM.equalsIgnoreCase(clicked)) {
                 RaceManager.setCharacterRaceData(id, EnumCharacter.getRandomCharacter());
                 //ネクストプレビューボタン
-            } else if (EnumSelectMenu.CharacterNext.equalsIgnoreCase(clicked)
-                    || EnumSelectMenu.CharacterPrev.equalsIgnoreCase(clicked)) {
+            } else if (EnumSelectMenu.CHARACTER_NEXT.equalsIgnoreCase(clicked)
+                    || EnumSelectMenu.CHARACTER_PREVIEW.equalsIgnoreCase(clicked)) {
                 if (isStandBy(id)) {
                     if (r.getCharacter() == null) {
                         Message.raceMustSelectCharacter.sendMessage(p, getCircuit(r.getEntry()));
@@ -504,14 +504,14 @@ public class DataListener extends RaceManager implements Listener {
                 return;
 
             //キャンセルボタン
-            if (EnumSelectMenu.KartCancel.equalsIgnoreCase(clicked)) {
+            if (EnumSelectMenu.KART_CANCEL.equalsIgnoreCase(clicked)) {
                 p.closeInventory();
                 //ランダムボタン
-            } else if (EnumSelectMenu.KartRandom.equalsIgnoreCase(clicked)) {
+            } else if (EnumSelectMenu.KART_RANDOM.equalsIgnoreCase(clicked)) {
                 RaceManager.setKartRaceData(id, EnumKarts.getRandomKart());
                 //ネクストプレビューボタン
-            } else if (EnumSelectMenu.KartNext.equalsIgnoreCase(clicked)
-                    || EnumSelectMenu.KartPrev.equalsIgnoreCase(clicked)) {
+            } else if (EnumSelectMenu.KART_NEXT.equalsIgnoreCase(clicked)
+                    || EnumSelectMenu.KART_PREVIEW.equalsIgnoreCase(clicked)) {
                 if (isStandBy(id)) {
                     if (r.getKart() == null) {
                         Message.raceMustSelectKart.sendMessage(p, getCircuit(r.getEntry()));

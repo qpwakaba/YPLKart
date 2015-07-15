@@ -125,7 +125,7 @@ public final class RaceData {
         if (!getCircuitSet().contains(circuitname)) {
             Message.invalidCircuit.sendMessage(p, circuitname);
         } else {
-            p.getInventory().addItem(EnumItem.getCheckPointTool(EnumItem.CheckPoint, circuitname));
+            p.getInventory().addItem(EnumItem.getCheckPointTool(EnumItem.CHECKPOINT_TOOL, circuitname));
             Message.cmdCircuitEdit.sendMessage(p, circuitname);
         }
     }

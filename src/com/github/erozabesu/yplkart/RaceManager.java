@@ -143,7 +143,7 @@ public class RaceManager {
         r.setCharacter(character);
         r.recoveryCharacterPhysical();
         //TODO : issue #46
-        p.getInventory().setHelmet(EnumItem.MarioHat.getItem());
+        p.getInventory().setHelmet(EnumItem.MARIO_HAT.getItem());
 
         PacketUtil.disguise(p, null, character);
         EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
@@ -526,21 +526,21 @@ public class RaceManager {
     public static void showCharacterSelectMenu(Player p) {
         Inventory inv = Bukkit.createInventory(null, 36, "Character Select Menu");
         //inv.setItem(8, EnumSelectMenu.CharacterCancel.getMenuItem());
-        inv.setItem(11, EnumCharacter.Human.getMenuItem());
-        inv.setItem(12, EnumCharacter.Zombie.getMenuItem());
-        inv.setItem(13, EnumCharacter.Creeper.getMenuItem());
-        inv.setItem(14, EnumCharacter.Skeleton.getMenuItem());
-        inv.setItem(15, EnumCharacter.Spider.getMenuItem());
-        inv.setItem(20, EnumCharacter.Enderman.getMenuItem());
-        inv.setItem(21, EnumCharacter.Witch.getMenuItem());
-        inv.setItem(22, EnumCharacter.Pig.getMenuItem());
-        inv.setItem(23, EnumCharacter.Squid.getMenuItem());
-        inv.setItem(24, EnumCharacter.Villager.getMenuItem());
-        inv.setItem(31, EnumSelectMenu.CharacterRandom.getMenuItem());
+        inv.setItem(11, EnumCharacter.HUMAN.getMenuItem());
+        inv.setItem(12, EnumCharacter.ZOMBIE.getMenuItem());
+        inv.setItem(13, EnumCharacter.CREEPER.getMenuItem());
+        inv.setItem(14, EnumCharacter.SKELETON.getMenuItem());
+        inv.setItem(15, EnumCharacter.SPIDER.getMenuItem());
+        inv.setItem(20, EnumCharacter.ENDERMAN.getMenuItem());
+        inv.setItem(21, EnumCharacter.WITCH.getMenuItem());
+        inv.setItem(22, EnumCharacter.PIG.getMenuItem());
+        inv.setItem(23, EnumCharacter.SQUID.getMenuItem());
+        inv.setItem(24, EnumCharacter.VILLAGER.getMenuItem());
+        inv.setItem(31, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
 
-        if (Permission.hasPermission(p, Permission.kart_ride, true)) {
-            inv.setItem(30, EnumSelectMenu.CharacterPrev.getMenuItem());
-            inv.setItem(32, EnumSelectMenu.CharacterNext.getMenuItem());
+        if (Permission.hasPermission(p, Permission.KART_RIDE, true)) {
+            inv.setItem(30, EnumSelectMenu.CHARACTER_PREVIEW.getMenuItem());
+            inv.setItem(32, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
         }
         p.openInventory(inv);
     }
@@ -548,17 +548,17 @@ public class RaceManager {
     public static void showKartSelectMenu(Player p) {
         Inventory inv = Bukkit.createInventory(null, 36, "Kart Select Menu");
         //inv.setItem(8, EnumSelectMenu.KartCancel.getMenuItem());
-        inv.setItem(9, EnumKarts.Kart1.getMenuItem());
-        inv.setItem(11, EnumKarts.Kart2.getMenuItem());
-        inv.setItem(13, EnumKarts.Kart3.getMenuItem());
-        inv.setItem(15, EnumKarts.Kart4.getMenuItem());
-        inv.setItem(19, EnumKarts.Kart5.getMenuItem());
-        inv.setItem(21, EnumKarts.Kart6.getMenuItem());
-        inv.setItem(23, EnumKarts.Kart7.getMenuItem());
-        inv.setItem(25, EnumKarts.Kart8.getMenuItem());
-        inv.setItem(31, EnumSelectMenu.KartRandom.getMenuItem());
-        inv.setItem(30, EnumSelectMenu.KartPrev.getMenuItem());
-        inv.setItem(32, EnumSelectMenu.KartNext.getMenuItem());
+        inv.setItem(9, EnumKarts.KART1.getMenuItem());
+        inv.setItem(11, EnumKarts.KART2.getMenuItem());
+        inv.setItem(13, EnumKarts.KART3.getMenuItem());
+        inv.setItem(15, EnumKarts.KART4.getMenuItem());
+        inv.setItem(19, EnumKarts.KART5.getMenuItem());
+        inv.setItem(21, EnumKarts.KART6.getMenuItem());
+        inv.setItem(23, EnumKarts.KART7.getMenuItem());
+        inv.setItem(25, EnumKarts.KART8.getMenuItem());
+        inv.setItem(31, EnumSelectMenu.KART_RANDOM.getMenuItem());
+        inv.setItem(30, EnumSelectMenu.KART_PREVIEW.getMenuItem());
+        inv.setItem(32, EnumSelectMenu.KART_NEXT.getMenuItem());
         p.openInventory(inv);
     }
 }

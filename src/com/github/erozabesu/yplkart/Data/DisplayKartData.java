@@ -83,7 +83,7 @@ public final class DisplayKartData {
                 }
             }
             if (flag) {
-                Minecart cart = RaceManager.createDisplayMinecart(getLocation(key), EnumKarts.Kart1, key);
+                Minecart cart = RaceManager.createDisplayMinecart(getLocation(key), EnumKarts.KART1, key);
                 cart.setDisplayBlock(new MaterialData(getType(key), getData(key)));
             }
         }
@@ -102,7 +102,7 @@ public final class DisplayKartData {
                     }
                 }
                 if (flag) {
-                    Minecart cart = RaceManager.createDisplayMinecart(getLocation(key), EnumKarts.Kart1, key);
+                    Minecart cart = RaceManager.createDisplayMinecart(getLocation(key), EnumKarts.KART1, key);
                     cart.setDisplayBlock(new MaterialData(getType(key), getData(key)));
                 }
             }

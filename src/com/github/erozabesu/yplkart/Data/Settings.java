@@ -502,103 +502,103 @@ public final class Settings {
     }
 
     private static void reloadClassMemver() {
-        EnumCharacter.Human.reload(HumanClassSetting);
-        EnumCharacter.Creeper.reload(CreeperClassSetting);
-        EnumCharacter.Zombie.reload(ZombieClassSetting);
-        EnumCharacter.Skeleton.reload(SkeletonClassSetting);
-        EnumCharacter.Spider.reload(SpiderClassSetting);
-        EnumCharacter.Enderman.reload(EndermanClassSetting);
-        EnumCharacter.Witch.reload(WitchClassSetting);
-        EnumCharacter.Pig.reload(PigClassSetting);
-        EnumCharacter.Squid.reload(SquidClassSetting);
-        EnumCharacter.Villager.reload(VillagerClassSetting);
+        EnumCharacter.HUMAN.reload(HumanClassSetting);
+        EnumCharacter.CREEPER.reload(CreeperClassSetting);
+        EnumCharacter.ZOMBIE.reload(ZombieClassSetting);
+        EnumCharacter.SKELETON.reload(SkeletonClassSetting);
+        EnumCharacter.SPIDER.reload(SpiderClassSetting);
+        EnumCharacter.ENDERMAN.reload(EndermanClassSetting);
+        EnumCharacter.WITCH.reload(WitchClassSetting);
+        EnumCharacter.PIG.reload(PigClassSetting);
+        EnumCharacter.SQUID.reload(SquidClassSetting);
+        EnumCharacter.VILLAGER.reload(VillagerClassSetting);
     }
 
     private static void reloadKartMemver() {
-        EnumKarts.Kart1.reload(KartName1, KartSetting1);
-        EnumKarts.Kart2.reload(KartName2, KartSetting2);
-        EnumKarts.Kart3.reload(KartName3, KartSetting3);
-        EnumKarts.Kart4.reload(KartName4, KartSetting4);
-        EnumKarts.Kart5.reload(KartName5, KartSetting5);
-        EnumKarts.Kart6.reload(KartName6, KartSetting6);
-        EnumKarts.Kart7.reload(KartName7, KartSetting7);
-        EnumKarts.Kart8.reload(KartName8, KartSetting8);
+        EnumKarts.KART1.reload(KartName1, KartSetting1);
+        EnumKarts.KART2.reload(KartName2, KartSetting2);
+        EnumKarts.KART3.reload(KartName3, KartSetting3);
+        EnumKarts.KART4.reload(KartName4, KartSetting4);
+        EnumKarts.KART5.reload(KartName5, KartSetting5);
+        EnumKarts.KART6.reload(KartName6, KartSetting6);
+        EnumKarts.KART7.reload(KartName7, KartSetting7);
+        EnumKarts.KART8.reload(KartName8, KartSetting8);
     }
 
     private static void reloadPermissionMemver() {
-        Permission.kart_ride.reload(EnablePermissionKartRide, EnablePermissionKartRide);
-        Permission.kart_drift.reload(EnablePermissionKartDrift, EnablePermissionKartDrift);
-        Permission.op_kart_remove.reload(EnableOPPermissionKartRemove, EnableOPPermissionKartRemove);
+        Permission.KART_RIDE.reload(EnablePermissionKartRide, EnablePermissionKartRide);
+        Permission.KART_DRIFT.reload(EnablePermissionKartDrift, EnablePermissionKartDrift);
+        Permission.OP_KART_REMOVE.reload(EnableOPPermissionKartRemove, EnableOPPermissionKartRemove);
 
-        Permission.cmd_ka.reload(false, false);
-        Permission.cmd_entry.reload(EnablePermissionCMDEntry, EnablePermissionCMDOtherEntry);
-        Permission.cmd_exit.reload(EnablePermissionCMDExit, EnablePermissionCMDOtherExit);
-        Permission.cmd_character.reload(EnablePermissionCMDCharacter, EnablePermissionCMDOtherCharacter);
-        Permission.cmd_characterreset.reload(EnablePermissionCMDCharacterReset, EnablePermissionCMDOtherCharacterReset);
-        Permission.cmd_ride.reload(EnablePermissionCMDRide, EnablePermissionCMDOtherRide);
-        Permission.cmd_leave.reload(EnablePermissionCMDLeave, EnablePermissionCMDOtherLeave);
-        Permission.cmd_ranking.reload(EnablePermissionCMDRanking, EnablePermissionCMDOtherRanking);
+        Permission.CMD_KA.reload(false, false);
+        Permission.CMD_ENTRY.reload(EnablePermissionCMDEntry, EnablePermissionCMDOtherEntry);
+        Permission.CMD_EXIT.reload(EnablePermissionCMDExit, EnablePermissionCMDOtherExit);
+        Permission.CMD_CHARACTER.reload(EnablePermissionCMDCharacter, EnablePermissionCMDOtherCharacter);
+        Permission.CMD_CHARACTERRESET.reload(EnablePermissionCMDCharacterReset, EnablePermissionCMDOtherCharacterReset);
+        Permission.CMD_RIDE.reload(EnablePermissionCMDRide, EnablePermissionCMDOtherRide);
+        Permission.CMD_LEAVE.reload(EnablePermissionCMDLeave, EnablePermissionCMDOtherLeave);
+        Permission.CMD_RANKING.reload(EnablePermissionCMDRanking, EnablePermissionCMDOtherRanking);
 
-        Permission.op_cmd_reload.reload(EnableOPPermissionCMDReload, EnableOPPermissionCMDReload);
-        Permission.op_cmd_itemboxtool.reload(EnableOPPermissionCMDItemBoxTool, EnableOPPermissionCMDItemBoxTool);
+        Permission.OP_CMD_RELOAD.reload(EnableOPPermissionCMDReload, EnableOPPermissionCMDReload);
+        Permission.OP_CMD_ITEMBOX.reload(EnableOPPermissionCMDItemBoxTool, EnableOPPermissionCMDItemBoxTool);
 
-        Permission.itemcmd_mushroom.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_powerfullmushroom.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_banana.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_fakeitembox.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_thunder.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_star.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_turtle.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_redturtle.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_thornedturtle.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_teresa.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_gesso.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
-        Permission.itemcmd_killer.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_MUSHROOM.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_POWERFULLMUSHROOM.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_BANANA.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_FAKEITEMBOX.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_THUNDER.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_STAR.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_TURTLE.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_REDTURTLE.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_THORNEDTURTLE.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_TERESA.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_GESSO.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
+        Permission.ITEMCMD_KILLER.reload(EnablePermissionCMDItem, EnablePermissionCMDOtherItem);
 
-        Permission.use_mushroom.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_powerfullmushroom.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_banana.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_fakeitembox.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_thunder.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_star.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_turtle.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_redturtle.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_thornedturtle.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_teresa.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_gesso.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.use_killer.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.interact_dashboard.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
-        Permission.interact_banana.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
-        Permission.interact_itembox.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
-        Permission.interact_fakeitembox.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
+        Permission.USE_MUSHROOM.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_POWERFULLMUSHROOM.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_BANANA.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_FAKEITEMBOX.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_THUNDER.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_STAR.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_TURTLE.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_REDTURTLE.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_THORNEDTURTLE.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_TERESA.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_GESSO.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.USE_KILLER.reload(EnablePermissionUseItem, EnablePermissionUseItem);
+        Permission.INTERACT_DASHBOARD.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
+        Permission.INTERACT_BANANA.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
+        Permission.INTERACT_ITEMBOX.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
+        Permission.INTERACT_FAKEITEMBOX.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
     }
 
     public static void reloadItemMember() {
-        EnumItem.Star.reload(StarTier, 1, StarMaxStackSize);
-        EnumItem.StarMultiple.reload(StarMultipleTier, StarMultipleDropAmount, StarMaxStackSize);
-        EnumItem.Mushroom.reload(MushroomTier, 1, MushroomMaxStackSize);
-        EnumItem.MushroomMultiple.reload(MushroomMultipleTier, MushroomMultipleDropAmount, MushroomMaxStackSize);
-        EnumItem.PowerfullMushroom.reload(PowerfullMushroomTier, 1, PowerfullMushroomMaxStackSize);
-        EnumItem.PowerfullMushroomMultiple.reload(PowerfullMushroomMultipleTier, PowerfullMushroomMultipleDropAmount,
+        EnumItem.STAR.reload(StarTier, 1, StarMaxStackSize);
+        EnumItem.STAR_MULTIPLE.reload(StarMultipleTier, StarMultipleDropAmount, StarMaxStackSize);
+        EnumItem.MUSHROOM.reload(MushroomTier, 1, MushroomMaxStackSize);
+        EnumItem.MUSHROOM_MULTIPLE.reload(MushroomMultipleTier, MushroomMultipleDropAmount, MushroomMaxStackSize);
+        EnumItem.POWERFULL_MUSHROOM.reload(PowerfullMushroomTier, 1, PowerfullMushroomMaxStackSize);
+        EnumItem.POWERFULL_MUSHROOM_MULTIPLE.reload(PowerfullMushroomMultipleTier, PowerfullMushroomMultipleDropAmount,
                 PowerfullMushroomMaxStackSize);
-        EnumItem.Turtle.reload(TurtleTier, 1, TurtleMaxStackSize);
-        EnumItem.Turtle.reload(TurtleMultipleTier, TurtleMultipleDropAmount, TurtleMaxStackSize);
-        EnumItem.RedTurtle.reload(RedTurtleTier, 1, RedTurtleMaxStackSize);
-        EnumItem.RedTurtleMultiple.reload(RedTurtleMultipleTier, RedTurtleMultipleDropAmount, RedTurtleMaxStackSize);
-        EnumItem.ThornedTurtle.reload(ThornedTurtleTier, 1, ThornedTurtleMaxStackSize);
-        EnumItem.ThornedTurtleMultiple.reload(ThornedTurtleMultipleTier, ThornedTurtleMultipleDropAmount,
+        EnumItem.TURTLE.reload(TurtleTier, 1, TurtleMaxStackSize);
+        EnumItem.TURTLE.reload(TurtleMultipleTier, TurtleMultipleDropAmount, TurtleMaxStackSize);
+        EnumItem.RED_TURTLE.reload(RedTurtleTier, 1, RedTurtleMaxStackSize);
+        EnumItem.RED_TURTLE_MULTIPLE.reload(RedTurtleMultipleTier, RedTurtleMultipleDropAmount, RedTurtleMaxStackSize);
+        EnumItem.THORNED_TURTLE.reload(ThornedTurtleTier, 1, ThornedTurtleMaxStackSize);
+        EnumItem.THORNED_TURTLE_MULTIPLE.reload(ThornedTurtleMultipleTier, ThornedTurtleMultipleDropAmount,
                 ThornedTurtleMaxStackSize);
-        EnumItem.Banana.reload(BananaTier, 1, BananaMaxStackSize);
-        EnumItem.BananaMultiple.reload(BananaMultipleTier, BananaMultipleDropAmount, BananaMaxStackSize);
-        EnumItem.FakeItembox.reload(FakeItemBoxTier, 1, FakeItemBoxMaxStackSize);
-        EnumItem.FakeItemboxMultiple.reload(FakeItemBoxMultipleTier, FakeItemBoxMultipleDropAmount,
+        EnumItem.BANANA.reload(BananaTier, 1, BananaMaxStackSize);
+        EnumItem.BANANA_MULTIPLE.reload(BananaMultipleTier, BananaMultipleDropAmount, BananaMaxStackSize);
+        EnumItem.FAKE_ITEMBOX.reload(FakeItemBoxTier, 1, FakeItemBoxMaxStackSize);
+        EnumItem.FAKE_ITEMBOX_MULTIPLE.reload(FakeItemBoxMultipleTier, FakeItemBoxMultipleDropAmount,
                 FakeItemBoxMaxStackSize);
-        EnumItem.Thunder.reload(ThunderTier, 1, ThunderMaxStackSize);
-        EnumItem.ThunderMultiple.reload(ThunderMultipleTier, ThunderMultipleDropAmount, ThunderMaxStackSize);
-        EnumItem.Teresa.reload(TeresaTier, 1, TeresaMaxStackSize);
-        EnumItem.TeresaMultiple.reload(TeresaMultipleTier, TeresaMultipleDropAmount, TeresaMaxStackSize);
-        EnumItem.Gesso.reload(GessoTier, 1, GessoMaxStackSize);
-        EnumItem.GessoMultiple.reload(GessoMultipleTier, GessoMultipleDropAmount, GessoMaxStackSize);
+        EnumItem.THUNDER.reload(ThunderTier, 1, ThunderMaxStackSize);
+        EnumItem.THUNDER_MULTIPLE.reload(ThunderMultipleTier, ThunderMultipleDropAmount, ThunderMaxStackSize);
+        EnumItem.TERESA.reload(TeresaTier, 1, TeresaMaxStackSize);
+        EnumItem.TERESA_MULTIPLE.reload(TeresaMultipleTier, TeresaMultipleDropAmount, TeresaMaxStackSize);
+        EnumItem.GESSO.reload(GessoTier, 1, GessoMaxStackSize);
+        EnumItem.GESSO_MULTIPLE.reload(GessoMultipleTier, GessoMultipleDropAmount, GessoMaxStackSize);
     }
 
     //〓〓	ファイル保存		〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

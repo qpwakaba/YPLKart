@@ -14,14 +14,14 @@ import com.github.erozabesu.yplkart.Data.Message;
 import com.github.erozabesu.yplkart.Data.Settings;
 
 public enum EnumKarts {
-    Kart1(Settings.KartName1, Material.HUGE_MUSHROOM_2, (byte) 0, Settings.KartSetting1, Material.BOWL, (byte) 0),
-    Kart2(Settings.KartName2, Material.HUGE_MUSHROOM_2, (byte) 1, Settings.KartSetting2, Material.STRING, (byte) 0),
-    Kart3(Settings.KartName3, Material.HUGE_MUSHROOM_2, (byte) 2, Settings.KartSetting3, Material.FEATHER, (byte) 0),
-    Kart4(Settings.KartName4, Material.HUGE_MUSHROOM_2, (byte) 3, Settings.KartSetting4, Material.SULPHUR, (byte) 0),
-    Kart5(Settings.KartName5, Material.HUGE_MUSHROOM_2, (byte) 4, Settings.KartSetting5, Material.SEEDS, (byte) 0),
-    Kart6(Settings.KartName6, Material.HUGE_MUSHROOM_2, (byte) 5, Settings.KartSetting6, Material.WHEAT, (byte) 0),
-    Kart7(Settings.KartName7, Material.HUGE_MUSHROOM_2, (byte) 6, Settings.KartSetting7, Material.FLINT, (byte) 0),
-    Kart8(Settings.KartName8, Material.HUGE_MUSHROOM_2, (byte) 7, Settings.KartSetting8, Material.LEATHER, (byte) 0);
+    KART1(Settings.KartName1, Material.HUGE_MUSHROOM_2, (byte) 0, Settings.KartSetting1, Material.BOWL, (byte) 0),
+    KART2(Settings.KartName2, Material.HUGE_MUSHROOM_2, (byte) 1, Settings.KartSetting2, Material.STRING, (byte) 0),
+    KART3(Settings.KartName3, Material.HUGE_MUSHROOM_2, (byte) 2, Settings.KartSetting3, Material.FEATHER, (byte) 0),
+    KART4(Settings.KartName4, Material.HUGE_MUSHROOM_2, (byte) 3, Settings.KartSetting4, Material.SULPHUR, (byte) 0),
+    KART5(Settings.KartName5, Material.HUGE_MUSHROOM_2, (byte) 4, Settings.KartSetting5, Material.SEEDS, (byte) 0),
+    KART6(Settings.KartName6, Material.HUGE_MUSHROOM_2, (byte) 5, Settings.KartSetting6, Material.WHEAT, (byte) 0),
+    KART7(Settings.KartName7, Material.HUGE_MUSHROOM_2, (byte) 6, Settings.KartSetting7, Material.FLINT, (byte) 0),
+    KART8(Settings.KartName8, Material.HUGE_MUSHROOM_2, (byte) 7, Settings.KartSetting8, Material.LEATHER, (byte) 0);
 
     private double[] setting;
     private String name;
