@@ -11,17 +11,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 public class ReflectionUtil {
-    private static String bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",")
-            .split(",")[3];
+    private static String bukkitVersion = 
+            Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
     private static String bukkitPackage = "net.minecraft.server." + getBukkitVersion();
     private static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
-    private static String yplkartPackage = "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
+    private static String yplkartPackage = 
+            "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
 
     private static Class<?> NMSWorld = getBukkitClass("World");
     private static Class<?> CraftWorld = getCraftClass("CraftWorld");
     private static Class<?> CraftItemStack = getCraftClass("inventory.CraftItemStack");
 
-    private static HashMap<String, Constructor<?>> BukkitEntity_Constructor = new HashMap<String, Constructor<?>>();
+    private static HashMap<String, Constructor<?>> BukkitEntity_Constructor =
+            new HashMap<String, Constructor<?>>();
     private static HashMap<String, Method> CraftEntity_getHandle = new HashMap<String, Method>();
     public static Method CraftWorld_getHandle;
     private static Method static_CraftItemStack_asNMSCopy;
