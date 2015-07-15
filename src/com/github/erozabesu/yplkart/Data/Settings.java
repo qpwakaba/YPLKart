@@ -567,7 +567,7 @@ public final class Settings {
         Permission.use_teresa.reload(EnablePermissionUseItem, EnablePermissionUseItem);
         Permission.use_gesso.reload(EnablePermissionUseItem, EnablePermissionUseItem);
         Permission.use_killer.reload(EnablePermissionUseItem, EnablePermissionUseItem);
-        Permission.interact_boostrail.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
+        Permission.interact_dashboard.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
         Permission.interact_banana.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
         Permission.interact_itembox.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);
         Permission.interact_fakeitembox.reload(EnablePermissionInteractObject, EnablePermissionInteractObject);

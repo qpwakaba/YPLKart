@@ -172,7 +172,7 @@ public enum Permission {
             Settings.EnablePermissionUseItem,
             Settings.EnablePermissionUseItem),
 
-    interact_boostrail(
+    interact_dashboard(
             YPLKart.plname + ".interact.dashboard",
             Settings.EnablePermissionInteractObject,
             Settings.EnablePermissionInteractObject),

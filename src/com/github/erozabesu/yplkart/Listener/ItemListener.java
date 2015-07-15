@@ -345,7 +345,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         if (Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_BASE
                 || Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_STICKY_BASE) {
-            if (Permission.hasPermission(p, Permission.interact_boostrail, false)) {
+            if (Permission.hasPermission(p, Permission.interact_dashboard, false)) {
                 if (boostRailCool.get(p) != null)
                     if (boostRailCool.get(p))
                         return;
