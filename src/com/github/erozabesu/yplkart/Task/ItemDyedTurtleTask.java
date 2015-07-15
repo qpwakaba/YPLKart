@@ -47,7 +47,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         this.shooter = shooter;
         this.adjustdamage = RaceManager.getRace(shooter).getCharacter().getItemAdjustAttackDamage();
         this.lap = RaceManager.getRace(shooter).getLapCount();
-        this.lastStepBlock = Util.getStepBlock(this.projectile.getLocation());
+        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
         shooterpassedcheckpoint = RaceManager.getRace(shooter).getPassedCheckPoint();
 
@@ -84,15 +84,15 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         //周回数の更新
         if (lastStepBlock.equalsIgnoreCase(Settings.StartBlock))
-            if (Util.getStepBlock(this.projectile.getLocation()).equalsIgnoreCase(Settings.GoalBlock))
+            if (Util.getGroundBlockID(this.projectile.getLocation()).equalsIgnoreCase(Settings.GoalBlock))
                 lap++;
-        this.lastStepBlock = Util.getStepBlock(this.projectile.getLocation());
+        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
         //targetを発見したら突撃return
         ArrayList<LivingEntity> livingentity = Util.getNearbyLivingEntities(this.projectile.getLocation(), 20);
         for (LivingEntity target : livingentity) {
             if (this.target.getUniqueId().toString().equalsIgnoreCase(target.getUniqueId().toString())) {
-                Vector v = Util.getVectorLocationToLocation(target.getLocation(), this.projectile.getLocation())
+                Vector v = Util.getVectorToLocation(this.projectile.getLocation(), target.getLocation())
                         .multiply(3);
                 this.motX = v.getX();
                 this.motY = v.getY();
@@ -153,8 +153,8 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         Entity checkpoint = Util.getNearestEntity(checkpointlist, this.projectile.getLocation());
         this.turtlepassedcheckpoint.add(lap + checkpoint.getUniqueId().toString());
-        Vector v = Util.getVectorLocationToLocation(checkpoint.getLocation().add(0, -RaceManager.checkPointHeight, 0),
-                this.projectile.getLocation()).multiply(3);
+        Vector v = Util.getVectorToLocation(this.projectile.getLocation(),
+                checkpoint.getLocation().add(0, -RaceManager.checkPointHeight, 0)).multiply(3);
         this.motX = v.getX();
         this.motY = v.getY();
         this.motZ = v.getZ();

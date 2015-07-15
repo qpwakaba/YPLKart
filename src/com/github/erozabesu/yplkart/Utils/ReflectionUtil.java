@@ -17,7 +17,7 @@ public class ReflectionUtil {
     private static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
     private static String yplkartPackage = "com.github.erozabesu.yplkart.OverrideClass." + getBukkitVersion();
 
-    private static Class<?> World = getBukkitClass("World");
+    private static Class<?> NMSWorld = getBukkitClass("World");
     private static Class<?> CraftWorld = getCraftClass("CraftWorld");
     private static Class<?> CraftItemStack = getCraftClass("inventory.CraftItemStack");
 
@@ -79,13 +79,16 @@ public class ReflectionUtil {
     }
 
     public static Field getField(Object instance, String name) {
-        for (Field f : instance.getClass().getFields()) {
-            if (!f.getName().equalsIgnoreCase(name))
-                continue;
-            f.setAccessible(true);
-            return f;
+        Field field = null;
+        try {
+            field = instance.getClass().getField(name);
+            if (field != null) {
+                field.setAccessible(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return null;
+        return field;
     }
 
     public static Field getField(Class<?> clazz, String name) {
@@ -131,7 +134,7 @@ public class ReflectionUtil {
         try {
             Constructor<?> con = BukkitEntity_Constructor.get(classname);
             if (con == null) {
-                con = getBukkitClass(classname).getConstructor(World);
+                con = getBukkitClass(classname).getConstructor(NMSWorld);
                 BukkitEntity_Constructor.put(classname, con);
             }
 

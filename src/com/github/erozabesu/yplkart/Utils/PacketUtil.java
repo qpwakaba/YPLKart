@@ -76,8 +76,7 @@ public class PacketUtil extends ReflectionUtil {
 
             Constructor_PacketPlayOutAttachEntity = PacketPlayOutAttachEntity.getConstructor(int.class, Entity, Entity);
             Constructor_PacketPlayOutEntityDestroy = PacketPlayOutEntityDestroy.getConstructor(int[].class);
-            Constructor_PacketPlayOutEntityEquipment = PacketPlayOutEntityEquipment.getConstructor(int.class,
-                    int.class, ItemStack);
+            Constructor_PacketPlayOutEntityEquipment = PacketPlayOutEntityEquipment.getConstructor(int.class, int.class, ItemStack);
             Constructor_PacketPlayOutNamedEntitySpawn = PacketPlayOutNamedEntitySpawn.getConstructor(EntityHuman);
             Constructor_PacketPlayOutSpawnEntityLiving = PacketPlayOutSpawnEntityLiving.getConstructor(EntityLiving);
             Constructor_PacketPlayOutTitle = PacketPlayOutTitle.getConstructor(EnumTitleAction, IChatBaseComponent);
@@ -90,8 +89,7 @@ public class PacketUtil extends ReflectionUtil {
 
             PlayerConnection_sendPacket = PlayerConnection.getMethod("sendPacket", Packet);
             Entity_setEntityID = Entity.getMethod("d", int.class);
-            Entity_setLocation = Entity.getMethod("setLocation", double.class, double.class, double.class, float.class,
-                    float.class);
+            Entity_setLocation = Entity.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
             Entity_setCustomName = Entity.getMethod("setCustomName", String.class);
             Entity_setCustomNameVisible = Entity.getMethod("setCustomNameVisible", boolean.class);
             static_ChatSerializer_buildTitle = ChatSerializer.getMethod("a", String.class);
@@ -368,11 +366,11 @@ public class PacketUtil extends ReflectionUtil {
     private static Object getTitlePacket(String text, boolean issubtitle) throws Exception {
         ChatColor color = Util.getChatColorFromText(text);
         text = ChatColor.stripColor(text);
-        Object title = static_ChatSerializer_buildTitle.invoke(null, "{\"text\": \"" + text + "\",color:"
-                + color.name().toLowerCase() + "}");
+        Object title = static_ChatSerializer_buildTitle.invoke(
+                null, "{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
 
-        return Constructor_PacketPlayOutTitle.newInstance(issubtitle ? EnumTitleAction_PerformSubTitle
-                : EnumTitleAction_PerformTitle, title);
+        return Constructor_PacketPlayOutTitle.newInstance(issubtitle ?
+                EnumTitleAction_PerformSubTitle : EnumTitleAction_PerformTitle, title);
     }
 
     private static Object getTitleLengthPacket(int fadein, int length, int fadeout) throws Exception {

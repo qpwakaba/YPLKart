@@ -265,7 +265,7 @@ public class CustomMinecart extends EntityMinecartRideable {
 
             Location current = this.bukkitEntity.getLocation().add(0, 0.5, 0);
             current.setYaw(current.getYaw() + 270);
-            Location ll = Util.getLocationfromYaw(current, -15);
+            Location ll = Util.getFrontBackLocationFromYaw(current, -15);
 
             for (int i = 0; i < 10; i++) {
                 Particle.sendToLocation(
@@ -279,9 +279,9 @@ public class CustomMinecart extends EntityMinecartRideable {
             if (this.passedCheckPoint == null) {
                 this.passedCheckPoint = new ArrayList<String>(r.getPassedCheckPoint());
                 this.lastPassedCheckPoint = RaceManager.getRace((Player) human.getBukkitEntity()).getUsingKiller();
-                Vector v = Util.getVectorLocationToLocation(
-                        this.lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight + 2, 0),
-                        this.getBukkitEntity().getLocation()).multiply(1.8);
+                Vector v = Util.getVectorToLocation(
+                        this.getBukkitEntity().getLocation(),
+                        this.lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight + 2, 0)).multiply(1.8);
                 this.killerX = v.getX();
                 this.killerY = v.getY();
                 this.killerZ = v.getZ();
@@ -310,9 +310,9 @@ public class CustomMinecart extends EntityMinecartRideable {
 
             this.lastPassedCheckPoint = Util.getNearestEntity(checkpoint, this.getBukkitEntity().getLocation());
             this.passedCheckPoint.add(lap + this.lastPassedCheckPoint.getUniqueId().toString());
-            Vector v = Util.getVectorLocationToLocation(
-                    this.lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight + 2, 0),
-                    this.getBukkitEntity().getLocation()).multiply(1.8);
+            Vector v = Util.getVectorToLocation(
+                    this.getBukkitEntity().getLocation(),
+                    this.lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight + 2, 0)).multiply(1.8);
             this.killerX = v.getX();
             this.killerY = v.getY();
             this.killerZ = v.getZ();
@@ -351,7 +351,7 @@ public class CustomMinecart extends EntityMinecartRideable {
                     if (100 < this.speedStack) {
                         Location current = this.bukkitEntity.getLocation();
                         current.setYaw(current.getYaw() + 270);
-                        Location ll = Util.getLocationfromYaw(current, -this.speedStack / 60);
+                        Location ll = Util.getFrontBackLocationFromYaw(current, -this.speedStack / 60);
 
                         Particle.sendToLocation("LAVA", ll, 0, 0, 0, 0, 5);
                     }
@@ -363,7 +363,7 @@ public class CustomMinecart extends EntityMinecartRideable {
 
             Location current = this.bukkitEntity.getLocation().add(0, 0.5, 0);
             current.setYaw(current.getYaw() + 270);
-            Location ll = Util.getLocationfromYaw(current, -1.0 - this.speedStack / 30);
+            Location ll = Util.getFrontBackLocationFromYaw(current, -1.0 - this.speedStack / 30);
 
             Particle.sendToLocation("SPELL",
                     ll.add(((double) Util.getRandom(4)) / 10, 0.5, ((double) Util.getRandom(4)) / 10), 0, 0, 0, 0, 5);
@@ -509,7 +509,7 @@ public class CustomMinecart extends EntityMinecartRideable {
 
         Location l = new Location(this.getBukkitEntity().getWorld(), i, j, k);
 
-        return (Settings.DirtBlock.equalsIgnoreCase(Util.getStepBlock(l)));
+        return (Settings.DirtBlock.equalsIgnoreCase(Util.getGroundBlockID(l)));
     }
 
     public boolean damageEntity(DamageSource damagesource, float f) {
@@ -566,8 +566,8 @@ public class CustomMinecart extends EntityMinecartRideable {
 
             double collisionpower = this.lastMotionSpeed - otherspeed;
             if (1 < (int) (collisionpower * 0.04 * 2)) {
-                Vector v = Util.getVectorLocationToLocation(other.getBukkitEntity().getLocation(),
-                        this.getBukkitEntity().getLocation()).setY(0);
+                Vector v = Util.getVectorToLocation(this.getBukkitEntity().getLocation(),
+                        other.getBukkitEntity().getLocation()).setY(0);
 
                 this.speedStack = this.speedStack - collisionpower < 0 ? 0 : this.speedStack - collisionpower;
                 other.getBukkitEntity().setVelocity(

@@ -328,7 +328,7 @@ public class Race {
         setStart(value);
         EnumItem.removeAllKeyItems(getPlayer());
 
-        Vector v = Util.getVectorLocationToLocation(to, from);
+        Vector v = Util.getVectorToLocation(from, to);
         Location l = getPlayer().getLocation().add(v.getX() * 5, 0, v.getZ() * 5);
 
         ArrayList<Entity> checkpoint = RaceManager.getNearbyCheckpoint(l, 20, getEntry());

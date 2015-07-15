@@ -2,7 +2,6 @@ package com.github.erozabesu.yplkart.Utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -83,14 +82,6 @@ public enum Particle {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void sendToLocationWide(String effect, Location location, float offsetX, float offsetY,
-            float offsetZ, float speed, int count, double radius) {
-        ArrayList<Location> square = Util.getSquareLocation(location, radius);
-        for (Location l : square) {
-            Particle.sendToLocation(effect, l, offsetX, offsetY, offsetZ, speed, count);
         }
     }
 

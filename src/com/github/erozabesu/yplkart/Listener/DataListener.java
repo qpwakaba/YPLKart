@@ -125,7 +125,7 @@ public class DataListener extends RaceManager implements Listener {
         if (!isStandBy(e.getPlayer().getUniqueId()))
             return;
 
-        getRace(e.getPlayer()).setLastStepBlock(Util.getStepBlock(e.getFrom()));
+        getRace(e.getPlayer()).setLastStepBlock(Util.getGroundBlockID(e.getFrom()));
     }
 
     //スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
@@ -162,7 +162,7 @@ public class DataListener extends RaceManager implements Listener {
         int lapcount = r.getLapCount();
 
         if (r.getLastStepBlock().equalsIgnoreCase(Settings.StartBlock)) {
-            if (Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.GoalBlock)) {
+            if (Util.getGroundBlockID(e.getTo()).equalsIgnoreCase(Settings.GoalBlock)) {
                 //正常ルート
                 if (lapcount == RaceData.getNumberOfLaps(r.getEntry())) {
                     r.setGoal();
@@ -178,7 +178,7 @@ public class DataListener extends RaceManager implements Listener {
                 r.setCool();
             }
         } else if (r.getLastStepBlock().equalsIgnoreCase(Settings.GoalBlock)) {
-            if (Util.getStepBlock(e.getTo()).equalsIgnoreCase(Settings.StartBlock)) {
+            if (Util.getGroundBlockID(e.getTo()).equalsIgnoreCase(Settings.StartBlock)) {
                 //逆走
                 Message.raceReverseRun.sendMessage(p, RaceManager.getCircuit(r.getEntry()));
                 if (lapcount <= 0)

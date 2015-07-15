@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,31 +46,43 @@ import com.github.erozabesu.yplkart.Task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.Task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil {
-    private static String OperatingSystem = System.getProperty("os.name").toLowerCase();
-    private static Class<?> CraftBlock = getBukkitClass("Block");
-    private static Class<?> CraftMaterial = getBukkitClass("Material");
+    private static Class<?> NMSBlock = getBukkitClass("Block");
+    private static Class<?> NMSMaterial = getBukkitClass("Material");
 
-    private static Method Block_getById;
+    private static Method static_NMSBlock_getById;
     private static Method Block_getMaterial;
     private static Method Material_isSolid;
 
     public Util() {
         try {
-            Block_getById = CraftBlock.getMethod("getById", int.class);
-            Block_getMaterial = CraftBlock.getMethod("getMaterial");
-            Material_isSolid = CraftMaterial.getMethod("isSolid");
+            static_NMSBlock_getById = NMSBlock.getMethod("getById", int.class);
+            Block_getMaterial = NMSBlock.getMethod("getMaterial");
+            Material_isSolid = NMSMaterial.getMethod("isSolid");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * value以下の乱数を生成する
+     * 生成した乱数は50％の確率で負の値に変換される
+     * @param value 乱数の上限・下限数値
+     * @return 生成した乱数
+     */
     public static int getRandom(int value) {
-        int num;
+        int newvalue;
         Random random = new Random();
-        num = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
-        return num;
+        newvalue = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
+        return newvalue;
     }
 
+    /**
+     * textに含まれるChatColorを返す
+     * 複数のChatColorが含まれていた場合文字列の最後に適応されているChatColorを返す
+     * ChatColorが含まれていない場合はChatColor.WHITEを返す
+     * @param text ChatColorを抽出する文字列
+     * @return 抽出されたChatColor
+     */
     public static ChatColor getChatColorFromText(String text) {
         String color = ChatColor.getLastColors(text);
         if (color == null)
@@ -80,14 +93,27 @@ public class Util extends ReflectionUtil {
         return ChatColor.getByChar(color.substring(1));
     }
 
-    public static Vector getVectorLocationToLocation(Location second_location, Location first_location) {
-        Vector vector = second_location.toVector().subtract(first_location.toVector());
+    /**
+     * Location fromからtoへのVectorを返す
+     * @param from
+     * @param to
+     * @return Location fromからtoへのVector
+     */
+    public static Vector getVectorToLocation(Location from, Location to) {
+        Vector vector = to.toVector().subtract(from.toVector());
         return vector.normalize();
     }
 
-    public static float getYawfromVector(Vector v) {
-        double dx = v.getX();
-        double dz = v.getZ();
+    /**
+     * vectorから偏揺れ角Yawを算出し返す
+     * 偏揺れ角はLocation型変数に用いられる水平方向の向きを表す方位角
+     * @see org.bukkit.Location
+     * @param vector ベクター
+     * @return 偏揺れ角
+     */
+    public static float getYawfromVector(Vector vector) {
+        double dx = vector.getX();
+        double dz = vector.getZ();
         double yaw = 0;
         // Set yaw
         if (dx != 0) {
@@ -104,66 +130,91 @@ public class Util extends ReflectionUtil {
         return (float) (-yaw * 180 / Math.PI - 90);
     }
 
-    public static String getStepBlock(Location l) {
-        Block b = l.getBlock();
-        if (b.getType() == Material.AIR) {
-            b = b.getLocation().add(0, -1, 0).getBlock();
-            if (b.getType() == Material.AIR) {
-                b = b.getLocation().add(0, -1, 0).getBlock();
+    /**
+     * locationを基点に直下の最も近い固形Blockを返す
+     * @param location 基点となる座標
+     * @return Block
+     */
+    public static Block getGroundBlock(Location location) {
+        for (int i = 0; i <= 5; i++) {
+            if (isSolidBlock(location)) {
+                return location.getBlock();
             }
+            location.add(0, -1, 0);
         }
-
-        return String.valueOf(b.getTypeId()) + ":" + String.valueOf(b.getData());
+        return null;
     }
 
-    public static Material getStepMaterial(Location l) {
-        Block b = l.add(0, 1, 0).getBlock();
-        if (b.getType() == Material.AIR) {
-            b = b.getLocation().add(0, -1, 0).getBlock();
-            if (b.getType() == Material.AIR) {
-                b = b.getLocation().add(0, -1, 0).getBlock();
-            }
+    /**
+     * locationを基点に直下の最も近い固形BlockのIDを返す
+     * @param location 基点となる座標
+     * @return BlockのID、データのString
+     */
+    public static String getGroundBlockID(Location location) {
+        Block block = getGroundBlock(location);
+        if (block == null) {
+            return "0:0";
         }
 
-        return b.getType();
+        return String.valueOf(block.getTypeId()) + ":" + String.valueOf(block.getData());
     }
 
-    public static Location getLocationfromYaw(Location from, double offset) {
-        Location fromadjust = adjustBlockLocation(from);
-        float yaw = fromadjust.getYaw();
+    /**
+     * locationを基点に直下の最も近い固形BlockのMaterialを返す
+     * @param location 基点となる座標
+     * @return BlockのMaterial
+     */
+    public static Material getGroundBlockMaterial(Location location) {
+        Block block = getGroundBlock(location);
+        if (block == null) {
+            return Material.AIR;
+        }
+
+        return block.getType();
+    }
+
+    /**
+     * locationを基点にoffsetの数値だけ前後に移動した座標を返す
+     * offsetが正の数値であれば前方、負の数値であれば後方へ移動する
+     * 前後の方角はlocationの偏揺れ角yawから算出している
+     * @param location 基点となる座標
+     * @param offset オフセット
+     * @return offsetの数値だけ前後に移動した座標
+     */
+    public static Location getFrontBackLocationFromYaw(Location location, double offset) {
+        Location adjustlocation = adjustBlockLocation(location);
+        float yaw = adjustlocation.getYaw();
         double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
         double z = Math.cos(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
 
-        Location to = new Location(fromadjust.getWorld(), fromadjust.getX() + x * offset, fromadjust.getY(),
-                fromadjust.getZ() + z * offset);
-        to.setYaw(yaw);
-        return to;
+        Location newlocation = new Location(adjustlocation.getWorld(),
+                adjustlocation.getX() + x * offset,
+                adjustlocation.getY(),
+                adjustlocation.getZ() + z * offset,
+                adjustlocation.getPitch(), yaw);
+        return newlocation;
     }
 
-    public static Location getSideLocationfromYaw(Location from, double offset) {
-        Location fromadjust = adjustBlockLocation(from);
-        float yaw = fromadjust.getYaw();
+    /**
+     * locationを基点にoffsetの数値だけ左右に移動した座標を返す
+     * offsetが正の数値であれば左方、負の数値であれば右方へ移動する
+     * 左右の方角はlocationの偏揺れ角yawから算出している
+     * @param location 基点となる座標
+     * @param offset オフセット
+     * @return offsetの数値だけ左右に移動した座標
+     */
+    public static Location getSideLocationFromYaw(Location location, double offset) {
+        Location adjustlocation = adjustBlockLocation(location);
+        float yaw = adjustlocation.getYaw();
         double x = Math.cos(Math.toRadians(yaw));
         double z = Math.sin(Math.toRadians(yaw));
 
-        Location to = new Location(fromadjust.getWorld(), fromadjust.getX() + x * offset, fromadjust.getY(),
-                fromadjust.getZ() + z * offset);
-        to.setYaw(yaw);
-        return to;
-    }
-
-    //指定半径内の高さ１ブロック内の座標を直方体で取得
-    public static ArrayList<Location> getSquareLocation(Location loc, double r) {
-        ArrayList<Location> square = new ArrayList<Location>();
-        double cx = loc.getX();
-        double cz = loc.getZ();
-        for (double x = cx - r; x <= cx + r; x++) {
-            for (double z = cz - r; z <= cz + r; z++) {
-                Location cylLocation = new Location(loc.getWorld(), x, loc.getBlockY(), z);
-                square.add(cylLocation);
-            }
-        }
-        return square;
+        Location newlocation = new Location(adjustlocation.getWorld(),
+                adjustlocation.getX() + x * offset,
+                adjustlocation.getY(),
+                adjustlocation.getZ() + z * offset,
+                adjustlocation.getPitch(), yaw);
+        return newlocation;
     }
 
     public static ArrayList<Entity> getNearbyEntities(Location l, double radius) {
@@ -231,27 +282,39 @@ public class Util extends ReflectionUtil {
         return p;
     }
 
-    public static ArrayList<Entity> getAllVehicle(Entity e) {
-        ArrayList<Entity> entity = new ArrayList<Entity>();
+    /**
+     * passengerが搭乗している全Entityを返す
+     * passengerが搭乗しているEntityが更に別のEntityに搭乗している場合を指す
+     * @param passenger
+     * @return passengerが搭乗している全EntityのList
+     */
+    public static List<Entity> getAllVehicle(Entity passenger) {
+        List<Entity> entitylist = new ArrayList<Entity>();
 
-        Entity vehicle = e.getVehicle() != null ? e.getVehicle() : null;
+        Entity vehicle = passenger.getVehicle() != null ? passenger.getVehicle() : null;
         while (vehicle != null) {
-            entity.add(vehicle);
+            entitylist.add(vehicle);
             vehicle = vehicle.getVehicle() != null ? vehicle.getVehicle() : null;
         }
 
-        return entity;
+        return entitylist;
     }
 
-    public static ArrayList<Entity> getAllPassenger(Entity e) {
-        ArrayList<Entity> entity = new ArrayList<Entity>();
+    /**
+     * vehicleに搭乗している全Entityを返す
+     * vehicleに搭乗しているEntityが更に別のEntityに搭乗されている場合を指す
+     * @param vehicle
+     * @return vehicleに搭乗している全EntityのList
+     */
+    public static ArrayList<Entity> getAllPassenger(Entity vehicle) {
+        ArrayList<Entity> entitylist = new ArrayList<Entity>();
 
-        Entity passenger = e.getPassenger() != null ? e.getPassenger() : null;
+        Entity passenger = vehicle.getPassenger() != null ? vehicle.getPassenger() : null;
         while (passenger != null) {
-            entity.add(passenger);
+            entitylist.add(passenger);
             passenger = passenger.getPassenger() != null ? passenger.getPassenger() : null;
         }
-        return entity;
+        return entitylist;
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -272,17 +335,12 @@ public class Util extends ReflectionUtil {
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static boolean isWindows() {
-        return OperatingSystem.startsWith("windows");
+    public static Boolean isOnline(String name) {
+        return Bukkit.getPlayerExact(name) != null;
     }
 
-    public static Boolean isOnline(String name) {
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (name.equalsIgnoreCase(online.getName())) {
-                return true;
-            }
-        }
-        return false;
+    public static Boolean isOnline(UUID id) {
+        return Bukkit.getPlayer(id) != null;
     }
 
     public static boolean isNumber(String number) {
@@ -318,14 +376,20 @@ public class Util extends ReflectionUtil {
         return true;
     }
 
-    public static Boolean isSolidBlock(Location l) {
+    /**
+     * 引数locationのBlockが固形Blockか判別する
+     * @param location 判別するBlockの座標
+     * @return 固形Blockかどうか
+     */
+    public static Boolean isSolidBlock(Location location) {
         try {
-            return (Boolean) Material_isSolid.invoke(Block_getMaterial.invoke(Block_getById.invoke(CraftBlock, l
-                    .getBlock().getTypeId())));
+            return (Boolean) Material_isSolid.invoke(
+                    Block_getMaterial.invoke(
+                            static_NMSBlock_getById.invoke(null, location.getBlock().getTypeId())));
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static Boolean isSlabBlock(Location l) {
@@ -384,19 +448,20 @@ public class Util extends ReflectionUtil {
         }
     }
 
-    public static void removeEntityCollision(Entity e) {
-        try {
-            Object craftentity = getCraftEntity(e);
-            Field nmsField;
-            for (Field f : craftentity.getClass().getFields()) {
-                if (!f.getName().equalsIgnoreCase("noclip"))
-                    continue;
-                nmsField = f;
-                nmsField.setAccessible(true);
-                nmsField.setBoolean(craftentity, true);
-                return;
+    /**
+     * entityの物理判定を無効にする
+     * 無効に設定されたEntityはBlockへの接触判定が行われない
+     * @param entity
+     */
+    public static void removeEntityCollision(Entity entity) {
+        Object craftentity = getCraftEntity(entity);
+        Field noclip = getField(craftentity, "noclip");
+        if (noclip != null) {
+            try {
+                noclip.setBoolean(craftentity, true);
+            }catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception exception) {
         }
     }
 
@@ -491,7 +556,7 @@ public class Util extends ReflectionUtil {
             if (!RaceManager.isRacing(((Player) damaged).getUniqueId()))
                 continue;
 
-            Vector v = Util.getVectorLocationToLocation(l, damaged.getLocation());
+            Vector v = Util.getVectorToLocation(damaged.getLocation(), l);
             v.setX(v.clone().multiply(-1).getX());
             v.setY(0);
             v.setZ(v.clone().multiply(-1).getZ());

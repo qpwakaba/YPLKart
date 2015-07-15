@@ -302,12 +302,12 @@ public final class RaceData {
         while (list.size() < defaultmaxplayer) {
             if (!Util.isSolidBlock(position))
                 list.add(position);
-            if (!Util.isSolidBlock(Util.getSideLocationfromYaw(position, 4)))
-                list.add(Util.getSideLocationfromYaw(position, 4));
-            if (!Util.isSolidBlock(Util.getSideLocationfromYaw(position, -4)))
-                list.add(Util.getSideLocationfromYaw(position, -4));
+            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(position, 4)))
+                list.add(Util.getSideLocationFromYaw(position, 4));
+            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(position, -4)))
+                list.add(Util.getSideLocationFromYaw(position, -4));
 
-            position = Util.getLocationfromYaw(position, 4);
+            position = Util.getFrontBackLocationFromYaw(position, 4);
         }
 
         return list;

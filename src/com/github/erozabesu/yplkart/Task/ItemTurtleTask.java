@@ -29,7 +29,7 @@ public class ItemTurtleTask extends BukkitRunnable {
         this.hitdamage = Settings.TurtleHitDamage
                 + RaceManager.getRace(shooter).getCharacter().getItemAdjustAttackDamage();
 
-        this.vector = Util.getVectorLocationToLocation(next, Util.adjustBlockLocation(this.projectile.getLocation()));
+        this.vector = Util.getVectorToLocation(Util.adjustBlockLocation(this.projectile.getLocation()), next);
         this.x = this.vector.getX();
         this.z = this.vector.getZ();
         this.y = this.verticalonhover;
@@ -102,7 +102,7 @@ public class ItemTurtleTask extends BukkitRunnable {
 
         if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//北東
             if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {
-                Vector normal = Util.getVectorLocationToLocation(current.clone().add(1, 0, -1), current);
+                Vector normal = Util.getVectorToLocation(current, current.clone().add(1, 0, -1));
                 setReverseVector(normal);
                 return;
             } else {
@@ -111,7 +111,7 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
         } else if (Util.isSolidBlock(current.clone().add(0, 0, 1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//南東
             if (Util.isSolidBlock(current.clone().add(0, 1, 1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {
-                Vector normal = Util.getVectorLocationToLocation(current.clone().add(1, 0, 1), current);
+                Vector normal = Util.getVectorToLocation(current, current.clone().add(1, 0, 1));
                 setReverseVector(normal);
                 return;
             } else {
@@ -120,7 +120,7 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
         } else if (Util.isSolidBlock(current.clone().add(0, 0, 1)) && Util.isSolidBlock(current.clone().add(-1, 0, 0))) {//南西
             if (Util.isSolidBlock(current.clone().add(0, 1, 1)) && Util.isSolidBlock(current.clone().add(-1, 1, 0))) {
-                Vector normal = Util.getVectorLocationToLocation(current.clone().add(-1, 0, 1), current);
+                Vector normal = Util.getVectorToLocation(current, current.clone().add(-1, 0, 1));
                 setReverseVector(normal);
                 return;
             } else {
@@ -129,7 +129,7 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
         } else if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(-1, 0, 0))) {//北西
             if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(-1, 1, 0))) {
-                Vector normal = Util.getVectorLocationToLocation(current.clone().add(-1, 0, -1), current);
+                Vector normal = Util.getVectorToLocation(current, current.clone().add(-1, 0, -1));
                 setReverseVector(normal);
                 return;
             } else {
