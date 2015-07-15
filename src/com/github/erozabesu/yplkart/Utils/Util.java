@@ -111,13 +111,11 @@ public class Util extends ReflectionUtil {
      * @param vector ベクター
      * @return 偏揺れ角
      */
-    public static float getYawfromVector(Vector vector) {
+    public static float getYawFromVector(Vector vector) {
         double dx = vector.getX();
         double dz = vector.getZ();
         double yaw = 0;
-        // Set yaw
         if (dx != 0) {
-            // Set yaw start value based on dx
             if (dx < 0) {
                 yaw = 1.5 * Math.PI;
             } else {
@@ -217,6 +215,7 @@ public class Util extends ReflectionUtil {
         return newlocation;
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static ArrayList<Entity> getNearbyEntities(Location l, double radius) {
         ArrayList<Entity> entities = new ArrayList<Entity>();
         for (Entity entity : l.getWorld().getEntities()) {
@@ -227,6 +226,7 @@ public class Util extends ReflectionUtil {
         return entities;
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static ArrayList<LivingEntity> getNearbyLivingEntities(Location l, double radius) {
         ArrayList<Entity> entity = getNearbyEntities(l, radius);
         ArrayList<LivingEntity> livingentity = new ArrayList<LivingEntity>();
@@ -237,6 +237,7 @@ public class Util extends ReflectionUtil {
         return livingentity;
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static ArrayList<Player> getNearbyPlayers(Location l, double radius) {
         ArrayList<Entity> entity = getNearbyEntities(l, radius);
         ArrayList<Player> livingentity = new ArrayList<Player>();
@@ -247,6 +248,7 @@ public class Util extends ReflectionUtil {
         return livingentity;
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static Entity getNearestEntity(List<Entity> entities, Location l) {
         Iterator<Entity> i = entities.iterator();
         Entity e = null;
@@ -263,6 +265,7 @@ public class Util extends ReflectionUtil {
         return e;
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static Player getNearestPlayer(ArrayList<Player> players, Location l) {
         if (players == null)
             return null;
@@ -465,6 +468,7 @@ public class Util extends ReflectionUtil {
         }
     }
 
+    //TODO 負荷の原因になっている可能性あり
     public static void removeEntityVerticalMotion(Entity e) {
         try {
             Object craftentity = getCraftEntity(e);

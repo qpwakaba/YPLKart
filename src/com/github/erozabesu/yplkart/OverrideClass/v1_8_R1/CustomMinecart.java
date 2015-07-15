@@ -255,7 +255,7 @@ public class CustomMinecart extends EntityMinecartRideable {
                 this.motY = this.killerY;
                 this.motZ = this.killerZ;
             }
-            setYawPitch(Util.getYawfromVector(new Vector(this.motX, this.motY, this.motZ)) + 180, 0);
+            setYawPitch(Util.getYawFromVector(new Vector(this.motX, this.motY, this.motZ)) + 180, 0);
 
             //〓〓演出
             p.playSound(p.getLocation(), Sound.GHAST_FIREBALL, 0.05F, 1.5F);
