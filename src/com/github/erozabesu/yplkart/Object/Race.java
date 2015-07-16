@@ -574,7 +574,7 @@ public class Race {
         final Player p = getPlayer();
         if (p.getVehicle() != null) {
             if (RaceManager.isRacingKart(p.getVehicle())) {
-                Object customkart = p.getVehicle().getMetadata(YPLKart.plname).get(0).value();
+                Object customkart = p.getVehicle().getMetadata(YPLKart.PLUGIN_NAME).get(0).value();
                 try {
                     Minecart cart = (Minecart) customkart.getClass().getMethod("getBukkitEntity").invoke(customkart);
                     cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));

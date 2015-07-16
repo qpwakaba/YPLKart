@@ -53,11 +53,11 @@ public class Scoreboards {
 
         Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
 
-        Objective obj = sb.registerNewObjective(YPLKart.plname, "dummy");
+        Objective obj = sb.registerNewObjective(YPLKart.PLUGIN_NAME, "dummy");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
 
-        Team team = sb.registerNewTeam(YPLKart.plname);
+        Team team = sb.registerNewTeam(YPLKart.PLUGIN_NAME);
         team.setCanSeeFriendlyInvisibles(false);
         team.setAllowFriendlyFire(false);
 
@@ -94,7 +94,7 @@ public class Scoreboards {
         if (sb == null)
             return;
 
-        Team team = sb.getTeam(YPLKart.plname);
+        Team team = sb.getTeam(YPLKart.PLUGIN_NAME);
         team.addPlayer(Bukkit.getPlayer(id) == null ? Bukkit.getOfflinePlayer(id) : Bukkit.getPlayer(id));
         setPoint(id);
 
@@ -111,7 +111,7 @@ public class Scoreboards {
         if (sb == null)
             return;
 
-        sb.getTeam(YPLKart.plname).removeEntry(getPlayerRegisterName(id));
+        sb.getTeam(YPLKart.PLUGIN_NAME).removeEntry(getPlayerRegisterName(id));
         sb.resetScores(getPlayerRegisterName(id));
         hideBoard(id);
     }
@@ -121,7 +121,7 @@ public class Scoreboards {
         if (entry.equalsIgnoreCase(""))
             return;
 
-        scoreboard.get(entry).getObjective(YPLKart.plname).getScore(getPlayerRegisterName(id))
+        scoreboard.get(entry).getObjective(YPLKart.PLUGIN_NAME).getScore(getPlayerRegisterName(id))
                 .setScore(RaceManager.getRace(id).getPoint());
     }
 

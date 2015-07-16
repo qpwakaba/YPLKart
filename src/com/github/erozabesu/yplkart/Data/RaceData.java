@@ -48,7 +48,9 @@ public final class RaceData {
         configFile = new File(datafolder, filename);
         config = YamlConfiguration.loadConfiguration(configFile);
 
-        CreateConfig();
+        if (!CreateConfig()) {
+            return;
+        }
     }
 
     /* <circuit name>:
@@ -577,12 +579,29 @@ public final class RaceData {
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void CreateConfig() {
+    /**
+     * Plugin.jarから/plugins/YPLKartディレクトリにコンフィグファイルをコピーする
+     * ファイルが生成済みの場合は何もせずtrueを返す
+     * ファイルが未生成の場合はファイルのコピーを試みる
+     * @return ファイルの生成に成功したかどうか
+     */
+    public static boolean CreateConfig() {
         if (!(configFile.exists())) {
-            pl.saveResource(filename, true);
+            //jarファイル内にコピー元のファイルが存在しない場合
+            if (!Util.copyResource(filename)) {
+                Message.sendAbsolute(null, "[" + YPLKart.PLUGIN_NAME + "] v."
+                        + YPLKart.PLUGIN_VERSION + " "
+                        + filename + " was not found in jar file");
+                YPLKart.getInstance().onDisable();
+                return false;
+            }
+
+            //jarファイル内からファイルのコピーに成功した場合
             configFile = new File(datafolder, filename);
             config = YamlConfiguration.loadConfiguration(configFile);
         }
+
+        return true;
     }
 
     public static File getConfigFile() {

@@ -601,18 +601,28 @@ public class Util extends ReflectionUtil {
      * 各OSのデフォルトの文字コードに変換しリソースを保管します
      */
     public static boolean copyResource(String filename) {
-        InputStream input = YPLKart.getInstance().getResource(filename);
-        if (input == null)
-            return false;
-
+        String filepath = "resources/" + filename;
+        File outputFile = new File(YPLKart.getInstance().getDataFolder() + File.separator + filename);
+        InputStream input = null;
         FileOutputStream output = null;
         BufferedReader reader = null;
         BufferedWriter writer = null;
 
+        File parent = outputFile.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+
         try {
-            output = new FileOutputStream(new File(YPLKart.getInstance().getDataFolder(), filename));
-            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+            input = YPLKart.getInstance().getResource(filepath);
+
+            if (input == null) {
+                return false;
+            }
+
+            output = new FileOutputStream(outputFile);
             reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
+            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -622,36 +632,37 @@ public class Util extends ReflectionUtil {
             writer.flush();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
-            //e.printStackTrace();
         } finally {
-            if (input != null)
+            if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (output != null)
+            }
+            if (output != null) {
                 try {
                     output.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (writer != null)
+            }
+            if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (reader != null)
+            }
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
+            }
         }
     }
 
@@ -714,33 +725,34 @@ public class Util extends ReflectionUtil {
         } catch (Exception e) {
             //e.printStackTrace();
         } finally {
-            if (input != null)
+            if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (output != null)
+            }
+            if (output != null) {
                 try {
                     output.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (writer != null)
+            }
+            if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
-
-            if (reader != null)
+            }
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    //e.printStackTrace();
+                    // Do nothing
                 }
+            }
         }
     }
 }

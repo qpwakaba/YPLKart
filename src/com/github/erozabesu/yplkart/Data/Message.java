@@ -422,12 +422,17 @@ public enum Message {
     }
 
     private static String replaceBasicTags(String message) {
+System.out.println("0");
         message = message.replace("<header>", getData(header.name(), header.getDefaultMessage()));
         message = message.replace("<circuitheader>", getData(circuitheader.name(), circuitheader.getDefaultMessage()));
-        message = message.replace("<plugin>", YPLKart.plname);
+        System.out.println("1");
+        message = message.replace("<plugin>", YPLKart.PLUGIN_NAME);
         message = message.replace("<itemlist>", EnumItem.getItemList().toLowerCase());
+        System.out.println("2");
         message = message.replace("<circuitlist>", RaceData.getCircuitList());
+        System.out.println("3");
         message = message.replace("<characterlist>", EnumCharacter.getCharacterList());
+        System.out.println("4");
         message = message.replace("<kartlist>", EnumKarts.getKartList());
         replaceChatColor(message);
 
@@ -518,7 +523,9 @@ public enum Message {
         configFile = new File(datafolder, filename);
         config = YamlConfiguration.loadConfiguration(configFile);
 
-        createConfig();
+        if (!CreateConfig()) {
+            return;
+        }
 
         updatePatch();
 
@@ -535,12 +542,29 @@ public enum Message {
         saveConfigFile();
     }
 
-    private static void createConfig() {
+    /**
+     * Plugin.jarから/plugins/YPLKartディレクトリにコンフィグファイルをコピーする
+     * ファイルが生成済みの場合は何もせずtrueを返す
+     * ファイルが未生成の場合はファイルのコピーを試みる
+     * @return ファイルの生成に成功したかどうか
+     */
+    public static boolean CreateConfig() {
         if (!(configFile.exists())) {
-            Util.copyResource(filename);
+            //jarファイル内にコピー元のファイルが存在しない場合
+            if (!Util.copyResource(filename)) {
+                Message.sendAbsolute(null, "[" + YPLKart.PLUGIN_NAME + "] v."
+                        + YPLKart.PLUGIN_VERSION + " "
+                        + filename + " was not found in jar file");
+                YPLKart.getInstance().onDisable();
+                return false;
+            }
+
+            //jarファイル内からファイルのコピーに成功した場合
             configFile = new File(datafolder, filename);
             config = YamlConfiguration.loadConfiguration(configFile);
         }
+
+        return true;
     }
 
     private static void saveConfigFile() {
@@ -548,11 +572,13 @@ public enum Message {
     }
 
     public static void reloadConfig() {
-        configFile = new File(datafolder, filename);
-        config = YamlConfiguration.loadConfiguration(configFile);
         loadConfig();
     }
 
+    /**
+     * 新規の要素を追加した際は自動的に追記されるためパッチを当てる必要はない
+     * 既存の要素を強制的に上書きする際に用いる
+     */
     private static void updatePatch() {
         String version = getData(messageVersion.name(), messageVersion.getDefaultMessage());
         if (version.equalsIgnoreCase("1.0")) {

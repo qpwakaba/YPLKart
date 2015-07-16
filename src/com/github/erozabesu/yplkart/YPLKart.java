@@ -20,13 +20,16 @@ import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.Utils.Util;
 
 public class YPLKart extends JavaPlugin {
-    public static String plname;
+    public static String PLUGIN_NAME;
+    public static String PLUGIN_VERSION;
 
     private VaultConnector vaultConnection;
 
     @Override
     public void onEnable() {
-        plname = this.getDescription().getName();
+        PLUGIN_NAME = this.getDescription().getName();
+        PLUGIN_VERSION = this.getDescription().getVersion();
+
         CMD CMDExecutor = new CMD();
         getCommand("ka").setExecutor(CMDExecutor);
 
@@ -51,14 +54,15 @@ public class YPLKart extends JavaPlugin {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
         }
 
-        Message.sendAbsolute(null, "[" + plname + "] v." + YPLKart.getInstance().getDescription().getVersion()
-                + " Plugin has been Enabled");
+        //Message.sendAbsolute(null,
+        //        "[" + PLUGIN_NAME + "] v." + PLUGIN_VERSION + " Plugin has been Enabled");
     }
 
     @Override
     public void onDisable() {
         Scoreboards.clearBoard();
         RaceManager.endAllCircuit();
+        Bukkit.getPluginManager().disablePlugin(this);
     }
 
     public static YPLKart getInstance() {

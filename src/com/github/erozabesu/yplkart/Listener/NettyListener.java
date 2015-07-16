@@ -30,7 +30,7 @@ public class NettyListener implements Listener {
         Channel channel = PacketUtil.getChannel(p);
         PlayerChannelHandler pch = new PlayerChannelHandler();
         if (channel.pipeline().get(PlayerChannelHandler.class) == null) {
-            channel.pipeline().addBefore("packet_handler", YPLKart.plname, pch);
+            channel.pipeline().addBefore("packet_handler", YPLKart.PLUGIN_NAME, pch);
         }
     }
 

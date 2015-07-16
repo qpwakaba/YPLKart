@@ -422,7 +422,7 @@ public class RaceManager {
         if (e instanceof Minecart)
             if (e.getCustomName() != null)
                 if (EnumKarts.getKartArrayList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
-                    if (e.getMetadata(YPLKart.plname).get(0) != null)
+                    if (e.getMetadata(YPLKart.PLUGIN_NAME).get(0) != null)
                         return true;
         return false;
     }
@@ -470,7 +470,7 @@ public class RaceManager {
             cart.setCustomName(kart.getName());
             cart.setCustomNameVisible(false);
 
-            cart.setMetadata(YPLKart.plname, new FixedMetadataValue(YPLKart.getInstance(), customCart));
+            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(YPLKart.getInstance(), customCart));
 
             return cart;
         } catch (Exception e) {
