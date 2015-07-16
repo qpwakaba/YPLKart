@@ -456,7 +456,7 @@ public final class RaceData {
             else
                 names += " , " + circuitname;
         }
-        return names;
+        return names == null ? "" : names;
     }
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
