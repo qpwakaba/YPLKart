@@ -6,18 +6,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.erozabesu.yplkart.Cmd.CMD;
-import com.github.erozabesu.yplkart.Connector.VaultConnector;
-import com.github.erozabesu.yplkart.Data.DisplayKartData;
-import com.github.erozabesu.yplkart.Data.Message;
-import com.github.erozabesu.yplkart.Data.RaceData;
-import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Listener.DataListener;
-import com.github.erozabesu.yplkart.Listener.ItemListener;
-import com.github.erozabesu.yplkart.Listener.NettyListener;
-import com.github.erozabesu.yplkart.Utils.PacketUtil;
-import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.Utils.Util;
+import com.github.erozabesu.yplkart.cmd.CMD;
+import com.github.erozabesu.yplkart.connector.VaultConnector;
+import com.github.erozabesu.yplkart.data.DisplayKartData;
+import com.github.erozabesu.yplkart.data.Messages;
+import com.github.erozabesu.yplkart.data.RaceData;
+import com.github.erozabesu.yplkart.data.Settings;
+import com.github.erozabesu.yplkart.listener.DataListener;
+import com.github.erozabesu.yplkart.listener.ItemListener;
+import com.github.erozabesu.yplkart.listener.NettyListener;
+import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
+import com.github.erozabesu.yplkart.utils.Util;
 
 public class YPLKart extends JavaPlugin {
     public static String PLUGIN_NAME;
@@ -44,7 +44,7 @@ public class YPLKart extends JavaPlugin {
         new RaceData(this);
         new DisplayKartData(this);
 
-        Message.reloadConfig();
+        Messages.reloadConfig();
 
         for (World w : Bukkit.getWorlds()) {
             DisplayKartData.respawnKart(w);

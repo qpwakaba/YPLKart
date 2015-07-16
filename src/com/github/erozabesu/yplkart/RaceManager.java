@@ -22,18 +22,18 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import com.github.erozabesu.yplkart.Data.DisplayKartData;
-import com.github.erozabesu.yplkart.Data.Message;
-import com.github.erozabesu.yplkart.Enum.EnumCharacter;
-import com.github.erozabesu.yplkart.Enum.EnumItem;
-import com.github.erozabesu.yplkart.Enum.EnumKarts;
-import com.github.erozabesu.yplkart.Enum.EnumSelectMenu;
-import com.github.erozabesu.yplkart.Enum.Permission;
-import com.github.erozabesu.yplkart.Object.Circuit;
-import com.github.erozabesu.yplkart.Object.Race;
-import com.github.erozabesu.yplkart.Utils.PacketUtil;
-import com.github.erozabesu.yplkart.Utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.Utils.Util;
+import com.github.erozabesu.yplkart.data.DisplayKartData;
+import com.github.erozabesu.yplkart.data.Messages;
+import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
+import com.github.erozabesu.yplkart.enumdata.EnumItem;
+import com.github.erozabesu.yplkart.enumdata.EnumKarts;
+import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
+import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceManager {
     public static int checkPointHeight = 8;
@@ -77,7 +77,7 @@ public class RaceManager {
             return;
         } else {
             c.acceptMatching(id);
-            Message.raceAccept.sendMessage(p, c);
+            Messages.raceAccept.sendMessage(p, c);
         }
     }
 
@@ -102,23 +102,23 @@ public class RaceManager {
     public static void setEntryRaceData(UUID id, String circuitname) {
         if (isEntry(id)) {
             String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
-            Message.raceEntryAlready.sendMessage(id, oldcircuitname);
+            Messages.raceEntryAlready.sendMessage(id, oldcircuitname);
         } else {
             Circuit c = setupCircuit(circuitname);
             if (c.isFillPlayer()) {
                 c.entryReservePlayer(id);
-                Message.raceEntryFull.sendMessage(id, c);
+                Messages.raceEntryFull.sendMessage(id, c);
             } else {
                 getRace(id).setEntry(circuitname);
 
                 if (c.isStarted()) {
                     c.entryReservePlayer(id);
-                    Message.raceEntryAlreadyStart.sendMessage(id, c);
+                    Messages.raceEntryAlreadyStart.sendMessage(id, c);
                 } else {
                     c.entryPlayer(id);
                     Scoreboards.entryCircuit(id);
 
-                    Message.raceEntry.sendMessage(id, c);
+                    Messages.raceEntry.sendMessage(id, c);
 
                     if (c.isMatching())
                         setMatchingCircuitData(id);
@@ -129,11 +129,11 @@ public class RaceManager {
 
     public static void setCharacterRaceData(UUID id, EnumCharacter character) {
         if (!isStandBy(id)) {
-            Message.raceNotStarted.sendMessage(id, getCircuit(id));
+            Messages.raceNotStarted.sendMessage(id, getCircuit(id));
             return;
         }
         if (Bukkit.getPlayer(id) == null) {
-            Message.invalidPlayer.sendMessage(null, id);
+            Messages.invalidPlayer.sendMessage(null, id);
             return;
         }
 
@@ -147,16 +147,16 @@ public class RaceManager {
 
         PacketUtil.disguise(p, null, character);
         EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
-        Message.raceCharacter.sendMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
+        Messages.raceCharacter.sendMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
     }
 
     public static void setKartRaceData(UUID id, EnumKarts kart) {
         if (!isStandBy(id)) {
-            Message.raceNotStarted.sendMessage(id, getCircuit(id));
+            Messages.raceNotStarted.sendMessage(id, getCircuit(id));
             return;
         }
         if (Bukkit.getPlayer(id) == null) {
-            Message.invalidPlayer.sendMessage(null, id);
+            Messages.invalidPlayer.sendMessage(null, id);
             return;
         }
 
@@ -164,7 +164,7 @@ public class RaceManager {
         r.setKart(kart);
         r.recoveryKart();
 
-        Message.raceKart.sendMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
+        Messages.raceKart.sendMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
     }
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -189,7 +189,7 @@ public class RaceManager {
                         p.teleport(r.getGoalPosition());
                     }
                 }
-                Message.raceExit.sendMessage(id, c);
+                Messages.raceExit.sendMessage(id, c);
             }
 
             r.init();
@@ -205,7 +205,7 @@ public class RaceManager {
         if (p != null) {
             getRace(id).recoveryPhysical();
             PacketUtil.returnPlayer(p);
-            Message.raceCharacterReset.sendMessage(id, getCircuit(id));
+            Messages.raceCharacterReset.sendMessage(id, getCircuit(id));
         }
     }
 
@@ -214,7 +214,7 @@ public class RaceManager {
             return;
 
         if (Bukkit.getPlayer(id) != null)
-            Message.raceLeave.sendMessage(id, getCircuit(id));
+            Messages.raceLeave.sendMessage(id, getCircuit(id));
         getRace(id).setKart(null);
     }
 

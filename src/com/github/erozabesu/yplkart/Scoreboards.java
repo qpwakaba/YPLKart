@@ -10,8 +10,8 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import com.github.erozabesu.yplkart.Data.Settings;
-import com.github.erozabesu.yplkart.Utils.Util;
+import com.github.erozabesu.yplkart.data.Settings;
+import com.github.erozabesu.yplkart.utils.Util;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
 public class Scoreboards {
