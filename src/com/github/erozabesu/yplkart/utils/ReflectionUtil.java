@@ -13,25 +13,25 @@ import org.bukkit.inventory.ItemStack;
 public class ReflectionUtil {
     private static String bukkitVersion =
             Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-    private static String bukkitPackage = "net.minecraft.server." + getBukkitVersion();
+    private static String nmsPackage = "net.minecraft.server." + getBukkitVersion();
     private static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
     private static String yplkartPackage =
             "com.github.erozabesu.yplkart.override." + getBukkitVersion();
 
-    private static Class<?> NMSWorld = getBukkitClass("World");
-    private static Class<?> CraftWorld = getCraftClass("CraftWorld");
-    private static Class<?> CraftItemStack = getCraftClass("inventory.CraftItemStack");
+    private static Class<?> nmsWorld = getNMSClass("World");
+    private static Class<?> craftWorld = getCraftClass("CraftWorld");
+    private static Class<?> craftItemStack = getCraftClass("inventory.CraftItemStack");
 
-    private static HashMap<String, Constructor<?>> BukkitEntity_Constructor =
+    private static HashMap<String, Constructor<?>> bukkitEntity_Constructor =
             new HashMap<String, Constructor<?>>();
-    private static HashMap<String, Method> CraftEntity_getHandle = new HashMap<String, Method>();
-    public static Method CraftWorld_getHandle;
-    private static Method static_CraftItemStack_asNMSCopy;
+    private static HashMap<String, Method> craftEntity_getHandle = new HashMap<String, Method>();
+    public static Method craftWorld_getHandle;
+    private static Method static_craftItemStack_asNMSCopy;
 
     public ReflectionUtil() {
         try {
-            CraftWorld_getHandle = CraftWorld.getMethod("getHandle");
-            static_CraftItemStack_asNMSCopy = CraftItemStack.getMethod("asNMSCopy", ItemStack.class);
+            craftWorld_getHandle = craftWorld.getMethod("getHandle");
+            static_craftItemStack_asNMSCopy = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -41,8 +41,8 @@ public class ReflectionUtil {
         return bukkitVersion;
     }
 
-    public static String getBukkitPackageName() {
-        return bukkitPackage;
+    public static String getNMSPackageName() {
+        return nmsPackage;
     }
 
     public static String getCraftPackageName() {
@@ -53,9 +53,9 @@ public class ReflectionUtil {
         return yplkartPackage;
     }
 
-    public static Class<?> getBukkitClass(String s) {
+    public static Class<?> getNMSClass(String s) {
         try {
-            return Class.forName(getBukkitPackageName() + "." + s);
+            return Class.forName(getNMSPackageName() + "." + s);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,10 +119,10 @@ public class ReflectionUtil {
 
     public static Object getCraftEntity(Entity entity) {
         try {
-            Method getHandle = CraftEntity_getHandle.get(entity.getClass().getSimpleName());
+            Method getHandle = craftEntity_getHandle.get(entity.getClass().getSimpleName());
             if (getHandle == null) {
                 getHandle = entity.getClass().getMethod("getHandle");
-                CraftEntity_getHandle.put(entity.getClass().getSimpleName(), getHandle);
+                craftEntity_getHandle.put(entity.getClass().getSimpleName(), getHandle);
             }
 
             return getHandle.invoke(entity);
@@ -134,10 +134,10 @@ public class ReflectionUtil {
 
     public static Object getCraftEntityFromClassName(World w, String classname) {
         try {
-            Constructor<?> con = BukkitEntity_Constructor.get(classname);
+            Constructor<?> con = bukkitEntity_Constructor.get(classname);
             if (con == null) {
-                con = getBukkitClass(classname).getConstructor(NMSWorld);
-                BukkitEntity_Constructor.put(classname, con);
+                con = getNMSClass(classname).getConstructor(nmsWorld);
+                bukkitEntity_Constructor.put(classname, con);
             }
 
             return con.newInstance(getCraftWorld(w));
@@ -149,7 +149,7 @@ public class ReflectionUtil {
 
     public static Object getCraftWorld(World w) {
         try {
-            return CraftWorld_getHandle.invoke(w);
+            return craftWorld_getHandle.invoke(w);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -158,7 +158,7 @@ public class ReflectionUtil {
 
     public static Object getCraftItemStack(ItemStack item) {
         try {
-            return static_CraftItemStack_asNMSCopy.invoke(null, item);
+            return static_craftItemStack_asNMSCopy.invoke(null, item);
         } catch (Exception e) {
             e.printStackTrace();
         }

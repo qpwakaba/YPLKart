@@ -90,15 +90,15 @@ public enum Particle {
         if (count <= 0) {
             count = 1;
         }
-        Class<?> packetClass = Util.getBukkitClass("PacketPlayOutWorldParticles");
+        Class<?> packetClass = Util.getNMSClass("PacketPlayOutWorldParticles");
 
         Object enumobject = null;
-        for (Object ob : Util.getBukkitClass("EnumParticle").getEnumConstants()) {
+        for (Object ob : Util.getNMSClass("EnumParticle").getEnumConstants()) {
             if (ob.toString().equalsIgnoreCase(effect))
                 enumobject = ob;
         }
 
-        Object packet = packetClass.getConstructor(Util.getBukkitClass("EnumParticle"), boolean.class, float.class,
+        Object packet = packetClass.getConstructor(Util.getNMSClass("EnumParticle"), boolean.class, float.class,
                 float.class, float.class, float.class, float.class, float.class, float.class, int.class,
                 int[].class).newInstance(enumobject, true, (float) location.getX(), (float) location.getY(),
                 (float) location.getZ(), offsetX, offsetY, offsetZ, speed, count, null);

@@ -46,18 +46,18 @@ import com.github.erozabesu.yplkart.task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil {
-    private static Class<?> NMSBlock = getBukkitClass("Block");
-    private static Class<?> NMSMaterial = getBukkitClass("Material");
+    private static Class<?> nmsBlock = getNMSClass("Block");
+    private static Class<?> nmsMaterial = getNMSClass("Material");
 
-    private static Method static_NMSBlock_getById;
-    private static Method Block_getMaterial;
-    private static Method Material_isSolid;
+    private static Method static_nmsBlock_getById;
+    private static Method block_getMaterial;
+    private static Method material_isSolid;
 
     public Util() {
         try {
-            static_NMSBlock_getById = NMSBlock.getMethod("getById", int.class);
-            Block_getMaterial = NMSBlock.getMethod("getMaterial");
-            Material_isSolid = NMSMaterial.getMethod("isSolid");
+            static_nmsBlock_getById = nmsBlock.getMethod("getById", int.class);
+            block_getMaterial = nmsBlock.getMethod("getMaterial");
+            material_isSolid = nmsMaterial.getMethod("isSolid");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -386,9 +386,9 @@ public class Util extends ReflectionUtil {
      */
     public static Boolean isSolidBlock(Location location) {
         try {
-            return (Boolean) Material_isSolid.invoke(
-                    Block_getMaterial.invoke(
-                            static_NMSBlock_getById.invoke(null, location.getBlock().getTypeId())));
+            return (Boolean) material_isSolid.invoke(
+                    block_getMaterial.invoke(
+                            static_nmsBlock_getById.invoke(null, location.getBlock().getTypeId())));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

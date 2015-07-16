@@ -457,13 +457,13 @@ public class RaceManager {
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
             Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-            Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class,
+            Object customCart = customClass.getConstructor(ReflectionUtil.getNMSClass("World"), EnumKarts.class,
                     Location.class, boolean.class).newInstance(craftWorld, kart, l, false);
             Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
 
             customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(),
                     l.getY() + 1, l.getZ());
-            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getBukkitClass("Entity"))
+            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
                     .invoke(craftWorld, customCart);
 
             cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
@@ -483,13 +483,13 @@ public class RaceManager {
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
             Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-            Object customCart = customClass.getConstructor(ReflectionUtil.getBukkitClass("World"), EnumKarts.class,
+            Object customCart = customClass.getConstructor(ReflectionUtil.getNMSClass("World"), EnumKarts.class,
                     Location.class, boolean.class).newInstance(craftWorld, kart, l, true);
             final Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
 
             customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(),
                     l.getY() + 1, l.getZ());
-            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getBukkitClass("Entity"))
+            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
                     .invoke(craftWorld, customCart);
 
             cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
