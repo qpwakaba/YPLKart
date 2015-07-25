@@ -36,8 +36,6 @@ import com.github.erozabesu.yplkart.utils.Util;
 
 public class CustomMinecart extends EntityMinecartRideable {
 
-    //〓 CraftBukkitメンバ変数 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     private boolean a;
     private String b;
     private static final int[][][] matrix = { { { 0, 0, -1 }, { 0, 0, 1 } }, { { -1 }, { 1 } }, { { -1, -1 }, { 1 } },
@@ -72,8 +70,6 @@ public class CustomMinecart extends EntityMinecartRideable {
     /* レール上を移動する際のモーション値の上限
     public double maxSpeed = 0.4D;*/
 
-    //〓 Pluginメンバ変数 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     /** Kartオブジェクト */
     private Kart kart;
 
@@ -100,21 +96,6 @@ public class CustomMinecart extends EntityMinecartRideable {
 
     /** キラー使用中、1チック前に通過したチェックポイントEntityのUUID */
     private org.bukkit.entity.Entity killerLastPassedCheckPoint;
-
-    /*
-     * 予めカートのパラメータを格納しておくことで余計な処理を省けるが
-     * ka reloadコマンドで設定の変更を行っても反映されない
-     *
-     * 動的にカートのパラメータを取得すればka reload処理後に反映されるが
-     * ラグ発生の原因を少しでも取り除くため前者で定義する
-     */
-    private double maxSpeedStack;
-    private double acceleration;
-    private double speedOnDirt;
-    private float climbableHeight;
-    private float corneringPower;
-    private float corneringPowerDrift;
-    private double speedDecreaseDrift;
 
     //〓 メイン 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -752,12 +733,6 @@ public class CustomMinecart extends EntityMinecartRideable {
     @Override
     public void t_()
     {
-        //クライアントから読み込まれなくなった場合デスポーン
-        if (isClientSide(this)) {
-            craftBukkit_die();
-            return;
-        }
-
         //よくわからない
         craftBukkit_J();
 
@@ -765,6 +740,12 @@ public class CustomMinecart extends EntityMinecartRideable {
         //マインカートや船のような一定時間攻撃し続けなければ壊れないEntityに利用される値
         if (getDamage() > 0.0F) {
             setDamage(getDamage() - 1.0F);
+        }
+
+        //クライアントから読み込まれなくなった場合デスポーン
+        if (isClientSide(this)) {
+            craftBukkit_die();
+            return;
         }
 
         //奈落に落下した場合デスポーン

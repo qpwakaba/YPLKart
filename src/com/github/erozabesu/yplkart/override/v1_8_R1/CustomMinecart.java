@@ -733,12 +733,6 @@ public class CustomMinecart extends EntityMinecartRideable {
     @Override
     public void s_()
     {
-        //クライアントから読み込まれなくなった場合デスポーン
-        if (isClientSide(this)) {
-            craftBukkit_die();
-            return;
-        }
-
         //よくわからない
         craftBukkit_J();
 
@@ -746,6 +740,12 @@ public class CustomMinecart extends EntityMinecartRideable {
         //マインカートや船のような一定時間攻撃し続けなければ壊れないEntityに利用される値
         if (getDamage() > 0.0F) {
             setDamage(getDamage() - 1.0F);
+        }
+
+        //クライアントから読み込まれなくなった場合デスポーン
+        if (isClientSide(this)) {
+            craftBukkit_die();
+            return;
         }
 
         //奈落に落下した場合デスポーン
