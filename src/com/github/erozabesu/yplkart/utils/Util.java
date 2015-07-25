@@ -1,17 +1,8 @@
 package com.github.erozabesu.yplkart.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,9 +29,9 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.data.Messages;
+import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 
@@ -185,12 +175,11 @@ public class Util extends ReflectionUtil {
         double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
         double z = Math.cos(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
 
-        Location newlocation = new Location(adjustlocation.getWorld(),
+        return new Location(adjustlocation.getWorld(),
                 adjustlocation.getX() + x * offset,
                 adjustlocation.getY(),
                 adjustlocation.getZ() + z * offset,
-                adjustlocation.getPitch(), yaw);
-        return newlocation;
+                yaw, adjustlocation.getPitch());
     }
 
     /**
@@ -207,12 +196,11 @@ public class Util extends ReflectionUtil {
         double x = Math.cos(Math.toRadians(yaw));
         double z = Math.sin(Math.toRadians(yaw));
 
-        Location newlocation = new Location(adjustlocation.getWorld(),
+        return new Location(adjustlocation.getWorld(),
                 adjustlocation.getX() + x * offset,
                 adjustlocation.getY(),
                 adjustlocation.getZ() + z * offset,
-                adjustlocation.getPitch(), yaw);
-        return newlocation;
+                yaw, adjustlocation.getPitch());
     }
 
     //TODO 負荷の原因になっている可能性あり
@@ -320,6 +308,28 @@ public class Util extends ReflectionUtil {
         return entitylist;
     }
 
+    /**
+     * 引数nmsEntityオブジェクトからBukkitEntityを取得し返す
+     * @param nmsEntity BukkitEntityを取得するNmsEntity
+     * @return BukkitEntity
+     */
+    public static Entity getBukkitEntityFromNmsEntity(Object nmsEntity) {
+        try {
+            return (Entity) nmsEntity.getClass().getMethod("getBukkitEntity").invoke(nmsEntity);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void setPotionEffect(Player p, PotionEffectType effect, int second, int level) {
@@ -422,15 +432,16 @@ public class Util extends ReflectionUtil {
                 Circuit c = RaceManager.getCircuit(p.getUniqueId());
                 p.setHealth(p.getMaxHealth());
                 if (executor != null)
-                    c.sendMessageEntryPlayer(Messages.racePlayerKill, new Object[] { c,
+                    c.sendMessageEntryPlayer(MessageEnum.racePlayerKill, new Object[] { c,
                             new Player[] { (Player) damaged, (Player) executor } });
                 else
-                    c.sendMessageEntryPlayer(Messages.racePlayerDead, new Object[] { c, (Player) damaged });
+                    c.sendMessageEntryPlayer(MessageEnum.racePlayerDead
+                            , new Object[] { c, (Player) damaged });
 
-                final Race r = RaceManager.getRace(p);
+                final Racer r = RaceManager.getRace(p);
 
-                p.setWalkSpeed(r.getCharacter().getDeathPenaltyWalkSpeed());
-                p.setNoDamageTicks(r.getCharacter().getDeathPenaltyAntiReskillSecond() * 20);
+                p.setWalkSpeed(r.getCharacter().getPenaltyWalkSpeed());
+                p.setNoDamageTicks(r.getCharacter().getPenaltyAntiReskillSecond() * 20);
                 p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
                 r.setDeathPenaltyTask(
                         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
@@ -439,11 +450,11 @@ public class Util extends ReflectionUtil {
                                 p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
                                 p.setSprinting(true);
                             }
-                        }, r.getCharacter().getDeathPenaltySecond() * 20)
+                        }, r.getCharacter().getPenaltySecond() * 20)
                         );
                 r.setDeathPenaltyTitleSendTask(
-                        new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getDeathPenaltySecond(),
-                                Messages.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
+                        new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getPenaltySecond(),
+                                MessageEnum.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
                         );
             }
         } else {
@@ -487,8 +498,8 @@ public class Util extends ReflectionUtil {
 
     public static Location adjustBlockLocation(Location old) {
         Location value = old.getBlock().getLocation();
-        return new Location(old.getWorld(), value.getX() + 0.5, value.getY(), value.getZ() + 0.5, old.getYaw(),
-                old.getPitch());
+        return new Location(old.getWorld(), value.getX() + 0.5, value.getY(), value.getZ() + 0.5
+                , old.getYaw(), old.getPitch());
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -533,6 +544,15 @@ public class Util extends ReflectionUtil {
     }
 
     public static String convertInitialUpperString(String string) {
+        if (string == null) {
+            return null;
+        }
+        if (string == "") {
+            return "";
+        }
+        if (string.length() == 1) {
+            return string.toUpperCase();
+        }
         String initial = string.substring(0, 1).toUpperCase();
         String other = string.substring(1, string.length()).toLowerCase();
 
@@ -593,165 +613,6 @@ public class Util extends ReflectionUtil {
                 FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect4);
             } catch (Exception ex) {
                 ex.printStackTrace();
-            }
-        }
-    }
-
-    /*
-     * 各OSのデフォルトの文字コードに変換しリソースを保管します
-     */
-    public static boolean copyResource(String filename) {
-        String filepath = "resources/" + filename;
-        File outputFile = new File(YPLKart.getInstance().getDataFolder() + File.separator + filename);
-        InputStream input = null;
-        FileOutputStream output = null;
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        File parent = outputFile.getParentFile();
-        if (!parent.exists()) {
-            parent.mkdirs();
-        }
-
-        try {
-            input = YPLKart.getInstance().getResource(filepath);
-
-            if (input == null) {
-                return false;
-            }
-
-            output = new FileOutputStream(outputFile);
-            reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
-            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line);
-                writer.newLine();
-            }
-            writer.flush();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-        }
-    }
-
-    /*
-     * 各OSのデフォルトの文字コードに変換し、コンフィグを最新の内容に上書き保存します
-     */
-    public static void saveConfiguration(File file, FileConfiguration config, List<String> ignorelist) {
-        //コンフィグファイルが無い場合新規作成します
-        if (!file.exists()) {
-            if (!copyResource(file.getName()))
-                return;
-            file = new File(YPLKart.getInstance().getDataFolder(), file.getName());
-        }
-        List<String> continuetext = new ArrayList<String>();
-        FileInputStream input = null;
-        FileOutputStream output = null;
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        try {
-            input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
-            reader = new BufferedReader(new InputStreamReader(input, Charset.defaultCharset()));
-
-            //新しいファイルにコメントアウトしている行のみ引き継ぐ
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("#"))
-                    continuetext.add(line);
-            }
-
-            file.delete();
-            file.createNewFile();
-
-            file.createNewFile();
-            output = new FileOutputStream(file);
-            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
-
-            for (String continueline : continuetext) {
-                writer.write(continueline);
-                writer.newLine();
-            }
-
-            boolean continueflag = false;
-            for (String configkey : config.getKeys(true)) {
-                continueflag = false;
-                for (String ignore : ignorelist) {
-                    if (configkey.startsWith(ignore)) {
-                        continueflag = true;
-                        break;
-                    }
-                }
-                if (continueflag)
-                    continue;
-
-                writer.write(configkey + " : \"" + config.get(configkey) + "\"");
-                writer.newLine();
-            }
-
-            writer.flush();
-        } catch (Exception e) {
-            //e.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // Do nothing
-                }
             }
         }
     }

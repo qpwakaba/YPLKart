@@ -13,15 +13,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.data.Messages;
-import com.github.erozabesu.yplkart.data.RaceData;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
-import com.github.erozabesu.yplkart.enumdata.EnumItem;
-import com.github.erozabesu.yplkart.enumdata.EnumKarts;
-import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.KartConfig;
+import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
@@ -63,7 +63,7 @@ public class Circuit {
      */
     public Circuit(final String name) {
         this.name = name;
-        this.limittime = RaceData.getLimitTime(name);
+        this.limittime = CircuitConfig.getCircuitData(name).getLimitTime();
         init();
 
         runCountUpTask();
@@ -72,38 +72,38 @@ public class Circuit {
     }
 
     private void setupRacer() {
-        List<Location> position = RaceData.getPositionList(name);
+        List<Location> position = CircuitConfig.getCircuitData(name).getStartLocationList();
         int count = 0;
 
-        for (UUID id : entry) {
-            if (Bukkit.getPlayer(id) != null) {
-                if (Bukkit.getPlayer(id).isOnline()) {
-                    Player p = Bukkit.getPlayer(id);
-                    Race r = RaceManager.getRace(p);
+        for (UUID uuid : entry) {
+            if (Bukkit.getPlayer(uuid) != null) {
+                if (Bukkit.getPlayer(uuid).isOnline()) {
+                    Player player = Bukkit.getPlayer(uuid);
+                    Racer race = RaceManager.getRace(player);
 
-                    Scoreboards.entryCircuit(id);
-                    r.init();
-                    r.setEntry(name);
-                    RaceManager.clearCharacterRaceData(id);
-                    RaceManager.clearKartRaceData(id);
-                    RaceManager.leaveRacingKart(p);
-                    r.setStandBy(true);
-                    r.savePlayerData();
+                    Scoreboards.entryCircuit(uuid);
+                    race.init();
+                    race.setEntry(name);
+                    RaceManager.clearCharacterRaceData(uuid);
+                    RaceManager.clearKartRaceData(uuid);
+                    RaceManager.leaveRacingKart(player);
+                    race.setStandBy(true);
+                    race.savePlayerData();
 
-                    p.getInventory().clear();
-                    p.setLevel(0);
-                    p.setExp(0);
+                    player.getInventory().clear();
+                    player.setLevel(0);
+                    player.setExp(0);
 
-                    p.leaveVehicle();
-                    p.teleport(position.get(count));
-                    RaceManager.showCharacterSelectMenu(p);
-                    EnumItem.addItem(p, EnumItem.MENU.getItem());
+                    player.leaveVehicle();
+                    player.teleport(position.get(count));
+                    RaceManager.showSelectMenu(player, true);
+                    ItemEnum.addItem(player, ItemEnum.MENU.getItem());
 
                     count++;
                     continue;
                 }
             }
-            exitPlayer(id);
+            exitPlayer(uuid);
         }
     }
 
@@ -147,7 +147,7 @@ public class Circuit {
     }
 
     public void endRace() {
-        sendMessageEntryPlayer(Messages.raceEnd, new Object[] { circuit });
+        sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { circuit });
         Iterator<UUID> i = entry.iterator();
         UUID id;
         while (i.hasNext()) {
@@ -290,15 +290,15 @@ public class Circuit {
                     if (laptime % 20 == 0) {
                         int remaintime = limittime - laptime / 20;
                         if (remaintime == 60) {
-                            sendMessageEntryPlayer(Messages.raceTimeLimitAlert, new Object[] { circuit, (int) 60 });
+                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 60 });
                         } else if (remaintime == 30) {
-                            sendMessageEntryPlayer(Messages.raceTimeLimitAlert, new Object[] { circuit, (int) 30 });
+                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 30 });
                         } else if (remaintime == 10) {
-                            sendMessageEntryPlayer(Messages.raceTimeLimitAlert, new Object[] { circuit, (int) 10 });
+                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 10 });
                         } else if (0 < remaintime && remaintime < 10) {
-                            sendMessageEntryPlayer(Messages.raceTimeLimitCountDown, new Object[] { circuit, remaintime });
+                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitCountDown, new Object[] { circuit, remaintime });
                         } else if (remaintime == 0) {
-                            sendMessageEntryPlayer(Messages.raceTimeUp, new Object[] { circuit });
+                            sendMessageEntryPlayer(MessageEnum.raceTimeUp, new Object[] { circuit });
                             endRace();
                         }
                     }
@@ -327,10 +327,10 @@ public class Circuit {
         this.detectreadytask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 //エントリーしたプレイヤーが規定人数以上
-                if (entry.size() < RaceData.getMinPlayer(name))
+                if (entry.size() < CircuitConfig.getCircuitData(name).getMinPlayer())
                     return;
                 //オンラインのプレイヤー人数が規定人数以上
-                if (getEntryPlayer().size() < RaceData.getMinPlayer(name))
+                if (getEntryPlayer().size() < CircuitConfig.getCircuitData(name).getMinPlayer())
                     return;
                 runMatchingTask();
                 detectreadytask.cancel();
@@ -343,7 +343,7 @@ public class Circuit {
         if (this.matchingtask != null)
             this.matchingtask.cancel();
 
-        this.matchingcountdown = RaceData.getMatchingTime(this.name);
+        this.matchingcountdown = CircuitConfig.getCircuitData(this.name).getMatchingTime();
         setMatching(true);
         String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
 
@@ -351,7 +351,7 @@ public class Circuit {
         for (UUID id : entry) {
             Player p = Bukkit.getPlayer(id);
             p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-            Messages.raceReady.sendMessage(p, circuit);
+            MessageEnum.raceReady.sendConvertedMessage(p, circuit);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + p.getName() + tellraw);
         }
 
@@ -370,7 +370,7 @@ public class Circuit {
                         }
                     }
 
-                    if (RaceData.getMinPlayer(name) <= matchingaccept.size()) {
+                    if (CircuitConfig.getCircuitData(name).getMinPlayer() <= matchingaccept.size()) {
                         matchingaccept.clear();
                         matchingcountdown = 0;
                         matchingtask.cancel();
@@ -378,14 +378,14 @@ public class Circuit {
 
                         setupRacer();
                         Scoreboards.startCircuit(name);
-                        sendMessageEntryPlayer(Messages.raceStart, new Object[] { circuit });
+                        sendMessageEntryPlayer(MessageEnum.raceStart, new Object[] { circuit });
 
                         runRaceStartTask();
                         return;
                     }
 
                     //マッチングに失敗した場合
-                    sendMessageEntryPlayer(Messages.raceMatchingFailed, new Object[] { circuit });
+                    sendMessageEntryPlayer(MessageEnum.raceMatchingFailed, new Object[] { circuit });
                     setMatching(false);
                     matchingaccept.clear();
                     matchingcountdown = 0;
@@ -415,7 +415,7 @@ public class Circuit {
         if (this.matchingtitlesendertask != null)
             this.matchingtitlesendertask.cancel();
 
-        this.matchingcountdownfortitle = RaceData.getMatchingTime(this.name) + 1;
+        this.matchingcountdownfortitle = CircuitConfig.getCircuitData(this.name).getMatchingTime() + 1;
 
         this.matchingtitlesendertask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
@@ -430,8 +430,8 @@ public class Circuit {
                 for (UUID id : entry) {
                     Player p = Bukkit.getPlayer(id);
                     if (p != null || RaceManager.isEntry(id)) {
-                        PacketUtil.sendTitle(p, Messages.titleRacePrepared.getMessage(), 0, 25, 0, false);
-                        PacketUtil.sendTitle(p, Messages.titleCountDown.getMessage(matchingcountdownfortitle), 0, 25, 0,
+                        PacketUtil.sendTitle(p, MessageEnum.titleRacePrepared.getMessage(), 0, 25, 0, false);
+                        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(matchingcountdownfortitle), 0, 25, 0,
                                 true);
                     }
                 }
@@ -452,7 +452,7 @@ public class Circuit {
         if (this.racestarttask != null)
             this.racestarttask.cancel();
 
-        this.racestartcountdown = RaceData.getMenuTime(this.name) + 12;
+        this.racestartcountdown = CircuitConfig.getCircuitData(this.name).getMenuTime() + 12;
 
         this.racestarttask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
@@ -460,46 +460,49 @@ public class Circuit {
                 if (12 < racestartcountdown) {
                     for (Player p : getEntryPlayer()) {
                         int count = racestartcountdown - 12;
-                        PacketUtil.sendTitle(p, Messages.titleRaceMenu.getMessage(), 0, 25, 0, false);
-                        PacketUtil.sendTitle(p, Messages.titleCountDown.getMessage(count), 0, 25, 0, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceMenu.getMessage(), 0, 25, 0, false);
+                        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(count), 0, 25, 0, true);
                     }
                 } else if (racestartcountdown == 12) {
                     for (Player p : getEntryPlayer()) {
                         if (RaceManager.getRace(p).getCharacter() == null) {
-                            RaceManager.setCharacterRaceData(p.getUniqueId(), EnumCharacter.getRandomCharacter());
+                            RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
                         if (RaceManager.getRace(p).getKart() == null
                                 && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
-                            RaceManager.setKartRaceData(p.getUniqueId(), EnumKarts.getRandomKart());
+                            RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
                         }
                         p.closeInventory();
-                        EnumItem.removeAllKeyItems(p);
-                        PacketUtil.sendTitle(p, Messages.titleRaceStandby.getMessage(), 10, 40, 10, false);
-                        PacketUtil.sendTitle(p, Messages.titleRaceStandbySub.getMessage(), 10, 40, 10, true);
+                        ItemEnum.removeAllKeyItems(p);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStandby.getMessage(), 10, 40, 10, false);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStandbySub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (racestartcountdown == 10) {
                     for (Player p : getEntryPlayer()) {
-                        PacketUtil.sendTitle(p, Messages.titleRaceLaps.getMessage(RaceData.getNumberOfLaps(name)), 10,
-                                40, 10, false);
-                        PacketUtil.sendTitle(p, Messages.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
+                        PacketUtil.sendTitle(
+                                p, MessageEnum.titleRaceLaps.getConvertedMessage(
+                                        CircuitConfig.getCircuitData(name).getNumberOfLaps())
+                                        , 10, 40, 10, false);
+                        PacketUtil.sendTitle(
+                                p, MessageEnum.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (racestartcountdown == 8) {
                     for (Player p : getEntryPlayer()) {
-                        PacketUtil.sendTitle(p, Messages.titleRaceTimeLimit.getMessage(RaceData.getLimitTime(name)), 10,
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(CircuitConfig.getCircuitData(name).getLimitTime()), 10,
                                 40, 10, false);
-                        PacketUtil.sendTitle(p, Messages.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (racestartcountdown == 6) {
                     for (Player p : getEntryPlayer()) {
-                        PacketUtil.sendTitle(p, Messages.titleRaceReady.getMessage(), 10, 20, 10, false);
-                        PacketUtil.sendTitle(p, Messages.titleRaceReadySub.getMessage(), 10, 20, 10, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceReady.getMessage(), 10, 20, 10, false);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceReadySub.getMessage(), 10, 20, 10, true);
                     }
                 } else if (0 < racestartcountdown && racestartcountdown < 4) {
                     for (Player p : getEntryPlayer()) {
                         p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
-                        PacketUtil.sendTitle(p, Messages.titleRaceStartCountDown.getMessage(racestartcountdown), 0, 20,
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(racestartcountdown), 0, 20,
                                 0, false);
-                        PacketUtil.sendTitle(p, Messages.titleRaceStartCountDownSub.getMessage(), 0, 20, 0, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDownSub.getMessage(), 0, 20, 0, true);
                     }
                 } else if (racestartcountdown == 0) {
                     setStart(true);
@@ -520,9 +523,9 @@ public class Circuit {
         }, 0, 20);
     }
 
-    public void sendMessageEntryPlayer(Messages message, Object[] object) {
+    public void sendMessageEntryPlayer(MessageEnum message, Object[] object) {
         for (Player p : getEntryPlayer()) {
-            message.sendMessage(p, object);
+            message.sendConvertedMessage(p, object);
         }
     }
 
@@ -569,7 +572,7 @@ public class Circuit {
     }
 
     public boolean isFillPlayer() {
-        if (RaceData.getMaxPlayer(this.name) <= this.entry.size())
+        if (CircuitConfig.getCircuitData(this.name).getMaxPlayer() <= this.entry.size())
             return true;
         return false;
     }

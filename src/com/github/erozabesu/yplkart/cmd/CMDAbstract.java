@@ -2,7 +2,7 @@ package com.github.erozabesu.yplkart.cmd;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.Permission;
 
 abstract class CMDAbstract extends CMD {
     public CMDAbstract() {

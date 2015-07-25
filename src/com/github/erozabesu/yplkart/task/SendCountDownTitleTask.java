@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Messages;
+import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 
 public class SendCountDownTitleTask extends BukkitRunnable {
@@ -19,7 +19,7 @@ public class SendCountDownTitleTask extends BukkitRunnable {
         this.text = text;
 
         PacketUtil.sendTitle(p, text, 0, 25, 0, false);
-        PacketUtil.sendTitle(p, Messages.titleCountDown.getMessage(maxlife), 0, 25, 0, true);
+        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(maxlife), 0, 25, 0, true);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SendCountDownTitleTask extends BukkitRunnable {
         if (life % 20 == 0) {
             if (((int) (maxlife - life) / 20) != 0) {
                 PacketUtil.sendTitle(p, text, 0, 25, 0, false);
-                PacketUtil.sendTitle(p, Messages.titleCountDown.getMessage((maxlife - life) / 20), 0, 25, 0, true);
+                PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage((maxlife - life) / 20), 0, 25, 0, true);
             }
         }
     }

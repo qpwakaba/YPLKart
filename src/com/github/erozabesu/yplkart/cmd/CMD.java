@@ -6,7 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.github.erozabesu.yplkart.enumdata.EnumItem;
+import com.github.erozabesu.yplkart.data.ItemEnum;
 
 public class CMD implements CommandExecutor {
     CMDAbstract cmd;
@@ -56,8 +56,8 @@ public class CMD implements CommandExecutor {
             else if (args[0].equalsIgnoreCase("item"))
                 this.cmd.additem(null, null);
             else {
-                EnumItem item = null;
-                if ((item = EnumItem.getEnumItem(args[0])) != null)
+                ItemEnum item = null;
+                if ((item = ItemEnum.getItemFromCommandKey(args[0])) != null)
                     this.cmd.additem(item.getItem(), item.getPermission());
             }
             return true;

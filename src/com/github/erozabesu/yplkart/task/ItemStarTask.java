@@ -9,8 +9,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Settings;
-import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemStarTask extends BukkitRunnable {
@@ -22,9 +22,10 @@ public class ItemStarTask extends BukkitRunnable {
 
     public ItemStarTask(Player p) {
         this.p = p;
-        this.effectsecond = (Settings.StarEffectSecond + RaceManager.getRace(p).getCharacter()
-                .getItemAdjustPositiveEffectSecond()) * 20;
-        this.hitdamage = Settings.StarHitDamage + RaceManager.getRace(p).getCharacter().getItemAdjustAttackDamage();
+        this.effectsecond = (ItemEnum.STAR.getEffectSecond()
+                + RaceManager.getRace(p).getCharacter().getAdjustPositiveEffectSecond()) * 20;
+        this.hitdamage = ItemEnum.STAR.getHitDamage()
+                + RaceManager.getRace(p).getCharacter().getAdjustAttackDamage();
 
         if (boostTask.get(p) != null) {
             boostTask.get(p).cancel();
@@ -34,13 +35,13 @@ public class ItemStarTask extends BukkitRunnable {
         boostTask.put(p, this);
 
         Util.setItemDecrease(p);
-        Race r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRace(p);
         r.setDeathPenaltyTask(null);
         r.setDeathPenaltyTitleSendTask(null);
         r.setItemNegativeSpeedTask(null);
         p.setNoDamageTicks(effectsecond);
         p.setFireTicks(0);
-        p.setWalkSpeed(Settings.StarWalkSpeed);
+        p.setWalkSpeed(ItemEnum.STAR.getWalkSpeed());
         p.removePotionEffect(PotionEffectType.SLOW);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.NIGHT_VISION);

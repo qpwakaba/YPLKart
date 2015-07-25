@@ -12,9 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
 import com.github.erozabesu.yplkart.listener.NettyListener;
-import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
@@ -40,11 +39,11 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                     return;
                 } else {
                     Player p = Bukkit.getPlayer(UUID.fromString(NettyListener.playerEntityId.get(id)));
-                    Race r = RaceManager.getRace(p);
+                    Racer r = RaceManager.getRace(p);
 
                     if (r.getCharacter() == null) {
                         super.write(ctx, msg, promise);
-                    } else if (r.getCharacter().equals(EnumCharacter.HUMAN)) {
+                    } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                         super.write(ctx, msg, promise);
                     } else {
                         List<Object> watchableobject = (List<Object>) ReflectionUtil.getFieldValue(msg, "b");
@@ -60,12 +59,12 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                 }
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutNamedEntitySpawn")) {
                 Player p = Bukkit.getPlayer((UUID) Util.getFieldValue(msg, "b"));
-                Race r = RaceManager.getRace(p);
+                Racer r = RaceManager.getRace(p);
 
                 //Human以外のキャラクターを選択している場合パケットを偽装
                 if (r.getCharacter() == null) {
                     super.write(ctx, msg, promise);
-                } else if (r.getCharacter().equals(EnumCharacter.HUMAN)) {
+                } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                     super.write(ctx, msg, promise);
                 } else {
                     super.write(ctx, PacketUtil.getDisguisePacket(p, r.getCharacter()), promise);

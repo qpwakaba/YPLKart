@@ -2,16 +2,21 @@ package com.github.erozabesu.yplkart.cmd;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.ConfigManager;
+import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Messages;
-import com.github.erozabesu.yplkart.data.RaceData;
-import com.github.erozabesu.yplkart.data.Settings;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
-import com.github.erozabesu.yplkart.enumdata.EnumKarts;
-import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.KartConfig;
+import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.CircuitData;
+import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class CMDAbstractBlock extends CMDAbstract {
@@ -25,77 +30,81 @@ public class CMDAbstractBlock extends CMDAbstract {
 
     @Override
     void ka() {
-        if (Bukkit.getPlayer(args[0]) != null)
-            Messages.reference.sendMessage(Bukkit.getPlayer(args[0]));
+        if (Bukkit.getPlayer(args[0]) != null) {
+            SystemMessageEnum.reference.sendConvertedMessage(Bukkit.getPlayer(args[0]));
+        }
     }
 
     @Override
     void circuit() {
         if (this.length == 2) {
             if (args[1].equalsIgnoreCase("list")) {
-                RaceData.listCricuit(null);
+                MessageEnum.cmdCircuitList.sendConvertedMessage(null);
                 return;
             }
         } else if (this.length == 3) {
             if (args[1].equalsIgnoreCase("info")) {
-                RaceData.sendCircuitInformation(null, args[2]);
+                CircuitData circuitData = CircuitConfig.getCircuitData(args[2]);
+                if (circuitData != null) {
+                    circuitData.sendInformation(null);
+                }
                 return;
             } else if (args[1].equalsIgnoreCase("delete")) {
-                RaceData.deleteCircuit(null, args[2]);
+                CircuitConfig.deleteCircuit(null, args[2]);
                 return;
             }
         } else if (this.length == 4) {
             if (args[1].equalsIgnoreCase("rename")) {
-                RaceData.renameCircuit(null, args[2], args[3]);
+                CircuitConfig.renameCircuit(null, args[2], args[3]);
                 return;
             } else if (args[1].equalsIgnoreCase("setminplayer")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setMinPlayer(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMinPlayer(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("setmaxplayer")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setMaxPlayer(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMaxPlayer(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("setmatchingtime")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMatchingTime(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("setmenutime")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setMenuTime(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMenuTime(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("setlimittime")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setLimitTime(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setLimitTime(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("setlap")) {
                 if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(null);
+                    MessageEnum.invalidNumber.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setNumberOfLaps(null, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setNumberOfLaps(null, args[2], Integer.valueOf(args[3]));
                 return;
             } else if (args[1].equalsIgnoreCase("broadcastgoal")) {
                 if (!Util.isBoolean(args[3])) {
-                    Messages.invalidBoolean.sendMessage(null);
+                    MessageEnum.invalidBoolean.sendConvertedMessage(null);
                     return;
                 }
-                RaceData.setBroadcastGoalMessage(null, args[2], Boolean.valueOf(args[3]));
+                CircuitConfig.setBroadcastGoalMessage(null, args[2], Boolean.valueOf(args[3]));
                 return;
             }
         } else if (this.length == 9) {
@@ -104,15 +113,27 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (!Util.isNumber(args[4]) || !Util.isNumber(args[5]) || !Util.isNumber(args[6])
                     || !Util.isNumber(args[7]) || !Util.isNumber(args[8]))
                 return;
-            //0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z
+            //0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
             if (args[1].equalsIgnoreCase("create")) {
-                RaceData.createCircuit(null, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]),
-                        Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+                World world = Bukkit.getWorld(args[3]);
+                if (world == null) {
+                    MessageEnum.invalidWorld.sendConvertedMessage(null);
+                }
+                Location location = new Location(world, Double.valueOf(args[4]), Double.valueOf(args[5])
+                        ,Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+                CircuitConfig.createCircuit(null, location, args[2]);
+
                 return;
-                //0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z
+            //0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
             } else if (args[1].equalsIgnoreCase("setposition")) {
-                RaceData.setPosition(null, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]),
-                        Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+                World world = Bukkit.getWorld(args[3]);
+                if (world == null) {
+                    MessageEnum.invalidWorld.sendConvertedMessage(null);
+                }
+                Location location = new Location(world, Double.valueOf(args[4]), Double.valueOf(args[5])
+                        ,Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+                CircuitConfig.setStartPosition(null, args[2], location);
+
                 return;
             }
         }
@@ -128,11 +149,11 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (!Util.isNumber(args[3]) || !Util.isNumber(args[4]) || !Util.isNumber(args[5])
                     || !Util.isNumber(args[6]) || !Util.isNumber(args[7]))
                 return;
-            EnumKarts kart = null;
+            Kart kart = null;
             if (args[1].equalsIgnoreCase("random"))
-                kart = EnumKarts.getRandomKart();
+                kart = KartConfig.getRandomKart();
             else
-                kart = EnumKarts.getKartfromString(args[1]);
+                kart = KartConfig.getKart(args[1]);
             if (kart == null)
                 return;
 
@@ -150,14 +171,14 @@ public class CMDAbstractBlock extends CMDAbstract {
         if (length == 2) {
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.showCharacterSelectMenu(other);
+                    RaceManager.showSelectMenu(other, true);
                 }
             } else {
                 if (!Util.isOnline(args[1]))
                     return;
 
                 Player other = Bukkit.getPlayer(args[1]);
-                RaceManager.showCharacterSelectMenu(other);
+                RaceManager.showSelectMenu(other, true);
             }
         } else {
         }
@@ -168,7 +189,7 @@ public class CMDAbstractBlock extends CMDAbstract {
     @Override
     void entry() {
         if (this.length == 3) {
-            if (!RaceData.isCircuit(args[2])) {
+            if (CircuitConfig.getCircuitData(args[2]) == null) {
                 return;
             }
             if (args[1].equalsIgnoreCase("all")) {
@@ -215,16 +236,16 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (args[2].equalsIgnoreCase("random")) {
                 if (args[1].equalsIgnoreCase("all")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
-                        RaceManager.setCharacterRaceData(other.getUniqueId(), EnumCharacter.getRandomCharacter());
+                        RaceManager.setCharacterRaceData(other.getUniqueId(), CharacterConfig.getRandomCharacter());
                     }
                 } else {
                     if (!Util.isOnline(args[1]))
                         return;
-                    EnumCharacter character = EnumCharacter.getRandomCharacter();
+                    Character character = CharacterConfig.getRandomCharacter();
                     RaceManager.setCharacterRaceData(Bukkit.getPlayer(args[1]).getUniqueId(), character);
                 }
             } else {
-                EnumCharacter character = EnumCharacter.getClassfromString(args[2]);
+                Character character = CharacterConfig.getCharacter(args[2]);
                 if (character == null)
                     return;
                 if (args[1].equalsIgnoreCase("all")) {
@@ -267,11 +288,11 @@ public class CMDAbstractBlock extends CMDAbstract {
     @Override
     void ride() {
         if (this.length == 3) {
-            EnumKarts kart = null;
+            Kart kart = null;
             if (args[2].equalsIgnoreCase("random"))
-                kart = EnumKarts.getRandomKart();
+                kart = KartConfig.getRandomKart();
             else
-                kart = EnumKarts.getKartfromString(args[2]);
+                kart = KartConfig.getKart(args[2]);
             if (kart == null)
                 return;
 
@@ -321,14 +342,14 @@ public class CMDAbstractBlock extends CMDAbstract {
         Player other = Bukkit.getPlayer(args[1]);
 
         if (this.length == 3) {
-            if (!RaceData.isCircuit(args[2])) {
-                Messages.invalidCircuit.sendMessage(null, args[2]);
+            if (CircuitConfig.getCircuitData(args[2]) == null) {
+                MessageEnum.invalidCircuit.sendConvertedMessage(null, args[2]);
                 return;
             }
 
-            RaceData.sendRanking(other.getUniqueId(), args[2]);
+            CircuitConfig.sendRanking(other.getUniqueId(), args[2]);
         } else {
-            Messages.referenceRankingOther.sendMessage(null);
+            SystemMessageEnum.referenceRankingOther.sendConvertedMessage(null);
         }
     }
 
@@ -339,9 +360,8 @@ public class CMDAbstractBlock extends CMDAbstract {
         }
         RaceManager.endAllCircuit();
 
-        Settings.reloadConfig();
-        Messages.reloadConfig();
-        Messages.cmdReload.sendMessage(null);
+        ConfigManager.reloadAllConfig();
+        MessageEnum.cmdReload.sendConvertedMessage(null);
     }
 
     @Override
@@ -351,13 +371,13 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     other.getInventory().addItem(item);
-                    Messages.cmdItem.sendMessage(other, item);
+                    MessageEnum.cmdItem.sendConvertedMessage(other, item);
                 }
                 //ka {item} @?
             } else {
                 Player other = Bukkit.getPlayer(args[1]);
                 other.getInventory().addItem(item);
-                Messages.cmdItem.sendMessage(other, item);
+                MessageEnum.cmdItem.sendConvertedMessage(other, item);
             }
         } else if (length == 3) {
             if (!Util.isNumber(args[2]))
@@ -368,13 +388,13 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     other.getInventory().addItem(item);
-                    Messages.cmdItem.sendMessage(other, item);
+                    MessageEnum.cmdItem.sendConvertedMessage(other, item);
                 }
                 //ka {item} @? 64
             } else {
                 Player other = Bukkit.getPlayer(args[1]);
                 other.getInventory().addItem(item);
-                Messages.cmdItem.sendMessage(other, item);
+                MessageEnum.cmdItem.sendConvertedMessage(other, item);
             }
         } else {
         }

@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Settings;
+import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemTurtleTask extends BukkitRunnable {
@@ -26,8 +26,8 @@ public class ItemTurtleTask extends BukkitRunnable {
     public ItemTurtleTask(Player shooter, Entity projectile, Location next, int life) {
         this.shooter = shooter;
         this.projectile = projectile;
-        this.hitdamage = Settings.TurtleHitDamage
-                + RaceManager.getRace(shooter).getCharacter().getItemAdjustAttackDamage();
+        this.hitdamage = ItemEnum.TURTLE.getHitDamage()
+                + RaceManager.getRace(shooter).getCharacter().getAdjustAttackDamage();
 
         this.vector = Util.getVectorToLocation(Util.adjustBlockLocation(this.projectile.getLocation()), next);
         this.x = this.vector.getX();

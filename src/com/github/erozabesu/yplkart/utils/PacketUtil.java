@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
+import com.github.erozabesu.yplkart.object.Character;
 
 public class PacketUtil extends ReflectionUtil {
     private static HashMap<UUID, Object> playerConnection = new HashMap<UUID, Object>();
@@ -115,43 +115,43 @@ public class PacketUtil extends ReflectionUtil {
      * targetプレイヤーに向けパケットを送信します
      * targetがnullの場合全プレイヤーに送信します
      */
-    public static void disguise(Player p, Player target, EnumCharacter job) {
-        if (job == null) {
+    public static void disguise(Player player, Player target, Character character) {
+        if (character == null) {
             return;
         }
-        if (job.getCraftClassName().equalsIgnoreCase(EnumCharacter.HUMAN.getCraftClassName())) {
-            returnPlayer(p);
+        if (character.getNmsClass().getSimpleName().equalsIgnoreCase("EntityHuman")) {
+            returnPlayer(player);
             return;
         }
         try {
-            Object disguise = getCraftEntityFromClassName(p.getWorld(), job.getCraftClassName());
-            Location loc = p.getLocation();
+            Object disguise = getCraftEntityFromClassName(player.getWorld(), character.getNmsClass().getSimpleName());
+            Location loc = player.getLocation();
 
             nmsEntity_setLocation.invoke(disguise, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-            nmsEntity_setEntityID.invoke(disguise, p.getEntityId());
-            nmsEntity_setCustomName.invoke(disguise, p.getName());
+            nmsEntity_setEntityID.invoke(disguise, player.getEntityId());
+            nmsEntity_setCustomName.invoke(disguise, player.getName());
             nmsEntity_setCustomNameVisible.invoke(disguise, true);
 
-            Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
+            Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
             Object spawnentitypacket = getSpawnEntityLivingPacket(disguise);
             Object attachentitypacket = null;
-            if (p.getVehicle() != null)
-                attachentitypacket = getAttachEntityPacket(disguise, getCraftEntity(p.getVehicle()));
-            Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
-            Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p
+            if (player.getVehicle() != null)
+                attachentitypacket = getAttachEntityPacket(disguise, getCraftEntity(player.getVehicle()));
+            Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
+            Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
                     .getEquipment().getHelmet());
-            Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p
+            Object chectpacket = player.getEquipment().getChestplate() == null ? null : getEquipmentPacket(player, 3, player
                     .getEquipment().getChestplate());
-            Object leggingspacket = p.getEquipment().getLeggings() == null ? null : getEquipmentPacket(p, 2, p
+            Object leggingspacket = player.getEquipment().getLeggings() == null ? null : getEquipmentPacket(player, 2, player
                     .getEquipment().getLeggings());
-            Object bootspacket = p.getEquipment().getBoots() == null ? null : getEquipmentPacket(p, 1, p.getEquipment()
+            Object bootspacket = player.getEquipment().getBoots() == null ? null : getEquipmentPacket(player, 1, player.getEquipment()
                     .getBoots());
 
             if (target == null) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    if (other.getUniqueId() == p.getUniqueId())
+                    if (other.getUniqueId() == player.getUniqueId())
                         continue;
-                    if (!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))
+                    if (!other.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()))
                         continue;
                     sendPacket(other, entitydestroypacket);
                     sendPacket(other, spawnentitypacket);
@@ -189,8 +189,9 @@ public class PacketUtil extends ReflectionUtil {
         }
     }
 
-    public static Object getDisguisePacket(Player p, EnumCharacter job) throws Exception {
-        Object craftentity = getCraftEntityFromClassName(p.getWorld(), job.getCraftClassName());
+    public static Object getDisguisePacket(Player p, Character character) throws Exception {
+        Object craftentity = getCraftEntityFromClassName(
+                p.getWorld(), character.getNmsClass().getSimpleName());
         Location loc = p.getLocation();
 
         nmsEntity_setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());

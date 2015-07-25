@@ -18,17 +18,15 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.data.Messages;
-import com.github.erozabesu.yplkart.data.RaceData;
-import com.github.erozabesu.yplkart.data.Settings;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
-import com.github.erozabesu.yplkart.enumdata.EnumItem;
-import com.github.erozabesu.yplkart.enumdata.EnumKarts;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
-public class Race {
+public class Racer {
     private UUID id;
     private Location goalposition;
     private double maxhealth;
@@ -50,8 +48,8 @@ public class Race {
     private ArrayList<ItemStack> quitinventory;
     private ArrayList<ItemStack> quitarmorcontents;
 
-    private EnumCharacter character;
-    private EnumKarts kart;
+    private Character character;
+    private Kart kart;
 
     private String entry;
     private boolean standby;
@@ -87,7 +85,7 @@ public class Race {
 
     private boolean stepDashBoard;
 
-    public Race(String id) {
+    public Racer(String id) {
         this.id = UUID.fromString(id);
         init();
     }
@@ -144,8 +142,13 @@ public class Race {
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public UUID getUUID() {
+        return this.id;
+    }
+
     public Player getPlayer() {
-        return Bukkit.getPlayer(this.id);
+        return Bukkit.getPlayer(getUUID());
     }
 
     public Location getGoalPosition() {
@@ -172,11 +175,11 @@ public class Race {
         return this.start;
     }
 
-    public EnumCharacter getCharacter() {
+    public Character getCharacter() {
         return this.character;
     }
 
-    public EnumKarts getKart() {
+    public Kart getKart() {
         return this.kart;
     }
 
@@ -257,11 +260,11 @@ public class Race {
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public void setCharacter(EnumCharacter clazz) {
-        this.character = clazz;
+    public void setCharacter(Character character) {
+        this.character = character;
     }
 
-    public void setKart(EnumKarts kart) {
+    public void setKart(Kart kart) {
         this.kart = kart;
     }
 
@@ -280,37 +283,38 @@ public class Race {
 
         new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!" + ChatColor.GOLD, "O", 1, false).runTaskTimer(
                 YPLKart.getInstance(), 0, 1);
-        String message = Messages.titleGoalRank.getMessage(new Object[] { new Number[] {
+        String message = MessageEnum.titleGoalRank.getConvertedMessage(new Object[] { new Number[] {
                 RaceManager.getGoalPlayer(entry).size(), (double) (currentmillisecond / 1000) } });
         PacketUtil.sendTitle(getPlayer(), message, 10, 100, 10, true);
         setPoint(getPassedCheckPoint().size() + (RaceManager.getRacingPlayer(entry).size()) * 10);
 
-        Circuit c = RaceManager.getCircuit(entry);
-        if (RaceData.getBroadcastGoalMessage(entry)) {
+        Circuit circuit = RaceManager.getCircuit(entry);
+        if (CircuitConfig.getCircuitData(entry).getBroadcastGoalMessage()) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                Messages.raceGoal.sendMessage(p,
+                MessageEnum.raceGoal.sendConvertedMessage(p,
                         new Object[] {
                                 getPlayer(),
-                                c,
+                                circuit,
                                 new Number[] { RaceManager.getGoalPlayer(entry).size(),
                                         (double) (currentmillisecond / 1000) } });
             }
         } else {
-            c.sendMessageEntryPlayer(Messages.raceGoal, new Object[] { getPlayer(), c,
+            circuit.sendMessageEntryPlayer(MessageEnum.raceGoal, new Object[] { getPlayer(), circuit,
                     new Number[] { RaceManager.getGoalPlayer(entry).size(), (double) (currentmillisecond / 1000) } });
         }
 
-        if (getKart() == null)
-            RaceData.addRunningRaceLapTime(getPlayer(), entry, currentmillisecond / 1000);
-        else
-            RaceData.addKartRaceLapTime(getPlayer(), entry, currentmillisecond / 1000);
+        if (getKart() == null) {
+            CircuitConfig.addRaceLapTime(getPlayer(), entry, currentmillisecond / 1000, false);
+        } else {
+            CircuitConfig.addRaceLapTime(getPlayer(), entry, currentmillisecond / 1000, true);
+        }
 
-        //終了処理 順序に注意?
+        //終了処理 順序に注意
         setStart(false);
-        RaceManager.clearCharacterRaceData(this.id);
-        RaceManager.clearKartRaceData(this.id);
+        RaceManager.clearCharacterRaceData(getUUID());
+        RaceManager.clearKartRaceData(getUUID());
         RaceManager.leaveRacingKart(getPlayer());
-        EnumItem.removeAllKeyItems(getPlayer());
+        ItemEnum.removeAllKeyItems(getPlayer());
         recoveryInventory();
         recoveryExp();
         getPlayer().teleport(goalposition);
@@ -326,7 +330,7 @@ public class Race {
 
     public void setStart(boolean value, Location from, Location to) {
         setStart(value);
-        EnumItem.removeAllKeyItems(getPlayer());
+        ItemEnum.removeAllKeyItems(getPlayer());
 
         Vector v = Util.getVectorToLocation(from, to);
         Location l = getPlayer().getLocation().add(v.getX() * 5, 0, v.getZ() * 5);
@@ -359,7 +363,7 @@ public class Race {
             return;
         getPassedCheckPoint().add(value);
         setPoint(getPassedCheckPoint().size());
-        Scoreboards.setPoint(this.id);
+        Scoreboards.setPoint(getUUID());
     }
 
     public void setPoint(int value) {
@@ -440,15 +444,13 @@ public class Race {
 
     public void setStepDashBoard() {
         this.stepDashBoard = true;
-        Bukkit.getScheduler().runTaskLater(
-                YPLKart.getInstance(),
-                new Runnable() {
-                    public void run() {
-                        stepDashBoard = false;
-                    }
-                },
-                (Settings.BoostRailEffectSecond + RaceManager.getRace(getPlayer()).getCharacter()
-                        .getItemAdjustPositiveEffectSecond()) * 20);
+        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(),new Runnable() {
+            public void run() {
+                stepDashBoard = false;
+            }
+        }, ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
+                + RaceManager.getRace(getPlayer())
+                .getCharacter().getAdjustPositiveEffectSecond()) * 20);
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -530,28 +532,28 @@ public class Race {
         for (ItemStack slot : inv.getContents()) {
             if (slot == null)
                 contents.add(null);
-            else if (EnumItem.isKeyItem(slot))
+            else if (ItemEnum.isKeyItem(slot))
                 contents.add(slot);
             else
                 contents.add(null);
         }
 
-        if (EnumItem.isKeyItem(inv.getHelmet()))
+        if (ItemEnum.isKeyItem(inv.getHelmet()))
             armor.add(inv.getHelmet());
         else
             armor.add(null);
 
-        if (EnumItem.isKeyItem(inv.getChestplate()))
+        if (ItemEnum.isKeyItem(inv.getChestplate()))
             armor.add(inv.getChestplate());
         else
             armor.add(null);
 
-        if (EnumItem.isKeyItem(inv.getLeggings()))
+        if (ItemEnum.isKeyItem(inv.getLeggings()))
             armor.add(inv.getLeggings());
         else
             armor.add(null);
 
-        if (EnumItem.isKeyItem(inv.getBoots()))
+        if (ItemEnum.isKeyItem(inv.getBoots()))
             armor.add(inv.getBoots());
         else
             armor.add(null);
@@ -566,36 +568,41 @@ public class Race {
      * その場合は古いカートを撤去し新しいカートに搭乗させる。
      */
     public void recoveryKart() {
-        if (getPlayer() == null)
+        if (getPlayer() == null) {
             return;
-        if (getKart() == null)
+        }
+        if (getKart() == null) {
             return;
+        }
 
-        final Player p = getPlayer();
-        if (p.getVehicle() != null) {
-            if (RaceManager.isRacingKart(p.getVehicle())) {
-                Object customkart = p.getVehicle().getMetadata(YPLKart.PLUGIN_NAME).get(0).value();
+        Player player = getPlayer();
+        Entity vehicle = player.getVehicle();
+        if (vehicle != null) {
+            if (RaceManager.isSpecificKartType(vehicle, KartType.RacingKart)) {
+                Object customKartObject =
+                        RaceManager.getCustomMinecartObjectFromEntityMetaData(vehicle);
+
                 try {
-                    Minecart cart = (Minecart) customkart.getClass().getMethod("getBukkitEntity").invoke(customkart);
-                    cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
-                    cart.setCustomName(kart.getName());
+                    Minecart cart = (Minecart) Util.getBukkitEntityFromNmsEntity(customKartObject);
+                    cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
+                    cart.setCustomName(kart.getKartName());
                     cart.setCustomNameVisible(false);
 
-                    customkart.getClass().getMethod("setParameter", EnumKarts.class).invoke(customkart, kart);
+                    customKartObject.getClass().getMethod("setParameter", Kart.class).invoke(customKartObject, kart);
                     return;
                 } catch (NoSuchMethodException e) {
-                    RaceManager.leaveRacingKart(p);
+                    RaceManager.leaveRacingKart(player);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return;
                 }
             } else {
-                p.leaveVehicle();
+                player.leaveVehicle();
             }
         }
-        Minecart cart = RaceManager.createCustomMinecart(p.getLocation(), kart);
-        cart.setPassenger(p);
-        PacketUtil.sendOwnAttachEntityPacket(p);
+        Minecart cart = RaceManager.createRacingMinecart(player.getLocation(), kart);
+        cart.setPassenger(player);
+        PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
     private void recoveryExp() {

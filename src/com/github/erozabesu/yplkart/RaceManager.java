@@ -18,19 +18,23 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
-import com.github.erozabesu.yplkart.data.DisplayKartData;
-import com.github.erozabesu.yplkart.data.Messages;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
-import com.github.erozabesu.yplkart.enumdata.EnumItem;
-import com.github.erozabesu.yplkart.enumdata.EnumKarts;
+import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.DisplayKartConfig;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.KartConfig;
+import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
-import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
@@ -38,7 +42,7 @@ import com.github.erozabesu.yplkart.utils.Util;
 public class RaceManager {
     public static int checkPointHeight = 8;
     public static int checkPointDetectRadius = 20;
-    private static HashMap<UUID, Race> racedata = new HashMap<UUID, Race>();
+    private static HashMap<UUID, Racer> racedata = new HashMap<UUID, Racer>();
     private static HashMap<String, Circuit> circuit = new HashMap<String, Circuit>();
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -77,7 +81,7 @@ public class RaceManager {
             return;
         } else {
             c.acceptMatching(id);
-            Messages.raceAccept.sendMessage(p, c);
+            MessageEnum.raceAccept.sendConvertedMessage(p, c);
         }
     }
 
@@ -102,23 +106,23 @@ public class RaceManager {
     public static void setEntryRaceData(UUID id, String circuitname) {
         if (isEntry(id)) {
             String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
-            Messages.raceEntryAlready.sendMessage(id, oldcircuitname);
+            MessageEnum.raceEntryAlready.sendConvertedMessage(id, oldcircuitname);
         } else {
             Circuit c = setupCircuit(circuitname);
             if (c.isFillPlayer()) {
                 c.entryReservePlayer(id);
-                Messages.raceEntryFull.sendMessage(id, c);
+                MessageEnum.raceEntryFull.sendConvertedMessage(id, c);
             } else {
                 getRace(id).setEntry(circuitname);
 
                 if (c.isStarted()) {
                     c.entryReservePlayer(id);
-                    Messages.raceEntryAlreadyStart.sendMessage(id, c);
+                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(id, c);
                 } else {
                     c.entryPlayer(id);
                     Scoreboards.entryCircuit(id);
 
-                    Messages.raceEntry.sendMessage(id, c);
+                    MessageEnum.raceEntry.sendConvertedMessage(id, c);
 
                     if (c.isMatching())
                         setMatchingCircuitData(id);
@@ -127,44 +131,46 @@ public class RaceManager {
         }
     }
 
-    public static void setCharacterRaceData(UUID id, EnumCharacter character) {
+    public static void setCharacterRaceData(UUID id, Character character) {
+        //レース開始前はなにもしない
         if (!isStandBy(id)) {
-            Messages.raceNotStarted.sendMessage(id, getCircuit(id));
+            MessageEnum.raceNotStarted.sendConvertedMessage(id, getCircuit(id));
             return;
         }
+        //プレイヤーがオフライン
         if (Bukkit.getPlayer(id) == null) {
-            Messages.invalidPlayer.sendMessage(null, id);
+            MessageEnum.invalidPlayer.sendConvertedMessage(null, id);
             return;
         }
 
         final Player p = Bukkit.getPlayer(id);
-        Race r = getRace(id);
+        Racer r = getRace(id);
 
         r.setCharacter(character);
         r.recoveryCharacterPhysical();
         //TODO : issue #46
-        p.getInventory().setHelmet(EnumItem.MARIO_HAT.getItem());
+        p.getInventory().setHelmet(ItemEnum.MARIO_HAT.getItem());
 
         PacketUtil.disguise(p, null, character);
-        EnumCharacter.playCharacterVoice(Bukkit.getPlayer(id), character);
-        Messages.raceCharacter.sendMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
+        character.playMenuSelectSound(p);
+        MessageEnum.raceCharacter.sendConvertedMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
     }
 
-    public static void setKartRaceData(UUID id, EnumKarts kart) {
+    public static void setKartRaceData(UUID id, Kart kart) {
         if (!isStandBy(id)) {
-            Messages.raceNotStarted.sendMessage(id, getCircuit(id));
+            MessageEnum.raceNotStarted.sendConvertedMessage(id, getCircuit(id));
             return;
         }
         if (Bukkit.getPlayer(id) == null) {
-            Messages.invalidPlayer.sendMessage(null, id);
+            MessageEnum.invalidPlayer.sendConvertedMessage(null, id);
             return;
         }
 
-        Race r = getRace(id);
+        Racer r = getRace(id);
         r.setKart(kart);
         r.recoveryKart();
 
-        Messages.raceKart.sendMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
+        MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
     }
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -173,7 +179,7 @@ public class RaceManager {
         if (isEntry(id)) {
             Scoreboards.exitCircuit(id);
 
-            Race r = getRace(id);
+            Racer r = getRace(id);
             Circuit c = getCircuit(id);
             c.exitPlayer(id);
 
@@ -189,7 +195,7 @@ public class RaceManager {
                         p.teleport(r.getGoalPosition());
                     }
                 }
-                Messages.raceExit.sendMessage(id, c);
+                MessageEnum.raceExit.sendConvertedMessage(id, c);
             }
 
             r.init();
@@ -205,7 +211,7 @@ public class RaceManager {
         if (p != null) {
             getRace(id).recoveryPhysical();
             PacketUtil.returnPlayer(p);
-            Messages.raceCharacterReset.sendMessage(id, getCircuit(id));
+            MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
         }
     }
 
@@ -214,19 +220,20 @@ public class RaceManager {
             return;
 
         if (Bukkit.getPlayer(id) != null)
-            Messages.raceLeave.sendMessage(id, getCircuit(id));
+            MessageEnum.raceLeave.sendConvertedMessage(id, getCircuit(id));
         getRace(id).setKart(null);
     }
 
-    public static void leaveRacingKart(Player p) {
-        if (p.getVehicle() != null)
-            if (isRacingKart(p.getVehicle())) {
-                getRace(p).setCMDForceLeave(true);
-                Entity vehicle = p.getVehicle();
-                p.leaveVehicle();
+    public static void leaveRacingKart(Player player) {
+        Entity vehicle = player.getVehicle();
+        if (vehicle != null) {
+            if (isSpecificKartType(vehicle, KartType.RacingKart)) {
+                getRace(player).setCMDForceLeave(true);
+                player.leaveVehicle();
                 vehicle.remove();
-                getRace(p).setCMDForceLeave(false);
+                getRace(player).setCMDForceLeave(false);
             }
+        }
     }
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -247,16 +254,16 @@ public class RaceManager {
         }
     }
 
-    public static Race getRace(Player p) {
+    public static Racer getRace(Player p) {
         if (racedata.get(p.getUniqueId()) == null) {
-            racedata.put(p.getUniqueId(), new Race(p.getUniqueId().toString()));
+            racedata.put(p.getUniqueId(), new Racer(p.getUniqueId().toString()));
         }
         return racedata.get(p.getUniqueId());
     }
 
-    public static Race getRace(UUID id) {
+    public static Racer getRace(UUID id) {
         if (racedata.get(id) == null) {
-            racedata.put(id, new Race(id.toString()));
+            racedata.put(id, new Racer(id.toString()));
         }
         return racedata.get(id);
     }
@@ -337,7 +344,7 @@ public class RaceManager {
         return nearbycheckpoint;
     }
 
-    public static List<Entity> getNearbyUnpassedCheckpoint(Location l, double radius, Race r) {
+    public static List<Entity> getNearbyUnpassedCheckpoint(Location l, double radius, Racer r) {
         String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
         List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
 
@@ -356,7 +363,7 @@ public class RaceManager {
         return nearbycheckpoint;
     }
 
-    public static Entity getNearestUnpassedCheckpoint(Location l, double radius, Race r) {
+    public static Entity getNearestUnpassedCheckpoint(Location l, double radius, Racer r) {
         List<Entity> checkpoint = getNearbyUnpassedCheckpoint(l, radius, r);
         if (checkpoint == null)
             return null;
@@ -380,6 +387,35 @@ public class RaceManager {
             return null;
 
         return nearbycheckpoint;
+    }
+
+    /**
+     * 引数entityのMetadataからCustomMinecartObjectを取得し返す
+     * @param entity CustomMinecartObjectを取得するEntity
+     * @return 取得したCustomMinecartObject
+     */
+    public static Object getCustomMinecartObjectFromEntityMetaData(Entity entity) {
+        List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
+        if (metaDataList != null) {
+            MetadataValue metaData = metaDataList.get(0);
+            if (metaData != null) {
+                Object metaDataValue = metaData.value();
+                if (metaDataValue.getClass().isArray()) {
+                    //MetaDataが配列の場合
+                    for (Object values : (Object[]) metaDataValue) {
+                        if (values.getClass().getSimpleName().contains("CustomMinecart")) {
+                            return values;
+                        }
+                    }
+                } else {
+                    //MetaDataが単数の場合
+                    if (metaDataValue.getClass().getSimpleName().contains("CustomMinecart")) {
+                        return metaDataValue;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -418,20 +454,39 @@ public class RaceManager {
         return false;
     }
 
-    public static boolean isRacingKart(Entity e) {
-        if (e instanceof Minecart)
-            if (e.getCustomName() != null)
-                if (EnumKarts.getKartArrayList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
-                    if (e.getMetadata(YPLKart.PLUGIN_NAME).get(0) != null)
-                        return true;
-        return false;
-    }
-
-    public static boolean isDisplayKart(Entity e) {
-        if (e instanceof Minecart)
-            if (e.getCustomName() != null)
-                if (DisplayKartData.getList().contains(ChatColor.stripColor(e.getCustomName()).toString()))
-                    return true;
+    /**
+     * 引数entityが引数kartTypeのエンティティかどうか判別する
+     * @param entity 判別するエンティティ
+     * @param kartType 判別するKartType
+     * @return 引数kartTypeのエンティティかどうか
+     */
+    public static boolean isSpecificKartType(Entity entity, KartType kartType) {
+        if (entity instanceof Minecart) {
+            List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
+            if (metaDataList != null) {
+                MetadataValue metaData = metaDataList.get(0);
+                if (metaData != null) {
+                    Object metaDataValue = metaData.value();
+                    if (metaDataValue.getClass().isArray()) {
+                        //MetaDataが配列の場合
+                        for (Object values : (Object[]) metaDataValue) {
+                            if (values instanceof KartType) {
+                                if (values.equals(kartType)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    } else {
+                        //MetaDataが単数の場合
+                        if (metaDataValue instanceof KartType) {
+                            if (metaDataValue.equals(kartType)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -453,24 +508,26 @@ public class RaceManager {
         }
     }
 
-    public static Minecart createCustomMinecart(Location l, EnumKarts kart) {
+    public static Minecart createRacingMinecart(Location l, Kart kart) {
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
             Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-            Object customCart = customClass.getConstructor(ReflectionUtil.getNMSClass("World"), EnumKarts.class,
-                    Location.class, boolean.class).newInstance(craftWorld, kart, l, false);
-            Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
+            Object customKart = customClass.getConstructor(
+                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
+                    .newInstance(craftWorld, kart, KartType.RacingKart, l);
+            Minecart cart = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
 
-            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(),
+            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customKart, l.getX(),
                     l.getY() + 1, l.getZ());
             craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
-                    .invoke(craftWorld, customCart);
+                    .invoke(craftWorld, customKart);
 
-            cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
-            cart.setCustomName(kart.getName());
+            cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
+            cart.setCustomName(kart.getKartName());
             cart.setCustomNameVisible(false);
 
-            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(YPLKart.getInstance(), customCart));
+            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+                    YPLKart.getInstance(), new Object[]{KartType.RacingKart, customKart}));
 
             return cart;
         } catch (Exception e) {
@@ -479,28 +536,32 @@ public class RaceManager {
         }
     }
 
-    public static Minecart createDisplayMinecart(Location l, EnumKarts kart, String id) {
+    public static Minecart createDisplayMinecart(Location l, Kart kart, String id) {
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
             Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-            Object customCart = customClass.getConstructor(ReflectionUtil.getNMSClass("World"), EnumKarts.class,
-                    Location.class, boolean.class).newInstance(craftWorld, kart, l, true);
-            final Minecart cart = (Minecart) customCart.getClass().getMethod("getBukkitEntity").invoke(customCart);
+            Object customKart = customClass.getConstructor(
+                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
+                    .newInstance(craftWorld, kart, KartType.DisplayKart, l);
+            Minecart cart = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
 
-            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customCart, l.getX(),
+            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customKart, l.getX(),
                     l.getY() + 1, l.getZ());
             craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
-                    .invoke(craftWorld, customCart);
+                    .invoke(craftWorld, customKart);
 
-            cart.setDisplayBlock(new MaterialData(kart.getDisplayBlock(), kart.getDisplayData()));
+            cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
 
             if (id == null) {
                 cart.setCustomName(cart.getUniqueId().toString());
-                DisplayKartData.createData(cart.getUniqueId().toString(), kart, l);
+                DisplayKartConfig.createDisplayKart(cart.getUniqueId().toString(), kart, l);
             } else {
                 cart.setCustomName(id);
             }
             cart.setCustomNameVisible(false);
+
+            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+                    YPLKart.getInstance(), new Object[]{KartType.DisplayKart, customKart}));
 
             return cart;
         } catch (Exception e) {
@@ -523,42 +584,84 @@ public class RaceManager {
 
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void showCharacterSelectMenu(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 36, "Character Select Menu");
-        //inv.setItem(8, EnumSelectMenu.CharacterCancel.getMenuItem());
-        inv.setItem(11, EnumCharacter.HUMAN.getMenuItem());
-        inv.setItem(12, EnumCharacter.ZOMBIE.getMenuItem());
-        inv.setItem(13, EnumCharacter.CREEPER.getMenuItem());
-        inv.setItem(14, EnumCharacter.SKELETON.getMenuItem());
-        inv.setItem(15, EnumCharacter.SPIDER.getMenuItem());
-        inv.setItem(20, EnumCharacter.ENDERMAN.getMenuItem());
-        inv.setItem(21, EnumCharacter.WITCH.getMenuItem());
-        inv.setItem(22, EnumCharacter.PIG.getMenuItem());
-        inv.setItem(23, EnumCharacter.SQUID.getMenuItem());
-        inv.setItem(24, EnumCharacter.VILLAGER.getMenuItem());
-        inv.setItem(31, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
+    /**
+     * 選択メニュー（仮想インベントリ）を引数playerに表示する
+     * 選択メニューのアイテムは下記のように配置される
+     * □ = 空白
+     * ■ = オブジェクトアイテム
+     * ▲ = メニュー操作用アイテム
+     * レイアウト：
+     * □□□□□□□□□
+     * □■■■■■■■□
+     * □■■■■■■■□
+     * ...
+     * □□□▲▲▲□□□
+     * @param player 選択メニューを表示するプレイヤー
+     * @param isCharacterMenu キャラクター選択メニューか、カート選択メニューかどうか
+     */
+    public static void showSelectMenu(Player player, boolean isCharacterMenu) {
 
-        if (Permission.hasPermission(p, Permission.KART_RIDE, true)) {
-            inv.setItem(30, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
-            inv.setItem(32, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
+        ArrayList<?> objectList;
+        objectList = isCharacterMenu ? CharacterConfig.getCharacterList() : KartConfig.getKartList();
+        Collections.reverse(objectList);
+        int objectSize = objectList.size();
+
+        //オブジェクト数が0以下の場合はなにもしない
+        if (objectSize <= 0) {
+            return;
         }
-        p.openInventory(inv);
-    }
 
-    public static void showKartSelectMenu(Player p) {
-        Inventory inv = Bukkit.createInventory(null, 36, "Kart Select Menu");
-        //inv.setItem(8, EnumSelectMenu.KartCancel.getMenuItem());
-        inv.setItem(9, EnumKarts.KART1.getMenuItem());
-        inv.setItem(11, EnumKarts.KART2.getMenuItem());
-        inv.setItem(13, EnumKarts.KART3.getMenuItem());
-        inv.setItem(15, EnumKarts.KART4.getMenuItem());
-        inv.setItem(19, EnumKarts.KART5.getMenuItem());
-        inv.setItem(21, EnumKarts.KART6.getMenuItem());
-        inv.setItem(23, EnumKarts.KART7.getMenuItem());
-        inv.setItem(25, EnumKarts.KART8.getMenuItem());
-        inv.setItem(31, EnumSelectMenu.KART_RANDOM.getMenuItem());
-        inv.setItem(30, EnumSelectMenu.KART_PREVIOUS.getMenuItem());
-        inv.setItem(32, EnumSelectMenu.KART_NEXT.getMenuItem());
-        p.openInventory(inv);
+        //インベントリスロット数
+        //空白行が1行（9スロット）、メニューボタンの行が1行（9スロット）で最低18スロット必要
+        int inventorySlotAmount = 17;
+
+        //オブジェクト数に応じてスロット数を拡張する
+        while (0 < objectSize) {
+            objectSize -= 7;
+            inventorySlotAmount += 9;
+        }
+
+        //仮想インベントリの作成
+        String inventoryName = isCharacterMenu ? "Character Select Menu" : "Kart Select Menu";
+        Inventory inv = Bukkit.createInventory(null, inventorySlotAmount + 1, inventoryName);
+
+        //スロットにオブジェクトアイテムを配置する
+        objectSize = objectList.size();
+        for (int i = 0; 0 < objectSize; i++) {
+            //最初の1行(0～8)は空白
+            if (i <= 8) {
+                continue;
+            }
+            //9の倍数、9の倍数-1のスロットは空白
+            if (i % 9 == 0 || i % 9 == 8) {
+                continue;
+            }
+
+            //キャラクター選択メニューとカート選択メニューで処理が異なる
+            if (isCharacterMenu) {
+                inv.setItem(i, new ItemStack(((Character)objectList.get(0)).getMenuItem()));
+            } else {
+                inv.setItem(i, new ItemStack(((Kart)objectList.get(0)).getMenuItem()));
+            }
+
+            objectList.remove(0);
+            objectSize--;
+        }
+
+        //メニュー操作用アイテムを配置する
+        //キャラクター選択メニューとカート選択メニューで処理が異なる
+        if (isCharacterMenu) {
+            inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
+            if (Permission.hasPermission(player, Permission.KART_RIDE, true)) {
+                inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
+                inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
+            }
+        } else {
+            inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.KART_RANDOM.getMenuItem());
+            inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.KART_PREVIOUS.getMenuItem());
+            inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.KART_NEXT.getMenuItem());
+        }
+
+        player.openInventory(inv);
     }
 }

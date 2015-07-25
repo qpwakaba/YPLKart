@@ -22,7 +22,7 @@ public class ReflectionUtil {
     private static Class<?> craftWorld = getCraftClass("CraftWorld");
     private static Class<?> craftItemStack = getCraftClass("inventory.CraftItemStack");
 
-    private static HashMap<String, Constructor<?>> bukkitEntity_Constructor =
+    private static HashMap<String, Constructor<?>> nmsEntity_Constructor =
             new HashMap<String, Constructor<?>>();
     private static HashMap<String, Method> craftEntity_getHandle = new HashMap<String, Method>();
     public static Method craftWorld_getHandle;
@@ -57,7 +57,7 @@ public class ReflectionUtil {
         try {
             return Class.forName(getNMSPackageName() + "." + s);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return null;
     }
@@ -134,10 +134,10 @@ public class ReflectionUtil {
 
     public static Object getCraftEntityFromClassName(World w, String classname) {
         try {
-            Constructor<?> con = bukkitEntity_Constructor.get(classname);
+            Constructor<?> con = nmsEntity_Constructor.get(classname);
             if (con == null) {
                 con = getNMSClass(classname).getConstructor(nmsWorld);
-                bukkitEntity_Constructor.put(classname, con);
+                nmsEntity_Constructor.put(classname, con);
             }
 
             return con.newInstance(getCraftWorld(w));

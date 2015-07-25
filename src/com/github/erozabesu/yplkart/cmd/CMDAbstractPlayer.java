@@ -4,37 +4,99 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.ConfigManager;
+import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Messages;
-import com.github.erozabesu.yplkart.data.RaceData;
-import com.github.erozabesu.yplkart.data.Settings;
-import com.github.erozabesu.yplkart.enumdata.EnumCharacter;
-import com.github.erozabesu.yplkart.enumdata.EnumKarts;
-import com.github.erozabesu.yplkart.enumdata.Permission;
+import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.KartConfig;
+import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.CircuitData;
+import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class CMDAbstractPlayer extends CMDAbstract {
-    Player p;
-    UUID id;
-    String[] args;
-    int length;
 
-    public CMDAbstractPlayer(Player p, String[] args) {
-        this.p = p;
-        this.id = p.getUniqueId();
-        this.args = args;
-        this.length = args.length;
+    /** コマンド実行プレイヤー */
+    private Player player;
+
+    /** コマンド実行プレイヤーのUUID */
+    private UUID uuid;
+
+    /** コマンドキー配列 */
+    private String[] args;
+
+    /** コマンドキー配列の長さ */
+    private int length;
+
+    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public CMDAbstractPlayer(Player player, String[] args) {
+        setPlayer(player);
+        setUUID(player.getUniqueId());
+        setArgs(args);
+        setLength(args.length);
     }
+
+    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return player コマンド実行プレイヤー */
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    /** @return uuid コマンド実行プレイヤーのUUID */
+    public UUID getUUID() {
+        return this.uuid;
+    }
+
+    /** @return args コマンドキー配列 */
+    public String[] getArgs() {
+        return this.args;
+    }
+
+    /** @return length コマンドキー配列の長さ */
+    public int getLength() {
+        return this.length;
+    }
+
+    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param player セットするコマンド実行プレイヤー */
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    /** @param uuid セットするコマンド実行プレイヤーのUUID */
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    /** @param args セットするコマンドキー配列 */
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    /** @param length セットするコマンドキー配列の長さ */
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     @Override
     void ka() {
-        if (!Permission.hasCMDPermission(this.p, Permission.CMD_KA, false, false))
+        if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_KA, false, false))
             return;
 
-        Messages.reference.sendMessage(this.p);
+        SystemMessageEnum.reference.sendConvertedMessage(this.getPlayer());
     }
 
     //ka circuit info {circuit name}
@@ -57,118 +119,131 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka circuit deny
     @Override
     void circuit() {
-        if (this.length == 2) {
-            if (args[1].equalsIgnoreCase("accept")) {
-                RaceManager.setMatchingCircuitData(this.id);
+        if (this.getLength() == 2) {
+            if (getArgs()[1].equalsIgnoreCase("accept")) {
+                RaceManager.setMatchingCircuitData(this.getUUID());
                 return;
-            } else if (args[1].equalsIgnoreCase("deny")) {
-                RaceManager.clearMatchingCircuitData(this.id);
+            } else if (getArgs()[1].equalsIgnoreCase("deny")) {
+                RaceManager.clearMatchingCircuitData(this.getUUID());
                 return;
             }
         }
 
-        if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_CIRCUIT, false, false))
+        if (!Permission.hasCMDPermission(this.getPlayer(), Permission.OP_CMD_CIRCUIT, false, false))
             return;
-        if (this.length == 2) {
-            if (args[1].equalsIgnoreCase("list")) {
-                RaceData.listCricuit(this.p);
+        if (this.getLength() == 2) {
+            if (getArgs()[1].equalsIgnoreCase("list")) {
+                MessageEnum.cmdCircuitList.sendConvertedMessage(this.getPlayer());
                 return;
             }
-        } else if (this.length == 3) {
-            if (args[1].equalsIgnoreCase("info")) {
-                RaceData.sendCircuitInformation(this.p, args[2]);
+        } else if (this.getLength() == 3) {
+            if (getArgs()[1].equalsIgnoreCase("info")) {
+                CircuitData circuitData = CircuitConfig.getCircuitData(getArgs()[2]);
+                if (circuitData != null) {
+                    circuitData.sendInformation(this.getPlayer());
+                }
                 return;
-            } else if (args[1].equalsIgnoreCase("create")) {
-                RaceData.createCircuit(this.p, args[2]);
+            } else if (getArgs()[1].equalsIgnoreCase("create")) {
+                CircuitConfig.createCircuit(this.getPlayer(), this.getPlayer().getLocation(), getArgs()[2]);
                 return;
-            } else if (args[1].equalsIgnoreCase("delete")) {
-                RaceData.deleteCircuit(this.p, args[2]);
+            } else if (getArgs()[1].equalsIgnoreCase("delete")) {
+                CircuitConfig.deleteCircuit(this.getPlayer(), getArgs()[2]);
                 return;
-            } else if (args[1].equalsIgnoreCase("edit")) {
-                RaceData.editCircuit(this.p, args[2]);
+            } else if (getArgs()[1].equalsIgnoreCase("edit")) {
+                ItemEnum.addCheckPointTool(this.getPlayer(), getArgs()[2]);
                 return;
-            } else if (args[1].equalsIgnoreCase("setposition")) {
-                RaceData.setPosition(this.p, args[2]);
+            } else if (getArgs()[1].equalsIgnoreCase("setposition")) {
+                CircuitConfig.setStartPosition(this.getPlayer(), getArgs()[2], this.getPlayer().getLocation());
                 return;
             }
-        } else if (this.length == 4) {
-            if (args[1].equalsIgnoreCase("rename")) {
-                RaceData.renameCircuit(this.p, args[2], args[3]);
+        } else if (this.getLength() == 4) {
+            if (getArgs()[1].equalsIgnoreCase("rename")) {
+                CircuitConfig.renameCircuit(this.getPlayer(), getArgs()[2], getArgs()[3]);
                 return;
-            } else if (args[1].equalsIgnoreCase("setminplayer")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setminplayer")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setMinPlayer(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMinPlayer(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("setmaxplayer")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setmaxplayer")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setMaxPlayer(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMaxPlayer(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("setmatchingtime")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setmatchingtime")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setMatchingTime(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMatchingTime(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("setmenutime")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setmenutime")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setMenuTime(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setMenuTime(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("setlimittime")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setlimittime")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setLimitTime(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setLimitTime(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("setlap")) {
-                if (!Util.isNumber(args[3])) {
-                    Messages.invalidNumber.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("setlap")) {
+                if (!Util.isNumber(getArgs()[3])) {
+                    MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setNumberOfLaps(this.p, args[2], Integer.valueOf(args[3]));
+                CircuitConfig.setNumberOfLaps(this.getPlayer(), getArgs()[2], Integer.valueOf(getArgs()[3]));
                 return;
-            } else if (args[1].equalsIgnoreCase("broadcastgoal")) {
-                if (!Util.isBoolean(args[3])) {
-                    Messages.invalidBoolean.sendMessage(this.p);
+            } else if (getArgs()[1].equalsIgnoreCase("broadcastgoal")) {
+                if (!Util.isBoolean(getArgs()[3])) {
+                    MessageEnum.invalidBoolean.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceData.setBroadcastGoalMessage(this.p, args[2], Boolean.valueOf(args[3]));
+                CircuitConfig.setBroadcastGoalMessage(this.getPlayer(), getArgs()[2], Boolean.valueOf(getArgs()[3]));
                 return;
             }
-        } else if (this.length == 9) {
-            if (Bukkit.getWorld(args[3]) == null) {
-                Messages.invalidWorld.sendMessage(this.p);
+        } else if (this.getLength() == 9) {
+            if (Bukkit.getWorld(getArgs()[3]) == null) {
+                MessageEnum.invalidWorld.sendConvertedMessage(this.getPlayer());
                 return;
             }
-            if (!Util.isNumber(args[4]) || !Util.isNumber(args[5]) || !Util.isNumber(args[6])
-                    || !Util.isNumber(args[7]) || !Util.isNumber(args[8])) {
-                Messages.invalidNumber.sendMessage(this.p);
+            if (!Util.isNumber(getArgs()[4]) || !Util.isNumber(getArgs()[5]) || !Util.isNumber(getArgs()[6])
+                    || !Util.isNumber(getArgs()[7]) || !Util.isNumber(getArgs()[8])) {
+                MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
                 return;
             }
-            //0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z
-            if (args[1].equalsIgnoreCase("create")) {
-                RaceData.createCircuit(this.p, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]),
-                        Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+            //0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
+            if (getArgs()[1].equalsIgnoreCase("create")) {
+                World world = Bukkit.getWorld(getArgs()[3]);
+                if (world == null) {
+                    MessageEnum.invalidWorld.sendConvertedMessage(this.getPlayer());
+                }
+                Location location = new Location(world, Double.valueOf(getArgs()[4]), Double.valueOf(getArgs()[5])
+                        ,Double.valueOf(getArgs()[6]), Float.valueOf(getArgs()[7]), Float.valueOf(getArgs()[8]));
+                CircuitConfig.createCircuit(this.getPlayer(), location, getArgs()[2]);
                 return;
-                //0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z
-            } else if (args[1].equalsIgnoreCase("setposition")) {
-                RaceData.setPosition(this.p, args[2], args[3], Double.valueOf(args[4]), Double.valueOf(args[5]),
-                        Double.valueOf(args[6]), Float.valueOf(args[7]), Float.valueOf(args[8]));
+
+            //0:circuit 1:setposition 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
+            } else if (getArgs()[1].equalsIgnoreCase("setposition")) {
+                World world = Bukkit.getWorld(getArgs()[3]);
+                if (world == null) {
+                    MessageEnum.invalidWorld.sendConvertedMessage(this.getPlayer());
+                }
+                Location location = new Location(world, Double.valueOf(getArgs()[4]), Double.valueOf(getArgs()[5])
+                        ,Double.valueOf(getArgs()[6]), Float.valueOf(getArgs()[7]), Float.valueOf(getArgs()[8]));
+                CircuitConfig.setStartPosition(this.getPlayer(), getArgs()[2], location);
                 return;
             }
         }
-        Messages.referenceCircuitIngame.sendMessage(this.p);
-        Messages.referenceCircuitOutgame.sendMessage(this.p);
+        SystemMessageEnum.referenceCircuitIngame.sendConvertedMessage(this.getPlayer());
     }
 
     //ka display {kart name}
@@ -177,50 +252,49 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka display random {worldname} {x} {y} {z}  {yaw} {pitch}
     @Override
     void display() {
-        if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_DISPLAY, false, false))
+        if (getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.OP_CMD_DISPLAY, false, false))
                 return;
-            EnumKarts kart = null;
-            if (args[1].equalsIgnoreCase("random"))
-                kart = EnumKarts.getRandomKart();
+            Kart kart = null;
+            if (getArgs()[1].equalsIgnoreCase("random"))
+                kart = KartConfig.getRandomKart();
             else
-                kart = EnumKarts.getKartfromString(args[1]);
+                kart = KartConfig.getKart(getArgs()[1]);
             if (kart == null) {
-                Messages.invalidKart.sendMessage(this.p);
+                MessageEnum.invalidKart.sendConvertedMessage(this.getPlayer());
                 return;
             }
 
-            RaceManager.createDisplayMinecart(this.p.getLocation(), kart, null);
-            Messages.cmdDisplayCreate.sendMessage(this.p, kart);
-        } else if (length == 8) {
-            if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_DISPLAY, false, false))
+            RaceManager.createDisplayMinecart(this.getPlayer().getLocation(), kart, null);
+            MessageEnum.cmdDisplayCreate.sendConvertedMessage(this.getPlayer(), kart);
+        } else if (getLength() == 8) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.OP_CMD_DISPLAY, false, false))
                 return;
-            if (Bukkit.getWorld(args[2]) == null) {
-                Messages.invalidWorld.sendMessage(this.p);
-                return;
-            }
-            if (!Util.isNumber(args[3]) || !Util.isNumber(args[4]) || !Util.isNumber(args[5])
-                    || !Util.isNumber(args[6]) || !Util.isNumber(args[7])) {
-                Messages.invalidNumber.sendMessage(this.p);
+            if (Bukkit.getWorld(getArgs()[2]) == null) {
+                MessageEnum.invalidWorld.sendConvertedMessage(this.getPlayer());
                 return;
             }
-            EnumKarts kart = null;
-            if (args[1].equalsIgnoreCase("random"))
-                kart = EnumKarts.getRandomKart();
+            if (!Util.isNumber(getArgs()[3]) || !Util.isNumber(getArgs()[4]) || !Util.isNumber(getArgs()[5])
+                    || !Util.isNumber(getArgs()[6]) || !Util.isNumber(getArgs()[7])) {
+                MessageEnum.invalidNumber.sendConvertedMessage(this.getPlayer());
+                return;
+            }
+            Kart kart = null;
+            if (getArgs()[1].equalsIgnoreCase("random"))
+                kart = KartConfig.getRandomKart();
             else
-                kart = EnumKarts.getKartfromString(args[1]);
+                kart = KartConfig.getKart(getArgs()[1]);
             if (kart == null) {
-                Messages.invalidKart.sendMessage(this.p);
+                MessageEnum.invalidKart.sendConvertedMessage(this.getPlayer());
                 return;
             }
 
             RaceManager.createDisplayMinecart(
-                    new Location(Bukkit.getWorld(args[2]), Double.valueOf(args[3]), Double.valueOf(args[4]), Double
-                            .valueOf(args[5]), Float.valueOf(args[6]), Float.valueOf(args[7])), kart, null);
-            Messages.cmdDisplayCreate.sendMessage(this.p, kart);
+                    new Location(Bukkit.getWorld(getArgs()[2]), Double.valueOf(getArgs()[3]), Double.valueOf(getArgs()[4]), Double
+                            .valueOf(getArgs()[5]), Float.valueOf(getArgs()[6]), Float.valueOf(getArgs()[7])), kart, null);
+            MessageEnum.cmdDisplayCreate.sendConvertedMessage(this.getPlayer(), kart);
         } else {
-            Messages.referenceDisplayIngame.sendMessage(this.p);
-            Messages.referenceDisplayOutgame.sendMessage(this.p);
+            SystemMessageEnum.referenceDisplayIngame.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -229,32 +303,32 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka menu all
     @Override
     void menu() {
-        if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_MENU, false, false))
+        if (this.getLength() == 1) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_MENU, false, false))
                 return;
-            RaceManager.showCharacterSelectMenu(this.p);
-        } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_MENU, true, false))
+            RaceManager.showSelectMenu(this.getPlayer(), true);
+        } else if (getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_MENU, true, false))
                 return;
 
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.showCharacterSelectMenu(other);
+                    RaceManager.showSelectMenu(other, true);
                 }
-                Messages.cmdMenuAll.sendMessage(this.p);
+                MessageEnum.cmdMenuAll.sendConvertedMessage(this.getPlayer());
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
 
-                Player other = Bukkit.getPlayer(args[1]);
-                RaceManager.showCharacterSelectMenu(other);
-                Messages.cmdMenuOther.sendMessage(this.p, other);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
+                RaceManager.showSelectMenu(other, true);
+                MessageEnum.cmdMenuOther.sendConvertedMessage(this.getPlayer(), other);
             }
         } else {
-            Messages.referenceMenu.sendMessage(this.p);
-            Messages.referenceMenuOther.sendMessage(this.p);
+            SystemMessageEnum.referenceMenu.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceMenuOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -264,41 +338,41 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void entry() {
         //ka entry {circuit name}
-        if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_ENTRY, false, false))
+        if (this.getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_ENTRY, false, false))
                 return;
-            if (!RaceData.isCircuit(args[1])) {
-                Messages.invalidCircuit.sendMessage(this.p, args[1]);
+            if (CircuitConfig.getCircuitData(getArgs()[1]) == null) {
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
                 return;
             }
 
-            RaceManager.setEntryRaceData(this.id, args[1]);
+            RaceManager.setEntryRaceData(this.getUUID(), getArgs()[1]);
             //ka entry {player name} {circuit name}
             //ka entry all {circuit name}
-        } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_ENTRY, true, false))
+        } else if (this.getLength() == 3) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_ENTRY, true, false))
                 return;
-            if (!RaceData.isCircuit(args[2])) {
-                Messages.invalidCircuit.sendMessage(this.p, args[1]);
+            if (CircuitConfig.getCircuitData(getArgs()[2]) == null) {
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
                 return;
             }
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
+                    RaceManager.setEntryRaceData(other.getUniqueId(), getArgs()[2]);
                 }
-                Messages.cmdEntryAll.sendMessage(this.p, args[2]);
+                MessageEnum.cmdEntryAll.sendConvertedMessage(this.getPlayer(), getArgs()[2]);
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                Player other = Bukkit.getPlayer(args[1]);
-                Messages.cmdEntryOther.sendMessage(this.p, new Object[] { other, args[2] });
-                RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
+                MessageEnum.cmdEntryOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, getArgs()[2] });
+                RaceManager.setEntryRaceData(other.getUniqueId(), getArgs()[2]);
             }
         } else {
-            Messages.referenceEntry.sendMessage(this.p);
-            Messages.referenceEntryOther.sendMessage(this.p);
+            SystemMessageEnum.referenceEntry.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceEntryOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -307,32 +381,32 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka exit all
     @Override
     void exit() {
-        if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_EXIT, false, false))
+        if (this.getLength() == 1) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_EXIT, false, false))
                 return;
-            RaceManager.clearEntryRaceData(this.id);
-        } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_EXIT, true, false))
+            RaceManager.clearEntryRaceData(this.getUUID());
+        } else if (getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_EXIT, true, false))
                 return;
 
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.clearEntryRaceData(other.getUniqueId());
                 }
-                Messages.cmdExitAll.sendMessage(this.p);
+                MessageEnum.cmdExitAll.sendConvertedMessage(this.getPlayer());
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
 
-                Player other = Bukkit.getPlayer(args[1]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
                 RaceManager.clearEntryRaceData(other.getUniqueId());
-                Messages.cmdExitOther.sendMessage(this.p, other);
+                MessageEnum.cmdExitOther.sendConvertedMessage(this.getPlayer(), other);
             }
         } else {
-            Messages.referenceExit.sendMessage(this.p);
-            Messages.referenceExitOther.sendMessage(this.p);
+            SystemMessageEnum.referenceExit.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceExitOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -344,67 +418,67 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka character all random
     @Override
     void character() {
-        if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTER, false, false))
+        if (this.getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_CHARACTER, false, false))
                 return;
-            if (args[1].equalsIgnoreCase("random")) {
-                RaceManager.setCharacterRaceData(this.id, EnumCharacter.getRandomCharacter());
+            if (getArgs()[1].equalsIgnoreCase("random")) {
+                RaceManager.setCharacterRaceData(this.getUUID(), CharacterConfig.getRandomCharacter());
                 //ka character {character name}
             } else {
-                EnumCharacter character = EnumCharacter.getClassfromString(args[1]);
+                Character character = CharacterConfig.getCharacter(getArgs()[1]);
                 if (character == null) {
-                    Messages.invalidCharacter.sendMessage(this.p);
+                    MessageEnum.invalidCharacter.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceManager.setCharacterRaceData(this.id, character);
+                RaceManager.setCharacterRaceData(this.getUUID(), character);
             }
             //ka character {player} {character name}
             //ka character all {character name}
             //ka character {player} random
             //ka character all random
-        } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTER, true, false))
+        } else if (this.getLength() == 3) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_CHARACTER, true, false))
                 return;
-            if (args[2].equalsIgnoreCase("random")) {
-                if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[2].equalsIgnoreCase("random")) {
+                if (getArgs()[1].equalsIgnoreCase("all")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
-                        RaceManager.setCharacterRaceData(other.getUniqueId(), EnumCharacter.getRandomCharacter());
+                        RaceManager.setCharacterRaceData(other.getUniqueId(), CharacterConfig.getRandomCharacter());
                     }
-                    Messages.cmdCharacterRandomAll.sendMessage(this.p);
+                    MessageEnum.cmdCharacterRandomAll.sendConvertedMessage(this.getPlayer());
                 } else {
-                    if (!Util.isOnline(args[1])) {
-                        Messages.invalidPlayer.sendMessage(this.p);
+                    if (!Util.isOnline(getArgs()[1])) {
+                        MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                         return;
                     }
-                    EnumCharacter character = EnumCharacter.getRandomCharacter();
-                    Player other = Bukkit.getPlayer(args[1]);
+                    Character character = CharacterConfig.getRandomCharacter();
+                    Player other = Bukkit.getPlayer(getArgs()[1]);
                     RaceManager.setCharacterRaceData(other.getUniqueId(), character);
-                    Messages.cmdCharacterOther.sendMessage(this.p, new Object[] { other, character });
+                    MessageEnum.cmdCharacterOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, character });
                 }
             } else {
-                EnumCharacter character = EnumCharacter.getClassfromString(args[2]);
+                Character character = CharacterConfig.getCharacter(getArgs()[2]);
                 if (character == null) {
-                    Messages.invalidCharacter.sendMessage(this.p);
+                    MessageEnum.invalidCharacter.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                if (args[1].equalsIgnoreCase("all")) {
+                if (getArgs()[1].equalsIgnoreCase("all")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
                         RaceManager.setCharacterRaceData(other.getUniqueId(), character);
                     }
-                    Messages.cmdCharacterAll.sendMessage(this.p, character);
+                    MessageEnum.cmdCharacterAll.sendConvertedMessage(this.getPlayer(), character);
                 } else {
-                    if (!Util.isOnline(args[1])) {
-                        Messages.invalidPlayer.sendMessage(this.p);
+                    if (!Util.isOnline(getArgs()[1])) {
+                        MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                         return;
                     }
-                    Player other = Bukkit.getPlayer(args[1]);
+                    Player other = Bukkit.getPlayer(getArgs()[1]);
                     RaceManager.setCharacterRaceData(other.getUniqueId(), character);
-                    Messages.cmdCharacterOther.sendMessage(this.p, new Object[] { other, character });
+                    MessageEnum.cmdCharacterOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, character });
                 }
             }
         } else {
-            Messages.referenceCharacter.sendMessage(this.p);
-            Messages.referenceCharacterOther.sendMessage(this.p);
+            SystemMessageEnum.referenceCharacter.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceCharacterOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -413,32 +487,32 @@ public class CMDAbstractPlayer extends CMDAbstract {
     //ka characterreset all
     @Override
     void characterreset() {
-        if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTERRESET, false, false))
+        if (this.getLength() == 1) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_CHARACTERRESET, false, false))
                 return;
-            RaceManager.clearCharacterRaceData(this.id);
-        } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_CHARACTERRESET, true, false))
+            RaceManager.clearCharacterRaceData(this.getUUID());
+        } else if (getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_CHARACTERRESET, true, false))
                 return;
 
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.clearCharacterRaceData(other.getUniqueId());
                 }
-                Messages.cmdCharacterResetAll.sendMessage(this.p);
+                MessageEnum.cmdCharacterResetAll.sendConvertedMessage(this.getPlayer());
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
 
-                Player other = Bukkit.getPlayer(args[1]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
                 RaceManager.clearCharacterRaceData(other.getUniqueId());
-                Messages.cmdCharacterResetOther.sendMessage(this.p, other);
+                MessageEnum.cmdCharacterResetOther.sendConvertedMessage(this.getPlayer(), other);
             }
         } else {
-            Messages.referenceCharacterReset.sendMessage(this.p);
-            Messages.referenceCharacterResetOther.sendMessage(this.p);
+            SystemMessageEnum.referenceCharacterReset.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceCharacterResetOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -452,56 +526,56 @@ public class CMDAbstractPlayer extends CMDAbstract {
     void ride() {
         //ka ride {kart name}
         //ka ride random
-        if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RIDE, false, false))
+        if (this.getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_KART, false, false))
                 return;
-            if (args[1].equalsIgnoreCase("random")) {
-                RaceManager.setKartRaceData(this.id, EnumKarts.getRandomKart());
+            if (getArgs()[1].equalsIgnoreCase("random")) {
+                RaceManager.setKartRaceData(this.getUUID(), KartConfig.getRandomKart());
             } else {
-                EnumKarts kart = EnumKarts.getKartfromString(args[1]);
+                Kart kart = KartConfig.getKart(getArgs()[1]);
                 if (kart == null) {
-                    Messages.invalidKart.sendMessage(this.p);
+                    MessageEnum.invalidKart.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                RaceManager.setKartRaceData(this.id, kart);
+                RaceManager.setKartRaceData(this.getUUID(), kart);
             }
             //ka ride all {kart name}
             //ka ride {player name} {kart name}
             //ka ride all random
             //ka ride {player name} random
-        } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RIDE, true, false))
+        } else if (this.getLength() == 3) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_KART, true, false))
                 return;
-            EnumKarts kart = null;
-            if (args[2].equalsIgnoreCase("random"))
-                kart = EnumKarts.getRandomKart();
+            Kart kart = null;
+            if (getArgs()[2].equalsIgnoreCase("random"))
+                kart = KartConfig.getRandomKart();
             else
-                kart = EnumKarts.getKartfromString(args[2]);
+                kart = KartConfig.getKart(getArgs()[2]);
             if (kart == null) {
-                Messages.invalidKart.sendMessage(this.p);
+                MessageEnum.invalidKart.sendConvertedMessage(this.getPlayer());
                 return;
             }
 
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.setKartRaceData(other.getUniqueId(), kart);
                 }
-                if (args[2].equalsIgnoreCase("random"))
-                    Messages.cmdRideRandomAll.sendMessage(this.p);
+                if (getArgs()[2].equalsIgnoreCase("random"))
+                    MessageEnum.cmdRideRandomAll.sendConvertedMessage(this.getPlayer());
                 else
-                    Messages.cmdRideAll.sendMessage(this.p, kart);
+                    MessageEnum.cmdRideAll.sendConvertedMessage(this.getPlayer(), kart);
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                Player other = Bukkit.getPlayer(args[1]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
                 RaceManager.setKartRaceData(other.getUniqueId(), kart);
-                Messages.cmdRideOther.sendMessage(this.p, new Object[] { other, kart });
+                MessageEnum.cmdRideOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, kart });
             }
         } else {
-            Messages.referenceRide.sendMessage(this.p);
-            Messages.referenceRideOther.sendMessage(this.p);
+            SystemMessageEnum.referenceRide.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceRideOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -511,37 +585,37 @@ public class CMDAbstractPlayer extends CMDAbstract {
     @Override
     void leave() {
         //ka leave
-        if (this.length == 1) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_LEAVE, false, false))
+        if (this.getLength() == 1) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_LEAVE, false, false))
                 return;
-            RaceManager.leaveRacingKart(this.p);
-            RaceManager.clearKartRaceData(this.id);
+            RaceManager.leaveRacingKart(this.getPlayer());
+            RaceManager.clearKartRaceData(this.getUUID());
             //ka leave {player}
             //ka leave all
-        } else if (length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_LEAVE, true, false))
+        } else if (getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_LEAVE, true, false))
                 return;
 
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.leaveRacingKart(other);
-                    RaceManager.clearKartRaceData(this.id);
+                    RaceManager.clearKartRaceData(this.getUUID());
                 }
-                Messages.cmdLeaveAll.sendMessage(this.p);
+                MessageEnum.cmdLeaveAll.sendConvertedMessage(this.getPlayer());
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
 
-                Player other = Bukkit.getPlayer(args[1]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
                 RaceManager.leaveRacingKart(other);
                 RaceManager.clearKartRaceData(other.getUniqueId());
-                Messages.cmdLeaveOther.sendMessage(this.p, other);
+                MessageEnum.cmdLeaveOther.sendConvertedMessage(this.getPlayer(), other);
             }
         } else {
-            Messages.referenceLeave.sendMessage(this.p);
-            Messages.referenceLeaveOther.sendMessage(this.p);
+            SystemMessageEnum.referenceLeave.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceLeaveOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
@@ -549,51 +623,51 @@ public class CMDAbstractPlayer extends CMDAbstract {
     void ranking() {
         //ka ranking {circuit name}
         //ka ranking list
-        if (this.length == 2) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RANKING, false, false))
+        if (this.getLength() == 2) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_RANKING, false, false))
                 return;
-            if (args[1].equalsIgnoreCase("list")) {
-                RaceData.listCricuit(this.p);
+            if (getArgs()[1].equalsIgnoreCase("list")) {
+                MessageEnum.cmdCircuitList.sendConvertedMessage(this.getPlayer());
             } else {
-                if (!RaceData.isCircuit(args[1])) {
-                    Messages.invalidCircuit.sendMessage(this.p, args[1]);
+                if (CircuitConfig.getCircuitData(getArgs()[1]) == null) {
+                    MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
                     return;
                 }
 
-                RaceData.sendRanking(this.id, args[1]);
+                CircuitConfig.sendRanking(this.getUUID(), getArgs()[1]);
             }
             //ka ranking {player name} 	{circuit name}
             //ka ranking all 			{circuit name}
-        } else if (this.length == 3) {
-            if (!Permission.hasCMDPermission(this.p, Permission.CMD_RANKING, true, false))
+        } else if (this.getLength() == 3) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_RANKING, true, false))
                 return;
-            if (!RaceData.isCircuit(args[2])) {
-                Messages.invalidCircuit.sendMessage(this.p, args[2]);
+            if (CircuitConfig.getCircuitData(getArgs()[2]) == null) {
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[2]);
                 return;
             }
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceData.sendRanking(other.getUniqueId(), args[2]);
+                    CircuitConfig.sendRanking(other.getUniqueId(), getArgs()[2]);
                 }
-                Messages.cmdRankingAll.sendMessage(this.p, args[2]);
+                MessageEnum.cmdRankingAll.sendConvertedMessage(this.getPlayer(), getArgs()[2]);
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
-                Player other = Bukkit.getPlayer(args[1]);
-                RaceData.sendRanking(other.getUniqueId(), args[2]);
-                Messages.cmdRankingOther.sendMessage(this.p, new Object[] { other, args[2] });
+                Player other = Bukkit.getPlayer(getArgs()[1]);
+                CircuitConfig.sendRanking(other.getUniqueId(), getArgs()[2]);
+                MessageEnum.cmdRankingOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, getArgs()[2] });
             }
         } else {
-            Messages.referenceRanking.sendMessage(this.p);
-            Messages.referenceRankingOther.sendMessage(this.p);
+            SystemMessageEnum.referenceRanking.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceRankingOther.sendConvertedMessage(this.getPlayer());
         }
     }
 
     @Override
     void reload() {
-        if (!Permission.hasCMDPermission(this.p, Permission.OP_CMD_RELOAD, false, false))
+        if (!Permission.hasCMDPermission(this.getPlayer(), Permission.OP_CMD_RELOAD, false, false))
             return;
 
         for (Player other : Bukkit.getOnlinePlayers()) {
@@ -601,93 +675,92 @@ public class CMDAbstractPlayer extends CMDAbstract {
         }
         RaceManager.endAllCircuit();
 
-        Settings.reloadConfig();
-        Messages.reloadConfig();
-        Messages.cmdReload.sendMessage(this.p);
+        ConfigManager.reloadAllConfig();
+        MessageEnum.cmdReload.sendConvertedMessage(this.getPlayer());
     }
 
     @Override
     void additem(ItemStack item, Permission permission) {
         //ka {item}
         if (item == null && permission == null) {
-            Messages.referenceAddItem.sendMessage(null);
-            Messages.referenceAddItemOther.sendMessage(null);
-        } else if (length == 1) {
-            if (!Permission.hasCMDPermission(this.p, permission, false, false))
+            SystemMessageEnum.referenceAddItem.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
+        } else if (getLength() == 1) {
+            if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false))
                 return;
 
-            this.p.getInventory().addItem(item);
-            Messages.cmdItem.sendMessage(this.p, item);
-        } else if (length == 2) {
+            this.getPlayer().getInventory().addItem(item);
+            MessageEnum.cmdItem.sendConvertedMessage(this.getPlayer(), item);
+        } else if (getLength() == 2) {
             //ka {item} 64
-            if (Util.isNumber(args[1])) {
-                if (!Permission.hasCMDPermission(this.p, permission, false, false))
+            if (Util.isNumber(getArgs()[1])) {
+                if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false))
                     return;
 
-                item.setAmount(Integer.valueOf(args[1]));
-                this.p.getInventory().addItem(item);
-                Messages.cmdItem.sendMessage(this.p, item);
+                item.setAmount(Integer.valueOf(getArgs()[1]));
+                this.getPlayer().getInventory().addItem(item);
+                MessageEnum.cmdItem.sendConvertedMessage(this.getPlayer(), item);
             } else {
                 if (permission.isOpPerm()) {
-                    if (!Permission.hasPermission(this.p, permission, false))
+                    if (!Permission.hasPermission(this.getPlayer(), permission, false))
                         return;
-                } else if (!Permission.hasCMDPermission(this.p, permission, true, false))
+                } else if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false))
                     return;
 
                 //ka {item} all
-                if (args[1].equalsIgnoreCase("all")) {
+                if (getArgs()[1].equalsIgnoreCase("all")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
                         other.getInventory().addItem(item);
-                        Messages.cmdItem.sendMessage(other, item);
+                        MessageEnum.cmdItem.sendConvertedMessage(other, item);
                     }
-                    Messages.cmdItemAll.sendMessage(this.p, item);
+                    MessageEnum.cmdItemAll.sendConvertedMessage(this.getPlayer(), item);
                     //ka {item} {player}
                 } else {
-                    if (!Util.isOnline(args[1])) {
-                        Messages.invalidPlayer.sendMessage(this.p);
+                    if (!Util.isOnline(getArgs()[1])) {
+                        MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                         return;
                     }
 
-                    Player other = Bukkit.getPlayer(args[1]);
+                    Player other = Bukkit.getPlayer(getArgs()[1]);
                     other.getInventory().addItem(item);
-                    Messages.cmdItem.sendMessage(other, item);
-                    Messages.cmdItemOther.sendMessage(this.p, new Object[] { other, item });
+                    MessageEnum.cmdItem.sendConvertedMessage(other, item);
+                    MessageEnum.cmdItemOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, item });
                 }
             }
-        } else if (length == 3) {
+        } else if (getLength() == 3) {
             if (permission.isOpPerm()) {
-                if (!Permission.hasPermission(this.p, permission, false))
+                if (!Permission.hasPermission(this.getPlayer(), permission, false))
                     return;
-            } else if (!Permission.hasCMDPermission(this.p, permission, true, false))
+            } else if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false))
                 return;
-            if (!Util.isNumber(args[2])) {
-                Messages.referenceAddItemOther.sendMessage(this.p);
+            if (!Util.isNumber(getArgs()[2])) {
+                SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
                 return;
             }
-            item.setAmount(Integer.valueOf(args[2]));
+            item.setAmount(Integer.valueOf(getArgs()[2]));
 
             //ka {item} all 64
-            if (args[1].equalsIgnoreCase("all")) {
+            if (getArgs()[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     other.getInventory().addItem(item);
-                    Messages.cmdItem.sendMessage(other, item);
+                    MessageEnum.cmdItem.sendConvertedMessage(other, item);
                 }
-                Messages.cmdItemAll.sendMessage(this.p, item);
+                MessageEnum.cmdItemAll.sendConvertedMessage(this.getPlayer(), item);
                 //ka {item} {player} 64
             } else {
-                if (!Util.isOnline(args[1])) {
-                    Messages.invalidPlayer.sendMessage(this.p);
+                if (!Util.isOnline(getArgs()[1])) {
+                    MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
                     return;
                 }
 
-                Player other = Bukkit.getPlayer(args[1]);
+                Player other = Bukkit.getPlayer(getArgs()[1]);
                 other.getInventory().addItem(item);
-                Messages.cmdItem.sendMessage(other, item);
-                Messages.cmdItemOther.sendMessage(this.p, new Object[] { other, item });
+                MessageEnum.cmdItem.sendConvertedMessage(other, item);
+                MessageEnum.cmdItemOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, item });
             }
         } else {
-            Messages.referenceAddItem.sendMessage(this.p);
-            Messages.referenceAddItemOther.sendMessage(this.p);
+            SystemMessageEnum.referenceAddItem.sendConvertedMessage(this.getPlayer());
+            SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
         }
     }
 }

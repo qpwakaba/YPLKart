@@ -10,7 +10,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import com.github.erozabesu.yplkart.data.Settings;
+import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.utils.Util;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
@@ -46,8 +46,9 @@ public class Scoreboards {
      */
 
     public static void createScoreboard(String name) {
-        if (!Settings.EnableScoreboard)
+        if (!(Boolean) ConfigEnum.ENABLE_SCOREBOARD.getValue()) {
             return;
+        }
         if (scoreboard.containsKey(name))
             return;
 

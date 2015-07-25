@@ -7,7 +7,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.github.erozabesu.yplkart.enumdata.EnumItem;
+import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -31,7 +31,7 @@ public class ItemBananaTask extends BukkitRunnable {
                     circuit.removeJammerEntity(this.banana);
 
                     FallingBlock b = l.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
-                    b.setCustomName(EnumItem.BANANA.getName());
+                    b.setCustomName(ItemEnum.BANANA.getDisplayName());
                     b.setCustomNameVisible(false);
                     b.setDropItem(false);
                     Util.removeEntityCollision(b);

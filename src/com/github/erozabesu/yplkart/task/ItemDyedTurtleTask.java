@@ -9,8 +9,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.Settings;
-import com.github.erozabesu.yplkart.object.Race;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemDyedTurtleTask extends BukkitRunnable {
@@ -45,7 +46,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         this.target = target;
         this.shooter = shooter;
-        this.adjustdamage = RaceManager.getRace(shooter).getCharacter().getItemAdjustAttackDamage();
+        this.adjustdamage = RaceManager.getRace(shooter).getCharacter().getAdjustAttackDamage();
         this.lap = RaceManager.getRace(shooter).getLapCount();
         this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
@@ -69,8 +70,8 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         }
 
         if (isthornedturtle) {
-            Util.createSafeExplosion(this.shooter, this.projectile.getLocation(), Settings.ThornedTurtleMovingDamage
-                    + this.adjustdamage, 5);
+            Util.createSafeExplosion(this.shooter, this.projectile.getLocation()
+                    , ItemEnum.THORNED_TURTLE.getMovingDamage() + this.adjustdamage, 5);
         }
 
         //モーション 読み込まれていないチャンクに居る場合はMotionの値ずつテレポートで移動させる
@@ -83,9 +84,13 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         }
 
         //周回数の更新
-        if (lastStepBlock.equalsIgnoreCase(Settings.StartBlock))
-            if (Util.getGroundBlockID(this.projectile.getLocation()).equalsIgnoreCase(Settings.GoalBlock))
+        if (lastStepBlock.equalsIgnoreCase(
+                (String) ConfigEnum.START_BLOCK_ID.getValue())) {
+            if (Util.getGroundBlockID(this.projectile.getLocation()).equalsIgnoreCase(
+                    (String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
                 lap++;
+            }
+        }
         this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
         //targetを発見したら突撃return
@@ -99,8 +104,8 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
                 this.motZ = v.getZ();
 
                 if (target.getLocation().distance(this.projectile.getLocation()) < 3) {
-                    Util.createSafeExplosion(this.shooter, target.getLocation(), Settings.RedTurtleHitDamage
-                            + this.adjustdamage, 3);
+                    Util.createSafeExplosion(this.shooter, target.getLocation()
+                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3);
                     die();
                 }
                 return;
@@ -108,7 +113,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         }
 
         //チェックポイントの更新
-        Race r = RaceManager.getRace(this.shooter);
+        Racer r = RaceManager.getRace(this.shooter);
         ArrayList<Entity> checkpointlist = new ArrayList<Entity>();
 
         //アカこうらを1位から2位に向け発射した場合
