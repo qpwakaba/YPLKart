@@ -1,0 +1,140 @@
+check_point_tool:
+  tier: -1
+  material: nether_star
+  material_data: 0
+  max_stack_size: 64
+mario_hat:
+  tier: -1
+  material: redstone_block
+  material_data: 0
+  max_stack_size: 64
+itembox_tool:
+  tier: 0
+  material: ink_sack
+  material_data: 0
+  max_stack_size: 64
+menu:
+  tier: -1
+  material: gold_ingot
+  material_data: 0
+  max_stack_size: 64
+mushroom:
+  tier: 1
+  material: ink_sack
+  material_data: 1
+  max_stack_size: 3
+  effect_level: 3
+  effect_second: 1
+  multiple:
+    tier: 3
+    drop_amount: 3
+powerfull_mushroom:
+  tier: 3
+  material: ink_sack
+  material_data: 2
+  max_stack_size: 1
+  effect_level: 4
+  effect_second: 3
+  multiple:
+    tier: 0
+    drop_amount: 2
+banana:
+  tier: 1
+  material: ink_sack
+  material_data: 6
+  max_stack_size: 5
+  effect_level: 2
+  effect_second: 2
+  multiple:
+    tier: 2
+    drop_amount: 3
+fake_itembox:
+  tier: 1
+  material: ink_sack
+  material_data: 7
+  max_stack_size: 1
+  hit_damage: 6
+  multiple:
+    tier: 0
+    drop_amount: 2
+turtle:
+  tier: 1
+  material: ink_sack
+  material_data: 3
+  max_stack_size: 3
+  hit_damage: 6
+  multiple:
+    tier: 2
+    drop_amount: 3
+red_turtle:
+  tier: 2
+  material: ink_sack
+  material_data: 4
+  max_stack_size: 3
+  hit_damage: 6
+  multiple:
+    tier: 3
+    drop_amount: 3
+thorned_turtle:
+  tier: 4
+  material: ink_sack
+  material_data: 5
+  max_stack_size: 1
+  hit_damage: 20
+  moving_damage: 6
+  multiple:
+    tier: 0
+    drop_amount: 2
+gesso:
+  tier: 3
+  material: ink_sack
+  material_data: 10
+  max_stack_size: 1
+  effect_level: 1
+  effect_second: 5
+  multiple:
+    tier: 0
+    drop_amount: 2
+thunder:
+  tier: 4
+  material: ink_sack
+  material_data: 8
+  hit_damage: 6
+  max_stack_size: 1
+  effect_level: 2
+  effect_second: 3
+  multiple:
+    tier: 0
+    drop_amount: 2
+star:
+  tier: 4
+  material: nether_star
+  material_data: 0
+  hit_damage: 2
+  max_stack_size: 1
+  walk_speed: 0.9
+  effect_second: 6
+  multiple:
+    tier: 0
+    drop_amount: 2
+teresa:
+  tier: 2
+  material: ink_sack
+  material_data: 9
+  max_stack_size: 1
+  effect_second: 4
+  multiple:
+    tier: 0
+    drop_amount: 2
+killer:
+  tier: 4
+  material: ink_sack
+  material_data: 11
+  display_block_material: huge_mushroom_1
+  display_block_material_data: 9
+  max_stack_size: 1
+  effect_second: 5
+  moving_damage: 6
+  multiple:
+    tier: 0
+    drop_amount: 2

@@ -1,0 +1,88 @@
+Standard:
+  display_material: huge_mushroom_2
+  display_material_data: 0
+  weight: 1.0
+  max_speed: 250.0
+  acceleration: 1.0
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 5.0
+  speed_decrease_on_drift: 2.0
+  default_cornering_power: 1.0
+  drift_cornering_power: 5.5
+Survival:
+  display_material: huge_mushroom_2
+  display_material_data: 1
+  weight: 1.5
+  max_speed: 220.0
+  acceleration: 1.0
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 1.0
+  speed_decrease_on_drift: 2.0
+  default_cornering_power: 1.0
+  drift_cornering_power: 6.5
+Accel:
+  display_material: huge_mushroom_2
+  display_material_data: 2
+  weight: 0.8
+  max_speed: 180.0
+  acceleration: 4.0
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 5.0
+  speed_decrease_on_drift: 2.0
+  default_cornering_power: 1.0
+  drift_cornering_power: 5.5
+Tricky:
+  display_material: huge_mushroom_2
+  display_material_data: 3
+  weight: 0.5
+  max_speed: 300.0
+  acceleration: 0.7
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 7.0
+  speed_decrease_on_drift: 2.0
+  default_cornering_power: 1.5
+  drift_cornering_power: 6.5
+Flexible:
+  display_material: huge_mushroom_2
+  display_material_data: 4
+  weight: 1.0
+  max_speed: 200.0
+  acceleration: 1.5
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 5.0
+  speed_decrease_on_drift: 5.0
+  default_cornering_power: 1.7
+  drift_cornering_power: 6.5
+Straight:
+  display_material: huge_mushroom_2
+  display_material_data: 5
+  weight: 0.5
+  max_speed: 300.0
+  acceleration: 2.5
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 5.0
+  speed_decrease_on_drift: 2.5
+  default_cornering_power: 1.0
+  drift_cornering_power: 4.0
+Power:
+  display_material: huge_mushroom_2
+  display_material_data: 6
+  weight: 4.0
+  max_speed: 200.0
+  acceleration: 0.7
+  climbable_height: 1.0
+  speed_decrease_on_dirt: 3.0
+  speed_decrease_on_drift: 1.5
+  default_cornering_power: 1.5
+  drift_cornering_power: 5.5
+Jalopy:
+  display_material: huge_mushroom_2
+  display_material_data: 7
+  weight: 1.0
+  max_speed: 200.0
+  acceleration: 0.8
+  climbable_height: 0.5
+  speed_decrease_on_dirt: 6.0
+  speed_decrease_on_drift: 2.0
+  default_cornering_power: 1.0
+  drift_cornering_power: 5.0
