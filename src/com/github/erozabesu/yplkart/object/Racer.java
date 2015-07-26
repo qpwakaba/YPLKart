@@ -216,12 +216,13 @@ public class Racer {
     }
 
     public Entity getLastPassedCheckPoint() {
-        if (getPlayer() == null)
+        if (getPlayer() == null) {
             return null;
+        }
 
-        for (Entity e : getPlayer().getWorld().getEntities()) {
-            if (e.getUniqueId().toString().equalsIgnoreCase(this.lastpassedcheckpoint))
-                return e;
+        for (Entity entity : getPlayer().getWorld().getEntities()) {
+            if (entity.getUniqueId().toString().equalsIgnoreCase(this.lastpassedcheckpoint))
+                return entity;
         }
         return null;
     }

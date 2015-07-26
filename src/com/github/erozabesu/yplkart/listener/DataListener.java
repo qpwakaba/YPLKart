@@ -203,20 +203,24 @@ public class DataListener implements Listener {
 
     @EventHandler
     public void RunningRank(PlayerMoveEvent e) {//順位
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld())) {
             return;
+        }
         Player p = e.getPlayer();
-        if (!RaceManager.isRacing(p.getUniqueId()))
+        if (!RaceManager.isRacing(p.getUniqueId())) {
             return;
-        if (RaceManager.getRace(p).getLapCount() < 1)
+        }
+        if (RaceManager.getRace(p).getLapCount() < 1) {
             return;
+        }
 
         Racer r = RaceManager.getRace(p);
 
         ArrayList<String> checkpoint = RaceManager.getNearbyCheckpointID(
                 e.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, r.getEntry());
-        if (checkpoint == null)
+        if (checkpoint == null) {
             return;
+        }
 
         Iterator<String> i = checkpoint.iterator();
         String id;
@@ -230,19 +234,23 @@ public class DataListener implements Listener {
 
     @EventHandler
     public void onRegainHealth(EntityRegainHealthEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld())) {
             return;
-        if (!(e.getEntity() instanceof Player))
+        }
+        if (!(e.getEntity() instanceof Player)) {
             return;
-        if (!RaceManager.isRacing(((Player) e.getEntity()).getUniqueId()))
+        }
+        if (!RaceManager.isRacing(((Player) e.getEntity()).getUniqueId())) {
             return;
+        }
         e.setCancelled(true);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
             return;
+        }
 
         final Player p = e.getPlayer();
         if (RaceManager.isStandBy(p.getUniqueId())) {
@@ -299,10 +307,12 @@ public class DataListener implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
             return;
-        if (!RaceManager.isStandBy(e.getPlayer().getUniqueId()))
+        }
+        if (!RaceManager.isStandBy(e.getPlayer().getUniqueId())) {
             return;
+        }
 
         final Player p = e.getPlayer();
         final Racer r = RaceManager.getRace(p);
@@ -346,12 +356,15 @@ public class DataListener implements Listener {
     //スタンバイ状態～レース開始までのダメージを無効
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent event) {
-        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld()))
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (!(event.getEntity() instanceof Player))
+        }
+        if (!(event.getEntity() instanceof Player)) {
             return;
-        if (event.getCause() == DamageCause.VOID)
+        }
+        if (event.getCause() == DamageCause.VOID) {
             return;
+        }
         Player p = (Player) event.getEntity();
 
         if (RaceManager.isRacing(p.getUniqueId())) {
@@ -377,19 +390,22 @@ public class DataListener implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld())) {
             return;
+        }
         final Player p = (Player) e.getEntity();
 
-        if (!RaceManager.isStandBy(p.getUniqueId()))
+        if (!RaceManager.isStandBy(p.getUniqueId())) {
             return;
+        }
         Racer r = RaceManager.getRace(p);
 
         RaceManager.leaveRacingKart(p);
         r.setLastYaw(p.getLocation().getYaw());
 
-        if (p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true"))
+        if (p.getWorld().getGameRuleValue("keepInventory").equalsIgnoreCase("true")) {
             return;
+        }
         e.getDrops().clear();
         //r.saveInventory();
         e.setKeepInventory(true);
@@ -405,10 +421,12 @@ public class DataListener implements Listener {
     //エントリー中の場合、キャラクター・カートが未選択の場合はメニューを閉じさせません
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
             return;
-        if (!RaceManager.isStandBy(((Player) e.getPlayer()).getUniqueId()))
+        }
+        if (!RaceManager.isStandBy(((Player) e.getPlayer()).getUniqueId())) {
             return;
+        }
 
         final Player p = (Player) e.getPlayer();
         Racer r = RaceManager.getRace(p);
@@ -461,10 +479,12 @@ public class DataListener implements Listener {
     //インベントリネーム一致：cancel
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getWhoClicked().getWorld()))
+        if (!YPLKart.isPluginEnabled(e.getWhoClicked().getWorld())) {
             return;
-        if (!(e.getWhoClicked() instanceof Player))
+        }
+        if (!(e.getWhoClicked() instanceof Player)) {
             return;
+        }
 
         //召集後はインベントリの操作をさせない
         if (RaceManager.isStandBy(((Player) e.getWhoClicked()).getUniqueId())) {
@@ -480,13 +500,15 @@ public class DataListener implements Listener {
             p.updateInventory();
 
             ItemStack item = e.getCurrentItem();
-            if (item == null)
+            if (item == null) {
                 return;
+            }
 
             String clickedItemName = item.hasItemMeta()
                     ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
-            if (clickedItemName == null)
+            if (clickedItemName == null) {
                 return;
+            }
 
             //キャンセルボタン
             if (EnumSelectMenu.CHARACTER_CANCEL.equalsIgnoreCase(clickedItemName)) {
@@ -522,8 +544,9 @@ public class DataListener implements Listener {
             p.updateInventory();
 
             ItemStack item = e.getCurrentItem();
-            if (item == null)
+            if (item == null) {
                 return;
+            }
 
             String clicked = item.hasItemMeta() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
             if (clicked == null) {
