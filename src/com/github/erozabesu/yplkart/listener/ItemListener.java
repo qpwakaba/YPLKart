@@ -151,7 +151,7 @@ public class ItemListener extends RaceManager implements Listener {
                 e.setCancelled(true);
                 if (Permission.hasPermission(p, ItemEnum.BANANA.getPermission(), false)) {
                     Util.setItemDecrease(p);
-                    Location l = Util.getFrontBackLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+                    Location l = Util.getForwardLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                             .add(0.5, 0, 0.5);
 
                     FallingBlock b = p.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
@@ -168,7 +168,7 @@ public class ItemListener extends RaceManager implements Listener {
                 if (Permission.hasPermission(p, ItemEnum.FAKE_ITEMBOX.getPermission(), false)) {
                     Util.setItemDecrease(p);
                     EnderCrystal endercrystal = p.getWorld().spawn(
-                            Util.getFrontBackLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+                            Util.getForwardLocationFromYaw(p.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                                     .add(0.5, 0, 0.5), EnderCrystal.class);
                     endercrystal.setCustomName(FakeItemBoxName);
                     endercrystal.setCustomNameVisible(true);
@@ -674,7 +674,7 @@ public class ItemListener extends RaceManager implements Listener {
         b.setCustomNameVisible(false);
         b.setDropItem(false);
 
-        new ItemTurtleTask(p, b, Util.getFrontBackLocationFromYaw(p.getLocation(), 3), 60).runTaskTimer(pl, 0, 1);
+        new ItemTurtleTask(p, b, Util.getForwardLocationFromYaw(p.getLocation(), 3), 60).runTaskTimer(pl, 0, 1);
     }
 
     public void itemRedturtle(Player user) {

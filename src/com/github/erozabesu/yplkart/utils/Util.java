@@ -152,7 +152,7 @@ public class Util extends ReflectionUtil {
      * @param offset オフセット
      * @return offsetの数値だけ前後に移動した座標
      */
-    public static Location getFrontBackLocationFromYaw(Location location, double offset) {
+    public static Location getForwardLocationFromYaw(Location location, double offset) {
         Location adjustlocation = adjustBlockLocation(location);
         float yaw = adjustlocation.getYaw();
         double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));

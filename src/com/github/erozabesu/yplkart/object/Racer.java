@@ -254,7 +254,7 @@ public class Racer {
         return this.cmdForceLeave;
     }
 
-    public boolean getStepDashBoard() {
+    public boolean isStepDashBoard() {
         return this.stepDashBoard;
     }
 

@@ -597,87 +597,7 @@ public class CustomMinecart extends EntityMinecartRideable {
         entity.fallDistance = fallDistance;
     }
 
-    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * Entityがダメージを受けた際の揺れる速度を時間経過で復元する<br>
-     * マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける
-     * ダメージを受けた際に左右に揺れる速度を指す<br>
-     * <br>
-     * EntityMinecartAbstract.getType()はMinecartのDataWatcherインデックス17番Shaking Powerを返す<br>
-     * EntityMinecartAbstract.j(int i)は同DataWatcherの値を変更する<br>
-     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
-     */
-    public void recoveryShakingPower() {
-        if (getType() > 0) {
-            j(getType() - 1);
-        }
-    }
-
-    /**
-     * Entityの耐久値を時間経過で復元する<br>
-     * 耐久値とは、マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける破壊の進捗度を指す<br>
-     * 同時に、耐久値はダメージを受けた際の揺れ幅にも影響する<br>
-     * <br>
-     * EntityMinecartAbstract.getDamage()はMinecartのDataWatcherインデックス19番Damage Taken / Shaking Multiplierを返す<br>
-     * EntityMinecartAbstract.setDamage(float f)は同DataWatcherの値を変更する<br>
-     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
-     */
-    public void recoveryDamage() {
-        if (getDamage() > 0.0F) {
-            setDamage(getDamage() - 1.0F);
-        }
-    }
-
-    public void craftBukkit_die() {
-        this.O();
-    }
-
-    public void craftBukkit_applyFriction() {
-        n();
-    }
-
-    public void craftBukkit_applyWaterCollision() {
-        W();
-    }
-
-    public void setParameter(Kart kart) {
-        this.setKart(kart);
-        setClimbableHeight(this, kart.getClimbableHeight());
-    }
-
-    /**
-     * @param entity
-     * @return 引数entityの現在座標のチャンクがロードされているかどうか
-     */
-    public boolean isLoadedChunk(Entity entity) {
-        BlockPosition currentPosition = getCurrentBlockPosition(entity);
-        return entity.getWorld().getChunkAtWorldCoords(currentPosition).o();
-    }
-
-    /** @return よじ登ることができるブロックかどうか */
-    public boolean isClambableBlock() {
-        int locationX = MathHelper.floor(getLocationX(this));
-        int locationY = MathHelper.floor(getLocationYFromBoundingBox());
-        int locationZ = MathHelper.floor(getLocationZ(this));
-        Block block = this.getWorld().getType(
-                new BlockPosition(locationX, locationY, locationZ)).getBlock();
-
-        return (block == Blocks.LADDER || block == Blocks.VINE);
-    }
-
-    /** @return ダートブロックかどうか */
-    public boolean isDirtBlock() {
-        int locationX = MathHelper.floor(getLocationX(this));
-        int locationY = MathHelper.floor(getLocationYFromBoundingBox());
-        int locationZ = MathHelper.floor(getLocationZ(this));
-
-        Location location =
-                new Location(this.getBukkitEntity().getWorld(), locationX, locationY, locationZ);
-
-        return Util.getGroundBlockID(location).equalsIgnoreCase(
-                (String) ConfigEnum.DIRT_BLOCK_ID.getValue());
-    }
+    //〓 get/set 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * @param entity
@@ -724,294 +644,311 @@ public class CustomMinecart extends EntityMinecartRideable {
         return passenger;
     }
 
-    //〓 Override 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     /**
-     * setPassenger
-     * マインカートが搭乗可能な状態だった場合搭乗させる
-     * プレイヤーに右クリックされた場合等に処理される
-     * @return 既に搭乗者がいた場合、搭乗者がプレイヤーならtrue、プレイヤー以外のEntityならfalse
+     * @param entity
+     * @return 引数entityの現在座標のチャンクがロードされているかどうか
      */
-    @Override
-    public boolean e(EntityHuman human)
-    {
-        if (getPassenger(this) != null && getPassenger(this) != human) {
-            if (getPassenger(this) instanceof EntityHuman) {
-                return true;
-            }
-            return false;
-        }
-        if (getKartType().equals(KartType.DisplayKart)) {
-            human.mount(this);
-        }
-        if (!isClientSide(this)) {
-            human.mount(this);
-        }
+    public boolean isLoadedChunk(Entity entity) {
+        BlockPosition currentPosition = getCurrentBlockPosition(entity);
+        return entity.getWorld().getChunkAtWorldCoords(currentPosition).o();
+    }
 
-        return true;
+    /** @return よじ登ることができるブロックかどうか */
+    public boolean isClambableBlock() {
+        int locationX = MathHelper.floor(getLocationX(this));
+        int locationY = MathHelper.floor(getLocationYFromBoundingBox());
+        int locationZ = MathHelper.floor(getLocationZ(this));
+        Block block = this.getWorld().getType(
+                new BlockPosition(locationX, locationY, locationZ)).getBlock();
+
+        return (block == Blocks.LADDER || block == Blocks.VINE);
+    }
+
+    /** @return ダートブロックかどうか */
+    public boolean isDirtBlock() {
+        int locationX = MathHelper.floor(getLocationX(this));
+        int locationY = MathHelper.floor(getLocationYFromBoundingBox());
+        int locationZ = MathHelper.floor(getLocationZ(this));
+
+        Location location =
+                new Location(this.getBukkitEntity().getWorld(), locationX, locationY, locationZ);
+
+        return Util.getGroundBlockID(location).equalsIgnoreCase(
+                (String) ConfigEnum.DIRT_BLOCK_ID.getValue());
     }
 
     /**
-     * livingUpdate
-     * Entityの状態を毎チック更新する
+     * パラメータを引数kartのオブジェクトから引き継ぐ
+     * @param kart パラメータを引き継ぐKartオブジェクト
      */
-    @Override
-    public void t_()
-    {
-        //被ダメージ時の揺れる速度を減衰する
-        recoveryShakingPower();
-
-        //被ダメージ時の耐久値の回復
-        recoveryDamage();
-
-        //クライアントから読み込まれなくなった場合デスポーン
-        if (isClientSide(this)) {
-            craftBukkit_die();
-            return;
-        }
-
-        //奈落に落下した場合デスポーン
-        if (getLocationY(this) < -64.0D) {
-            craftBukkit_die();
-        }
-
-        //1チック前の座標を記録
-        setLastLocationX(this, getLocationX(this));
-        setLastLocationY(this, getLocationY(this));
-        setLastLocationZ(this, getLocationZ(this));
-
-        //展示用カートの場合モーションを0に固定しreturnする
-        if (getKartType().equals(KartType.DisplayKart)) {
-            setMotionX(this, 0);
-            setMotionY(this, 0);
-            setMotionZ(this, 0);
-            setYawPitch(getYaw(this), getPitch(this));
-            return;
-        }
-
-        //YモーションをマイナスしEntityを自然落下させる
-        setMotionY(this, getMotionY(this) - 0.03999999910593033D);
-
-        craftBukkit_applyFriction();
-
-        checkBlockCollisions();
-
-        Iterator iterator = this.getWorld().getEntities(this,
-                getBoundingBox().grow(0.2000000029802322D, 0.0D, 0.2000000029802322D)).iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if ((entity != getPassenger(this)) && ((entity instanceof EntityMinecartAbstract))) {
-                entity.collide(this);
-            }
-        }
-
-        if (getPassenger(this) != null && isDead(getPassenger(this))) {
-            if (getVehicle(getPassenger(this)) == this) {
-                setVehicle(getPassenger(this), null);
-            }
-
-            setPassenger(this, null);
-        }
-
-        if (getPassenger(this) != null) {
-            if (getVehicle(getPassenger(this)) == this) {
-                Player player = (Player) getPassenger(this).getBukkitEntity();
-                player.playSound(getPassenger(this).getBukkitEntity().getLocation()
-                        , Sound.COW_WALK, 0.2F, 0.05F + ((float) this.getSpeedStack() / 200));
-                player.playSound(getPassenger(this).getBukkitEntity().getLocation()
-                        , Sound.GHAST_FIREBALL, 0.01F + ((float) this.getSpeedStack() / 400), 1.0F);
-                player.playSound(getPassenger(this).getBukkitEntity().getLocation()
-                        , Sound.FIZZ, 0.01F + ((float) this.getSpeedStack() / 400), 0.5F);
-            }
-        }
-
-        craftBukkit_applyWaterCollision();
+    public void setParameter(Kart kart) {
+        this.setKart(kart);
+        setClimbableHeight(this, kart.getClimbableHeight());
     }
 
     /**
-     * applyFriction
-     * 現在のモーション値に摩擦係数を適用し徐々に減衰させる
+     * カートのモーションを適用する
+     * キラー使用中のモーションを適用する場合はapplyKillerMotion(Racer r)を利用する
+     * @param human 計算の基となるEntityHuman
      */
-    @Override
-    protected void n() {
-        //搭乗者がいる場合
-        if (getPassenger(this) != null) {
-            //プレイヤーが搭乗している場合
-            if (getPassenger(this) instanceof EntityHuman) {
-                setMotion((EntityHuman) getPassenger(this));
-            } else {
-                //プレイヤー以外が搭乗している場合
-                double d0 = getFrictionValue();
+    public void setNormalMotion(EntityHuman human) {
+        //キラー用変数の初期化
+        this.setKillerPassedCheckPointList(null);
+        this.setKillerLastPassedCheckPoint(null);
+        this.setKillerX(0);
+        this.setKillerY(0);
+        this.setKillerZ(0);
 
-                setMotionX(this, MathHelper.a(getMotionX(this), -d0, d0));
-                setMotionZ(this, MathHelper.a(getMotionZ(this), -d0, d0));
-            }
-        }
+        //横方向への移動入力値
+        float sideInput = getSideMotionInput(human) * 0.0F;
 
-        //地面にいる場合は地面との摩擦係数を適用
-        if (isOnGround(this)) {
-            setMotionX(this, getMotionX(this) * getGroundFrictionX());
-            setMotionY(this, getMotionY(this) * getGroundFrictionY());
-            setMotionZ(this, getMotionZ(this) * getGroundFrictionZ());
-        }
+        //縦方向への移動入力値
+        float forwardInput = getForwardMotionInput(human);
 
-        //移動
-        move(getMotionX(this), getMotionY(this), getMotionZ(this));
+        //スピードスタックの算出、格納
+        setSpeedStack(calcSpeedStack(human));
 
-        //空中にいる場合は地面との摩擦係数を適用
-        //なぜmoveの後に適用するのかは不明
-        if (!isOnGround(this)) {
-            setMotionX(this, getMotionX(this) * getFlyFrictionX());
-            setMotionY(this, getMotionY(this) * getFlyFrictionY());
-            setMotionZ(this, getMotionZ(this) * getFlyFrictionZ());
-        }
-    }
+        //スピードスタックを基に縦方向への移動入力値を変換
+        forwardInput = calcForwardInput(forwardInput);
 
-    public void setMotion(EntityHuman human) {
-        this.setLastMotionSpeed(calcMotionSpeed(getMotionX(this), getMotionZ(this)) * this.getKart().getWeight());
-
-        /*
-         * キラー発動中
-         * 「最寄」の「一度も通過していない」チェックポイントに向け自動で移動する
-         * コースアウトを防ぐため、最寄のチェックポイントとの平面距離が3ブロック以内になるまで
-         * 次のチェックポイントへは移動しない
-         */
-        if (RaceManager.getRace(human.getUniqueID()).getUsingKiller() != null) {
-            Player player = (Player) human.getBukkitEntity();
-            Racer r = RaceManager.getRace(player);
-
-            setNoclip(this, true);
-            setSpeedStack(getKart().getMaxSpeed());
-
-            //〓〓モーション初期化
-            if (this.getKillerX() != 0 && this.getKillerY() != 0 && this.getKillerZ() != 0) {
-                setMotionX(this, this.getKillerX());
-                setMotionY(this, this.getKillerY());
-                setMotionZ(this, this.getKillerZ());
-            }
-            setYawPitch(Util.getYawFromVector(new Vector(getMotionX(this), getMotionY(this), getMotionZ(this))) + 180, 0);
-
-            //〓〓演出
-            player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 0.05F, 1.5F);
-            player.playSound(player.getLocation(), Sound.FIZZ, 0.05F, 1.0F);
-            Util.createSafeExplosion(player, getBukkitEntity().getLocation()
-                    , ItemEnum.KILLER.getMovingDamage()
-                    + RaceManager.getRace(player).getCharacter().getAdjustAttackDamage(), 2);
-
-            Location current = getBukkitEntity().getLocation().add(0, 0.5, 0);
-            current.setYaw(current.getYaw() + 270);
-            Location ll = Util.getFrontBackLocationFromYaw(current, -15);
-
-            for (int i = 0; i < 10; i++) {
-                Particle.sendToLocation(
-                        "REDSTONE",
-                        ll.add(((double) Util.getRandom(10)) / 10, ((double) Util.getRandom(10)) / 10,
-                                ((double) Util.getRandom(10)) / 10), 0, 0, 0, 0, 10);
-            }
-
-            //〓〓チェックポイント
-            //初回起動
-            if (this.getKillerPassedCheckPointList() == null) {
-                this.setKillerPassedCheckPointList(new ArrayList<String>(r.getPassedCheckPoint()));
-                this.setKillerLastPassedCheckPoint(RaceManager.getRace((Player) human.getBukkitEntity()).getUsingKiller());
-                Vector v = Util.getVectorToLocation(
-                        getBukkitEntity().getLocation(),
-                        getKillerLastPassedCheckPoint().getLocation().add(0, -RaceManager.checkPointHeight + 2, 0)).multiply(1.8);
-                this.setKillerX(v.getX());
-                this.setKillerY(v.getY());
-                this.setKillerZ(v.getZ());
-            }
-            if (this.getKillerLastPassedCheckPoint() != null)
-                if (RaceManager.checkPointHeight + 5 < this.getKillerLastPassedCheckPoint().getLocation().distance(
-                        getBukkitEntity().getLocation()))
-                    return;
-
-            ArrayList<org.bukkit.entity.Entity> checkpoint = new ArrayList<org.bukkit.entity.Entity>();
-            String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
-            ArrayList<org.bukkit.entity.Entity> templist = RaceManager.getNearbyCheckpoint(player.getLocation(), 40,
-                    r.getEntry());
-            if (templist == null)
-                return;
-
-            for (org.bukkit.entity.Entity e : templist) {
-                if (!this.getKillerPassedCheckPointList().contains(lap + e.getUniqueId().toString())) {
-                    checkpoint.add(e);
-                }
-            }
-
-            if (checkpoint.isEmpty()) {
-                return;
-            }
-
-            this.setKillerLastPassedCheckPoint(Util.getNearestEntity(checkpoint, this.getBukkitEntity().getLocation()));
-            this.getKillerPassedCheckPointList().add(lap + this.getKillerLastPassedCheckPoint().getUniqueId().toString());
-            Vector v = Util.getVectorToLocation(
-                    this.getBukkitEntity().getLocation(),
-                    this.getKillerLastPassedCheckPoint().getLocation().add(0, -RaceManager.checkPointHeight + 2, 0)).multiply(1.8);
-            this.setKillerX(v.getX());
-            this.setKillerY(v.getY());
-            this.setKillerZ(v.getZ());
-        } else {
-            if (!RaceManager.isRacing(human.getUniqueID()))
-                return;
-
-            float sideMotion = getSideMotionInput(human) * 0.0F;//横方向への移動速度(+-0.98固定)
-            float forwardMotion = getForwardMotionInput(human);//縦方向への移動速度(+-3.92固定)
-
-            setNoclip(this, false);
-            this.setKillerPassedCheckPointList(null);
-            this.setKillerLastPassedCheckPoint(null);
-            this.setKillerX(0);
-            this.setKillerY(0);
-            this.setKillerZ(0);
-
-            calcSpeedStack(human);
-
-            if (0 < forwardMotion) {
-                forwardMotion *= 0.1;
-                forwardMotion += this.getSpeedStack() / 400;
-            } else if (forwardMotion < 0) {
-                if (isDirtBlock())
-                    forwardMotion *= getKart().getSpeedDecreaseOnDirt() * 0.1;
-                else
-                    forwardMotion *= 0.1;
-            }
-
-            //コーナリング性能
-            if (Permission.hasPermission((Player) human.getBukkitEntity(), Permission.KART_DRIFT, true)) {
-                if (human.isSneaking()) {
-                    setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
-                            * getKart().getDriftCorneringPower()));
-                } else {
-                    setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
-                            * getKart().getDefaultCorneringPower()));
-                }
-
-                if (human.isSneaking()) {
-                    if (100 < this.getSpeedStack()) {
-                        Location current = getBukkitEntity().getLocation();
-                        current.setYaw(current.getYaw() + 270);
-                        Location ll = Util.getFrontBackLocationFromYaw(current, -this.getSpeedStack() / 60);
-
-                        Particle.sendToLocation("LAVA", ll, 0, 0, 0, 0, 5);
-                    }
-                }
+        //横方向への移動入力値を基にYawを変更
+        if (Permission.hasPermission((Player) human.getBukkitEntity(), Permission.KART_DRIFT, true)) {
+            if (human.isSneaking()) {
+                setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
+                        * getKart().getDriftCorneringPower()));
             } else {
                 setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
                         * getKart().getDefaultCorneringPower()));
             }
-
-            Location current = getBukkitEntity().getLocation().add(0, 0.5, 0);
-            current.setYaw(current.getYaw() + 270);
-            Location ll = Util.getFrontBackLocationFromYaw(current, -1.0 - this.getSpeedStack() / 30);
-
-            Particle.sendToLocation("SPELL",
-                    ll.add(((double) Util.getRandom(4)) / 10, 0.5, ((double) Util.getRandom(4)) / 10)
-                    , 0, 0, 0, 0, 5);
-
-            setYawPitch(getYaw(this), 0);
-            calcMotion(forwardMotion, sideMotion, getMotionInputStrength(human) / 2.0F);
+        } else {
+            setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
+                    * getKart().getDefaultCorneringPower()));
         }
+        setYawPitch(getYaw(this), 0);
+
+        //移動入力値を基にモーションを算出し格納
+        float normalizeMotion = forwardInput * forwardInput + sideInput * sideInput;
+
+        if (normalizeMotion >= 1.0E-004F) {
+            normalizeMotion = (float) Math.sqrt(normalizeMotion);
+            if (normalizeMotion < 1.0F) {
+                normalizeMotion = 1.0F;
+            }
+
+            normalizeMotion = (getMotionInputStrength(human) / 2.0F) / normalizeMotion;
+            forwardInput *= normalizeMotion;
+            sideInput *= normalizeMotion;
+
+            float sin = MathHelper.sin(getYaw(this) * 3.141593F / 180.0F);
+            float cos = MathHelper.cos(getYaw(this) * 3.141593F / 180.0F);
+
+            setMotionX(this, getMotionX(this) + (forwardInput * cos - sideInput * sin));
+            setMotionZ(this, getMotionZ(this) + (sideInput * cos + forwardInput * sin));
+        }
+    }
+
+    /**
+     * キラー使用中のモーションを適用する<br>
+     * 最寄の未通過のチェックポイントに向けたモーションを算出し適用する<br>
+     * <br>
+     * 未通過のチェックポイントを検出するため、通過済みのチェックポイントをリストとして保管する<br>
+     * ただし、Racerオブジェクトから取得できる通過済みリストとは異なり、別の変数として新規に宣言している<br>
+     * これは、キラー使用中はコースアウトを防ぐため、チェックポイントとの平面距離が5ブロック以内になるまで次のチェックポイントへは移動しない、<br>
+     * という処理を実現するためである<br>
+     * Racerオブジェクトの通過済みリストは、周囲のEntityを取得し、検出された全チェックポイントを無差別に格納している<br>
+     * この場合、チェックポイントとの距離が5ブロック以内に差し掛かった際に、既に隣接するチェックポイントは通過済みリストに含まれているため、<br>
+     * 次の未通過のチェックポイントが検出不可能となる<br>
+     * そこで、通過済みリストを別の変数として宣言し、キラー使用中に限り、<br>
+     * 距離が5ブロック以内チェックポイントのみを通過済みリストに格納するよう処理している
+     *
+     * @param r
+     */
+    public void setKillerMotion(Racer r) {
+        int checkPointHeihgt = RaceManager.checkPointHeight;
+        Location location = getBukkitEntity().getLocation();
+
+        //モーションの適用
+        if (this.getKillerX() != 0 &&  getKillerZ() != 0) {
+            setMotionX(this, getKillerX());
+            setMotionZ(this, getKillerZ());
+        }
+        setYawPitch(Util.getYawFromVector(new Vector(getMotionX(this), getMotionY(this), getMotionZ(this))) + 180, 0);
+
+
+        //初回起動時のみ
+        if (getKillerPassedCheckPointList() == null) {
+            //キラー使用者が通過済みのチェックポイントリストを引き継ぐ
+            setKillerPassedCheckPointList(new ArrayList<String>(r.getPassedCheckPoint()));
+
+            //キラー使用時に取得した、最寄の未通過のチェックポイントを格納
+            setKillerLastPassedCheckPoint(r.getUsingKiller());
+
+            //最寄の未通過のチェックポイントへ向けたベクターを算出
+            Vector vector = Util.getVectorToLocation(
+                    location,
+                    getKillerLastPassedCheckPoint().getLocation().add(0, -checkPointHeihgt, 0)).multiply(1.5);
+
+            //算出したベクターのX、Zモーションを格納
+            //Yモーションは利用しない
+            setKillerX(vector.getX());
+            setKillerZ(vector.getZ());
+        }
+
+        //最寄の未通過のチェックポイントとの平面距離が5ブロック以内になるまでreturnする
+        if (getKillerLastPassedCheckPoint() != null) {
+            double distance = getKillerLastPassedCheckPoint().getLocation()
+                    .distance(location.clone().add(0,checkPointHeihgt,0));
+            if ( 5 < distance) {
+                return;
+            }
+        }
+
+        //周囲のチェックポイントを取得し、検出できなかった場合return
+        ArrayList<org.bukkit.entity.Entity> chackPointList = RaceManager.getNearbyCheckpoint(location, 40, r.getEntry());
+        if (chackPointList == null) {
+            return;
+        }
+
+        //周囲のチェックポイントの内、未通過のチェックポイントを抽出
+        ArrayList<org.bukkit.entity.Entity> unpassedCheckPointList = new ArrayList<org.bukkit.entity.Entity>();
+        String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+        for (org.bukkit.entity.Entity checkPoint : chackPointList) {
+            if (!this.getKillerPassedCheckPointList().contains(lap + checkPoint.getUniqueId().toString())) {
+                unpassedCheckPointList.add(checkPoint);
+            }
+        }
+
+        //未通過のチェックポイントが検出できなかった場合return
+        if (unpassedCheckPointList.isEmpty()) {
+            return;
+        }
+
+        //最寄の未通過のチェックポイントを格納
+        setKillerLastPassedCheckPoint(Util.getNearestEntity(unpassedCheckPointList, location));
+
+        //最寄の未通過のチェックポイントへ向けたベクターを算出
+        Vector v = Util.getVectorToLocation(
+                location,
+                getKillerLastPassedCheckPoint().getLocation().add(0, -RaceManager.checkPointHeight, 0)).multiply(1.5);
+
+        //算出したベクターのX、Zモーションを格納
+        //Yモーションは利用しない
+        this.setKillerX(v.getX());
+        this.setKillerZ(v.getZ());
+
+        //チェックポイントを通過済みリストに格納
+        getKillerPassedCheckPointList().add(lap + getKillerLastPassedCheckPoint().getUniqueId().toString());
+    }
+
+    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * Entityがダメージを受けた際の揺れる速度を時間経過で復元する<br>
+     * マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける
+     * ダメージを受けた際に左右に揺れる速度を指す<br>
+     * <br>
+     * EntityMinecartAbstract.getType()はMinecartのDataWatcherインデックス17番Shaking Powerを返す<br>
+     * EntityMinecartAbstract.j(int i)は同DataWatcherの値を変更する<br>
+     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
+     */
+    public void recoveryShakingPower() {
+        if (getType() > 0) {
+            j(getType() - 1);
+        }
+    }
+
+    /**
+     * Entityの耐久値を時間経過で復元する<br>
+     * 耐久値とは、マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける破壊の進捗度を指す<br>
+     * 同時に、耐久値はダメージを受けた際の揺れ幅にも影響する<br>
+     * <br>
+     * EntityMinecartAbstract.getDamage()はMinecartのDataWatcherインデックス19番Damage Taken / Shaking Multiplierを返す<br>
+     * EntityMinecartAbstract.setDamage(float f)は同DataWatcherの値を変更する<br>
+     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
+     */
+    public void recoveryDamage() {
+        if (getDamage() > 0.0F) {
+            setDamage(getDamage() - 1.0F);
+        }
+    }
+
+    /** 当クラスのEntityを死亡させる */
+    public void removeEntity() {
+        this.O();
+    }
+
+    /** モーション値に摩擦係数を割り当て減衰させる */
+    public void applyFriction() {
+        n();
+    }
+
+    /** 水に接触している場合水没フラグをtrueにし、落下距離・延焼を初期化する */
+    public void applyWaterCollision() {
+        W();
+    }
+
+    /**
+     * プレイヤーが登場時のカートのモーションを当プラグイン独自の値に変換し適用する
+     * @param human カートに搭乗しているEntityHuman
+     */
+    public void applyMotion() {
+
+        //EntityHumanが搭乗していない場合は何もしない
+        if (getPassenger(this) == null) {
+            return;
+        }
+        if (!(getPassenger(this) instanceof EntityHuman)) {
+            return;
+        }
+
+        //モーション値を変換する前に現在のモーション値を残しておく
+        //collide()で使用する
+        setLastMotionSpeed(calcMotionSpeed(getMotionX(this), getMotionZ(this)) * this.getKart().getWeight());
+
+        EntityHuman human = (EntityHuman) getPassenger(this);
+        Player player = (Player) human.getBukkitEntity();
+        Racer r = RaceManager.getRace(player);
+
+        //キラー使用中
+        if (r.getUsingKiller() != null) {
+            //よじ登れる高さを一時的に高くする
+            setClimbableHeight(this, getKart().getClimbableHeight() + 5);
+
+            //スピードスタックを一時的に常に最大値に固定する
+            setSpeedStack(getKart().getMaxSpeed());
+
+            //キラー専用モーションの適用
+            setKillerMotion(r);
+
+            //キラー用エフェクトの再生
+            playKillerEffect(human);
+
+            //周囲のプレイヤーへダメージ
+            Util.createSafeExplosion(player, getBukkitEntity().getLocation()
+                    , ItemEnum.KILLER.getMovingDamage()
+                    + RaceManager.getRace(player).getCharacter().getAdjustAttackDamage(), 4);
+        } else {
+            //レースが開始されるまで動かない
+            if (!RaceManager.isRacing(human.getUniqueID())) {
+                return;
+            }
+
+            //よじ登れる高さを元に戻す
+            setClimbableHeight(this, getKart().getClimbableHeight());
+
+            //モーションの適用
+            setNormalMotion(human);
+
+            //アイドリングエフェクトの再生
+            playIdleEffect(human);
+
+            //ドリフトエフェクトの再生
+            playDriftEffect(human);
+
+            //スピードメーター
+            player.setLevel(calcMotionSpeed(getMotionX(this), getMotionZ(this)));
+        }
+
         //はしご、つたのようなよじ登れるブロックに立っている場合
         if (isClambableBlock()) {
             float f4 = 0.15F;
@@ -1044,72 +981,187 @@ public class CustomMinecart extends EntityMinecartRideable {
         setMotionY(this, getMotionY(this) * 0.9800000190734863D);
         //setMotionX(getMotionX() * groundFriction);
         //setMotionZ(getMotionZ() * groundFriction);
+    }
 
-        //スピードメーター
-        if (RaceManager.getRace((Player) human.getBukkitEntity()).getUsingKiller() == null) {
-            ((Player) human.getBukkitEntity()).setLevel(calcMotionSpeed(getMotionX(this), getMotionZ(this)));
+    /** エンジン音、排気口のパーティクルを生成する */
+    public void playIdleEffect(EntityHuman human) {
+        Location currentLocation = getBukkitEntity().getLocation().add(0, 0.5, 0);
+        currentLocation.setYaw(currentLocation.getYaw() + 270);
+
+        //排気口付近の座標を取得
+        currentLocation =
+                Util.getForwardLocationFromYaw(currentLocation, -1.0 - this.getSpeedStack() / 30);
+
+        //座標にランダム性を持たせ、排気口付近にパーティクルを散らす
+        double[] particleOffSet = new double[]{
+                Double.valueOf(Util.getRandom(4)) / 10
+                , 0.5
+                , Double.valueOf(Util.getRandom(4)) / 10};
+        currentLocation.add(particleOffSet[0], particleOffSet[1], particleOffSet[2]);
+        Particle.sendToLocation("SPELL", currentLocation, 0, 0, 0, 0, 5);
+
+        //音声を再生
+        Player player = (Player) human.getBukkitEntity();
+        player.playSound(player.getLocation()
+                , Sound.COW_WALK, 0.2F, 0.05F + ((float) this.getSpeedStack() / 200));
+        player.playSound(player.getLocation()
+                , Sound.GHAST_FIREBALL, 0.01F + ((float) this.getSpeedStack() / 400), 1.0F);
+        player.playSound(player.getLocation()
+                , Sound.FIZZ, 0.01F + ((float) this.getSpeedStack() / 400), 0.5F);
+    }
+
+    /** キラー使用中のエンジン音、排気口のパーティクルを生成する */
+    public void playKillerEffect(EntityHuman human) {
+        Location currentLocation = getBukkitEntity().getLocation().add(0, 0.5, 0);
+        currentLocation.setYaw(currentLocation.getYaw() + 270);
+
+        //キラーの排気口付近の座標を取得
+        currentLocation = Util.getForwardLocationFromYaw(currentLocation, -15);
+
+        //座標にランダム性を持たせ、排気口付近に赤いパーティクルを散らす
+        double[] particleOffSet;
+        for (int i = 0; i < 10; i++) {
+            particleOffSet = new double[]{
+                    Double.valueOf(Util.getRandom(10)) / 10
+                    , Double.valueOf(Util.getRandom(10)) / 10
+                    , Double.valueOf(Util.getRandom(10)) / 10};
+            currentLocation.add(particleOffSet[0], particleOffSet[1], particleOffSet[2]);
+            Particle.sendToLocation("REDSTONE", currentLocation, 0, 0, 0, 0, 10);
+        }
+
+        //音声を再生
+        Player player = (Player) human.getBukkitEntity();
+        player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 0.05F, 1.5F);
+        player.playSound(player.getLocation(), Sound.FIZZ, 0.05F, 1.0F);
+    }
+
+    /** ドリフト中の火花パーティクルを生成する */
+    public void playDriftEffect(EntityHuman human) {
+        if (human.isSneaking()) {
+
+            //スピードスタックが100を越える場合のみ火花のパーティクルを生成する
+            if (100 < getSpeedStack()) {
+                Location location = getBukkitEntity().getLocation();
+                location.setYaw(location.getYaw() + 270);
+
+                //後輪付近の座標を取得
+                location = Util.getForwardLocationFromYaw(location, -this.getSpeedStack() / 60);
+
+                //後輪付近に火花のパーティクルを散らす
+                Particle.sendToLocation("LAVA", location, 0, 0, 0, 0, 5);
+            }
+
+            //音声を再生
+            Player player = (Player) human.getBukkitEntity();
+            player.playSound(player.getLocation(), Sound.FIREWORK_BLAST, 1.0F, 7.0F);
         }
     }
 
-    public void calcSpeedStack(EntityHuman human) {
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数humanの情報を基にスピードスタックを算出し返す
+     * @param human 取得するHumanEntity
+     * @return 引数humanの情報を基に算出したスピードスタック
+     */
+    public double calcSpeedStack(EntityHuman human) {
         Player player = (Player) human.getBukkitEntity();
-        if (RaceManager.getRace(player).getStepDashBoard()) {
-            this.setSpeedStack(getKart().getMaxSpeed()
+        Racer race = RaceManager.getRace(player);
+
+        double speedStack = 0;
+
+        //ダッシュボード、ポーションの効果をスピードスタックに上乗せしreturnする
+        //returnしなければ、後の処理で最大値・最小値を越えている場合、正常値にマージされてしまう
+        //両効果が重複してしまうと爆発的なスピードが出てしまうため、
+        //ダッシュボードに接触している場合はポーションの効果は無視する
+        if (race.isStepDashBoard()) {
+
+            //ダッシュボードに接触した場合、スピードスタックを最大値+αしreturnする
+            return getKart().getMaxSpeed()
                     * (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
-                    + RaceManager.getRace(player).getCharacter().getAdjustPositiveEffectLevel() * 50);
-            return;
-        }
-        for (PotionEffect potion : player.getActivePotionEffects()) {
-            if (potion.getType().getName().equalsIgnoreCase("SPEED")) {
-                setSpeedStack(getKart().getMaxSpeed() + potion.getAmplifier() * 10);
-                return;
-            } else if (potion.getType().getName().equalsIgnoreCase("SLOW")) {
-                if (this.getSpeedStack() < potion.getAmplifier())
-                    this.setSpeedStack(0);
-                else
-                    this.setSpeedStack(this.getSpeedStack() - potion.getAmplifier());
-                return;
-            }
-        }
+                    + race.getCharacter().getAdjustPositiveEffectLevel() * 50;
+        } else {
 
-        if (0 < getForwardMotionInput(human)) {
-            if (!isDirtBlock()) {
-                if (this.getSpeedStack() < getKart().getMaxSpeed()) {
-                    this.setSpeedStack(this.getSpeedStack() + getKart().getAcceleration());
-                } else {
-                    //キノコ等で急加速した場合一時的にmaxSpeedStackを超えるため
-                    this.setSpeedStack(getKart().getMaxSpeed());
+            //スピードに影響するポーション効果を保持している場合、スピードスタックを操作しreturnする
+            for (PotionEffect potion : player.getActivePotionEffects()) {
+
+                //スピードポーション効果を保持している場合、スピードスタックを最大値+αしreturnする
+                if (potion.getType().getName().equalsIgnoreCase("SPEED")) {
+                    return  getKart().getMaxSpeed() + potion.getAmplifier() * 10;
                 }
-            } else {
-                this.setSpeedStack(this.getSpeedStack()
-                        - RaceManager.getRace(player).getKart().getSpeedDecreaseOnDirt());
-            }
 
-            if (human.isSneaking()) {
-                this.setSpeedStack(this.getSpeedStack() - getKart().getSpeedDecreaseOnDrift());
-                ((Player) human.getBukkitEntity()).playSound(human.getBukkitEntity().getLocation(),
-                        Sound.FIREWORK_BLAST, 1.0F, 7.0F);
-            }
-        } else if (0 == getForwardMotionInput(human)) {
-            //入力がなく停止している状態
-            if (0 < this.getSpeedStack()) {
-                this.setSpeedStack(this.getSpeedStack() - 4);
-            }
-        }
-        if (getForwardMotionInput(human) < 0) {
-            //後方へ入力されている状態
-            if (0 < this.getSpeedStack()) {
-                this.setSpeedStack(this.getSpeedStack() - 10);
+                //スロウポーション効果を保持している場合、スピードスタックを急激に減衰しreturnする
+                if (potion.getType().getName().equalsIgnoreCase("SLOW")) {
+                    if (getSpeedStack() < potion.getAmplifier()) {
+                        return 0;
+                    } else {
+                        return getSpeedStack() - potion.getAmplifier();
+                    }
+                }
             }
         }
-        if (this.getSpeedStack() < 0) {
-            this.setSpeedStack(0);
+
+        float forwardMotionInput = getForwardMotionInput(human);
+        //前方へキーを入力している
+        if (0 < forwardMotionInput) {
+            if (!isDirtBlock()) {
+                speedStack = getSpeedStack() + getKart().getAcceleration();
+            } else {
+                speedStack = getSpeedStack() - race.getKart().getSpeedDecreaseOnDirt();
+            }
+        //後方へキーを入力している
+        } else if (forwardMotionInput < 0) {
+            speedStack = getSpeedStack() - 10;
+
+        //入力していない
+        } else if (0 == forwardMotionInput) {
+            speedStack = getSpeedStack() - 4;
         }
+
+        //最大値・最小値を越えている場合、正常値にマージする
+        if (getKart().getMaxSpeed() < getSpeedStack()) {
+            speedStack = getKart().getMaxSpeed();
+        } else if (getSpeedStack() < 0) {
+            speedStack = 0;
+        }
+
+        //モーション値が限りなく0に近い場合はスピードスタックを0にする
+        //壁に衝突した場合などの急激なモーションのストップに対する処理
         BigDecimal bd = new BigDecimal((getMotionX(this) * getMotionX(this)
                 + getMotionZ(this) * getMotionZ(this)));
         double mot = bd.setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
-        if (mot == 0)
-            this.setSpeedStack(0);
+        if (mot == 0) {
+            speedStack = 0;
+        }
+
+        return speedStack;
+    }
+
+    /**
+     * スピードスタックを基に、縦方向の移動入力値を変換し返す
+     * @param forwardInput 変換前の縦方向の移動入力値
+     * @return 変換した縦方向の移動入力値
+     */
+    public float calcForwardInput(float forwardInput) {
+        //前方へキーを入力している
+        if (0 < forwardInput) {
+            forwardInput *= 0.1;
+            forwardInput += getSpeedStack() / 400;
+
+        //後方へキーを入力している
+        } else if (forwardInput < 0) {
+            if (isDirtBlock()) {
+                forwardInput *= getKart().getSpeedDecreaseOnDirt() * 0.1;
+            } else {
+                forwardInput *= 0.1;
+            }
+
+        //入力していない
+        } else {
+            // Do nothing
+        }
+
+        return forwardInput;
     }
 
     public int calcMotionSpeed(double x, double z) {
@@ -1117,33 +1169,124 @@ public class CustomMinecart extends EntityMinecartRideable {
         return (int) (bd.doubleValue() * 564);
     }
 
-    /**
-     * クライアントからの移動に関する入力をモーション値に変換し格納する
-     * @param forwardMotion 縦方向の入力値
-     * @param sideMotion 横方向の入力値
-     * @param friction 摩擦係数
-     */
-    public void calcMotion(float forwardMotion, float sideMotion, float friction) {
-        float f3 = forwardMotion * forwardMotion + sideMotion * sideMotion;
+    //〓 Override 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-        if (f3 >= 1.0E-004F) {
-            f3 = (float) Math.sqrt(f3);
-            if (f3 < 1.0F) {
-                f3 = 1.0F;
+    /**
+     * livingUpdate
+     * Entityの状態を毎チック更新する
+     */
+    @Override
+    public void t_()
+    {
+        //被ダメージ時の揺れる速度を減衰する
+        recoveryShakingPower();
+
+        //被ダメージ時の耐久値の回復
+        recoveryDamage();
+
+        //クライアントから読み込まれなくなった場合デスポーン
+        if (isClientSide(this)) {
+            removeEntity();
+            return;
+        }
+
+        //奈落に落下した場合デスポーン
+        if (getLocationY(this) < -64.0D) {
+            removeEntity();
+        }
+
+        //1チック前の座標を記録
+        setLastLocationX(this, getLocationX(this));
+        setLastLocationY(this, getLocationY(this));
+        setLastLocationZ(this, getLocationZ(this));
+
+        //展示用カートの場合モーションを0に固定しreturnする
+        if (getKartType().equals(KartType.DisplayKart)) {
+            setMotionX(this, 0);
+            setMotionY(this, 0);
+            setMotionZ(this, 0);
+            setYawPitch(getYaw(this), getPitch(this));
+            return;
+        }
+
+        //YモーションをマイナスしEntityを自然落下させる
+        setMotionY(this, getMotionY(this) - 0.03999999910593033D);
+
+        //プレイヤーが搭乗時、当プラグイン独自のモーション値を適用する
+        applyMotion();
+
+        //モーション値に摩擦係数を割り当て減衰させる
+        applyFriction();
+
+        //よく分からない
+        checkBlockCollisions();
+
+        //BoundingBox内のEntityを検索し、Entityがマインカートであれば当たり判定を発生させる
+        Iterator iterator = this.getWorld().getEntities(this,
+                getBoundingBox().grow(0.2000000029802322D, 0.0D, 0.2000000029802322D)).iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if ((entity != getPassenger(this)) && ((entity instanceof EntityMinecartAbstract))) {
+                entity.collide(this);
+            }
+        }
+
+        //搭乗者が死亡していた場合passenger変数を初期化する
+        if (getPassenger(this) != null && isDead(getPassenger(this))) {
+            if (getVehicle(getPassenger(this)) == this) {
+                setVehicle(getPassenger(this), null);
             }
 
-            f3 = friction / f3;
-            forwardMotion *= f3;
-            sideMotion *= f3;
+            setPassenger(this, null);
+        }
 
-            float f4 = MathHelper.sin(getYaw(this) * 3.141593F / 180.0F);
-            float f5 = MathHelper.cos(getYaw(this) * 3.141593F / 180.0F);
+        //水に接触している場合水没フラグをtrueにし、落下距離・延焼を初期化する
+        applyWaterCollision();
+    }
 
-            setMotionX(this, getMotionX(this) + (forwardMotion * f5 - sideMotion * f4));
-            setMotionZ(this, getMotionZ(this) + (sideMotion * f5 + forwardMotion * f4));
+    /**
+     * applyFriction
+     * 現在のモーション値に摩擦係数を適用し徐々に減衰させる
+     */
+    @Override
+    protected void n() {
+
+        //搭乗者がいる場合
+        if (getPassenger(this) != null) {
+
+            //プレイヤーが搭乗している場合
+            if (getPassenger(this) instanceof EntityHuman) {
+                // Do nothing
+
+            //プレイヤー以外が搭乗している場合
+            } else {
+                double d0 = getFrictionValue();
+
+                setMotionX(this, MathHelper.a(getMotionX(this), -d0, d0));
+                setMotionZ(this, MathHelper.a(getMotionZ(this), -d0, d0));
+            }
+        }
+
+        //地面にいる場合は地面との摩擦係数を適用
+        if (isOnGround(this)) {
+            setMotionX(this, getMotionX(this) * getGroundFrictionX());
+            setMotionY(this, getMotionY(this) * getGroundFrictionY());
+            setMotionZ(this, getMotionZ(this) * getGroundFrictionZ());
+        }
+
+        //移動
+        move(getMotionX(this), getMotionY(this), getMotionZ(this));
+
+        //空中にいる場合は地面との摩擦係数を適用
+        //なぜmoveの後に適用するのかは不明
+        if (!isOnGround(this)) {
+            setMotionX(this, getMotionX(this) * getFlyFrictionX());
+            setMotionY(this, getMotionY(this) * getFlyFrictionY());
+            setMotionZ(this, getMotionZ(this) * getFlyFrictionZ());
         }
     }
 
+    @Override
     public boolean damageEntity(DamageSource damagesource, float f) {
         if ((!isClientSide(this)) && (!this.dead)) {
             if (!(damagesource.getEntity() instanceof EntityHuman))
@@ -1160,7 +1303,7 @@ public class CustomMinecart extends EntityMinecartRideable {
                 DisplayKartConfig.deleteDisplayKart(player, this.getCustomName());
             }
 
-            craftBukkit_die();
+            removeEntity();
         }
         return true;
     }
@@ -1214,5 +1357,30 @@ public class CustomMinecart extends EntityMinecartRideable {
                 }
             }
         }
+    }
+
+    /**
+     * setPassenger
+     * マインカートが搭乗可能な状態だった場合搭乗させる
+     * プレイヤーに右クリックされた場合等に処理される
+     * @return 既に搭乗者がいた場合、搭乗者がプレイヤーならtrue、プレイヤー以外のEntityならfalse
+     */
+    @Override
+    public boolean e(EntityHuman human)
+    {
+        if (getPassenger(this) != null && getPassenger(this) != human) {
+            if (getPassenger(this) instanceof EntityHuman) {
+                return true;
+            }
+            return false;
+        }
+        if (getKartType().equals(KartType.DisplayKart)) {
+            human.mount(this);
+        }
+        if (!isClientSide(this)) {
+            human.mount(this);
+        }
+
+        return true;
     }
 }
