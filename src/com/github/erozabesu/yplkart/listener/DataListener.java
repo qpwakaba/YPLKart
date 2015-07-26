@@ -93,12 +93,12 @@ public class DataListener implements Listener {
 
     //レース用カートを右クリックした場合キャンセル
     @EventHandler
-    public void interactKart(PlayerInteractEntityEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
+    public void interactKart(PlayerInteractEntityEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
             return;
         }
-        if (RaceManager.isSpecificKartType(e.getRightClicked(), KartType.RacingKart)) {
-            e.setCancelled(true);
+        if (RaceManager.isSpecificKartType(event.getRightClicked(), KartType.RacingKart)) {
+            event.setCancelled(true);
             return;
         }
     }
@@ -345,33 +345,33 @@ public class DataListener implements Listener {
     //カート搭乗中の落下ダメージを無効
     //スタンバイ状態～レース開始までのダメージを無効
     @EventHandler
-    public void onPlayerDamage(EntityDamageEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld()))
             return;
-        if (!(e.getEntity() instanceof Player))
+        if (!(event.getEntity() instanceof Player))
             return;
-        if (e.getCause() == DamageCause.VOID)
+        if (event.getCause() == DamageCause.VOID)
             return;
-        Player p = (Player) e.getEntity();
+        Player p = (Player) event.getEntity();
 
         if (RaceManager.isRacing(p.getUniqueId())) {
             if (RaceManager.getRace(p).getUsingKiller() != null) {
-                if (e.getCause() == DamageCause.SUFFOCATION) {
-                    e.setCancelled(true);
+                if (event.getCause() == DamageCause.SUFFOCATION) {
+                    event.setCancelled(true);
                     return;
                 }
             }
-            if (e.getCause() == DamageCause.FALL) {
+            if (event.getCause() == DamageCause.FALL) {
                 if (p.getVehicle() != null) {
                     if (RaceManager.isSpecificKartType(p.getVehicle(), KartType.RacingKart)) {
-                        e.setCancelled(true);
+                        event.setCancelled(true);
                     }
                 }
             }
         } else if (RaceManager.isStandBy(p.getUniqueId())
                 && !RaceManager.isRacing(p.getUniqueId())) {
-            if (e.getCause() != DamageCause.VOID)
-                e.setCancelled(true);
+            if (event.getCause() != DamageCause.VOID)
+                event.setCancelled(true);
         }
     }
 

@@ -99,17 +99,18 @@ public class CustomMinecart extends EntityMinecartRideable {
 
     //〓 メイン 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public CustomMinecart(World w, Kart kart, KartType kartType, Location l) {
+    public CustomMinecart(World w, Kart kart, KartType kartType, Location location) {
         super(w);
         setKartType(kartType);
-        this.yaw = l.getYaw();
+        this.yaw = location.getYaw();
 
         if (getKartType().equals(KartType.DisplayKart)) {
-            this.pitch = -l.getPitch();
+            this.pitch = -location.getPitch();
             setYawPitch(this.yaw + 90F, this.pitch);
             return;
         }
         setYawPitch(this.yaw + 90F, 0F);
+        setPosition(location.getX(), location.getY() + 1, location.getZ());
         setParameter(kart);
     }
 
@@ -598,9 +599,33 @@ public class CustomMinecart extends EntityMinecartRideable {
 
     //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public void craftBukkit_J() {
+    /**
+     * Entityがダメージを受けた際の揺れる速度を時間経過で復元する<br>
+     * マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける
+     * ダメージを受けた際に左右に揺れる速度を指す<br>
+     * <br>
+     * EntityMinecartAbstract.getType()はMinecartのDataWatcherインデックス17番Shaking Powerを返す<br>
+     * EntityMinecartAbstract.j(int i)は同DataWatcherの値を変更する<br>
+     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
+     */
+    public void recoveryShakingPower() {
         if (getType() > 0) {
             j(getType() - 1);
+        }
+    }
+
+    /**
+     * Entityの耐久値を時間経過で復元する<br>
+     * 耐久値とは、マインカートや船のような一定時間攻撃し続けなければ破壊できないEntityにおける破壊の進捗度を指す<br>
+     * 同時に、耐久値はダメージを受けた際の揺れ幅にも影響する<br>
+     * <br>
+     * EntityMinecartAbstract.getDamage()はMinecartのDataWatcherインデックス19番Damage Taken / Shaking Multiplierを返す<br>
+     * EntityMinecartAbstract.setDamage(float f)は同DataWatcherの値を変更する<br>
+     * @see <a href="http://wiki.vg/Entities#Entity_Metadata_Format">Entity_Metadata_Format</a>
+     */
+    public void recoveryDamage() {
+        if (getDamage() > 0.0F) {
+            setDamage(getDamage() - 1.0F);
         }
     }
 
@@ -733,14 +758,11 @@ public class CustomMinecart extends EntityMinecartRideable {
     @Override
     public void s_()
     {
-        //よくわからない
-        craftBukkit_J();
+        //被ダメージ時の揺れる速度を減衰する
+        recoveryShakingPower();
 
-        //Entityのブレーク値の減衰
-        //マインカートや船のような一定時間攻撃し続けなければ壊れないEntityに利用される値
-        if (getDamage() > 0.0F) {
-            setDamage(getDamage() - 1.0F);
-        }
+        //被ダメージ時の耐久値の回復
+        recoveryDamage();
 
         //クライアントから読み込まれなくなった場合デスポーン
         if (isClientSide(this)) {
