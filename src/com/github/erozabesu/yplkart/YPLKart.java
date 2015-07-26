@@ -15,9 +15,6 @@ import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.listener.DataListener;
 import com.github.erozabesu.yplkart.listener.ItemListener;
 import com.github.erozabesu.yplkart.listener.NettyListener;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
 
 public class YPLKart extends JavaPlugin {
     private static YPLKart PLUGIN;
@@ -38,10 +35,6 @@ public class YPLKart extends JavaPlugin {
 
         //全コンフィグの読み込み、格納
         ConfigManager.reloadAllConfig();
-
-        new ReflectionUtil();
-        new Util();
-        new PacketUtil();
 
         new DataListener(this);
         new ItemListener(this);

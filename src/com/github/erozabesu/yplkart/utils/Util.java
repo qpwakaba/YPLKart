@@ -2,7 +2,6 @@ package com.github.erozabesu.yplkart.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,22 +35,6 @@ import com.github.erozabesu.yplkart.task.FlowerShowerTask;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil {
-    private static Class<?> nmsBlock = getNMSClass("Block");
-    private static Class<?> nmsMaterial = getNMSClass("Material");
-
-    private static Method static_nmsBlock_getById;
-    private static Method block_getMaterial;
-    private static Method material_isSolid;
-
-    public Util() {
-        try {
-            static_nmsBlock_getById = nmsBlock.getMethod("getById", int.class);
-            block_getMaterial = nmsBlock.getMethod("getMaterial");
-            material_isSolid = nmsMaterial.getMethod("isSolid");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * value以下の乱数を生成する
@@ -396,8 +379,8 @@ public class Util extends ReflectionUtil {
      */
     public static Boolean isSolidBlock(Location location) {
         try {
-            return (Boolean) material_isSolid.invoke(
-                    block_getMaterial.invoke(
+            return (Boolean) nmsMaterial_isSolid.invoke(
+                    nmsBlock_getMaterial.invoke(
                             static_nmsBlock_getById.invoke(null, location.getBlock().getTypeId())));
         } catch (Exception e) {
             e.printStackTrace();

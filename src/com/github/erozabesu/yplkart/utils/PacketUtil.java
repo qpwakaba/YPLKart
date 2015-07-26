@@ -2,7 +2,6 @@ package com.github.erozabesu.yplkart.utils;
 
 import io.netty.channel.Channel;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -22,81 +21,9 @@ public class PacketUtil extends ReflectionUtil {
     private static HashMap<UUID, Object> networkManager = new HashMap<UUID, Object>();
     private static HashMap<UUID, Channel> channel = new HashMap<UUID, Channel>();
 
-    private static Class<?> nmsEntity = getNMSClass("Entity");
-    private static Class<?> nmsEntityHuman = getNMSClass("EntityHuman");
-    private static Class<?> nmsEntityLiving = getNMSClass("EntityLiving");
-    private static Class<?> nmsItemStack = getNMSClass("ItemStack");
-
-    private static Class<?> nmsPacket = getNMSClass("Packet");
-    private static Class<?> nmsPlayerConnection = getNMSClass("PlayerConnection");
-
-    private static Class<?> nmsIChatBaseComponent = getNMSClass("IChatBaseComponent");
-    private static Class<?> nmsChatSerializer;
-    private static Class<?> nmsEnumTitleAction;
-    private static Class<?> nmsEnumClientCommand;
-
-    private static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
-    private static Constructor<?> constructor_nmsPacketPlayOutAttachEntity;
-    private static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
-    private static Constructor<?> constructor_nmsPacketPlayOutEntityDestroy;
-    private static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
-    private static Constructor<?> constructor_nmsPacketPlayOutEntityEquipment;
-    private static Class<?> nmsPacketPlayOutNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn");
-    private static Constructor<?> constructor_nmsPacketPlayOutNamedEntitySpawn;
-    private static Class<?> nmsPacketPlayOutSpawnEntityLiving = getNMSClass("PacketPlayOutSpawnEntityLiving");
-    private static Constructor<?> constructor_nmsPacketPlayOutSpawnEntityLiving;
-    private static Class<?> nmsPacketPlayOutTitle = getNMSClass("PacketPlayOutTitle");
-    private static Constructor<?> constructor_nmsPacketPlayOutTitle;
-    private static Constructor<?> constructor_nmsPacketPlayOutTitle_Length;
-    private static Class<?> nmsPacketPlayInClientCommand = getNMSClass("PacketPlayInClientCommand");
-    private static Constructor<?> constructor_nmsPacketPlayInClientCommand;
-
-    private static Object enumTitleAction_PerformTitle;
-    private static Object enumTitleAction_PerformSubTitle;
-    private static Object enumClientCommand_PerformRespawn;
-
-    private static Method nmsPlayerConnection_sendPacket;
-    private static Method nmsEntity_setEntityID;
-    private static Method nmsEntity_setLocation;
-    private static Method nmsEntity_setCustomName;
-    private static Method nmsEntity_setCustomNameVisible;
-    private static Method static_nmsChatSerializer_buildTitle;
-
-    public PacketUtil() {
-        try {
-            if (getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
-                nmsChatSerializer = getNMSClass("ChatSerializer");
-                nmsEnumTitleAction = getNMSClass("EnumTitleAction");
-                nmsEnumClientCommand = getNMSClass("EnumClientCommand");
-            } else {
-                nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
-                nmsEnumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
-                nmsEnumClientCommand = getNMSClass("PacketPlayInClientCommand$EnumClientCommand");
-            }
-
-            constructor_nmsPacketPlayOutAttachEntity = nmsPacketPlayOutAttachEntity.getConstructor(int.class, nmsEntity, nmsEntity);
-            constructor_nmsPacketPlayOutEntityDestroy = nmsPacketPlayOutEntityDestroy.getConstructor(int[].class);
-            constructor_nmsPacketPlayOutEntityEquipment = nmsPacketPlayOutEntityEquipment.getConstructor(int.class, int.class, nmsItemStack);
-            constructor_nmsPacketPlayOutNamedEntitySpawn = nmsPacketPlayOutNamedEntitySpawn.getConstructor(nmsEntityHuman);
-            constructor_nmsPacketPlayOutSpawnEntityLiving = nmsPacketPlayOutSpawnEntityLiving.getConstructor(nmsEntityLiving);
-            constructor_nmsPacketPlayOutTitle = nmsPacketPlayOutTitle.getConstructor(nmsEnumTitleAction, nmsIChatBaseComponent);
-            constructor_nmsPacketPlayOutTitle_Length = nmsPacketPlayOutTitle.getConstructor(int.class, int.class, int.class);
-            constructor_nmsPacketPlayInClientCommand = nmsPacketPlayInClientCommand.getConstructor(nmsEnumClientCommand);
-
-            enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
-            enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
-            enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
-
-            nmsPlayerConnection_sendPacket = nmsPlayerConnection.getMethod("sendPacket", nmsPacket);
-            nmsEntity_setEntityID = nmsEntity.getMethod("d", int.class);
-            nmsEntity_setLocation = nmsEntity.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
-            nmsEntity_setCustomName = nmsEntity.getMethod("setCustomName", String.class);
-            nmsEntity_setCustomNameVisible = nmsEntity.getMethod("setCustomNameVisible", boolean.class);
-            static_nmsChatSerializer_buildTitle = nmsChatSerializer.getMethod("a", String.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
+    private static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
+    private static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
 
     /*
      * プレイヤーがログアウトした場合は登録されているデータを初期化します
