@@ -33,5 +33,7 @@ abstract class CMDAbstract extends CMD {
 
     abstract void reload();
 
+    abstract void debug();
+
     abstract void additem(ItemStack item, Permission permission);
 }

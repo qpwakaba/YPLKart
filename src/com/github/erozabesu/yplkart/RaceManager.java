@@ -1,5 +1,6 @@
 package com.github.erozabesu.yplkart;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -396,7 +398,7 @@ public class RaceManager {
      */
     public static Object getCustomMinecartObjectFromEntityMetaData(Entity entity) {
         List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
-        if (metaDataList != null) {
+        if (metaDataList.size() != 0) {
             MetadataValue metaData = metaDataList.get(0);
             if (metaData != null) {
                 Object metaDataValue = metaData.value();
@@ -463,7 +465,7 @@ public class RaceManager {
     public static boolean isSpecificKartType(Entity entity, KartType kartType) {
         if (entity instanceof Minecart) {
             List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
-            if (metaDataList != null) {
+            if (metaDataList.size() != 0) {
                 MetadataValue metaData = metaDataList.get(0);
                 if (metaData != null) {
                     Object metaDataValue = metaData.value();
@@ -508,66 +510,101 @@ public class RaceManager {
         }
     }
 
-    public static Minecart createRacingMinecart(Location l, Kart kart) {
-        try {
-            Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
-            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
-            Object customKart = customClass.getConstructor(
-                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
-                    .newInstance(craftWorld, kart, KartType.RacingKart, l);
-            Minecart cart = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+    public static Minecart createRacingMinecart(Location location, Kart kart) {
+        Minecart minecartEntity = createCustomMinecart(location, kart, KartType.RacingKart);
 
-            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customKart, l.getX(),
-                    l.getY() + 1, l.getZ());
-            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
-                    .invoke(craftWorld, customKart);
+        minecartEntity.setCustomName(kart.getKartName());
 
-            cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
-            cart.setCustomName(kart.getKartName());
-            cart.setCustomNameVisible(false);
-
-            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
-                    YPLKart.getInstance(), new Object[]{KartType.RacingKart, customKart}));
-
-            return cart;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return minecartEntity;
     }
 
-    public static Minecart createDisplayMinecart(Location l, Kart kart, String id) {
+    public static Minecart createDisplayMinecart(Location location, Kart kart, String uuid) {
+        Minecart minecartEntity = createCustomMinecart(location, kart, KartType.DisplayKart);
+
+        if (uuid == null) {
+            minecartEntity.setCustomName(minecartEntity.getUniqueId().toString());
+            DisplayKartConfig.createDisplayKart(minecartEntity.getUniqueId().toString(), kart, location);
+        } else {
+            minecartEntity.setCustomName(uuid);
+        }
+
+        return minecartEntity;
+    }
+
+    /**
+     * カスタムMinecartEntityを生成する
+     * @param location 生成する座標
+     * @param kart パラメータを引き継ぐKartObject
+     * @param kartType カートの種類
+     * @return 生成したMinecartEntity
+     */
+    private static Minecart createCustomMinecart(Location location, Kart kart, KartType kartType) {
+        Minecart minecartEntity = null;
         try {
-            Object craftWorld = ReflectionUtil.getCraftWorld(l.getWorld());
+            Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
             Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
             Object customKart = customClass.getConstructor(
                     ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
-                    .newInstance(craftWorld, kart, KartType.DisplayKart, l);
-            Minecart cart = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+                    .newInstance(craftWorld, kart, kartType, location);
 
-            customClass.getMethod("setPosition", double.class, double.class, double.class).invoke(customKart, l.getX(),
-                    l.getY() + 1, l.getZ());
+            minecartEntity = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+
             craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
                     .invoke(craftWorld, customKart);
 
-            cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
+            minecartEntity.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
+            minecartEntity.setCustomNameVisible(false);
+            minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+                    YPLKart.getInstance(), new Object[]{kartType, customKart}));
 
-            if (id == null) {
-                cart.setCustomName(cart.getUniqueId().toString());
-                DisplayKartConfig.createDisplayKart(cart.getUniqueId().toString(), kart, l);
-            } else {
-                cart.setCustomName(id);
-            }
-            cart.setCustomNameVisible(false);
-
-            cart.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
-                    YPLKart.getInstance(), new Object[]{KartType.DisplayKart, customKart}));
-
-            return cart;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return null;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
+        return minecartEntity;
+    }
+
+    public static Minecart createTestMinecart(Location location) {
+        Minecart minecartEntity = null;
+        try {
+            Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
+            Class<?> customClass = ReflectionUtil.getYPLKartClass("TestMinecart");
+            Object customKart = customClass.getConstructor(
+                    ReflectionUtil.getNMSClass("World"), Location.class)
+                    .newInstance(craftWorld, location);
+
+            minecartEntity = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+
+            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
+                    .invoke(craftWorld, customKart);
+
+            minecartEntity.setDisplayBlock(new MaterialData(Material.BEACON, (byte) 5));
+            minecartEntity.setCustomNameVisible(true);
+            minecartEntity.setCustomName("Test_Minecart");
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return minecartEntity;
     }
 
     public static Entity createCustomWitherSkull(Location l, String circuitname) throws Exception {

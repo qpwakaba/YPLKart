@@ -500,4 +500,9 @@ public class CMDAbstractConsole extends CMDAbstract {
             SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(null);
         }
     }
+
+    @Override
+    void debug() {
+        // Do nothing
+    }
 }

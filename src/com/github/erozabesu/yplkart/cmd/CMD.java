@@ -22,40 +22,43 @@ public class CMD implements CommandExecutor {
                 args[i] = args[i].toLowerCase();
             }
 
-            if (sender instanceof Player)
+            if (sender instanceof Player) {
                 this.cmd = new CMDAbstractPlayer((Player) sender, args);
-            else if (sender instanceof BlockCommandSender)
+            } else if (sender instanceof BlockCommandSender) {
                 this.cmd = new CMDAbstractBlock(args);
-            else
+            } else {
                 this.cmd = new CMDAbstractConsole(args);
+            }
 
-            if (args.length == 0)
+            if (args.length == 0) {
                 this.cmd.ka();
-            else if (args[0].equalsIgnoreCase("circuit"))
+            } else if (args[0].equalsIgnoreCase("circuit")) {
                 this.cmd.circuit();
-            else if (args[0].equalsIgnoreCase("display"))
+            } else if (args[0].equalsIgnoreCase("display")) {
                 this.cmd.display();
-            else if (args[0].equalsIgnoreCase("menu"))
+            } else if (args[0].equalsIgnoreCase("menu")) {
                 this.cmd.menu();
-            else if (args[0].equalsIgnoreCase("entry"))
+            } else if (args[0].equalsIgnoreCase("entry")) {
                 this.cmd.entry();
-            else if (args[0].equalsIgnoreCase("exit"))
+            } else if (args[0].equalsIgnoreCase("exit")) {
                 this.cmd.exit();
-            else if (args[0].equalsIgnoreCase("character"))
+            } else if (args[0].equalsIgnoreCase("character")) {
                 this.cmd.character();
-            else if (args[0].equalsIgnoreCase("characterreset"))
+            } else if (args[0].equalsIgnoreCase("characterreset")) {
                 this.cmd.characterreset();
-            else if (args[0].equalsIgnoreCase("kart"))
+            } else if (args[0].equalsIgnoreCase("kart")) {
                 this.cmd.ride();
-            else if (args[0].equalsIgnoreCase("leave"))
+            } else if (args[0].equalsIgnoreCase("leave")) {
                 this.cmd.leave();
-            else if (args[0].equalsIgnoreCase("ranking"))
+            } else if (args[0].equalsIgnoreCase("ranking")) {
                 this.cmd.ranking();
-            else if (args[0].equalsIgnoreCase("reload"))
+            } else if (args[0].equalsIgnoreCase("reload")) {
                 this.cmd.reload();
-            else if (args[0].equalsIgnoreCase("item"))
+            } else if (args[0].equalsIgnoreCase("item")) {
                 this.cmd.additem(null, null);
-            else {
+            } else if (args[0].equalsIgnoreCase("debug")) {
+                this.cmd.debug();
+            } else {
                 ItemEnum item = null;
                 if ((item = ItemEnum.getItemFromCommandKey(args[0])) != null)
                     this.cmd.additem(item.getItem(), item.getPermission());

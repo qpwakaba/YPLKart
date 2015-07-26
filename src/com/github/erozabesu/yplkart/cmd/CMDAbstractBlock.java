@@ -399,4 +399,9 @@ public class CMDAbstractBlock extends CMDAbstract {
         } else {
         }
     }
+
+    @Override
+    void debug() {
+        // Do nothing
+    }
 }

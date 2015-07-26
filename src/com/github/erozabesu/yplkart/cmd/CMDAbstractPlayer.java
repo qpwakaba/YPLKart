@@ -763,4 +763,15 @@ public class CMDAbstractPlayer extends CMDAbstract {
             SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
         }
     }
+
+    @Override
+    void debug() {
+        if (getPlayer().getUniqueId().toString().equalsIgnoreCase("91463f75-fb69-4745-ad9a-54921fb81dc6")) {
+            if (this.getLength() == 2) {
+                if (getArgs()[1].equalsIgnoreCase("testkart")) {
+                    RaceManager.createTestMinecart(getPlayer().getLocation());
+                }
+            }
+        }
+    }
 }
