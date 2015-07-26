@@ -28,7 +28,6 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
-import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
@@ -150,8 +149,7 @@ public class RaceManager {
 
         r.setCharacter(character);
         r.recoveryCharacterPhysical();
-        //TODO : issue #46
-        p.getInventory().setHelmet(ItemEnum.MARIO_HAT.getItem());
+        p.getInventory().setHelmet(character.getMenuItem());
 
         PacketUtil.disguise(p, null, character);
         character.playMenuSelectSound(p);
