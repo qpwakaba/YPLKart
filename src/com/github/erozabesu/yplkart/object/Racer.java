@@ -316,6 +316,7 @@ public class Racer {
         RaceManager.clearKartRaceData(getUUID());
         RaceManager.leaveRacingKart(getPlayer());
         ItemEnum.removeAllKeyItems(getPlayer());
+        getPlayer().getInventory().clear(-1, -1);
         recoveryInventory();
         recoveryExp();
         getPlayer().teleport(goalposition);

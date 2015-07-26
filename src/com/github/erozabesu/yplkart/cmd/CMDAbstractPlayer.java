@@ -20,6 +20,7 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class CMDAbstractPlayer extends CMDAbstract {
@@ -770,6 +771,8 @@ public class CMDAbstractPlayer extends CMDAbstract {
             if (this.getLength() == 2) {
                 if (getArgs()[1].equalsIgnoreCase("testkart")) {
                     RaceManager.createTestMinecart(getPlayer().getLocation());
+                } else if (getArgs()[1].equalsIgnoreCase("disguise")) {
+                    PacketUtil.disguise(getPlayer(), null, CharacterConfig.getCharacter("Villager"));
                 }
             }
         }

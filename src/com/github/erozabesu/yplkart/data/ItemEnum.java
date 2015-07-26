@@ -431,8 +431,8 @@ public enum ItemEnum {
     }
 
     /**
-     * マテリアル、マテリアルデータ、アイテム名、アイテムロアを比較し一致しているかどうかを返す
-     * ChatColorは考慮しない
+     * マテリアル、マテリアルデータ、アイテム名、アイテムロアを比較し一致しているかどうかを返す<br>
+     * ChatColorは考慮しない<br>
      * チェックポイントツールの場合はロアが動的なため、ロアの比較を行わず
      * サーキット一覧にロアが含まれているかどうかで判別する
      * @param itemStack 比較するItemStack
@@ -476,11 +476,18 @@ public enum ItemEnum {
 
     //〓 static 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static Boolean isKeyItem(ItemStack i) {
+    /**
+     * @param itemStack 調べるItemStack
+     * @return 引数itemStackが当プラグイン専用のアイテムかどうか
+     */
+    public static Boolean isKeyItem(ItemStack itemStack) {
+        //アイテムの比較
         for (ItemEnum item : values()) {
-            if (item.isSimilar(i))
+            if (item.isSimilar(itemStack)) {
                 return true;
+            }
         }
+
         return false;
     }
 
@@ -608,22 +615,35 @@ public enum ItemEnum {
         PlayerInventory inv = player.getInventory();
 
         for (int i = 0; i < 36; i++) {
-            if (isKeyItem(inv.getItem(i)))
+            if (isKeyItem(inv.getItem(i))) {
                 inv.setItem(i, null);
+            }
         }
 
-        if (inv.getHelmet() != null)
-            if (isKeyItem(inv.getHelmet()))
+        if (inv.getHelmet() != null) {
+            if (isKeyItem(inv.getHelmet())) {
                 inv.setHelmet(new ItemStack(Material.AIR));
-        if (inv.getChestplate() != null)
-            if (isKeyItem(inv.getChestplate()))
+            }
+        }
+
+        if (inv.getChestplate() != null) {
+            if (isKeyItem(inv.getChestplate())) {
                 inv.setChestplate(new ItemStack(Material.AIR));
-        if (inv.getLeggings() != null)
-            if (isKeyItem(inv.getLeggings()))
+            }
+        }
+
+        if (inv.getLeggings() != null) {
+            if (isKeyItem(inv.getLeggings())) {
                 inv.setLeggings(new ItemStack(Material.AIR));
-        if (inv.getBoots() != null)
-            if (isKeyItem(inv.getBoots()))
+            }
+        }
+
+        if (inv.getBoots() != null) {
+            if (isKeyItem(inv.getBoots())) {
                 inv.setBoots(new ItemStack(Material.AIR));
+            }
+        }
+
         player.updateInventory();
     }
 
