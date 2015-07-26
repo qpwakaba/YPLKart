@@ -70,6 +70,25 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                     super.write(ctx, PacketUtil.getDisguisePacket(p, r.getCharacter()), promise);
                 }
                 return;
+
+            //Human以外のキャラクターを選択している場合、装備の情報を全て破棄する
+            } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityEquipment")) {
+                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
+                if (NettyListener.playerEntityId.get(id) == null) {
+                    super.write(ctx, msg, promise);
+                    return;
+                } else {
+                    Player player = Bukkit.getPlayer(UUID.fromString(NettyListener.playerEntityId.get(id)));
+                    Racer r = RaceManager.getRace(player);
+
+                    if (r.getCharacter() == null) {
+                        super.write(ctx, msg, promise);
+                    } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
+                        super.write(ctx, msg, promise);
+                    } else {
+                        // Do nothing
+                    }
+                }
             } else {
                 super.write(ctx, msg, promise);
             }

@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -51,28 +52,20 @@ public class PacketUtil extends ReflectionUtil {
             return;
         }
         try {
-            Object disguise = getCraftEntityFromClassName(player.getWorld(), character.getNmsClass().getSimpleName());
-            Location loc = player.getLocation();
-
-            nmsEntity_setLocation.invoke(disguise, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-            nmsEntity_setEntityID.invoke(disguise, player.getEntityId());
-            nmsEntity_setCustomName.invoke(disguise, player.getName());
-            nmsEntity_setCustomNameVisible.invoke(disguise, true);
+            Object craftEntity = getCraftEntityFromClassName(player.getWorld(), character.getNmsClass().getSimpleName());
 
             Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
-            Object spawnentitypacket = getSpawnEntityLivingPacket(disguise);
+            Object spawnentitypacket = getDisguisePacket(player, character);
             Object attachentitypacket = null;
-            if (player.getVehicle() != null)
-                attachentitypacket = getAttachEntityPacket(disguise, getCraftEntity(player.getVehicle()));
-            Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
-            Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
-                    .getEquipment().getHelmet());
-            Object chectpacket = player.getEquipment().getChestplate() == null ? null : getEquipmentPacket(player, 3, player
-                    .getEquipment().getChestplate());
-            Object leggingspacket = player.getEquipment().getLeggings() == null ? null : getEquipmentPacket(player, 2, player
-                    .getEquipment().getLeggings());
-            Object bootspacket = player.getEquipment().getBoots() == null ? null : getEquipmentPacket(player, 1, player.getEquipment()
-                    .getBoots());
+            if (player.getVehicle() != null) {
+                attachentitypacket = getAttachEntityPacket(craftEntity, getCraftEntity(player.getVehicle()));
+            }
+
+            Object handpacket = getEquipmentPacket(player, 0, new ItemStack(Material.AIR));
+            Object helmetpacket = getEquipmentPacket(player, 4, new ItemStack(Material.AIR));
+            Object chectpacket = getEquipmentPacket(player, 3, new ItemStack(Material.AIR));
+            Object leggingspacket = getEquipmentPacket(player, 2, new ItemStack(Material.AIR));
+            Object bootspacket = getEquipmentPacket(player, 1, new ItemStack(Material.AIR));
 
             if (target == null) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
@@ -82,34 +75,26 @@ public class PacketUtil extends ReflectionUtil {
                         continue;
                     sendPacket(other, entitydestroypacket);
                     sendPacket(other, spawnentitypacket);
-                    if (attachentitypacket != null)
+                    if (attachentitypacket != null) {
                         sendPacket(other, attachentitypacket);
-                    if (handpacket != null)
-                        sendPacket(other, handpacket);
-                    if (helmetpacket != null)
-                        sendPacket(other, helmetpacket);
-                    if (chectpacket != null)
-                        sendPacket(other, chectpacket);
-                    if (leggingspacket != null)
-                        sendPacket(other, leggingspacket);
-                    if (bootspacket != null)
-                        sendPacket(other, bootspacket);
+                    }
+                    sendPacket(other, handpacket);
+                    sendPacket(other, helmetpacket);
+                    sendPacket(other, chectpacket);
+                    sendPacket(other, leggingspacket);
+                    sendPacket(other, bootspacket);
                 }
             } else {
                 sendPacket(target, entitydestroypacket);
                 sendPacket(target, spawnentitypacket);
-                if (attachentitypacket != null)
+                if (attachentitypacket != null) {
                     sendPacket(target, attachentitypacket);
-                if (handpacket != null)
-                    sendPacket(target, handpacket);
-                if (helmetpacket != null)
-                    sendPacket(target, helmetpacket);
-                if (chectpacket != null)
-                    sendPacket(target, chectpacket);
-                if (leggingspacket != null)
-                    sendPacket(target, leggingspacket);
-                if (bootspacket != null)
-                    sendPacket(target, bootspacket);
+                }
+                sendPacket(target, handpacket);
+                sendPacket(target, helmetpacket);
+                sendPacket(target, chectpacket);
+                sendPacket(target, leggingspacket);
+                sendPacket(target, bootspacket);
             }
         } catch (Exception e) {
             e.printStackTrace();
