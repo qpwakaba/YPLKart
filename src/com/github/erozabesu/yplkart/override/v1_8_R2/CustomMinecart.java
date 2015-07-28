@@ -1383,4 +1383,10 @@ public class CustomMinecart extends EntityMinecartRideable {
 
         return true;
     }
+
+    @Override
+    public void die() {
+        RaceManager.removeKartEntityIdList(getId());
+        dead = true;
+    }
 }

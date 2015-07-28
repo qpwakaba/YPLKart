@@ -46,6 +46,44 @@ public class RaceManager {
     private static HashMap<UUID, Racer> racedata = new HashMap<UUID, Racer>();
     private static HashMap<String, Circuit> circuit = new HashMap<String, Circuit>();
 
+    /**
+     * 生成したカートエンティティのEntityIDを格納する
+     * EntityIDからカートエンティティかどうかを判断するためのもの
+     */
+    private static List<Integer> kartEntityIdList = new ArrayList<Integer>();
+
+    // 〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * @param entityId 調べるエンティティのEntityID
+     * @return 引数entityIdをEntityIDとして持つエンティティがカートエンティティかどうか
+     */
+    public static boolean isKartEntityFromEntityId(int entityId) {
+        return kartEntityIdList.contains(entityId);
+    }
+
+    // 〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数entityIdを配列kartEntityIdListに追加する
+     * @param entityId 追加するEntityID
+     */
+    public static void addKartEntityIdList(int entityId) {
+        if (!isKartEntityFromEntityId(entityId)) {
+            kartEntityIdList.add(entityId);
+        }
+    }
+
+    /**
+     * 引数entityIdを配列kartEntityIdListから削除する
+     * @param entityId 削除するEntityID
+     */
+    public static void removeKartEntityIdList(int entityId) {
+        if (isKartEntityFromEntityId(entityId)) {
+            kartEntityIdList.remove((Object) entityId);
+        }
+    }
+
     // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Circuit setupCircuit(String circuitname) {
@@ -490,6 +528,37 @@ public class RaceManager {
         return false;
     }
 
+    /**
+     * 引数entityカートエンティティかどうか判別する
+     * @param entity 判別するエンティティ
+     * @return カートエンティティかどうか
+     */
+    public static boolean isKartEntity(Entity entity) {
+        if (entity instanceof Minecart) {
+            List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
+            if (metaDataList.size() != 0) {
+                MetadataValue metaData = metaDataList.get(0);
+                if (metaData != null) {
+                    Object metaDataValue = metaData.value();
+                    if (metaDataValue.getClass().isArray()) {
+                        //MetaDataが配列の場合
+                        for (Object values : (Object[]) metaDataValue) {
+                            if (values instanceof KartType) {
+                                return true;
+                            }
+                        }
+                    } else {
+                        //MetaDataが単数の場合
+                        if (metaDataValue instanceof KartType) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean isCustomWitherSkull(Entity e, String circuitname) {
         if (!(e instanceof WitherSkull))
             return false;
@@ -500,7 +569,7 @@ public class RaceManager {
         return true;
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void removeAllJammerEntity() {
         for (Circuit cir : circuit.values()) {
@@ -555,6 +624,8 @@ public class RaceManager {
             minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
                     YPLKart.getInstance(), new Object[]{kartType, customKart}));
 
+            addKartEntityIdList(minecartEntity.getEntityId());
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -588,6 +659,10 @@ public class RaceManager {
             minecartEntity.setDisplayBlock(new MaterialData(Material.BEACON, (byte) 5));
             minecartEntity.setCustomNameVisible(true);
             minecartEntity.setCustomName("Test_Minecart");
+            minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+                    YPLKart.getInstance(), new Object[]{KartType.DisplayKart, customKart}));
+
+            addKartEntityIdList(minecartEntity.getEntityId());
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

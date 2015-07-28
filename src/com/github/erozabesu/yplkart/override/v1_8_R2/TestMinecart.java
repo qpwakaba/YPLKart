@@ -31,6 +31,8 @@ import net.minecraft.server.v1_8_R2.WorldServer;
 
 import org.bukkit.Location;
 
+import com.github.erozabesu.yplkart.RaceManager;
+
 public class TestMinecart extends EntityMinecartRideable {
 
     private boolean a;
@@ -925,5 +927,11 @@ public class TestMinecart extends EntityMinecartRideable {
         this.locX = (this.getBoundingBox().a + this.getBoundingBox().d) / 2.0D;
         this.locY = this.getBoundingBox().b;
         this.locZ = (this.getBoundingBox().c + this.getBoundingBox().f) / 2.0D;
+    }
+
+    @Override
+    public void die() {
+        RaceManager.removeKartEntityIdList(getId());
+        dead = true;
     }
 }

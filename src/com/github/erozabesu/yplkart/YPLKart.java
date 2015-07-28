@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.cmd.CMD;
@@ -40,8 +41,17 @@ public class YPLKart extends JavaPlugin {
         new ItemListener(this);
         new NettyListener(this);
 
-        for (World w : Bukkit.getWorlds()) {
-            DisplayKartConfig.respawnKart(w);
+        for (World world : Bukkit.getWorlds()) {
+            DisplayKartConfig.respawnKart(world);
+        }
+
+        //全カートエンティティのEntityIDを取得し格納
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (RaceManager.isKartEntity(entity)) {
+                    RaceManager.addKartEntityIdList(entity.getEntityId());
+                }
+            }
         }
 
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
