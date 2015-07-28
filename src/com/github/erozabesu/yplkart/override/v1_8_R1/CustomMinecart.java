@@ -105,12 +105,14 @@ public class CustomMinecart extends EntityMinecartRideable {
         this.yaw = location.getYaw();
 
         if (getKartType().equals(KartType.DisplayKart)) {
+            setPosition(location.getX(), location.getY(), location.getZ());
             this.pitch = -location.getPitch();
             setYawPitch(this.yaw + 90F, this.pitch);
-            return;
+        } else {
+            setPosition(location.getX(), location.getY() + 1, location.getZ());
+            setYawPitch(this.yaw + 90F, 0F);
         }
-        setYawPitch(this.yaw + 90F, 0F);
-        setPosition(location.getX(), location.getY() + 1, location.getZ());
+
         setParameter(kart);
     }
 
