@@ -157,7 +157,7 @@ public class DisplayKart {
     public void saveConfiguration() {
         String configKey = getConfigKey();
 
-        ConfigManager config = ConfigManager.RACEDATA_CONFIG;
+        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
 
         //設定データに値を上書き
         config.setValue(configKey + ".kart_type", getKartObjectKey());
@@ -174,7 +174,7 @@ public class DisplayKart {
 
     /** ローカルコンフィグファイルから全データを削除する */
     public void deleteConfiguration() {
-        ConfigManager config = ConfigManager.RACEDATA_CONFIG;
+        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
 
         config.setValue(getConfigKey(), null);
 
