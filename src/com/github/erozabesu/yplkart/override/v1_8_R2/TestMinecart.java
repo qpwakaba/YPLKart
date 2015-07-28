@@ -29,9 +29,12 @@ import net.minecraft.server.v1_8_R2.Vec3D;
 import net.minecraft.server.v1_8_R2.World;
 import net.minecraft.server.v1_8_R2.WorldServer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.YPLKart;
 
 public class TestMinecart extends EntityMinecartRideable {
 
@@ -47,6 +50,25 @@ public class TestMinecart extends EntityMinecartRideable {
     private double h;
     private double i;
 
+    /**
+     * エンティティが生存しているかどうかをチェックするタスク<br>
+     * O()、die()メソッドをOverrideしてもチャンクのアンロードによるデスポーンを検出不可能なため
+     * タスクを起動して確認する
+     */
+    private BukkitTask livingCheckTask;
+
+    /**
+     * 1チック前のticksLivedの値を格納する
+     * livingCheckTaskで利用する<br>
+     * エンティティが自然消滅した場合、メンバ変数は特に変更されないまま静かに消滅する<br>
+     * そのため、deadフラグやisAlive()メソッドは生前の値のまま放置され、<br>
+     * 消滅後でもdeadフラグはfalseであり、isAlive()メソッドはtrueを返す<br>
+     * 同様に何チック生存したかを示すticksLivedも消滅後は値が変更されなくなるため、<br>
+     * ticksLivedが1チック前と同じ値を示した場合、エンティティの消滅を確認することができる<br>
+     * この変数はその確認を行うために宣言している
+     */
+    private int lastTicksLived = -2;
+
     //〓 メイン 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public TestMinecart(World w, Location location) {
@@ -55,6 +77,9 @@ public class TestMinecart extends EntityMinecartRideable {
         setYawPitch(this.yaw + 90F, location.getPitch());
         setPosition(location.getX(), location.getY() + 1, location.getZ());
 
+        runLivingCheckTask();
+
+        System.out.println("v1_8_R2 : test kart spawned");
     }
 
     //〓 getter - CraftBukkit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -256,6 +281,16 @@ public class TestMinecart extends EntityMinecartRideable {
         return getBoundingBox().b;
     }
 
+    /** @return livingCheckTask 生存チェックタスク */
+    public BukkitTask getLivingCheckTask() {
+        return livingCheckTask;
+    }
+
+    /** @return lastTicksLived 1チック前のticksLived */
+    public int getLastTicksLived() {
+        return lastTicksLived;
+    }
+
     //〓 setter - CraftBukkit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
@@ -384,6 +419,42 @@ public class TestMinecart extends EntityMinecartRideable {
      */
     public void setFallDistance(Entity entity, float fallDistance) {
         entity.fallDistance = fallDistance;
+    }
+
+    /** @param livingCheckTask 生存チェックタスク */
+    public void setLivingCheckTask(BukkitTask livingCheckTask) {
+        this.livingCheckTask = livingCheckTask;
+    }
+
+    /** @param lastTicksLived 1チック前のticksLived */
+    public void setLastTicksLived(int lastTicksLived) {
+        this.lastTicksLived = lastTicksLived;
+    }
+
+    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * エンティティが生存しているかどうかをチェックするタスク<br>
+     * O()、die()メソッドをOverrideしてもチャンクのアンロードによるデスポーンを検出不可能なため
+     * タスクを起動して確認する
+     */
+    public void runLivingCheckTask() {
+        setLivingCheckTask(
+            Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    setLastTicksLived(getLastTicksLived() + 1);
+                    try {
+                        if (getLastTicksLived() == ticksLived) {
+                            System.out.println("v1_8_R2 : test kart is dead");
+                            RaceManager.removeKartEntityIdList(getId());
+                            getLivingCheckTask().cancel();
+                        }
+                    } catch(Exception e) {
+                        getLivingCheckTask().cancel();
+                    }
+                }
+            }, 0, 1)
+        );
     }
 
     //〓 Override 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
