@@ -70,6 +70,8 @@ public class RaceManager {
      */
     public static void addKartEntityIdList(int entityId) {
         if (!isKartEntityFromEntityId(entityId)) {
+            //TODO
+            System.out.println("kart entity added");
             kartEntityIdList.add(entityId);
         }
     }
@@ -80,6 +82,8 @@ public class RaceManager {
      */
     public static void removeKartEntityIdList(int entityId) {
         if (isKartEntityFromEntityId(entityId)) {
+            //TODO
+            System.out.println("kart entity removed");
             kartEntityIdList.remove((Object) entityId);
         }
     }
@@ -268,6 +272,7 @@ public class RaceManager {
             if (isSpecificKartType(vehicle, KartType.RacingKart)) {
                 getRace(player).setCMDForceLeave(true);
                 player.leaveVehicle();
+                removeKartEntityIdList(vehicle.getEntityId());
                 vehicle.remove();
                 getRace(player).setCMDForceLeave(false);
             }
