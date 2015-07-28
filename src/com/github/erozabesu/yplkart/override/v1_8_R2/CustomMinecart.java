@@ -16,14 +16,17 @@ import net.minecraft.server.v1_8_R2.EntityMinecartRideable;
 import net.minecraft.server.v1_8_R2.MathHelper;
 import net.minecraft.server.v1_8_R2.World;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
@@ -97,6 +100,25 @@ public class CustomMinecart extends EntityMinecartRideable {
     /** キラー使用中、1チック前に通過したチェックポイントEntityのUUID */
     private org.bukkit.entity.Entity killerLastPassedCheckPoint;
 
+    /**
+     * エンティティが生存しているかどうかをチェックするタスク<br>
+     * O()、die()メソッドをOverrideしてもチャンクのアンロードによるデスポーンを検出不可能なため
+     * タスクを起動して確認する
+     */
+    private BukkitTask livingCheckTask;
+
+    /**
+     * 1チック前のticksLivedの値を格納する
+     * livingCheckTaskで利用する<br>
+     * エンティティが自然消滅した場合、メンバ変数は特に変更されないまま静かに消滅する<br>
+     * そのため、deadフラグやisAlive()メソッドは生前の値のまま放置され、<br>
+     * 消滅後でもdeadフラグはfalseであり、isAlive()メソッドはtrueを返す<br>
+     * 同様に何チック生存したかを示すticksLivedも消滅後は値が変更されなくなるため、<br>
+     * ticksLivedが1チック前と同じ値を示した場合、エンティティの消滅を確認することができる<br>
+     * この変数はその確認を行うために宣言している
+     */
+    private int lastTicksLived = -2;
+
     //〓 メイン 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public CustomMinecart(World w, Kart kart, KartType kartType, Location location) {
@@ -114,6 +136,8 @@ public class CustomMinecart extends EntityMinecartRideable {
         }
 
         setParameter(kart);
+
+        runLivingCheckTask();
     }
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -193,6 +217,16 @@ public class CustomMinecart extends EntityMinecartRideable {
         return killerLastPassedCheckPoint;
     }
 
+    /** @return livingCheckTask 生存チェックタスク */
+    public BukkitTask getLivingCheckTask() {
+        return livingCheckTask;
+    }
+
+    /** @return lastTicksLived 1チック前のticksLived */
+    public int getLastTicksLived() {
+        return lastTicksLived;
+    }
+
     //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param groundFrictionX Xモーションの地面での摩擦係数 */
@@ -268,6 +302,16 @@ public class CustomMinecart extends EntityMinecartRideable {
     /** @param killerLastPassedCheckPoint セットするキラー使用中、1チック前に通過したチェックポイントEntity */
     public void setKillerLastPassedCheckPoint(org.bukkit.entity.Entity killerLastPassedCheckPoint) {
         this.killerLastPassedCheckPoint = killerLastPassedCheckPoint;
+    }
+
+    /** @param livingCheckTask 生存チェックタスク */
+    public void setLivingCheckTask(BukkitTask livingCheckTask) {
+        this.livingCheckTask = livingCheckTask;
+    }
+
+    /** @param lastTicksLived 1チック前のticksLived */
+    public void setLastTicksLived(int lastTicksLived) {
+        this.lastTicksLived = lastTicksLived;
     }
 
     //〓 getter - CraftBukkit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -843,6 +887,29 @@ public class CustomMinecart extends EntityMinecartRideable {
     }
 
     //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * エンティティが生存しているかどうかをチェックするタスク<br>
+     * O()、die()メソッドをOverrideしてもチャンクのアンロードによるデスポーンを検出不可能なため
+     * タスクを起動して確認する
+     */
+    public void runLivingCheckTask() {
+        setLivingCheckTask(
+            Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    setLastTicksLived(getLastTicksLived() + 1);
+                    try {
+                        if (getLastTicksLived() == ticksLived) {
+                            RaceManager.removeKartEntityIdList(getId());
+                            getLivingCheckTask().cancel();
+                        }
+                    } catch(Exception e) {
+                        getLivingCheckTask().cancel();
+                    }
+                }
+            }, 0, 1)
+        );
+    }
 
     /**
      * Entityがダメージを受けた際の揺れる速度を時間経過で復元する<br>

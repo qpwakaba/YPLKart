@@ -41,18 +41,25 @@ public class YPLKart extends JavaPlugin {
         new ItemListener(this);
         new NettyListener(this);
 
-        for (World world : Bukkit.getWorlds()) {
-            DisplayKartConfig.respawnKart(world);
-        }
-
-        //全カートエンティティのEntityIDを取得し格納
+        //全カートエンティティをデスポーン
+        //リロードした場合はエンティティの自動消滅が行われないため、明示的にデスポーンさせる
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (RaceManager.isKartEntity(entity)) {
-                    RaceManager.addKartEntityIdList(entity.getEntityId());
+                    entity.remove();
                 }
             }
         }
+
+        //レースカート以外のカートエンティティをリスポーン
+        //遅延させなければ、既に同名のエンティティが存在している判定が出力され、正しく動作しない
+        Bukkit.getScheduler().runTaskLater(getInstance(), new Runnable() {
+            public void run() {
+                for (World world : Bukkit.getWorlds()) {
+                    DisplayKartConfig.respawnKart(world);
+                }
+            }
+        }, 5);
 
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
@@ -66,6 +73,7 @@ public class YPLKart extends JavaPlugin {
     public void onDisable() {
         Scoreboards.clearBoard();
         RaceManager.endAllCircuit();
+
         Bukkit.getPluginManager().disablePlugin(this);
     }
 

@@ -548,13 +548,13 @@ public class RaceManager {
                     if (metaDataValue.getClass().isArray()) {
                         //MetaDataが配列の場合
                         for (Object values : (Object[]) metaDataValue) {
-                            if (values instanceof KartType) {
+                            if (values.getClass().getSimpleName().equalsIgnoreCase("KartType")) {
                                 return true;
                             }
                         }
                     } else {
                         //MetaDataが単数の場合
-                        if (metaDataValue instanceof KartType) {
+                        if (metaDataValue.getClass().getSimpleName().equalsIgnoreCase("KartType")) {
                             return true;
                         }
                     }
@@ -590,6 +590,13 @@ public class RaceManager {
         return minecartEntity;
     }
 
+    /**
+     * 引数uuidをカスタムネームに持つディスプレイ用カートを引数locationに生成する
+     * @param location 生成する座標
+     * @param kart Kartオブジェクト。ディスプレイブロックの設定を引き継ぐ
+     * @param uuid カスタムネーム。displaykart.ymlのコンフィグキーでもある
+     * @return 生成したMinecartエンティティ
+     */
     public static Minecart createDisplayMinecart(Location location, Kart kart, String uuid) {
         Minecart minecartEntity = createCustomMinecart(location, kart, KartType.DisplayKart);
 

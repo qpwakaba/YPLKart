@@ -8,8 +8,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
-import org.bukkit.material.MaterialData;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.RaceManager;
@@ -182,10 +180,8 @@ public class DisplayKartConfig {
             }
             //Entityのスポーン
             if (flag) {
-                Minecart cart = RaceManager.createDisplayMinecart(displayKart.getLocation()
-                        , KartConfig.getRandomKart(), displayKart.getConfigKey());
-                cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial()
-                        , kart.getDisplayMaterialData()));
+                RaceManager.createDisplayMinecart(displayKart.getLocation()
+                        , kart, displayKart.getConfigKey());
             }
         }
     }
