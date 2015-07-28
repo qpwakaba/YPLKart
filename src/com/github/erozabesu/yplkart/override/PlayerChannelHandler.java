@@ -19,17 +19,18 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
+
     @SuppressWarnings("unchecked")
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         try {
             /*
              * プレイヤーがLivingEntityに姿を変えていた場合、LivingEntityのMetadataパケットに
-             * EntityHuman特有のデータが送信されクライアントがクラッシュしてしまうため該当データを削除する。
-             * EntityHuman特有のデータとは、
-             * PacketPlayOutEntityMetadata.bに格納されているList<DataWatcher.WatchableObject>の中の特定の4つのデータ。
+             * EntityHuman特有のデータが送信されクライアントがクラッシュしてしまうため該当データを削除する
+             * EntityHuman特有のデータとは、PacketPlayOutEntityMetadata.bに格納されている
+             * List<DataWatcher.WatchableObject>の中の特定の4つのデータ
              * DataWatcher.WatchableObject.a()メソッドを実行するとWatchableObjectのindexが取得できるので
-             * indexが10、16、17、18に一致したものを削除する。
+             * indexが10、16、17、18に一致したものを削除する
              * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
              */
             if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")) {
@@ -57,11 +58,12 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                         }
                     }
                 }
+
+            //Human以外のキャラクターを選択している場合パケットを偽装
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutNamedEntitySpawn")) {
                 Player p = Bukkit.getPlayer((UUID) Util.getFieldValue(msg, "b"));
                 Racer r = RaceManager.getRace(p);
 
-                //Human以外のキャラクターを選択している場合パケットを偽装
                 if (r.getCharacter() == null) {
                     super.write(ctx, msg, promise);
                 } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {

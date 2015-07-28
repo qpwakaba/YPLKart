@@ -40,7 +40,11 @@ public class ReflectionUtil {
     protected static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
     protected static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
     protected static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
+    protected static Class<?> nmsPacketPlayOutEntityLook = null;
+    protected static Class<?> nmsPacketPlayOutEntityTeleport = getNMSClass("PacketPlayOutEntityTeleport");
     protected static Class<?> nmsPacketPlayOutNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn");
+    protected static Class<?> nmsPacketPlayOutRelEntityMoveLook = null;
+    protected static Class<?> nmsPacketPlayOutSpawnEntity = getNMSClass("PacketPlayOutSpawnEntity");
     protected static Class<?> nmsPacketPlayOutSpawnEntityLiving = getNMSClass("PacketPlayOutSpawnEntityLiving");
     protected static Class<?> nmsPacketPlayOutTitle = getNMSClass("PacketPlayOutTitle");
     protected static Class<?> nmsPacketPlayInClientCommand = getNMSClass("PacketPlayInClientCommand");
@@ -50,10 +54,14 @@ public class ReflectionUtil {
             nmsChatSerializer = getNMSClass("ChatSerializer");
             nmsEnumTitleAction = getNMSClass("EnumTitleAction");
             nmsEnumClientCommand = getNMSClass("EnumClientCommand");
+            nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntityLook");
+            nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutRelEntityMoveLook");
         } else {
             nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
             nmsEnumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
             nmsEnumClientCommand = getNMSClass("PacketPlayInClientCommand$EnumClientCommand");
+            nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutEntityLook");
+            nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook");
         }
     }
 
@@ -62,7 +70,11 @@ public class ReflectionUtil {
     protected static Constructor<?> constructor_nmsPacketPlayOutAttachEntity;
     protected static Constructor<?> constructor_nmsPacketPlayOutEntityDestroy;
     protected static Constructor<?> constructor_nmsPacketPlayOutEntityEquipment;
+    protected static Constructor<?> constructor_nmsPacketPlayOutEntityLook;
+    protected static Constructor<?> constructor_nmsPacketPlayOutEntityTeleport;
     protected static Constructor<?> constructor_nmsPacketPlayOutNamedEntitySpawn;
+    protected static Constructor<?> constructor_nmsPacketPlayOutRelEntityMoveLook;
+    protected static Constructor<?> constructor_nmsPacketPlayOutSpawnEntity;
     protected static Constructor<?> constructor_nmsPacketPlayOutSpawnEntityLiving;
     protected static Constructor<?> constructor_nmsPacketPlayOutTitle;
     protected static Constructor<?> constructor_nmsPacketPlayOutTitle_Length;
@@ -73,7 +85,11 @@ public class ReflectionUtil {
             constructor_nmsPacketPlayOutAttachEntity = nmsPacketPlayOutAttachEntity.getConstructor(int.class, nmsEntity, nmsEntity);
             constructor_nmsPacketPlayOutEntityDestroy = nmsPacketPlayOutEntityDestroy.getConstructor(int[].class);
             constructor_nmsPacketPlayOutEntityEquipment = nmsPacketPlayOutEntityEquipment.getConstructor(int.class, int.class, nmsItemStack);
+            constructor_nmsPacketPlayOutEntityLook = nmsPacketPlayOutEntityLook.getConstructor(int.class, byte.class, byte.class, boolean.class);
+            constructor_nmsPacketPlayOutEntityTeleport = nmsPacketPlayOutEntityTeleport.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
+            constructor_nmsPacketPlayOutRelEntityMoveLook = nmsPacketPlayOutRelEntityMoveLook.getConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
             constructor_nmsPacketPlayOutNamedEntitySpawn = nmsPacketPlayOutNamedEntitySpawn.getConstructor(nmsEntityHuman);
+            constructor_nmsPacketPlayOutSpawnEntity = nmsPacketPlayOutSpawnEntity.getConstructor(nmsEntity, int.class, int.class);
             constructor_nmsPacketPlayOutSpawnEntityLiving = nmsPacketPlayOutSpawnEntityLiving.getConstructor(nmsEntityLiving);
             constructor_nmsPacketPlayOutTitle = nmsPacketPlayOutTitle.getConstructor(nmsEnumTitleAction, nmsIChatBaseComponent);
             constructor_nmsPacketPlayOutTitle_Length = nmsPacketPlayOutTitle.getConstructor(int.class, int.class, int.class);
@@ -123,6 +139,12 @@ public class ReflectionUtil {
     protected static HashMap<String, Constructor<?>> nmsEntity_Constructor =
             new HashMap<String, Constructor<?>>();
 
+    //〓 Nms Object 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    protected static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
+    protected static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
+    protected static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
+
     //〓 Craft Class 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     protected static Class<?> craftWorld = getCraftClass("CraftWorld");
@@ -148,6 +170,8 @@ public class ReflectionUtil {
 
     /** EntityXxxxxクラス毎のgetHandleメソッド */
     protected static HashMap<String, Method> craftEntity_getHandle = new HashMap<String, Method>();
+
+    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static String getBukkitVersion() {
         return bukkitVersion;
@@ -190,49 +214,6 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static Field getField(Object instance, String name) {
-        Field field = null;
-        try {
-            field = instance.getClass().getField(name);
-            if (field != null) {
-                field.setAccessible(true);
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        return field;
-    }
-
-    public static Field getField(Class<?> clazz, String name) {
-        for (Field field : clazz.getFields()) {
-            if (!field.getName().equalsIgnoreCase(name)) {
-                continue;
-            }
-            field.setAccessible(true);
-            return field;
-        }
-        return null;
-    }
-
-    public static Object getFieldValue(Object instance, String name) throws Exception {
-        Field field = instance.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-
-        return field.get(instance);
-    }
-
-    public static void setFieldValue(Field field, Object obj, Object value) {
-        try {
-            field.set(obj, value);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
     }
 
     public static Object getCraftEntity(Entity entity) {
@@ -309,5 +290,81 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    //〓 java reflection 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数instanceオブジェクトのクラスから引数fieldNameフィールドを取得し返す
+     * private、publicを問わず、全てのスーパークラスを遡って取得する
+     * @param instance フィールドを取得するオブジェクト
+     * @param fieldName フィールド名
+     * @return 取得したフィールド
+     */
+    public static Field getField(Object instance, String fieldName) {
+        return getField(instance.getClass(), fieldName);
+    }
+
+    /**
+     * 引数clazzクラスから引数fieldNameフィールドを取得し返す
+     * private、publicを問わず、全てのスーパークラスを遡って取得する
+     * @param clazz フィールドを取得するクラス
+     * @param fieldName フィールド名
+     * @return 取得したフィールド
+     */
+    public static Field getField(Class<?> clazz, String fieldName) {
+        Field field = null;
+        while (clazz != null) {
+            try {
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                break;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            }
+        }
+
+        return field;
+    }
+
+    public static Object getFieldValue(Object instance, String fieldName){
+        Field field = getField(instance, fieldName);
+        if (field != null) {
+            field.setAccessible(true);
+            try {
+                return field.get(instance);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static Object getFieldValue(Field field, Object instance){
+        if (field != null) {
+            field.setAccessible(true);
+            try {
+                return field.get(instance);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static void setFieldValue(Field field, Object instance, Object value) {
+        try {
+            field.set(instance, value);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

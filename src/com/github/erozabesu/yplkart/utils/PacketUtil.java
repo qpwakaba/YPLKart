@@ -3,14 +3,15 @@ package com.github.erozabesu.yplkart.utils;
 import io.netty.channel.Channel;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,25 +19,60 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.Character;
 
 public class PacketUtil extends ReflectionUtil {
-    private static HashMap<UUID, Object> playerConnection = new HashMap<UUID, Object>();
-    private static HashMap<UUID, Object> networkManager = new HashMap<UUID, Object>();
-    private static HashMap<UUID, Channel> channel = new HashMap<UUID, Channel>();
 
-    private static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
-    private static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
-    private static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
-
-    /*
-     * プレイヤーがログアウトした場合は登録されているデータを初期化します
-     * 再ログイン後はCraftEntityが内部的に別のものに変わるため前回ログイン時のデータは流用できません
+    /**
+     * PlayerとPlayerConnectionを格納するハッシュマップ
+     * Playerの再ログインと共に削除されるため、UUIDではなくPlayerを利用する
      */
-    public static void removeData(UUID id) {
-        playerConnection.remove(id);
-        networkManager.remove(id);
-        channel.remove(id);
+    private static HashMap<Player, Object> playerConnectionMap = new HashMap<Player, Object>();
+
+    /**
+     * PlayerとNetworkManagerを格納するハッシュマップ
+     * Playerの再ログインと共に削除されるため、UUIDではなくPlayerを利用する
+     */
+    private static HashMap<Player, Object> networkManagerMap = new HashMap<Player, Object>();
+
+    /**
+     * PlayerとChannelを格納するハッシュマップ
+     * Playerの再ログインと共に削除されるため、UUIDではなくPlayerを利用する
+     */
+    private static HashMap<Player, Channel> channelMap = new HashMap<Player, Channel>();
+
+    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static HashMap<Player, Object> getPlayerConnectionMap() {
+        return playerConnectionMap;
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    public static HashMap<Player, Object> getNetworkManagerMap() {
+        return networkManagerMap;
+    }
+
+    public static HashMap<Player, Channel> getChannelMap() {
+        return channelMap;
+    }
+
+    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static void putPlayerConnection(Player player, Object playerConnection) {
+        getPlayerConnectionMap().put(player, playerConnection);
+    }
+
+    public static void putNetworkManager(Player player, Object networkManager) {
+        getNetworkManagerMap().put(player, networkManager);
+    }
+
+    public static void putChannel(Player player, Channel channel) {
+        getChannelMap().put(player, channel);
+    }
+
+    public static void removeAllData(Player player) {
+        playerConnectionMap.remove(player);
+        networkManagerMap.remove(player);
+        channelMap.remove(player);
+    }
+
+    //〓 Send Packet 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /*
      * job.getCraftClassName()で得られるエンティティの姿にpを変身させます
@@ -101,19 +137,6 @@ public class PacketUtil extends ReflectionUtil {
         }
     }
 
-    public static Object getDisguisePacket(Player p, Character character) throws Exception {
-        Object craftentity = getCraftEntityFromClassName(
-                p.getWorld(), character.getNmsClass().getSimpleName());
-        Location loc = p.getLocation();
-
-        nmsEntity_setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        nmsEntity_setEntityID.invoke(craftentity, p.getEntityId());
-        nmsEntity_setCustomName.invoke(craftentity, p.getName());
-        nmsEntity_setCustomNameVisible.invoke(craftentity, true);
-
-        return getSpawnEntityLivingPacket(craftentity);
-    }
-
     public static void returnPlayer(final Player p) {
         try {
             Object craftentity = getCraftEntity(p);
@@ -121,8 +144,9 @@ public class PacketUtil extends ReflectionUtil {
             Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
             Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
             Object attachentitypacket = null;
-            if (p.getVehicle() != null)
+            if (p.getVehicle() != null) {
                 attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(p.getVehicle()));
+            }
             Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
             Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p
                     .getEquipment().getHelmet());
@@ -210,64 +234,47 @@ public class PacketUtil extends ReflectionUtil {
         }, 5);
     }
 
-    private static void sendPacket(Player p, Object packet) {
-        try {
-            nmsPlayerConnection_sendPacket.invoke(getPlayerConnection(p), packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public static void sendEntityTeleportPacket(Player target, Entity entity, Location location) {
+        Object packet = null;
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+        packet = getEntityTeleportPacket(entity.getEntityId(), location);
 
-    private static Object getPlayerConnection(Player p) throws Exception {
-        Object connection = playerConnection.get(p.getUniqueId());
-
-        if (connection == null) {
-            Object craftPlayer = ReflectionUtil.getCraftEntity(p);
-            Field connectionField = getField(craftPlayer, "playerConnection");
-
-            connection = connectionField.get(craftPlayer);
-            playerConnection.put(p.getUniqueId(), connection);
-        }
-
-        return connection;
-    }
-
-    private static Object getNetworkManager(Player p) throws Exception {
-        Object playerconnection = getPlayerConnection(p);
-        Object network = networkManager.get(p.getUniqueId());
-
-        if (network == null) {
-            Field networkField = getField(playerconnection, "networkManager");
-            network = networkField.get(playerconnection);
-            networkManager.put(p.getUniqueId(), network);
-        }
-
-        return network;
-    }
-
-    public static Channel getChannel(Player p) throws Exception {
-        Object network = getNetworkManager(p);
-        Channel c = channel.get(p.getUniqueId());
-
-        if (c == null) {
-            String version = getBukkitVersion();
-            Field channelField = null;
-
-            if (version.equalsIgnoreCase("v1_8_R1")) {
-                channelField = ReflectionUtil.getField(network, "i");
-            } else if (version.equalsIgnoreCase("v1_8_R2")) {
-                channelField = ReflectionUtil.getField(network, "k");
-            } else if (version.equalsIgnoreCase("v1_8_R3")) {
-                channelField = ReflectionUtil.getField(network, "channel");
+        if (target == null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                sendPacket(player, packet);
             }
-
-            c = (Channel) channelField.get(network);
-            channel.put(p.getUniqueId(), c);
+        } else {
+            sendPacket(target, packet);
         }
+    }
 
-        return c;
+    public static void sendSpawnEntityPacket(Player target, Object craftEntity, int objectID, int objectData) {
+        Object packet = null;
+
+        packet = getSpawnEntityPacket(craftEntity, objectID, objectData);
+
+        if (target == null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                sendPacket(player, packet);
+            }
+        } else {
+            sendPacket(target, packet);
+        }
+    }
+
+    //〓 Get Packet 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Object getDisguisePacket(Player p, Character character) throws Exception {
+        Object craftentity = getCraftEntityFromClassName(
+                p.getWorld(), character.getNmsClass().getSimpleName());
+        Location loc = p.getLocation();
+
+        nmsEntity_setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        nmsEntity_setEntityID.invoke(craftentity, p.getEntityId());
+        nmsEntity_setCustomName.invoke(craftentity, p.getName());
+        nmsEntity_setCustomNameVisible.invoke(craftentity, true);
+
+        return getSpawnEntityLivingPacket(craftentity);
     }
 
     // itemslot: 0-hand / 4-head / 3-chest / 2-leggings / 1-boots
@@ -294,19 +301,200 @@ public class PacketUtil extends ReflectionUtil {
         return constructor_nmsPacketPlayInClientCommand.newInstance(enumClientCommand_PerformRespawn);
     }
 
-    public static Object getEntityDestroyPacket(int id) throws Exception {
-        return constructor_nmsPacketPlayOutEntityDestroy.newInstance(new int[] { id });
+    /**
+     * @param entityId デスポーンさせるEntityのEntityID
+     * @return 引数entityIdをEntityIDとして持つEntityをデスポーンさせるパケット
+     */
+    public static Object getEntityDestroyPacket(int entityId){
+        Object packet = null;
+        try {
+            packet = constructor_nmsPacketPlayOutEntityDestroy.newInstance(new int[] { entityId });
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return packet;
     }
 
-    private static Object getSpawnEntityLivingPacket(Object craftentity) throws Exception {
-        return constructor_nmsPacketPlayOutSpawnEntityLiving.newInstance(craftentity);
+    /**
+     * 引数craftPlayerをスポーンさせるパケットを返す<br>
+     * HumanEntityのみ利用可能
+     * @param craftPlayer スポーンさせるHumanEntity
+     * @return 引数craftPlayerをスポーンさせるパケット
+     */
+    private static Object getSpawnNamedEntityPacket(Object craftPlayer) {
+        Object packet = null;
+        try {
+            packet = constructor_nmsPacketPlayOutNamedEntitySpawn.newInstance(craftPlayer);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return packet;
     }
 
-    private static Object getAttachEntityPacket(Object passenger, Object vehicle) throws Exception {
-        return constructor_nmsPacketPlayOutAttachEntity.newInstance(0, passenger, vehicle);
+    /**
+     * 引数craftLivingEntityエンティティをスポーンさせるパケットを返す<br>
+     * LivingEntityのみ利用可能
+     * @param craftLivingEntity スポーンさせるCraftEntity
+     * @return 引数craftLivingEntityをスポーンさせるパケット
+     */
+    private static Object getSpawnEntityLivingPacket(Object craftLivingEntity) {
+        Object packet = null;
+        try {
+            packet = constructor_nmsPacketPlayOutSpawnEntityLiving.newInstance(craftLivingEntity);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return packet;
     }
 
-    private static Object getSpawnNamedEntityPacket(Object craftplayer) throws Exception {
-        return constructor_nmsPacketPlayOutNamedEntitySpawn.newInstance(craftplayer);
+    /**
+     * @param passenger 搭乗させるCraftEntity
+     * @param vehicle 乗り物となるCraftEntity
+     * @return 引数passengerを引数vehicleに搭乗させるパケット
+     */
+    private static Object getAttachEntityPacket(Object passenger, Object vehicle) {
+        Object packet = null;
+        try {
+            packet = constructor_nmsPacketPlayOutAttachEntity.newInstance(0, passenger, vehicle);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return packet;
+    }
+
+    /**
+     * @param entityId テレポートさせるEntityのEntityID
+     * @param location テレポートする座標
+     * @return 引数entityIdをEntityIDとして持つEntityを引数locationにテレポートするパケット
+     */
+    public static Object getEntityTeleportPacket(int entityId, Location location){
+        Object packet = null;
+        try {
+            //パケットではdouble型を扱えない
+            //座標は、座標値を32倍した数値をint型に変換し利用する
+            int x = (int) (location.getX() * 32.0D);
+            int y = (int) (location.getY() * 32.0D);
+            int z = (int) (location.getZ() * 32.0D);
+
+            //パケットではfloat型を扱えない
+            //yaw・pitchはbyte型に変換し利用する
+            //変換は、byteの最大値256をyaw・pitchの最大値360.0Fで割り、基になったyaw・pitchに掛け合わせる
+            byte yaw = (byte) (location.getYaw() * (255.0F / 360.0F));
+            byte pitch = (byte) (location.getPitch() * (255.0F / 360.0F));
+
+            packet = constructor_nmsPacketPlayOutEntityTeleport
+                    .newInstance(entityId, x, y, z, yaw, pitch, false);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return packet;
+    }
+
+    public static Object getSpawnEntityPacket(Object craftEntity, int objectID, int objectData) {
+        Object packet = null;
+
+        try {
+            packet = constructor_nmsPacketPlayOutSpawnEntity.newInstance(craftEntity, objectID, objectData);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return packet;
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    private static void sendPacket(Player p, Object packet) {
+        try {
+            nmsPlayerConnection_sendPacket.invoke(getPlayerConnection(p), packet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Object getPlayerConnection(Player player) throws Exception {
+        Object connection = getPlayerConnectionMap().get(player);
+
+        if (connection == null) {
+            Object craftPlayer = ReflectionUtil.getCraftEntity(player);
+            Field connectionField = getField(craftPlayer, "playerConnection");
+
+            connection = connectionField.get(craftPlayer);
+            putPlayerConnection(player, connection);
+        }
+
+        return connection;
+    }
+
+    private static Object getNetworkManager(Player player) throws Exception {
+        Object playerconnection = getPlayerConnection(player);
+        Object network = getNetworkManagerMap().get(player);
+
+        if (network == null) {
+            Field networkField = getField(playerconnection, "networkManager");
+            network = networkField.get(playerconnection);
+            putNetworkManager(player, network);
+        }
+
+        return network;
+    }
+
+    public static Channel getChannel(Player player) throws Exception {
+        Object network = getNetworkManager(player);
+        Channel channel = getChannelMap().get(player);
+
+        if (channel == null) {
+            String version = getBukkitVersion();
+            Field channelField = null;
+
+            if (version.equalsIgnoreCase("v1_8_R1")) {
+                channelField = ReflectionUtil.getField(network, "i");
+            } else if (version.equalsIgnoreCase("v1_8_R2")) {
+                channelField = ReflectionUtil.getField(network, "k");
+            } else if (version.equalsIgnoreCase("v1_8_R3")) {
+                channelField = ReflectionUtil.getField(network, "channel");
+            }
+
+            channel = (Channel) channelField.get(network);
+            putChannel(player, channel);
+        }
+
+        return channel;
     }
 }

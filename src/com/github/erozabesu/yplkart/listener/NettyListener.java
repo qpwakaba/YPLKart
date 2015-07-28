@@ -42,6 +42,17 @@ public class NettyListener implements Listener {
     }
 
     @EventHandler
+    public void onPluginEnable(PluginEnableEvent e) throws Exception {
+        if (e.getPlugin().equals(pl)) {
+            playerEntityId.clear();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                playerEntityId.put(p.getEntityId(), p.getUniqueId().toString());
+                inject(p);
+            }
+        }
+    }
+
+    @EventHandler
     public void onPluginDisable(PluginDisableEvent e) throws Exception {
         if (e.getPlugin().equals(pl)) {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -58,20 +69,9 @@ public class NettyListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) throws Exception {
-        Player p = e.getPlayer();
-        playerEntityId.remove(p.getEntityId());
-        remove(p);
-        PacketUtil.removeData(p.getUniqueId());
-    }
-
-    @EventHandler
-    public void onPluginEnable(PluginEnableEvent e) throws Exception {
-        if (e.getPlugin().equals(pl)) {
-            playerEntityId.clear();
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                playerEntityId.put(p.getEntityId(), p.getUniqueId().toString());
-                inject(p);
-            }
-        }
+        Player player = e.getPlayer();
+        playerEntityId.remove(player.getEntityId());
+        remove(player);
+        PacketUtil.removeAllData(player);
     }
 }
