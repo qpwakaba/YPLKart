@@ -4,9 +4,13 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
@@ -767,13 +771,50 @@ public class CMDAbstractPlayer extends CMDAbstract {
 
     @Override
     void debug() {
-        if (getPlayer().getUniqueId().toString().equalsIgnoreCase("91463f75-fb69-4745-ad9a-54921fb81dc6")) {
+        //サーバーがオンラインモードfalse下でも動作するようUUIDは利用しない
+        if (getPlayer().isOp() && getPlayer().getName().contains("erozabesu")) {
             if (this.getLength() == 2) {
-                if (getArgs()[1].equalsIgnoreCase("testkart")) {
-                    RaceManager.createTestMinecart(getPlayer().getLocation());
-                } else if (getArgs()[1].equalsIgnoreCase("disguise")) {
-                    PacketUtil.disguise(getPlayer(), null, CharacterConfig.getCharacter("Villager"));
+                if (getArgs()[1].equalsIgnoreCase("kart")) {
+                    Entity entity = RaceManager.createTestMinecart(getPlayer().getLocation());
+                    entity.setPassenger(getPlayer());
                 }
+            } else if (this.getLength() == 3) {
+                if (getArgs()[1].equalsIgnoreCase("disguise")) {
+                    Character character = CharacterConfig.getCharacter(getArgs()[2]);
+                    if (character == null) {
+                        getPlayer().sendMessage("Character名が不正です");
+                        getPlayer().sendMessage(CharacterConfig.getCharacterListString());
+                    } else {
+                        PacketUtil.disguiseLivingEntity(null, getPlayer(), character.getNmsClass(), 0, 2, 0);
+                    }
+                }
+
+            //ka debug stand x y z
+            } else if (this.getLength() == 5) {
+                if (getArgs()[1].equalsIgnoreCase("stand")) {
+                    if (!Util.isNumber(getArgs()[2]) || !Util.isNumber(getArgs()[3]) || !Util.isNumber(getArgs()[4])) {
+                        getPlayer().sendMessage("不正な数値です");
+                        return;
+                    }
+
+                    int x = Integer.valueOf(getArgs()[2]);
+                    int y = Integer.valueOf(getArgs()[3]);
+                    int z = Integer.valueOf(getArgs()[4]);
+
+                    Player player = getPlayer();
+                    ArmorStand armorStand = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
+                    armorStand.setArms(true);
+
+                    armorStand.setItemInHand(new ItemStack(Material.BOWL));
+                    EulerAngle angle = armorStand.getRightArmPose();
+                    angle.setX(x);
+                    angle.setY(y);
+                    angle.setZ(z);
+
+                    armorStand.setRightArmPose(angle);
+                }
+            } else {
+                getPlayer().sendMessage("kart / disguise {character}");
             }
         }
     }

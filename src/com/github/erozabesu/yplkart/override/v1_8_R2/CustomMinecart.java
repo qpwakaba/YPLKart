@@ -900,7 +900,7 @@ public class CustomMinecart extends EntityMinecartRideable {
                     setLastTicksLived(getLastTicksLived() + 1);
                     try {
                         if (getLastTicksLived() == ticksLived) {
-                            RaceManager.removeKartEntityIdList(getId());
+                            RaceManager.removeKartEntityIdMap(getId());
                             getLivingCheckTask().cancel();
                         }
                     } catch(Exception e) {
@@ -1455,7 +1455,7 @@ public class CustomMinecart extends EntityMinecartRideable {
 
     @Override
     public void die() {
-        RaceManager.removeKartEntityIdList(getId());
+        RaceManager.removeKartEntityIdMap(getId());
         dead = true;
     }
 }

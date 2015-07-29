@@ -240,15 +240,43 @@ public class ReflectionUtil {
         return null;
     }
 
-    public static Object getCraftEntityFromClassName(World w, String classname) {
+    public static Object getNewCraftEntityFromClass(World world, Class<?> nmsEntityClass) {
         try {
-            Constructor<?> con = nmsEntity_Constructor.get(classname);
-            if (con == null) {
-                con = getNMSClass(classname).getConstructor(nmsWorld);
-                nmsEntity_Constructor.put(classname, con);
+            Constructor<?> constructor = nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
+
+            if (constructor == null) {
+                constructor = nmsEntityClass.getConstructor(nmsWorld);
+                nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
             }
 
-            return con.newInstance(getCraftWorld(w));
+            return constructor.newInstance(getCraftWorld(world));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Object getNewCraftEntityFromClassName(World world, String classname) {
+        try {
+            Constructor<?> constructor = nmsEntity_Constructor.get(classname);
+
+            if (constructor == null) {
+                constructor = getNMSClass(classname).getConstructor(nmsWorld);
+                nmsEntity_Constructor.put(classname, constructor);
+            }
+
+            return constructor.newInstance(getCraftWorld(world));
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {

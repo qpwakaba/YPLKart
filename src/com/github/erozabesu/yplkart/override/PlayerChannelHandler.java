@@ -69,7 +69,8 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                 } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                     super.write(ctx, msg, promise);
                 } else {
-                    super.write(ctx, PacketUtil.getDisguisePacket(p, r.getCharacter()), promise);
+                    super.write(ctx, PacketUtil.getDisguiseLivingEntityPacket(p
+                            , r.getCharacter().getNmsClass(), 0, 0, 0), promise);
                 }
                 return;
 
@@ -91,7 +92,27 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                         // Do nothing
                     }
                 }
-            } else {
+            }/* else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
+                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
+                Entity kartEntity = RaceManager.getKartEntityFromEntityId(id);
+
+                if (kartEntity != null) {
+                    Location location = kartEntity.getLocation();
+
+                    Field field_locationY = ReflectionUtil.getField(msg, "c");
+                    Field field_yaw = ReflectionUtil.getField(msg, "e");
+                    int locationY = (int) ((location.getY() - 1.0D) * 32.0D);
+                    byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
+
+                    ReflectionUtil.setFieldValue(field_locationY, msg, locationY);
+                    ReflectionUtil.setFieldValue(field_yaw, msg, yaw);
+
+                    super.write(ctx, msg, promise);
+                    return;
+                } else {
+                    super.write(ctx, msg, promise);
+                }
+            }*/ else {
                 super.write(ctx, msg, promise);
             }
         } catch (Exception ex) {

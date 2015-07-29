@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.object.Character;
 
 public class PacketUtil extends ReflectionUtil {
 
@@ -79,36 +78,45 @@ public class PacketUtil extends ReflectionUtil {
      * targetプレイヤーに向けパケットを送信します
      * targetがnullの場合全プレイヤーに送信します
      */
-    public static void disguise(Player player, Player target, Character character) {
-        if (character == null) {
+    public static void disguiseLivingEntity(Player adress, Entity disguiseEntity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ) {
+        if (nmsEntityClass == null) {
             return;
         }
-        if (character.getNmsClass().getSimpleName().equalsIgnoreCase("EntityHuman")) {
-            returnPlayer(player);
-            return;
-        }
-        try {
-            Object craftEntity = getCraftEntityFromClassName(player.getWorld(), character.getNmsClass().getSimpleName());
 
-            Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
-            Object spawnentitypacket = getDisguisePacket(player, character);
+        String nmsEntityClassName = nmsEntityClass.getSimpleName();
+        if (nmsEntityClassName.equalsIgnoreCase("EntityHuman")) {
+            if (disguiseEntity instanceof Player) {
+                returnOriginalPlayer((Player) disguiseEntity);
+            }
+            return;
+        }
+
+        try {
+            Object craftEntity = getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
+
+            Object entitydestroypacket = getEntityDestroyPacket(disguiseEntity.getEntityId());
+            Object spawnentitypacket = getDisguiseLivingEntityPacket(disguiseEntity, nmsEntityClass
+                    , offsetX, offsetY, offsetZ);
             Object attachentitypacket = null;
-            if (player.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftEntity, getCraftEntity(player.getVehicle()));
+            if (disguiseEntity.getVehicle() != null) {
+                attachentitypacket = getAttachEntityPacket(craftEntity, getCraftEntity(disguiseEntity.getVehicle()));
             }
 
-            Object handpacket = getEquipmentPacket(player, 0, new ItemStack(Material.AIR));
-            Object helmetpacket = getEquipmentPacket(player, 4, new ItemStack(Material.AIR));
-            Object chectpacket = getEquipmentPacket(player, 3, new ItemStack(Material.AIR));
-            Object leggingspacket = getEquipmentPacket(player, 2, new ItemStack(Material.AIR));
-            Object bootspacket = getEquipmentPacket(player, 1, new ItemStack(Material.AIR));
+            Object handpacket = getEquipmentPacket(disguiseEntity, 0, new ItemStack(Material.AIR));
+            Object helmetpacket = getEquipmentPacket(disguiseEntity, 4, new ItemStack(Material.AIR));
+            Object chectpacket = getEquipmentPacket(disguiseEntity, 3, new ItemStack(Material.AIR));
+            Object leggingspacket = getEquipmentPacket(disguiseEntity, 2, new ItemStack(Material.AIR));
+            Object bootspacket = getEquipmentPacket(disguiseEntity, 1, new ItemStack(Material.AIR));
 
-            if (target == null) {
+            if (adress == null) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    if (other.getUniqueId() == player.getUniqueId())
+                    if (other.getUniqueId() == disguiseEntity.getUniqueId()) {
                         continue;
-                    if (!other.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()))
+                    }
+                    if (!other.getWorld().getName().equalsIgnoreCase(disguiseEntity.getWorld().getName())) {
                         continue;
+                    }
+
                     sendPacket(other, entitydestroypacket);
                     sendPacket(other, spawnentitypacket);
                     if (attachentitypacket != null) {
@@ -121,46 +129,46 @@ public class PacketUtil extends ReflectionUtil {
                     sendPacket(other, bootspacket);
                 }
             } else {
-                sendPacket(target, entitydestroypacket);
-                sendPacket(target, spawnentitypacket);
+                sendPacket(adress, entitydestroypacket);
+                sendPacket(adress, spawnentitypacket);
                 if (attachentitypacket != null) {
-                    sendPacket(target, attachentitypacket);
+                    sendPacket(adress, attachentitypacket);
                 }
-                sendPacket(target, handpacket);
-                sendPacket(target, helmetpacket);
-                sendPacket(target, chectpacket);
-                sendPacket(target, leggingspacket);
-                sendPacket(target, bootspacket);
+                sendPacket(adress, handpacket);
+                sendPacket(adress, helmetpacket);
+                sendPacket(adress, chectpacket);
+                sendPacket(adress, leggingspacket);
+                sendPacket(adress, bootspacket);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void returnPlayer(final Player p) {
+    public static void returnOriginalPlayer(Player player) {
         try {
-            Object craftentity = getCraftEntity(p);
+            Object craftentity = getCraftEntity(player);
 
-            Object entitydestroypacket = getEntityDestroyPacket(p.getEntityId());
+            Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
             Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
             Object attachentitypacket = null;
-            if (p.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(p.getVehicle()));
+            if (player.getVehicle() != null) {
+                attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(player.getVehicle()));
             }
-            Object handpacket = p.getItemInHand() == null ? null : getEquipmentPacket(p, 0, p.getItemInHand());
-            Object helmetpacket = p.getEquipment().getHelmet() == null ? null : getEquipmentPacket(p, 4, p
+            Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
+            Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
                     .getEquipment().getHelmet());
-            Object chectpacket = p.getEquipment().getChestplate() == null ? null : getEquipmentPacket(p, 3, p
+            Object chectpacket = player.getEquipment().getChestplate() == null ? null : getEquipmentPacket(player, 3, player
                     .getEquipment().getChestplate());
-            Object leggingspacket = p.getEquipment().getLeggings() == null ? null : getEquipmentPacket(p, 2, p
+            Object leggingspacket = player.getEquipment().getLeggings() == null ? null : getEquipmentPacket(player, 2, player
                     .getEquipment().getLeggings());
-            Object bootspacket = p.getEquipment().getBoots() == null ? null : getEquipmentPacket(p, 1, p.getEquipment()
+            Object bootspacket = player.getEquipment().getBoots() == null ? null : getEquipmentPacket(player, 1, player.getEquipment()
                     .getBoots());
 
             for (Player other : Bukkit.getOnlinePlayers()) {
-                if (other.getUniqueId() == p.getUniqueId())
+                if (other.getUniqueId() == player.getUniqueId())
                     continue;
-                if (!other.getWorld().getName().equalsIgnoreCase(p.getWorld().getName()))
+                if (!other.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()))
                     continue;
                 sendPacket(other, entitydestroypacket);
                 sendPacket(other, spawnnamedentitypacket);
@@ -264,22 +272,38 @@ public class PacketUtil extends ReflectionUtil {
 
     //〓 Get Packet 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static Object getDisguisePacket(Player p, Character character) throws Exception {
-        Object craftentity = getCraftEntityFromClassName(
-                p.getWorld(), character.getNmsClass().getSimpleName());
-        Location loc = p.getLocation();
+    /**
+     * 引数entityと同様の情報を持った、引数nmsEntityClassクラスのエンティティがスポーンするパケットを返す
+     * @param entity スポーンさせるエンティティの基となる情報をもつエンティティ
+     * @param nmsEntityClass スポーンさせるエンティティのNmsEntityClass
+     * @return 引数entityと同様の情報を持った、引数nmsEntityClassクラスのエンティティがスポーンするパケット
+     */
+    public static Object getDisguiseLivingEntityPacket(Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ){
+        try {
+            Object craftEntity = getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
+            Location location = entity.getLocation();
 
-        nmsEntity_setLocation.invoke(craftentity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        nmsEntity_setEntityID.invoke(craftentity, p.getEntityId());
-        nmsEntity_setCustomName.invoke(craftentity, p.getName());
-        nmsEntity_setCustomNameVisible.invoke(craftentity, true);
+            nmsEntity_setLocation.invoke(craftEntity, location.getX() + offsetX, location.getY() + offsetY
+                    , location.getZ() + offsetZ, location.getYaw(), location.getPitch());
+            nmsEntity_setEntityID.invoke(craftEntity, entity.getEntityId());
+            nmsEntity_setCustomName.invoke(craftEntity, entity.getName());
+            nmsEntity_setCustomNameVisible.invoke(craftEntity, true);
 
-        return getSpawnEntityLivingPacket(craftentity);
+            return getSpawnEntityLivingPacket(craftEntity);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     // itemslot: 0-hand / 4-head / 3-chest / 2-leggings / 1-boots
-    private static Object getEquipmentPacket(Player p, int itemslot, ItemStack equipment) throws Exception {
-        return constructor_nmsPacketPlayOutEntityEquipment.newInstance(p.getEntityId(), itemslot,
+    private static Object getEquipmentPacket(Entity entity, int itemslot, ItemStack equipment) throws Exception {
+        return constructor_nmsPacketPlayOutEntityEquipment.newInstance(entity.getEntityId(), itemslot,
                 getCraftItemStack(equipment));
     }
 

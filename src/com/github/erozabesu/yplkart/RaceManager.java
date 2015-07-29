@@ -13,7 +13,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -46,11 +45,8 @@ public class RaceManager {
     private static HashMap<UUID, Racer> racedata = new HashMap<UUID, Racer>();
     private static HashMap<String, Circuit> circuit = new HashMap<String, Circuit>();
 
-    /**
-     * 生成したカートエンティティのEntityIDを格納する
-     * EntityIDからカートエンティティかどうかを判断するためのもの
-     */
-    private static List<Integer> kartEntityIdList = new ArrayList<Integer>();
+    /** 生成したカートエンティティのEntityIDとEntityを格納する */
+    private static HashMap<Integer, Entity> kartEntityIdMap = new HashMap<Integer, Entity>();
 
     // 〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -59,28 +55,32 @@ public class RaceManager {
      * @return 引数entityIdをEntityIDとして持つエンティティがカートエンティティかどうか
      */
     public static boolean isKartEntityFromEntityId(int entityId) {
-        return kartEntityIdList.contains(entityId);
+        return kartEntityIdMap.keySet().contains(entityId);
+    }
+
+    public static Entity getKartEntityFromEntityId(int entityId) {
+        return kartEntityIdMap.get(entityId);
     }
 
     // 〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * 引数entityIdを配列kartEntityIdListに追加する
-     * @param entityId 追加するEntityID
+     * 引数entityをハッシュマップkartEntityIdMapに追加する
+     * @param entity 追加するエンティティ
      */
-    public static void addKartEntityIdList(int entityId) {
-        if (!isKartEntityFromEntityId(entityId)) {
-            kartEntityIdList.add(entityId);
+    public static void putKartEntityIdMap(Entity entity) {
+        if (!isKartEntityFromEntityId(entity.getEntityId())) {
+            kartEntityIdMap.put(entity.getEntityId(), entity);
         }
     }
 
     /**
-     * 引数entityIdを配列kartEntityIdListから削除する
+     * 引数entityIdをハッシュマップkartEntityIdMapから削除する
      * @param entityId 削除するEntityID
      */
-    public static void removeKartEntityIdList(int entityId) {
+    public static void removeKartEntityIdMap(int entityId) {
         if (isKartEntityFromEntityId(entityId)) {
-            kartEntityIdList.remove((Object) entityId);
+            kartEntityIdMap.remove(entityId);
         }
     }
 
@@ -189,7 +189,7 @@ public class RaceManager {
         r.recoveryCharacterPhysical();
         p.getInventory().setHelmet(character.getMenuItem());
 
-        PacketUtil.disguise(p, null, character);
+        PacketUtil.disguiseLivingEntity(null, p, character.getNmsClass(), 0, 0, 0);
         character.playMenuSelectSound(p);
         MessageEnum.raceCharacter.sendConvertedMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
     }
@@ -248,7 +248,7 @@ public class RaceManager {
         Player p = Bukkit.getPlayer(id);
         if (p != null) {
             getRace(id).recoveryPhysical();
-            PacketUtil.returnPlayer(p);
+            PacketUtil.returnOriginalPlayer(p);
             MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
         }
     }
@@ -268,7 +268,7 @@ public class RaceManager {
             if (isSpecificKartType(vehicle, KartType.RacingKart)) {
                 getRace(player).setCMDForceLeave(true);
                 player.leaveVehicle();
-                removeKartEntityIdList(vehicle.getEntityId());
+                removeKartEntityIdMap(vehicle.getEntityId());
                 vehicle.remove();
                 getRace(player).setCMDForceLeave(false);
             }
@@ -632,8 +632,10 @@ public class RaceManager {
             minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
                     YPLKart.getInstance(), new Object[]{kartType, customKart}));
 
-            addKartEntityIdList(minecartEntity.getEntityId());
+            putKartEntityIdMap(minecartEntity);
 
+            PacketUtil.disguiseLivingEntity(null, minecartEntity
+                    , ReflectionUtil.getNMSClass("EntityArmorStand"), 0, 0, 0);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -650,27 +652,29 @@ public class RaceManager {
         return minecartEntity;
     }
 
-    public static Minecart createTestMinecart(Location location) {
-        Minecart minecartEntity = null;
+    public static Entity createTestMinecart(Location location) {
+        Entity entity = null;
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
-            Class<?> customClass = ReflectionUtil.getYPLKartClass("TestMinecart");
+            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomArmorStand");
             Object customKart = customClass.getConstructor(
-                    ReflectionUtil.getNMSClass("World"), Location.class)
-                    .newInstance(craftWorld, location);
+                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
+                    .newInstance(craftWorld, KartConfig.getRandomKart(), KartType.RacingKart, location);
 
-            minecartEntity = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+            entity = (Entity) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
 
             craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
                     .invoke(craftWorld, customKart);
 
-            minecartEntity.setDisplayBlock(new MaterialData(Material.BEACON, (byte) 5));
-            minecartEntity.setCustomNameVisible(true);
-            minecartEntity.setCustomName("Test_Minecart");
-            minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
-                    YPLKart.getInstance(), new Object[]{KartType.DisplayKart, customKart}));
+            entity.setCustomNameVisible(false);
+            entity.setCustomName("Test_Minecart");
+            entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+                    YPLKart.getInstance(), new Object[]{KartType.RacingKart, customKart}));
 
-            addKartEntityIdList(minecartEntity.getEntityId());
+            putKartEntityIdMap(entity);
+
+            //PacketUtil.disguiseLivingEntity(null, entity
+            //        , ReflectionUtil.getNMSClass("EntityArmorStand"), 0, 0, 0);
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -685,7 +689,7 @@ public class RaceManager {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        return minecartEntity;
+        return entity;
     }
 
     public static Entity createCustomWitherSkull(Location l, String circuitname) throws Exception {

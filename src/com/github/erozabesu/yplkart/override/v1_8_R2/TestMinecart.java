@@ -446,7 +446,7 @@ public class TestMinecart extends EntityMinecartRideable {
                     try {
                         if (getLastTicksLived() == ticksLived) {
                             System.out.println("v1_8_R2 : test kart is dead");
-                            RaceManager.removeKartEntityIdList(getId());
+                            RaceManager.removeKartEntityIdMap(getId());
                             getLivingCheckTask().cancel();
                         }
                     } catch(Exception e) {
@@ -1002,7 +1002,7 @@ public class TestMinecart extends EntityMinecartRideable {
 
     @Override
     public void die() {
-        RaceManager.removeKartEntityIdList(getId());
+        RaceManager.removeKartEntityIdMap(getId());
         dead = true;
     }
 }
