@@ -14,13 +14,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
@@ -42,49 +41,88 @@ import com.github.erozabesu.yplkart.utils.Util;
 public class RaceManager {
     public static int checkPointHeight = 8;
     public static int checkPointDetectRadius = 20;
-    private static HashMap<UUID, Racer> racedata = new HashMap<UUID, Racer>();
+
+    /** プレイヤーUUIDとRacerオブジェクトを格納する */
+    private static HashMap<UUID, Racer> racerDataMap = new HashMap<UUID, Racer>();
+
+    /** サーキット名とCircuitオブジェクトを格納する */
     private static HashMap<String, Circuit> circuit = new HashMap<String, Circuit>();
 
     /** 生成したカートエンティティのEntityIDとEntityを格納する */
     private static HashMap<Integer, Entity> kartEntityIdMap = new HashMap<Integer, Entity>();
 
-    // 〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数uuidを持つプレイヤーのRacerオブジェクトを返す
+     * Racerオブジェクトがnullの場合、新規に生成し格納したオブジェクトを返す
+     * @param uuid ハッシュマップキーとなるプレイヤーUUID
+     * @return Racerオブジェクト
+     */
+    public static Racer getRace(UUID uuid) {
+        if (racerDataMap.get(uuid) == null) {
+            putRacer(uuid, null);
+        }
+        return racerDataMap.get(uuid);
+    }
+
+    /**
+     * 引数playerのRacerオブジェクトを返す
+     * Racerオブジェクトがnullの場合、新規に生成し格納したオブジェクトを返す
+     * @param player ハッシュマップキーとなるプレイヤー
+     * @return Racerオブジェクト
+     */
+    public static Racer getRace(Player player) {
+        return getRace(player.getUniqueId());
+    }
+
+    public static Circuit getCircuit(UUID id) {
+        try {
+            return circuit.get(getRace(id).getEntry());
+        } catch (NullPointerException ex) {
+            return null;
+        }
+    }
+
+    public static Circuit getCircuit(String circuitname) {
+        try {
+            return circuit.get(circuitname);
+        } catch (NullPointerException ex) {
+            return null;
+        }
+    }
 
     /**
      * @param entityId 調べるエンティティのEntityID
      * @return 引数entityIdをEntityIDとして持つエンティティがカートエンティティかどうか
      */
-    public static boolean isKartEntityFromEntityId(int entityId) {
+    public static boolean isKartEntityByEntityId(int entityId) {
         return kartEntityIdMap.keySet().contains(entityId);
     }
 
-    public static Entity getKartEntityFromEntityId(int entityId) {
+    /**
+     * @param entityId 調べるエンティティのEntityID
+     * @return 引数entityIdをEntityIDとして持つカートエンティティを返す
+     */
+    public static Entity getKartEntityByEntityId(int entityId) {
         return kartEntityIdMap.get(entityId);
     }
 
-    // 〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * 引数entityをハッシュマップkartEntityIdMapに追加する
-     * @param entity 追加するエンティティ
+     * 引数uuidをキー、引数racerをバリューとして、ハッシュマップracerDataMapに格納する<br>
+     * 引数racerがnullの場合、Racerオブジェクトを新規に生成し格納する
+     * @param uuid ハッシュマップキーとして格納するプレイヤーUUID
+     * @param racer バリューとして格納するRacerオブジェクト
      */
-    public static void putKartEntityIdMap(Entity entity) {
-        if (!isKartEntityFromEntityId(entity.getEntityId())) {
-            kartEntityIdMap.put(entity.getEntityId(), entity);
+    public static void putRacer(UUID uuid, Racer racer) {
+        if (racer == null) {
+            racerDataMap.put(uuid, new Racer(uuid.toString()));
+        } else {
+            racerDataMap.put(uuid, racer);
         }
     }
-
-    /**
-     * 引数entityIdをハッシュマップkartEntityIdMapから削除する
-     * @param entityId 削除するEntityID
-     */
-    public static void removeKartEntityIdMap(int entityId) {
-        if (isKartEntityFromEntityId(entityId)) {
-            kartEntityIdMap.remove(entityId);
-        }
-    }
-
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Circuit setupCircuit(String circuitname) {
         if (circuit.get(circuitname) == null)
@@ -106,6 +144,26 @@ public class RaceManager {
         }
         circuit.clear();
     }
+
+    /**
+     * 引数entityをハッシュマップkartEntityIdMapに追加する
+     * @param entity 追加するエンティティ
+     */
+    public static void putKartEntityIdMap(Entity entity) {
+        kartEntityIdMap.put(entity.getEntityId(), entity);
+    }
+
+    /**
+     * 引数entityIdをハッシュマップkartEntityIdMapから削除する
+     * @param entityId 削除するEntityID
+     */
+    public static void removeKartEntityIdMap(int entityId) {
+        if (isKartEntityByEntityId(entityId)) {
+            kartEntityIdMap.remove(entityId);
+        }
+    }
+
+    // 〓 Circuit Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void setMatchingCircuitData(UUID id) {
         Circuit c = getCircuit(id);
@@ -140,7 +198,7 @@ public class RaceManager {
         }
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Racer Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void setEntryRaceData(UUID id, String circuitname) {
         if (isEntry(id)) {
@@ -211,8 +269,6 @@ public class RaceManager {
         MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     public static void clearEntryRaceData(UUID id) {
         if (isEntry(id)) {
             Scoreboards.exitCircuit(id);
@@ -275,37 +331,7 @@ public class RaceManager {
         }
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public static Circuit getCircuit(UUID id) {
-        try {
-            return circuit.get(getRace(id).getEntry());
-        } catch (NullPointerException ex) {
-            return null;
-        }
-    }
-
-    public static Circuit getCircuit(String circuitname) {
-        try {
-            return circuit.get(circuitname);
-        } catch (NullPointerException ex) {
-            return null;
-        }
-    }
-
-    public static Racer getRace(Player p) {
-        if (racedata.get(p.getUniqueId()) == null) {
-            racedata.put(p.getUniqueId(), new Racer(p.getUniqueId().toString()));
-        }
-        return racedata.get(p.getUniqueId());
-    }
-
-    public static Racer getRace(UUID id) {
-        if (racedata.get(id) == null) {
-            racedata.put(id, new Racer(id.toString()));
-        }
-        return racedata.get(id);
-    }
+    // 〓 Util Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static List<Player> getEntryPlayer(String circuitname) {
         if (circuit.get(circuitname) == null)
@@ -457,7 +483,7 @@ public class RaceManager {
         return null;
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Util Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /*
      * レースに参加申請し、開始されるまで待機している状態です
@@ -500,7 +526,10 @@ public class RaceManager {
      * @return 引数kartTypeのエンティティかどうか
      */
     public static boolean isSpecificKartType(Entity entity, KartType kartType) {
-        if (entity instanceof Minecart) {
+        if (entity == null) {
+            return false;
+        }
+        if (entity instanceof ArmorStand) {
             List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
             if (metaDataList.size() != 0) {
                 MetadataValue metaData = metaDataList.get(0);
@@ -535,7 +564,10 @@ public class RaceManager {
      * @return カートエンティティかどうか
      */
     public static boolean isKartEntity(Entity entity) {
-        if (entity instanceof Minecart) {
+        if (entity == null) {
+            return false;
+        }
+        if (entity instanceof ArmorStand) {
             List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
             if (metaDataList.size() != 0) {
                 MetadataValue metaData = metaDataList.get(0);
@@ -578,12 +610,12 @@ public class RaceManager {
         }
     }
 
-    public static Minecart createRacingMinecart(Location location, Kart kart) {
-        Minecart minecartEntity = createCustomMinecart(location, kart, KartType.RacingKart);
+    public static Entity createRacingKart(Location location, Kart kart) {
+        Entity entity = createCustomKart(location, kart, KartType.RacingKart);
 
-        minecartEntity.setCustomName(kart.getKartName());
+        entity.setCustomName(kart.getKartName());
 
-        return minecartEntity;
+        return entity;
     }
 
     /**
@@ -593,17 +625,17 @@ public class RaceManager {
      * @param uuid カスタムネーム。displaykart.ymlのコンフィグキーでもある
      * @return 生成したMinecartエンティティ
      */
-    public static Minecart createDisplayMinecart(Location location, Kart kart, String uuid) {
-        Minecart minecartEntity = createCustomMinecart(location, kart, KartType.DisplayKart);
+    public static Entity createDisplayKart(Location location, Kart kart, String uuid) {
+        Entity entity = createCustomKart(location, kart, KartType.DisplayKart);
 
         if (uuid == null) {
-            minecartEntity.setCustomName(minecartEntity.getUniqueId().toString());
-            DisplayKartConfig.createDisplayKart(minecartEntity.getUniqueId().toString(), kart, location);
+            entity.setCustomName(entity.getUniqueId().toString());
+            DisplayKartConfig.createDisplayKart(entity.getUniqueId().toString(), kart, location);
         } else {
-            minecartEntity.setCustomName(uuid);
+            entity.setCustomName(uuid);
         }
 
-        return minecartEntity;
+        return entity;
     }
 
     /**
@@ -613,29 +645,26 @@ public class RaceManager {
      * @param kartType カートの種類
      * @return 生成したMinecartEntity
      */
-    private static Minecart createCustomMinecart(Location location, Kart kart, KartType kartType) {
-        Minecart minecartEntity = null;
+    private static Entity createCustomKart(Location location, Kart kart, KartType kartType) {
+        Entity entity = null;
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
-            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomMinecart");
+            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomArmorStand");
             Object customKart = customClass.getConstructor(
                     ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
                     .newInstance(craftWorld, kart, kartType, location);
 
-            minecartEntity = (Minecart) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
-
             craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
                     .invoke(craftWorld, customKart);
 
-            minecartEntity.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
-            minecartEntity.setCustomNameVisible(false);
-            minecartEntity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
+            entity = (Entity) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
+
+            entity.setCustomNameVisible(false);
+            entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
                     YPLKart.getInstance(), new Object[]{kartType, customKart}));
 
-            putKartEntityIdMap(minecartEntity);
+            putKartEntityIdMap(entity);
 
-            PacketUtil.disguiseLivingEntity(null, minecartEntity
-                    , ReflectionUtil.getNMSClass("EntityArmorStand"), 0, 0, 0);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -649,10 +678,10 @@ public class RaceManager {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        return minecartEntity;
+        return entity;
     }
 
-    public static Entity createTestMinecart(Location location) {
+    public static Entity createTestKart(Location location) {
         Entity entity = null;
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
@@ -672,9 +701,6 @@ public class RaceManager {
                     YPLKart.getInstance(), new Object[]{KartType.RacingKart, customKart}));
 
             putKartEntityIdMap(entity);
-
-            //PacketUtil.disguiseLivingEntity(null, entity
-            //        , ReflectionUtil.getNMSClass("EntityArmorStand"), 0, 0, 0);
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -704,7 +730,7 @@ public class RaceManager {
         return skull;
     }
 
-    // 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Edit Player 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 選択メニュー（仮想インベントリ）を引数playerに表示する
