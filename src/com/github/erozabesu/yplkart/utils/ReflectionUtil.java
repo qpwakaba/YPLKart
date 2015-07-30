@@ -41,6 +41,7 @@ public class ReflectionUtil {
     protected static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
     protected static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
     protected static Class<?> nmsPacketPlayOutEntityLook = null;
+    protected static Class<?> nmsPacketPlayOutEntityMetadata = getNMSClass("PacketPlayOutEntityMetadata");
     protected static Class<?> nmsPacketPlayOutEntityTeleport = getNMSClass("PacketPlayOutEntityTeleport");
     protected static Class<?> nmsPacketPlayOutNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn");
     protected static Class<?> nmsPacketPlayOutRelEntityMoveLook = null;
@@ -101,6 +102,12 @@ public class ReflectionUtil {
         }
     }
 
+    //〓 Nms Constructor List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** EntityXxxxxクラス毎のコンストラクタ */
+    protected static HashMap<String, Constructor<?>> nmsEntity_Constructor =
+            new HashMap<String, Constructor<?>>();
+
     //〓 Nms Method 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     protected static Method nmsBlock_getMaterial;
@@ -133,17 +140,24 @@ public class ReflectionUtil {
         }
     }
 
-    //〓 Nms Method List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** EntityXxxxxクラス毎のコンストラクタ */
-    protected static HashMap<String, Constructor<?>> nmsEntity_Constructor =
-            new HashMap<String, Constructor<?>>();
-
     //〓 Nms Object 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     protected static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
     protected static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
     protected static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
+
+    //〓 Nms Field 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Field field_PacketPlayOutEntityMetadata_EntityId = getField(nmsPacketPlayOutEntityMetadata, "a");
+    public static Field field_PacketPlayOutEntityMetadata_WatchableObject = getField(nmsPacketPlayOutEntityMetadata, "b");
+    public static Field field_PacketPlayOutNamedEntitySpawn_UUID = getField(nmsPacketPlayOutNamedEntitySpawn, "b");
+    public static Field field_PacketPlayOutEntityEquipment_EntityId = getField(nmsPacketPlayOutEntityEquipment, "a");
+    public static Field field_PacketPlayOutEntityTeleport_EntityId = getField(nmsPacketPlayOutEntityTeleport, "a");
+    public static Field field_PacketPlayOutEntityTeleport_LocationY = getField(nmsPacketPlayOutEntityTeleport, "c");
+    public static Field field_PacketPlayOutEntityTeleport_LocationYaw = getField(nmsPacketPlayOutEntityTeleport, "e");
+    public static Field field_PacketPlayOutSpawnEntity_EntityId = getField(nmsPacketPlayOutSpawnEntity, "a");
+    public static Field field_PacketPlayOutSpawnEntity_LocationY = getField(nmsPacketPlayOutSpawnEntity, "c");
+    public static Field field_PacketPlayOutSpawnEntity_LocationYaw = getField(nmsPacketPlayOutSpawnEntity, "i");
 
     //〓 Craft Class 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 

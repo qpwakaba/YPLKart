@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
@@ -16,9 +18,10 @@ import com.github.erozabesu.yplkart.listener.NettyListener;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
+
+    private static double locationYOffset = 1.4D;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -34,26 +37,30 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
              * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
              */
             if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")) {
-                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
-                if (NettyListener.playerEntityId.get(id) == null) {
+                int entityId = (Integer) ReflectionUtil.getFieldValue(
+                        ReflectionUtil.field_PacketPlayOutEntityMetadata_EntityId, msg);
+
+                Player player = NettyListener.getPlayerByEntityId(entityId);
+
+                if (player == null) {
                     super.write(ctx, msg, promise);
                     return;
                 } else {
-                    Player p = Bukkit.getPlayer(UUID.fromString(NettyListener.playerEntityId.get(id)));
-                    Racer r = RaceManager.getRace(p);
+                    Racer r = RaceManager.getRace(player);
 
                     if (r.getCharacter() == null) {
                         super.write(ctx, msg, promise);
                     } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                         super.write(ctx, msg, promise);
                     } else {
-                        List<Object> watchableobject = (List<Object>) ReflectionUtil.getFieldValue(msg, "b");
-                        Iterator i = watchableobject.iterator();
-                        while (i.hasNext()) {
-                            Object w = i.next();
-                            int index = (Integer) w.getClass().getMethod("a").invoke(w);
+                        List<Object> watchableObjectList = (List<Object>) ReflectionUtil.getFieldValue(
+                                ReflectionUtil.field_PacketPlayOutEntityMetadata_WatchableObject, msg);
+                        Iterator iterator = watchableObjectList.iterator();
+                        while (iterator.hasNext()) {
+                            Object watchableObject = iterator.next();
+                            int index = (Integer) watchableObject.getClass().getMethod("a").invoke(watchableObject);
                             if (index == 10 || index == 16 || index == 17 || index == 18) {
-                                i.remove();
+                                iterator.remove();
                             }
                         }
                     }
@@ -61,27 +68,31 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             //Human以外のキャラクターを選択している場合パケットを偽装
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutNamedEntitySpawn")) {
-                Player p = Bukkit.getPlayer((UUID) Util.getFieldValue(msg, "b"));
-                Racer r = RaceManager.getRace(p);
+                UUID uuid = (UUID) ReflectionUtil.getFieldValue(
+                        ReflectionUtil.field_PacketPlayOutNamedEntitySpawn_UUID, msg);
+                Player player = Bukkit.getPlayer(uuid);
+                Racer r = RaceManager.getRace(player);
 
                 if (r.getCharacter() == null) {
                     super.write(ctx, msg, promise);
                 } else if (r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                     super.write(ctx, msg, promise);
                 } else {
-                    super.write(ctx, PacketUtil.getDisguiseLivingEntityPacket(p
+                    super.write(ctx, PacketUtil.getDisguiseLivingEntityPacket(player
                             , r.getCharacter().getNmsClass(), 0, 0, 0), promise);
                 }
                 return;
 
             //Human以外のキャラクターを選択している場合、装備の情報を全て破棄する
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityEquipment")) {
-                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
-                if (NettyListener.playerEntityId.get(id) == null) {
+                int entityId = (Integer) ReflectionUtil.getFieldValue(
+                        ReflectionUtil.field_PacketPlayOutEntityEquipment_EntityId, msg);
+                Player player = NettyListener.getPlayerByEntityId(entityId);
+
+                if (player == null) {
                     super.write(ctx, msg, promise);
                     return;
                 } else {
-                    Player player = Bukkit.getPlayer(UUID.fromString(NettyListener.playerEntityId.get(id)));
                     Racer r = RaceManager.getRace(player);
 
                     if (r.getCharacter() == null) {
@@ -92,27 +103,51 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                         // Do nothing
                     }
                 }
-            }/* else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
-                int id = (Integer) ReflectionUtil.getFieldValue(msg, "a");
-                Entity kartEntity = RaceManager.getKartEntityFromEntityId(id);
+
+            //カートエンティティが移動中のパケットのY座標をずらし、地中に半分埋める
+            } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
+                int entityId = (Integer) ReflectionUtil.getFieldValue(
+                        ReflectionUtil.field_PacketPlayOutEntityTeleport_EntityId, msg);
+                Entity kartEntity = RaceManager.getKartEntityFromEntityId(entityId);
 
                 if (kartEntity != null) {
                     Location location = kartEntity.getLocation();
-
-                    Field field_locationY = ReflectionUtil.getField(msg, "c");
-                    Field field_yaw = ReflectionUtil.getField(msg, "e");
-                    int locationY = (int) ((location.getY() - 1.0D) * 32.0D);
+                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
                     byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
-                    ReflectionUtil.setFieldValue(field_locationY, msg, locationY);
-                    ReflectionUtil.setFieldValue(field_yaw, msg, yaw);
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationY, msg, locationY);
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationYaw, msg, yaw);
 
                     super.write(ctx, msg, promise);
                     return;
                 } else {
                     super.write(ctx, msg, promise);
                 }
-            }*/ else {
+
+            //カートエンティティがスポーン時のパケットのY座標をずらし、地中に半分埋める
+            } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
+                int id = (Integer) ReflectionUtil.getFieldValue(
+                        ReflectionUtil.field_PacketPlayOutSpawnEntity_EntityId, msg);
+                Entity kartEntity = RaceManager.getKartEntityFromEntityId(id);
+
+                if (kartEntity != null) {
+                    Location location = kartEntity.getLocation();
+                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
+                    byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
+
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationY, msg, locationY);
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationYaw, msg, yaw);
+
+                    super.write(ctx, msg, promise);
+                    return;
+                } else {
+                    super.write(ctx, msg, promise);
+                }
+            } else {
                 super.write(ctx, msg, promise);
             }
         } catch (Exception ex) {
