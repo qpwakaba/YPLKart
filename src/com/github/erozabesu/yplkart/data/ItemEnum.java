@@ -33,11 +33,6 @@ public enum ItemEnum {
             Permission.OP_CMD_CIRCUIT,
             "チェックポイントツール",
             ""),
-    MARIO_HAT(
-            "mario_hat",
-            null,
-            "赤い帽子",
-            "ひげのおじさんになれる赤い帽子。"),
     ITEMBOX_TOOL(
             "itembox_tool",
             Permission.OP_CMD_ITEMBOXTOOL,

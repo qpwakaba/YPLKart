@@ -3,11 +3,6 @@ check_point_tool:
   material: nether_star
   material_data: 0
   max_stack_size: 64
-mario_hat:
-  tier: -1
-  material: redstone_block
-  material_data: 0
-  max_stack_size: 64
 itembox_tool:
   tier: 0
   material: ink_sack
@@ -130,8 +125,8 @@ killer:
   tier: 4
   material: ink_sack
   material_data: 11
-  display_block_material: huge_mushroom_1
-  display_block_material_data: 9
+  display_block_material: ink_sack
+  display_block_material_data: 15
   max_stack_size: 1
   effect_second: 5
   moving_damage: 6

@@ -1,5 +1,5 @@
 Standard:
-  display_material: huge_mushroom_2
+  display_material: bowl
   display_material_data: 0
   weight: 1.0
   max_speed: 250.0
@@ -10,8 +10,8 @@ Standard:
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
 Survival:
-  display_material: huge_mushroom_2
-  display_material_data: 1
+  display_material: string
+  display_material_data: 0
   weight: 1.5
   max_speed: 220.0
   acceleration: 1.0
@@ -21,8 +21,8 @@ Survival:
   default_cornering_power: 1.0
   drift_cornering_power: 6.5
 Accel:
-  display_material: huge_mushroom_2
-  display_material_data: 2
+  display_material: feather
+  display_material_data: 0
   weight: 0.8
   max_speed: 180.0
   acceleration: 4.0
@@ -32,8 +32,8 @@ Accel:
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
 Tricky:
-  display_material: huge_mushroom_2
-  display_material_data: 3
+  display_material: sulphur
+  display_material_data: 0
   weight: 0.5
   max_speed: 300.0
   acceleration: 0.7
@@ -43,8 +43,8 @@ Tricky:
   default_cornering_power: 1.5
   drift_cornering_power: 6.5
 Flexible:
-  display_material: huge_mushroom_2
-  display_material_data: 4
+  display_material: seeds
+  display_material_data: 0
   weight: 1.0
   max_speed: 200.0
   acceleration: 1.5
@@ -54,8 +54,8 @@ Flexible:
   default_cornering_power: 1.7
   drift_cornering_power: 6.5
 Straight:
-  display_material: huge_mushroom_2
-  display_material_data: 5
+  display_material: wheat
+  display_material_data: 0
   weight: 0.5
   max_speed: 300.0
   acceleration: 2.5
@@ -65,8 +65,8 @@ Straight:
   default_cornering_power: 1.0
   drift_cornering_power: 4.0
 Power:
-  display_material: huge_mushroom_2
-  display_material_data: 6
+  display_material: flint
+  display_material_data: 0
   weight: 4.0
   max_speed: 200.0
   acceleration: 0.7
@@ -76,8 +76,8 @@ Power:
   default_cornering_power: 1.5
   drift_cornering_power: 5.5
 Jalopy:
-  display_material: huge_mushroom_2
-  display_material_data: 7
+  display_material: leather
+  display_material_data: 0
   weight: 1.0
   max_speed: 200.0
   acceleration: 0.8
