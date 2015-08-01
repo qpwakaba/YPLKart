@@ -212,19 +212,73 @@ public enum ItemEnum {
         ConfigManager config = ConfigManager.ITEM_ENUM;
         String nodePrefix = getConfigKey() + ".";
 
+        //全アイテム共通項目
         setTier(config.getInteger(nodePrefix + "tier"));
         setMaterial(config.getMaterial(nodePrefix + "material"));
         setMaterialData(config.getByte(nodePrefix + "material_data"));
-        setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_block_material"));
-        setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_block_material_data"));
         setMaxstack(config.getInteger(nodePrefix + "max_stack_size"));
-        setWalkSpeed(config.getFloat(nodePrefix + "walk_speed"));
-        setHitDamage(config.getInteger(nodePrefix + "hit_damage"));
-        setMovingDamage(config.getInteger(nodePrefix + "moving_damage"));
-        setEffectLevel(config.getInteger(nodePrefix + "effect_level"));
-        setEffectSecond(config.getInteger(nodePrefix + "effect_second"));
-        setTierMultiple(config.getInteger(nodePrefix + "multiple.tier"));
-        setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount"));
+
+        //OP用アイテム
+        if (this.equals(CHECKPOINT_TOOL)
+                || this.equals(ITEMBOX_TOOL)
+                || this.equals(MENU)) {
+
+            // Do nothing
+
+        //レース用アイテム
+        } else {
+            //外見マテリアル
+            if (this.equals(KILLER)) {
+                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_block_material"));
+                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_block_material_data"));
+            }
+
+            //エフェクトレベル
+            if (this.equals(MUSHROOM)
+                    || this.equals(POWERFULL_MUSHROOM)
+                    || this.equals(BANANA)
+                    || this.equals(GESSO)
+                    || this.equals(THUNDER)) {
+                setEffectLevel(config.getInteger(nodePrefix + "effect_level"));
+            }
+
+            //エフェクト秒数
+            if (this.equals(MUSHROOM)
+                    || this.equals(POWERFULL_MUSHROOM)
+                    || this.equals(BANANA)
+                    || this.equals(GESSO)
+                    || this.equals(THUNDER)
+                    || this.equals(STAR)
+                    || this.equals(TERESA)
+                    || this.equals(KILLER)) {
+                setEffectSecond(config.getInteger(nodePrefix + "effect_second"));
+            }
+
+            //歩行速度
+            if (this.equals(STAR)) {
+                setWalkSpeed(config.getFloat(nodePrefix + "walk_speed"));
+            }
+
+            //ヒットダメージ
+            if (this.equals(FAKE_ITEMBOX)
+                    || this.equals(TURTLE)
+                    || this.equals(RED_TURTLE)
+                    || this.equals(THORNED_TURTLE)
+                    || this.equals(THUNDER)
+                    || this.equals(STAR)) {
+                setHitDamage(config.getInteger(nodePrefix + "hit_damage"));
+            }
+
+            //ムービングダメージ
+            if (this.equals(KILLER)
+                    || this.equals(THORNED_TURTLE)) {
+                setMovingDamage(config.getInteger(nodePrefix + "moving_damage"));
+            }
+
+            //全レース用アイテム共通
+            setTierMultiple(config.getInteger(nodePrefix + "multiple.tier"));
+            setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount"));
+        }
     }
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
