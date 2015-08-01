@@ -91,6 +91,7 @@ public class Circuit {
                     race.savePlayerData();
 
                     player.getInventory().clear();
+                    player.getInventory().setArmorContents(null);
                     player.setLevel(0);
                     player.setExp(0);
 
