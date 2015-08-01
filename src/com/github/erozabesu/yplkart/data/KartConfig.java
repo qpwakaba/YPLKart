@@ -133,4 +133,10 @@ public class KartConfig{
 
         return getKartList().get(ram);
     }
+
+    /** @return アイテムキラー用のカートオブジェクト */
+    public static Kart getKillerKart() {
+        return new Kart("Killer"
+                , ItemEnum.KILLER.getDisplayBlockMaterial(), ItemEnum.KILLER.getDisplayBlockMaterialData());
+    }
 }

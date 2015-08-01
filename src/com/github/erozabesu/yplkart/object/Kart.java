@@ -71,6 +71,29 @@ public class Kart {
         setDriftCorneringPower(config.getDouble(key + ".drift_cornering_power"));
     }
 
+    /**
+     * コンフィグファイルの影響のないカートオブジェクトを生成するコンストラクタ<br>
+     * 主にキラーのような、一時的にカードオブジェクトの見た目を変更するアイテム用
+     * @param kartName カート名
+     * @param displayMaterial ディスプレイするアイテムのマテリアル
+     * @param displayMaterialData ディスプレイするアイテムのマテリアルデータ
+     */
+    public Kart(String kartName, Material displayMaterial, byte displayMaterialData) {
+        setKartName(kartName);
+
+        setDisplayMaterial(displayMaterial);
+        setDisplayMaterialData(displayMaterialData);
+
+        setWeight(1.0D);
+        setMaxSpeed(250.0D);
+        setAcceleration(1.5D);
+        setClimbableHeight(0.5F);
+        setSpeedDecreaseOnDirt(5.0D);
+        setSpeedDecreaseOnDrift(2.0D);
+        setDefaultCorneringPower(1.0D);
+        setDriftCorneringPower(5.5D);
+    }
+
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return kartName カート名 */

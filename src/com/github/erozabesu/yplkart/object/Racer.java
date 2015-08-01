@@ -1,5 +1,7 @@
 package com.github.erozabesu.yplkart.object;
 
+import io.netty.channel.ChannelHandlerContext;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -7,11 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -21,6 +21,7 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
@@ -55,6 +56,12 @@ public class Racer {
     private boolean standby;
     private boolean goal;
     private boolean start;
+
+    /**
+     * プレイヤーがスニークしているかどうか
+     * @see com.github.erozabesu.yplkart.override.PlayerChannelHandler#channelRead(ChannelHandlerContext , Object)
+     */
+    private boolean isSneaking;
 
     private String laststepblock;
     private int lapcount;
@@ -189,6 +196,11 @@ public class Racer {
 
     public boolean getLapStepCool() {
         return this.lapstepcool;
+    }
+
+    /** @return isSneaking スニークしているかどうか */
+    public boolean isSneaking() {
+        return isSneaking;
     }
 
     public String getLastStepBlock() {
@@ -348,6 +360,11 @@ public class Racer {
         this.lapstepcool = value;
     }
 
+    /** @param isSneaking スニークしているかどうか */
+    public void setSneaking(boolean isSneaking) {
+        this.isSneaking = isSneaking;
+    }
+
     public void setLastStepBlock(String value) {
         this.laststepblock = value;
     }
@@ -430,14 +447,26 @@ public class Racer {
     }
 
     public void setUsingKiller(int life, Entity nearestunpassedcheckpoint) {
+        final Player player = getPlayer();
+
         this.usingKiller = nearestunpassedcheckpoint;
-        if (this.usingKiller != null) {
-            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                public void run() {
-                    usingKiller = null;
-                }
-            }, life * 20);
+
+        //ランニングレース中にキラーを使用した場合、新規にキラー用カートエンティティを生成し搭乗する
+        if (getKart() == null) {
+            Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), KartConfig.getKillerKart());
+            kartEntity.setPassenger(player);
         }
+
+        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                usingKiller = null;
+
+                //ランニングレース中にキラーを使用した場合、登場中のキラー用カートエンティティを降りる
+                if (getKart() == null) {
+                    RaceManager.leaveRacingKart(player);
+                }
+            }
+        }, life * 20);
     }
 
     public void setCMDForceLeave(boolean value) {
@@ -580,13 +609,12 @@ public class Racer {
         Player player = getPlayer();
         Entity vehicle = player.getVehicle();
         if (vehicle != null) {
-            if (RaceManager.isSpecificKartType(vehicle, KartType.RacingKart)) {
+            if (RaceManager.isKartEntity(vehicle)) {
                 Object customKartObject =
                         RaceManager.getCustomMinecartObjectFromEntityMetaData(vehicle);
 
                 try {
-                    Minecart cart = (Minecart) Util.getBukkitEntityFromNmsEntity(customKartObject);
-                    cart.setDisplayBlock(new MaterialData(kart.getDisplayMaterial(), kart.getDisplayMaterialData()));
+                    Entity cart = (Entity) Util.getBukkitEntityFromNmsEntity(customKartObject);
                     cart.setCustomName(kart.getKartName());
                     cart.setCustomNameVisible(false);
 
@@ -602,8 +630,8 @@ public class Racer {
                 player.leaveVehicle();
             }
         }
-        Minecart cart = RaceManager.createRacingMinecart(player.getLocation(), kart);
-        cart.setPassenger(player);
+        Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), kart);
+        kartEntity.setPassenger(player);
         PacketUtil.sendOwnAttachEntityPacket(player);
     }
 

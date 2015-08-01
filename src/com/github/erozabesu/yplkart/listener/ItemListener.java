@@ -17,7 +17,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
@@ -36,7 +35,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -45,10 +43,8 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
-import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.object.Character;
-import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.task.ItemBananaTask;
@@ -742,6 +738,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemKiller(final Player user) {
+        //TODO リファクタリング：InteractEventの上流で事前にチェックしておく
         if (!isRacing(user.getUniqueId()))
             return;
         if (getRank(user) == 0)
@@ -769,50 +766,8 @@ public class ItemListener extends RaceManager implements Listener {
         int life = ItemEnum.KILLER.getEffectSecond() + character.getAdjustPositiveEffectSecond();
         new SendCountDownTitleTask(user, life, MessageEnum.titleUsingKiller.getMessage()).runTaskTimer(
                 YPLKart.getInstance(), 0, 1);
+
         r.setUsingKiller(life, unpassedcheckpoint);
-
-        if (r.getKart() == null) {
-            Kart kart = KartConfig.getRandomKart();
-
-            //TODO キラーのマテリアルをコンフィグから指定可能に
-            try {
-                Minecart minecart = createRacingMinecart(user.getLocation(), kart);
-                minecart.setDisplayBlock(new MaterialData(Material.HUGE_MUSHROOM_1, (byte) 9));
-                minecart.setPassenger(user);
-                Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        try {
-                            if (user.getVehicle() != null) {
-                                leaveRacingKart(user);
-                            }
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }, life * 20);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            if (user.getVehicle() != null)
-                if (user.getVehicle() instanceof Minecart) {
-                    ((Minecart) user.getVehicle())
-                            .setDisplayBlock(new MaterialData(Material.HUGE_MUSHROOM_1, (byte) 9));
-                    Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                        public void run() {
-                            try {
-                                if (user.getVehicle() != null)
-                                    if (user.getVehicle() instanceof Minecart)
-                                        ((Minecart) user.getVehicle()).setDisplayBlock(new MaterialData(r.getKart()
-                                                .getDisplayMaterial(), r.getKart().getDisplayMaterialData()));
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }, life * 20);
-                }
-        }
     }
 
     public static void setNegativeItemSpeed(final Player p, int second, int level, Sound sound) {

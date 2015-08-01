@@ -37,6 +37,8 @@ public class ReflectionUtil {
     protected static Class<?> nmsChatSerializer = null;
     protected static Class<?> nmsEnumTitleAction = null;
     protected static Class<?> nmsEnumClientCommand = null;
+    protected static Class<?> nmsPacketPlayInSteerVehicle = getNMSClass("PacketPlayInSteerVehicle");
+    protected static Class<?> nmsPacketPlayInUseEntity = getNMSClass("PacketPlayInUseEntity");
     protected static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
     protected static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
     protected static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
@@ -148,10 +150,13 @@ public class ReflectionUtil {
 
     //〓 Nms Field 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    public static Field field_PacketPlayInSteerVehicle_isUnmount = getField(nmsPacketPlayInSteerVehicle, "d");
     public static Field field_PacketPlayOutEntityMetadata_EntityId = getField(nmsPacketPlayOutEntityMetadata, "a");
     public static Field field_PacketPlayOutEntityMetadata_WatchableObject = getField(nmsPacketPlayOutEntityMetadata, "b");
     public static Field field_PacketPlayOutNamedEntitySpawn_UUID = getField(nmsPacketPlayOutNamedEntitySpawn, "b");
     public static Field field_PacketPlayOutEntityEquipment_EntityId = getField(nmsPacketPlayOutEntityEquipment, "a");
+    public static Field field_PacketPlayOutEntityEquipment_ItemSlot = getField(nmsPacketPlayOutEntityEquipment, "b");
+    public static Field field_PacketPlayOutEntityEquipment_ItemStack = getField(nmsPacketPlayOutEntityEquipment, "c");
     public static Field field_PacketPlayOutEntityTeleport_EntityId = getField(nmsPacketPlayOutEntityTeleport, "a");
     public static Field field_PacketPlayOutEntityTeleport_LocationY = getField(nmsPacketPlayOutEntityTeleport, "c");
     public static Field field_PacketPlayOutEntityTeleport_LocationYaw = getField(nmsPacketPlayOutEntityTeleport, "e");

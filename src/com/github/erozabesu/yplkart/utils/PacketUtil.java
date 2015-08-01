@@ -270,6 +270,29 @@ public class PacketUtil extends ReflectionUtil {
         }
     }
 
+    /**
+     * エンティティがアイテムを装備するパケットを送信する<br>
+     * 引数itemSlotで装備するスロットを指定する<br>
+     * 0:手  1:ブーツ  2:レギンス  3:チェスト  4:ヘルメット
+     * @param target パケットを送信するプレイヤー
+     * @param entityId アイテムを装備するエンティティのエンティティID
+     * @param itemSlot アイテムを装備するスロット
+     * @param equipItemStack 装備するアイテムのNmsItemStack
+     */
+    public static void sendEntityEquipmentPacket(Player target, int entityId, int itemSlot, Object equipItemStack) {
+        Object packet = null;
+
+        packet = getEntityEquipmentPacket(entityId, itemSlot, equipItemStack);
+
+        if (target == null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                sendPacket(player, packet);
+            }
+        } else {
+            sendPacket(target, packet);
+        }
+    }
+
     //〓 Get Packet 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
@@ -462,6 +485,31 @@ public class PacketUtil extends ReflectionUtil {
         return packet;
     }
 
+    /**
+     * エンティティがアイテムを装備するパケットを返す
+     * @param entityId アイテムを装備するエンティティのエンティティID
+     * @param itemSlot アイテムを装備するスロット
+     * @param equipItemStack 装備するアイテムのNmsItemStackオブジェクト
+     * @return エンティティがアイテムを装備するパケット
+     */
+    public static Object getEntityEquipmentPacket(int entityId, int itemSlot, Object equipItemStack) {
+        Object packet = null;
+
+        try {
+            packet = constructor_nmsPacketPlayOutEntityEquipment.newInstance(entityId, itemSlot, equipItemStack);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return packet;
+    }
+
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     private static void sendPacket(Player p, Object packet) {
@@ -470,6 +518,20 @@ public class PacketUtil extends ReflectionUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 引数networkManagerと一致するNetworkManagerオブジェクトを所有するプレイヤーを返す
+     * @param networkManager NetworkManagerオブジェクト
+     * @return NetworkManagerオブジェクトが一致したプレイヤー
+     */
+    public static Player getPlayerByNetworkManager(Object networkManager) {
+        for (Player key : getNetworkManagerMap().keySet()) {
+            if (getNetworkManagerMap().get(key).equals(networkManager)) {
+                return key;
+            }
+        }
+        return null;
     }
 
     private static Object getPlayerConnection(Player player) throws Exception {

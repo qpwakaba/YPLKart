@@ -180,7 +180,7 @@ public class DisplayKartConfig {
             }
             //Entityのスポーン
             if (flag) {
-                RaceManager.createDisplayMinecart(displayKart.getLocation()
+                RaceManager.createDisplayKart(displayKart.getLocation()
                         , kart, displayKart.getConfigKey());
             }
         }

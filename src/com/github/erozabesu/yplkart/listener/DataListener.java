@@ -19,12 +19,10 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -67,40 +65,6 @@ public class DataListener implements Listener {
         if (!YPLKart.isPluginEnabled(e.getWorld()))
             return;
         DisplayKartConfig.respawnKart(e.getWorld());
-    }
-
-    //ドリフト
-    //カートに乗っている間はコマンド以外の手段では搭乗解除不可
-    //leaveはゴール時、コマンド実行時のみ
-    @EventHandler
-    public void onVehicleExit(VehicleExitEvent e) {
-        if (!(e.getExited() instanceof Player)) {
-            return;
-        }
-        if (!YPLKart.isPluginEnabled(e.getExited().getWorld())) {
-            return;
-        }
-        if (!RaceManager.isSpecificKartType(e.getVehicle(), KartType.RacingKart)) {
-            return;
-        }
-
-        Player p = (Player) e.getExited();
-        if (!RaceManager.getRace(p).getCMDFroceLeave()) {
-            e.setCancelled(true);
-            return;
-        }
-    }
-
-    //レース用カートを右クリックした場合キャンセル
-    @EventHandler
-    public void interactKart(PlayerInteractEntityEvent event) {
-        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
-            return;
-        }
-        if (RaceManager.isSpecificKartType(event.getRightClicked(), KartType.RacingKart)) {
-            event.setCancelled(true);
-            return;
-        }
     }
 
     @EventHandler

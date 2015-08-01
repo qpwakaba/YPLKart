@@ -157,7 +157,7 @@ public class CMDAbstractBlock extends CMDAbstract {
             if (kart == null)
                 return;
 
-            RaceManager.createDisplayMinecart(
+            RaceManager.createDisplayKart(
                     new Location(Bukkit.getWorld(args[2]), Double.valueOf(args[3]), Double.valueOf(args[4]), Double
                             .valueOf(args[5]), Float.valueOf(args[6]), Float.valueOf(args[7])), kart, null);
         } else {

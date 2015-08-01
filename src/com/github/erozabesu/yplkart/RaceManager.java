@@ -468,13 +468,13 @@ public class RaceManager {
                 if (metaDataValue.getClass().isArray()) {
                     //MetaDataが配列の場合
                     for (Object values : (Object[]) metaDataValue) {
-                        if (values.getClass().getSimpleName().contains("CustomMinecart")) {
+                        if (values.getClass().getSimpleName().contains("CustomArmorStand")) {
                             return values;
                         }
                     }
                 } else {
                     //MetaDataが単数の場合
-                    if (metaDataValue.getClass().getSimpleName().contains("CustomMinecart")) {
+                    if (metaDataValue.getClass().getSimpleName().contains("CustomArmorStand")) {
                         return metaDataValue;
                     }
                 }
