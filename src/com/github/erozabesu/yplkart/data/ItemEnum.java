@@ -690,7 +690,7 @@ public enum ItemEnum {
     private static void removeUnuseslotKeyItems(Player player) {
         PlayerInventory inv = player.getInventory();
         int i = (Integer) ConfigEnum.ITEM_SLOT.getValue();
-        i += RaceManager.getRace(player).getCharacter() == null ? 0 : RaceManager.getRace(player).getCharacter()
+        i += RaceManager.getRacer(player).getCharacter() == null ? 0 : RaceManager.getRacer(player).getCharacter()
                 .getAdjustMaxSlotSize();
         for (int j = i; j < 36; j++) {
             if (isKeyItem(inv.getItem(j)))
@@ -718,7 +718,7 @@ public enum ItemEnum {
 
             temp = inv.getItem(i);
             maxstacksize = getMaxstackSize(temp);
-            maxstacksize += RaceManager.getRace(player).getCharacter() == null ? 0 : RaceManager.getRace(player).getCharacter()
+            maxstacksize += RaceManager.getRacer(player).getCharacter() == null ? 0 : RaceManager.getRacer(player).getCharacter()
                     .getAdjustMaxStackSize();
 
             if (maxstacksize < temp.getAmount()) {
@@ -751,7 +751,7 @@ public enum ItemEnum {
             if (inv.getItem(j) != null) {
                 if (inv.getItem(j).isSimilar(over.get(overindex))) {
                     int tempmaxstacksize = getMaxstackSize(inv.getItem(j));
-                    tempmaxstacksize += RaceManager.getRace(player).getCharacter() == null ? 0 : RaceManager.getRace(player)
+                    tempmaxstacksize += RaceManager.getRacer(player).getCharacter() == null ? 0 : RaceManager.getRacer(player)
                             .getCharacter().getAdjustMaxStackSize();
                     if (inv.getItem(j).getAmount() < tempmaxstacksize) {
                         int tempflow = (inv.getItem(j).getAmount() + over.get(overindex).getAmount())

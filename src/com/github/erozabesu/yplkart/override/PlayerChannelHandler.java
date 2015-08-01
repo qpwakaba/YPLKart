@@ -60,7 +60,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                                 ReflectionUtil.field_PacketPlayInSteerVehicle_isUnmount, msg, false);
 
                         //擬似スニークフラグをtrueにする
-                        RaceManager.getRace(player).setSneaking(true);
+                        RaceManager.getRacer(player).setSneaking(true);
 
                         super.channelRead(ctx, msg);
                         return;
@@ -68,7 +68,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                 }
 
                 //擬似スニークフラグをfalseにする
-                RaceManager.getRace(player).setSneaking(false);
+                RaceManager.getRacer(player).setSneaking(false);
             }
 
             super.channelRead(ctx, msg);
@@ -81,31 +81,37 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 
-        /*
-         * プレイヤーがLivingEntityに姿を変えていた場合、LivingEntityのMetadataパケットに
-         * EntityHuman特有のデータが送信されクライアントがクラッシュしてしまうため該当データを削除する。
-         * 特有のデータとは、PacketPlayOutEntityMetadata.bに格納されている、
-         * List<DataWatcher.WatchableObject>の中のindexが10、16、17、18のデータ。
-         * DataWatcher.WatchableObject.a()メソッドを実行するとWatchableObjectのindexが取得できるので
-         * 該当indexのデータを削除する。
-         * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
-         */
         if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")) {
             int entityId = (Integer) ReflectionUtil.getFieldValue(
                     ReflectionUtil.field_PacketPlayOutEntityMetadata_EntityId, msg);
 
             Player player = NettyListener.getPlayerByEntityId(entityId);
 
+            /*
+             * プレイヤーがLivingEntityに姿を変えていた場合、LivingEntityのMetadataパケットに
+             * EntityHumanのNBTデータが送信されクライアントがクラッシュしてしまうため該当データを削除する。
+             * 該当データは、メンバ変数bに格納されているindexが10、16、17、18のデータ。
+             * DataWatcher.WatchableObject.a()メソッドを実行するとindexが取得できるので
+             * 該当indexのデータを削除する。
+             * 各データが何を指すかはhttp://wiki.vg/Entities#Entity_Metadata_FormatのHumanの項目を参照。
+             */
             if (player != null) {
-                Racer r = RaceManager.getRace(player);
+                Racer r = RaceManager.getRacer(player);
 
+                //選択キャラクターのエンティティタイプがEntityHuman以外
                 if (r.getCharacter() != null && !r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
+
+                    //NBTが格納されているリストを取得
                     List<Object> watchableObjectList = (List<Object>) ReflectionUtil.getFieldValue(
                             ReflectionUtil.field_PacketPlayOutEntityMetadata_WatchableObject, msg);
                     Iterator iterator = watchableObjectList.iterator();
+
+                    Object watchableObject = null;
+
+                    //該当indexのNBTを破棄
                     while (iterator.hasNext()) {
-                        Object watchableObject = iterator.next();
-                        int index = (Integer) watchableObject.getClass().getMethod("a").invoke(watchableObject);
+                        watchableObject = iterator.next();
+                        int index = (Integer) ReflectionUtil.nmsWatchableObject_getIndex.invoke(watchableObject);
                         if (index == 10 || index == 16 || index == 17 || index == 18) {
                             iterator.remove();
                         }
@@ -115,12 +121,12 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             super.write(ctx, msg, promise);
 
-        //Human以外のキャラクターを選択している場合パケットを偽装
+        //Human以外のキャラクターを選択している場合、選択キャラクターのエンティティタイプに外見を偽装
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutNamedEntitySpawn")) {
             UUID uuid = (UUID) ReflectionUtil.getFieldValue(
                     ReflectionUtil.field_PacketPlayOutNamedEntitySpawn_UUID, msg);
             Player player = Bukkit.getPlayer(uuid);
-            Racer r = RaceManager.getRace(player);
+            Racer r = RaceManager.getRacer(player);
 
             //キャラクターを選択しており、かつ選択キャラクターのエンティティタイプがHuman以外の場合
             if (r.getCharacter() != null) {
@@ -142,7 +148,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             if (player != null) {
 
-                Racer r = RaceManager.getRace(player);
+                Racer r = RaceManager.getRacer(player);
 
                 //キャラクターを選択しており、かつ選択キャラクターのエンティティタイプがHuman以外の場合
                 if (r.getCharacter() != null) {
@@ -155,7 +161,15 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             super.write(ctx, msg, promise);
 
-        //ディスプレイカートを除く、カートエンティティが移動中のパケットのY座標をずらし、地中に半分埋める
+        /*
+         * カートエンティティに利用しているアーマースタンド(以下AS)エンティティのMarkerNBTが
+         * 1.8R1には実装されていないため、1.8R1のみASエンティティが移動時のパケットを変更する
+         *
+         * MarkerNBTを有効にしているASは、プレイヤー搭乗時の登場位置が地面に接する位置まで下がるが、
+         * そうでない場合は目線の高さまで上がってしまう。
+         * これに対処するため、移動中のY座標をずらし地中に半分埋めることで、
+         * クライアント描画時の搭乗位置を地面の高さまで下げる
+         */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
             int entityId = (Integer) ReflectionUtil.getFieldValue(
                     ReflectionUtil.field_PacketPlayOutEntityTeleport_EntityId, msg);
@@ -176,7 +190,15 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             super.write(ctx, msg, promise);
 
-        //ディスプレイカートを除く、カートエンティティがスポーン時のパケットのY座標をずらし、地中に半分埋める
+        /*
+         * カートエンティティに利用しているアーマースタンド(以下AS)エンティティのMarkerNBTが
+         * 1.8R1には実装されていないため、1.8R1のみASエンティティスポーン時のパケットを変更する
+         *
+         * MarkerNBTを有効にしているASは、プレイヤー搭乗時の登場位置が地面に接する位置まで下がるが、
+         * そうでない場合は目線の高さまで上がってしまう。
+         * これに対処するため、スポーン座標のY座標をずらし地中に半分埋めることで、
+         * クライアント描画時の搭乗位置を地面の高さまで下げる
+         */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
             int id = (Integer) ReflectionUtil.getFieldValue(
                     ReflectionUtil.field_PacketPlayOutSpawnEntity_EntityId, msg);

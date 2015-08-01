@@ -27,7 +27,7 @@ public class ItemTurtleTask extends BukkitRunnable {
         this.shooter = shooter;
         this.projectile = projectile;
         this.hitdamage = ItemEnum.TURTLE.getHitDamage()
-                + RaceManager.getRace(shooter).getCharacter().getAdjustAttackDamage();
+                + RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
 
         this.vector = Util.getVectorToLocation(Util.adjustBlockLocation(this.projectile.getLocation()), next);
         this.x = this.vector.getX();

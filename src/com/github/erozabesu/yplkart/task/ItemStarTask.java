@@ -23,9 +23,9 @@ public class ItemStarTask extends BukkitRunnable {
     public ItemStarTask(Player p) {
         this.p = p;
         this.effectsecond = (ItemEnum.STAR.getEffectSecond()
-                + RaceManager.getRace(p).getCharacter().getAdjustPositiveEffectSecond()) * 20;
+                + RaceManager.getRacer(p).getCharacter().getAdjustPositiveEffectSecond()) * 20;
         this.hitdamage = ItemEnum.STAR.getHitDamage()
-                + RaceManager.getRace(p).getCharacter().getAdjustAttackDamage();
+                + RaceManager.getRacer(p).getCharacter().getAdjustAttackDamage();
 
         if (boostTask.get(p) != null) {
             boostTask.get(p).cancel();
@@ -35,7 +35,7 @@ public class ItemStarTask extends BukkitRunnable {
         boostTask.put(p, this);
 
         Util.setItemDecrease(p);
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
         r.setDeathPenaltyTask(null);
         r.setDeathPenaltyTitleSendTask(null);
         r.setItemNegativeSpeedTask(null);
@@ -59,13 +59,13 @@ public class ItemStarTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (RaceManager.getRace(p).getGoal()) {
+        if (RaceManager.getRacer(p).getGoal()) {
             p.setWalkSpeed(0.2F);
             die();
             return;
         }
         if (effectsecond < life) {
-            p.setWalkSpeed(RaceManager.getRace(p).getCharacter().getWalkSpeed());
+            p.setWalkSpeed(RaceManager.getRacer(p).getCharacter().getWalkSpeed());
             die();
             return;
         }

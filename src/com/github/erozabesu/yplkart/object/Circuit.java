@@ -79,7 +79,7 @@ public class Circuit {
             if (Bukkit.getPlayer(uuid) != null) {
                 if (Bukkit.getPlayer(uuid).isOnline()) {
                     Player player = Bukkit.getPlayer(uuid);
-                    Racer race = RaceManager.getRace(player);
+                    Racer race = RaceManager.getRacer(player);
 
                     Scoreboards.entryCircuit(uuid);
                     race.init();
@@ -465,10 +465,10 @@ public class Circuit {
                     }
                 } else if (racestartcountdown == 12) {
                     for (Player p : getEntryPlayer()) {
-                        if (RaceManager.getRace(p).getCharacter() == null) {
+                        if (RaceManager.getRacer(p).getCharacter() == null) {
                             RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
-                        if (RaceManager.getRace(p).getKart() == null
+                        if (RaceManager.getRacer(p).getKart() == null
                                 && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                             RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
                         }

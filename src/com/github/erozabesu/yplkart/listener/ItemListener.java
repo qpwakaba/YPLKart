@@ -289,7 +289,7 @@ public class ItemListener extends RaceManager implements Listener {
                                     }
                                 }, 2 * 20L + 10L);
 
-                                int denominator = getRacingPlayer(getRace(p).getEntry()).size();
+                                int denominator = getRacingPlayer(getRacer(p).getEntry()).size();
                                 //denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
                                 if (denominator == 0)
                                     denominator = 1;
@@ -356,7 +356,7 @@ public class ItemListener extends RaceManager implements Listener {
 
                 if (p.getVehicle() != null) {
                     if (isSpecificKartType(p.getVehicle(), KartType.RacingKart)) {
-                        getRace(p).setStepDashBoard();
+                        getRacer(p).setStepDashBoard();
                         p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
                         return;
                     }
@@ -542,7 +542,7 @@ public class ItemListener extends RaceManager implements Listener {
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public void itemTeresa(Player user) {
-        List<Player> entry = getRacingPlayer(getRace(user).getEntry());
+        List<Player> entry = getRacingPlayer(getRacer(user).getEntry());
         if (entry.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -555,7 +555,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         ArrayList<ItemStack> targetitem = new ArrayList<ItemStack>();
         int itemSlotSize = (Integer) ConfigEnum.ITEM_SLOT.getValue()
-                + getRace(target).getCharacter().getAdjustMaxSlotSize();
+                + getRacer(target).getCharacter().getAdjustMaxSlotSize();
         for (int i = 0; i < itemSlotSize; i++) {
             if (targetinv.getItem(i) != null)
                 if (ItemEnum.isKeyItem(targetinv.getItem(i)))
@@ -577,7 +577,7 @@ public class ItemListener extends RaceManager implements Listener {
             target.updateInventory();
         }
 
-        int effectsecond = (ItemEnum.TERESA.getEffectSecond() + getRace(user).getCharacter()
+        int effectsecond = (ItemEnum.TERESA.getEffectSecond() + getRacer(user).getCharacter()
                 .getAdjustPositiveEffectSecond()) * 20;
         user.setNoDamageTicks(effectsecond);
         user.removePotionEffect(PotionEffectType.INVISIBILITY);
@@ -585,7 +585,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemThunder(Player user) {
-        List<Player> list = getRacingPlayer(getRace(user).getEntry());
+        List<Player> list = getRacingPlayer(getRacer(user).getEntry());
         if (list.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -594,7 +594,7 @@ public class ItemListener extends RaceManager implements Listener {
         final World w = user.getWorld();
 
         int launchdamage = ItemEnum.THUNDER.getHitDamage()
-                + getRace(user).getCharacter().getAdjustAttackDamage();
+                + getRacer(user).getCharacter().getAdjustAttackDamage();
         for (final Player p : list) {
             if (p.getUniqueId() == user.getUniqueId())
                 continue;
@@ -602,9 +602,9 @@ public class ItemListener extends RaceManager implements Listener {
                 continue;
 
             int effectSecond = ItemEnum.THUNDER.getEffectSecond()
-                    + getRace(p).getCharacter().getAdjustNegativeEffectSecond();
+                    + getRacer(p).getCharacter().getAdjustNegativeEffectSecond();
             int effectLevel = ItemEnum.THUNDER.getEffectLevel()
-                    + getRace(p).getCharacter().getAdjustNegativeEffectLevel();
+                    + getRacer(p).getCharacter().getAdjustNegativeEffectLevel();
 
             p.removePotionEffect(PotionEffectType.SLOW);
             p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW
@@ -619,7 +619,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemGesso(Player user) {
-        List<Player> list = getRacingPlayer(getRace(user).getEntry());
+        List<Player> list = getRacingPlayer(getRacer(user).getEntry());
         if (list.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -646,9 +646,9 @@ public class ItemListener extends RaceManager implements Listener {
                 continue;
 
             int effectSecond = ItemEnum.GESSO.getEffectSecond()
-                    + getRace(p).getCharacter().getAdjustNegativeEffectSecond();
+                    + getRacer(p).getCharacter().getAdjustNegativeEffectSecond();
             int effectLevel = ItemEnum.GESSO.getEffectLevel()
-                    + getRace(p).getCharacter().getAdjustNegativeEffectLevel();
+                    + getRacer(p).getCharacter().getAdjustNegativeEffectLevel();
 
             p.removePotionEffect(PotionEffectType.BLINDNESS);
             p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS
@@ -676,13 +676,13 @@ public class ItemListener extends RaceManager implements Listener {
     public void itemRedturtle(Player user) {
         if (!isRacing(user.getUniqueId()))
             return;
-        if (getRacingPlayer(getRace(user).getEntry()).size() <= 1) {
+        if (getRacingPlayer(getRacer(user).getEntry()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
         if (getRank(user) == 0)
             return;
-        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRace(user)) == null) {
+        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRacer(user)) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -698,17 +698,17 @@ public class ItemListener extends RaceManager implements Listener {
         int rank = getRank(user);
         Player target = null;
         if (rank == 1)
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRace(user).getEntry(), rank + 1), turtle, false, true)
+            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), rank + 1), turtle, false, true)
                     .runTaskTimer(YPLKart.getInstance(), 0, 1);
         else
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRace(user).getEntry(), rank - 1), turtle, false, false)
+            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), rank - 1), turtle, false, false)
                     .runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemThornedturtle(Player user) {
         if (!isRacing(user.getUniqueId()))
             return;
-        if (getRacingPlayer(getRace(user).getEntry()).size() <= 1) {
+        if (getRacingPlayer(getRacer(user).getEntry()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -720,7 +720,7 @@ public class ItemListener extends RaceManager implements Listener {
                     ItemEnum.THORNED_TURTLE.getItem() });
             return;
         }
-        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRace(user)) == null) {
+        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRacer(user)) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -733,7 +733,7 @@ public class ItemListener extends RaceManager implements Listener {
         turtle.setCustomNameVisible(false);
         turtle.setDropItem(false);
 
-        new ItemDyedTurtleTask(user, getPlayerfromRank(getRace(user).getEntry(), 1), turtle, true, false).runTaskTimer(
+        new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), 1), turtle, true, false).runTaskTimer(
                 pl, 0, 1);
     }
 
@@ -745,14 +745,14 @@ public class ItemListener extends RaceManager implements Listener {
             return;
 
         Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20,
-                getRace(user));
+                getRacer(user));
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
 
-        final Racer r = getRace(user);
+        final Racer r = getRacer(user);
 
         if (r.getUsingKiller() != null) {
             MessageEnum.itemAlreadyUsing.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
@@ -772,17 +772,17 @@ public class ItemListener extends RaceManager implements Listener {
 
     public static void setNegativeItemSpeed(final Player p, int second, int level, Sound sound) {
         p.playSound(p.getLocation(), sound, 0.5F, -1.0F);
-        second = (second + getRace(p).getCharacter().getAdjustNegativeEffectSecond()) * 20;
+        second = (second + getRacer(p).getCharacter().getAdjustNegativeEffectSecond()) * 20;
 
         Util.setPotionEffect(p, PotionEffectType.SLOW, second, level
-                + getRace(p).getCharacter().getAdjustNegativeEffectLevel());
+                + getRacer(p).getCharacter().getAdjustNegativeEffectLevel());
 
-        getRace(p).setItemNegativeSpeedTask(
+        getRacer(p).setItemNegativeSpeedTask(
                 Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
                     public void run() {
                         p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
                         p.removePotionEffect(PotionEffectType.SLOW);
-                        getRace(p).setItemNegativeSpeedTask(null);
+                        getRacer(p).setItemNegativeSpeedTask(null);
                     }
                 }, second)
                 );
@@ -790,7 +790,7 @@ public class ItemListener extends RaceManager implements Listener {
 
     public static void setPositiveItemSpeed(final Player p, int second, int level, Sound sound) {
         p.playSound(p.getLocation(), sound, 0.5F, -1.0F);
-        final Racer race = getRace(p);
+        final Racer race = getRacer(p);
 
         second = (second + race.getCharacter().getAdjustPositiveEffectSecond()) * 20;
         Util.setPotionEffect(p, PotionEffectType.SPEED, second, level

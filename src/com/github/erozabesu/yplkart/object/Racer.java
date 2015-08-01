@@ -480,7 +480,7 @@ public class Racer {
                 stepDashBoard = false;
             }
         }, ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
-                + RaceManager.getRace(getPlayer())
+                + RaceManager.getRacer(getPlayer())
                 .getCharacter().getAdjustPositiveEffectSecond()) * 20);
     }
 

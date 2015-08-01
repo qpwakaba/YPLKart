@@ -95,7 +95,7 @@ public class DataListener implements Listener {
         if (!RaceManager.isStandBy(e.getPlayer().getUniqueId()))
             return;
 
-        RaceManager.getRace(e.getPlayer()).setLastStepBlock(Util.getGroundBlockID(e.getFrom()));
+        RaceManager.getRacer(e.getPlayer()).setLastStepBlock(Util.getGroundBlockID(e.getFrom()));
     }
 
     //スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
@@ -124,7 +124,7 @@ public class DataListener implements Listener {
         Player p = e.getPlayer();
         if (!RaceManager.isStandBy(p.getUniqueId()))
             return;
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
         if (r.getGoal())
             return;
         if (r.getLapStepCool())
@@ -174,11 +174,11 @@ public class DataListener implements Listener {
         if (!RaceManager.isRacing(p.getUniqueId())) {
             return;
         }
-        if (RaceManager.getRace(p).getLapCount() < 1) {
+        if (RaceManager.getRacer(p).getLapCount() < 1) {
             return;
         }
 
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
 
         ArrayList<String> checkpoint = RaceManager.getNearbyCheckpointID(
                 e.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, r.getEntry());
@@ -218,7 +218,7 @@ public class DataListener implements Listener {
 
         final Player p = e.getPlayer();
         if (RaceManager.isStandBy(p.getUniqueId())) {
-            Racer r = RaceManager.getRace(p);
+            Racer r = RaceManager.getRacer(p);
             p.teleport(r.getGoalPositionOnQuit());
             Scoreboards.showBoard(p.getUniqueId());
             r.recoveryPhysicalOnQuit();
@@ -234,7 +234,7 @@ public class DataListener implements Listener {
         }
 
         Player player = e.getPlayer();
-        Racer r = RaceManager.getRace(player);
+        Racer r = RaceManager.getRacer(player);
 
         //ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
         //ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
@@ -279,7 +279,7 @@ public class DataListener implements Listener {
         }
 
         final Player p = e.getPlayer();
-        final Racer r = RaceManager.getRace(p);
+        final Racer r = RaceManager.getRacer(p);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
             public void run() {
@@ -332,7 +332,7 @@ public class DataListener implements Listener {
         Player p = (Player) event.getEntity();
 
         if (RaceManager.isRacing(p.getUniqueId())) {
-            if (RaceManager.getRace(p).getUsingKiller() != null) {
+            if (RaceManager.getRacer(p).getUsingKiller() != null) {
                 if (event.getCause() == DamageCause.SUFFOCATION) {
                     event.setCancelled(true);
                     return;
@@ -362,7 +362,7 @@ public class DataListener implements Listener {
         if (!RaceManager.isStandBy(p.getUniqueId())) {
             return;
         }
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
 
         RaceManager.leaveRacingKart(p);
         r.setLastYaw(p.getLocation().getYaw());
@@ -393,7 +393,7 @@ public class DataListener implements Listener {
         }
 
         final Player p = (Player) e.getPlayer();
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
             if (r.getCharacter() == null) {
                 MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
@@ -458,7 +458,7 @@ public class DataListener implements Listener {
 
         Player p = (Player) e.getWhoClicked();
         UUID id = p.getUniqueId();
-        Racer r = RaceManager.getRace(p);
+        Racer r = RaceManager.getRacer(p);
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
             e.setCancelled(true);
             p.updateInventory();

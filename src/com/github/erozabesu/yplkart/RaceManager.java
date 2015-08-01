@@ -72,7 +72,7 @@ public class RaceManager {
      * @param player ハッシュマップキーとなるプレイヤー
      * @return Racerオブジェクト
      */
-    public static Racer getRace(Player player) {
+    public static Racer getRacer(Player player) {
         return getRace(player.getUniqueId());
     }
 
@@ -322,11 +322,11 @@ public class RaceManager {
         Entity vehicle = player.getVehicle();
         if (vehicle != null) {
             if (isSpecificKartType(vehicle, KartType.RacingKart)) {
-                getRace(player).setCMDForceLeave(true);
+                getRacer(player).setCMDForceLeave(true);
                 player.leaveVehicle();
                 removeKartEntityIdMap(vehicle.getEntityId());
                 vehicle.remove();
-                getRace(player).setCMDForceLeave(false);
+                getRacer(player).setCMDForceLeave(false);
             }
         }
     }
@@ -342,7 +342,7 @@ public class RaceManager {
     public static List<Player> getGoalPlayer(String circuitname) {
         ArrayList<Player> goalplayer = new ArrayList<Player>();
         for (Player p : getEntryPlayer(circuitname)) {
-            if (getRace(p).getGoal())
+            if (getRacer(p).getGoal())
                 goalplayer.add(p);
         }
         return goalplayer;
@@ -351,7 +351,7 @@ public class RaceManager {
     public static List<Player> getRacingPlayer(String circuitname) {
         ArrayList<Player> list = new ArrayList<Player>();
         for (Player p : getEntryPlayer(circuitname)) {
-            if (!getRace(p).getGoal())
+            if (!getRacer(p).getGoal())
                 list.add(p);
         }
         return list;
@@ -369,8 +369,8 @@ public class RaceManager {
     public static Integer getRank(Player p) {
         HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
 
-        for (Player entryplayer : getRacingPlayer(getRace(p).getEntry())) {
-            count.put(entryplayer.getUniqueId(), getRace(entryplayer).getPassedCheckPoint().size());
+        for (Player entryplayer : getRacingPlayer(getRacer(p).getEntry())) {
+            count.put(entryplayer.getUniqueId(), getRacer(entryplayer).getPassedCheckPoint().size());
         }
 
         List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(count.entrySet());
@@ -649,16 +649,12 @@ public class RaceManager {
         Entity entity = null;
         try {
             Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
-            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomArmorStand");
-            Object customKart = customClass.getConstructor(
-                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
+            Object customKart = ReflectionUtil.constructor_yplCustomKart
                     .newInstance(craftWorld, kart, kartType, location);
 
-            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
-                    .invoke(craftWorld, customKart);
+            ReflectionUtil.nmsWorld_addEntity.invoke(craftWorld, customKart);
 
-            entity = (Entity) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
-
+            entity = (Entity) ReflectionUtil.nmsEntity_getBukkitEntity.invoke(customKart);
             entity.setCustomNameVisible(false);
             entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
                     YPLKart.getInstance(), new Object[]{kartType, customKart}));
@@ -674,8 +670,6 @@ public class RaceManager {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         return entity;

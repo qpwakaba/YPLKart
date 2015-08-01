@@ -7,50 +7,55 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+
+import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.KartType;
 
 public class ReflectionUtil {
 
     //〓 Package Name 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static String bukkitVersion =
+    public static String bukkitVersion =
             Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-    protected static String nmsPackage = "net.minecraft.server." + getBukkitVersion();
-    protected static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
-    protected static String yplkartPackage =
+    public static String nmsPackage = "net.minecraft.server." + getBukkitVersion();
+    public static String craftPackage = "org.bukkit.craftbukkit." + getBukkitVersion();
+    public static String yplkartPackage =
             "com.github.erozabesu.yplkart.override." + getBukkitVersion();
 
     //〓 Nms Class 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Class<?> nmsWorld = getNMSClass("World");
-    protected static Class<?> nmsBlock = getNMSClass("Block");
-    protected static Class<?> nmsMaterial = getNMSClass("Material");
-    protected static Class<?> nmsEntity = getNMSClass("Entity");
-    protected static Class<?> nmsEntityHuman = getNMSClass("EntityHuman");
-    protected static Class<?> nmsEntityLiving = getNMSClass("EntityLiving");
-    protected static Class<?> nmsItemStack = getNMSClass("ItemStack");
-    protected static Class<?> nmsPacket = getNMSClass("Packet");
-    protected static Class<?> nmsPlayerConnection = getNMSClass("PlayerConnection");
-    protected static Class<?> nmsIChatBaseComponent = getNMSClass("IChatBaseComponent");
-    protected static Class<?> nmsChatSerializer = null;
-    protected static Class<?> nmsEnumTitleAction = null;
-    protected static Class<?> nmsEnumClientCommand = null;
-    protected static Class<?> nmsPacketPlayInSteerVehicle = getNMSClass("PacketPlayInSteerVehicle");
-    protected static Class<?> nmsPacketPlayInUseEntity = getNMSClass("PacketPlayInUseEntity");
-    protected static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
-    protected static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
-    protected static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
-    protected static Class<?> nmsPacketPlayOutEntityLook = null;
-    protected static Class<?> nmsPacketPlayOutEntityMetadata = getNMSClass("PacketPlayOutEntityMetadata");
-    protected static Class<?> nmsPacketPlayOutEntityTeleport = getNMSClass("PacketPlayOutEntityTeleport");
-    protected static Class<?> nmsPacketPlayOutNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn");
-    protected static Class<?> nmsPacketPlayOutRelEntityMoveLook = null;
-    protected static Class<?> nmsPacketPlayOutSpawnEntity = getNMSClass("PacketPlayOutSpawnEntity");
-    protected static Class<?> nmsPacketPlayOutSpawnEntityLiving = getNMSClass("PacketPlayOutSpawnEntityLiving");
-    protected static Class<?> nmsPacketPlayOutTitle = getNMSClass("PacketPlayOutTitle");
-    protected static Class<?> nmsPacketPlayInClientCommand = getNMSClass("PacketPlayInClientCommand");
+    public static Class<?> nmsWorld = getNMSClass("World");
+    public static Class<?> nmsBlock = getNMSClass("Block");
+    public static Class<?> nmsMaterial = getNMSClass("Material");
+    public static Class<?> nmsEntity = getNMSClass("Entity");
+    public static Class<?> nmsEntityHuman = getNMSClass("EntityHuman");
+    public static Class<?> nmsEntityLiving = getNMSClass("EntityLiving");
+    public static Class<?> nmsItemStack = getNMSClass("ItemStack");
+    public static Class<?> nmsPacket = getNMSClass("Packet");
+    public static Class<?> nmsWatchableObject = getNMSClass("DataWatcher$WatchableObject");
+    public static Class<?> nmsPlayerConnection = getNMSClass("PlayerConnection");
+    public static Class<?> nmsIChatBaseComponent = getNMSClass("IChatBaseComponent");
+    public static Class<?> nmsChatSerializer = null;
+    public static Class<?> nmsEnumTitleAction = null;
+    public static Class<?> nmsEnumClientCommand = null;
+    public static Class<?> nmsPacketPlayInSteerVehicle = getNMSClass("PacketPlayInSteerVehicle");
+    public static Class<?> nmsPacketPlayInUseEntity = getNMSClass("PacketPlayInUseEntity");
+    public static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
+    public static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
+    public static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
+    public static Class<?> nmsPacketPlayOutEntityLook = null;
+    public static Class<?> nmsPacketPlayOutEntityMetadata = getNMSClass("PacketPlayOutEntityMetadata");
+    public static Class<?> nmsPacketPlayOutEntityTeleport = getNMSClass("PacketPlayOutEntityTeleport");
+    public static Class<?> nmsPacketPlayOutNamedEntitySpawn = getNMSClass("PacketPlayOutNamedEntitySpawn");
+    public static Class<?> nmsPacketPlayOutRelEntityMoveLook = null;
+    public static Class<?> nmsPacketPlayOutSpawnEntity = getNMSClass("PacketPlayOutSpawnEntity");
+    public static Class<?> nmsPacketPlayOutSpawnEntityLiving = getNMSClass("PacketPlayOutSpawnEntityLiving");
+    public static Class<?> nmsPacketPlayOutTitle = getNMSClass("PacketPlayOutTitle");
+    public static Class<?> nmsPacketPlayInClientCommand = getNMSClass("PacketPlayInClientCommand");
 
     static {
         if (getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
@@ -70,18 +75,18 @@ public class ReflectionUtil {
 
     //〓 Nms Constructor 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Constructor<?> constructor_nmsPacketPlayOutAttachEntity;
-    protected static Constructor<?> constructor_nmsPacketPlayOutEntityDestroy;
-    protected static Constructor<?> constructor_nmsPacketPlayOutEntityEquipment;
-    protected static Constructor<?> constructor_nmsPacketPlayOutEntityLook;
-    protected static Constructor<?> constructor_nmsPacketPlayOutEntityTeleport;
-    protected static Constructor<?> constructor_nmsPacketPlayOutNamedEntitySpawn;
-    protected static Constructor<?> constructor_nmsPacketPlayOutRelEntityMoveLook;
-    protected static Constructor<?> constructor_nmsPacketPlayOutSpawnEntity;
-    protected static Constructor<?> constructor_nmsPacketPlayOutSpawnEntityLiving;
-    protected static Constructor<?> constructor_nmsPacketPlayOutTitle;
-    protected static Constructor<?> constructor_nmsPacketPlayOutTitle_Length;
-    protected static Constructor<?> constructor_nmsPacketPlayInClientCommand;
+    public static Constructor<?> constructor_nmsPacketPlayOutAttachEntity;
+    public static Constructor<?> constructor_nmsPacketPlayOutEntityDestroy;
+    public static Constructor<?> constructor_nmsPacketPlayOutEntityEquipment;
+    public static Constructor<?> constructor_nmsPacketPlayOutEntityLook;
+    public static Constructor<?> constructor_nmsPacketPlayOutEntityTeleport;
+    public static Constructor<?> constructor_nmsPacketPlayOutNamedEntitySpawn;
+    public static Constructor<?> constructor_nmsPacketPlayOutRelEntityMoveLook;
+    public static Constructor<?> constructor_nmsPacketPlayOutSpawnEntity;
+    public static Constructor<?> constructor_nmsPacketPlayOutSpawnEntityLiving;
+    public static Constructor<?> constructor_nmsPacketPlayOutTitle;
+    public static Constructor<?> constructor_nmsPacketPlayOutTitle_Length;
+    public static Constructor<?> constructor_nmsPacketPlayInClientCommand;
 
     static {
         try {
@@ -107,31 +112,37 @@ public class ReflectionUtil {
     //〓 Nms Constructor List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** EntityXxxxxクラス毎のコンストラクタ */
-    protected static HashMap<String, Constructor<?>> nmsEntity_Constructor =
+    public static HashMap<String, Constructor<?>> nmsEntity_Constructor =
             new HashMap<String, Constructor<?>>();
 
     //〓 Nms Method 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Method nmsBlock_getMaterial;
-    protected static Method nmsMaterial_isSolid;
-    protected static Method nmsPlayerConnection_sendPacket;
-    protected static Method nmsEntity_setEntityID;
-    protected static Method nmsEntity_setLocation;
-    protected static Method nmsEntity_setCustomName;
-    protected static Method nmsEntity_setCustomNameVisible;
+    public static Method nmsWorld_addEntity;
+    public static Method nmsBlock_getMaterial;
+    public static Method nmsMaterial_isSolid;
+    public static Method nmsPlayerConnection_sendPacket;
+    public static Method nmsEntity_getBukkitEntity;
+    public static Method nmsEntity_setEntityID;
+    public static Method nmsEntity_setLocation;
+    public static Method nmsEntity_setCustomName;
+    public static Method nmsEntity_setCustomNameVisible;
+    public static Method nmsWatchableObject_getIndex;
 
-    protected static Method static_nmsChatSerializer_buildTitle;
-    protected static Method static_nmsBlock_getById;
+    public static Method static_nmsChatSerializer_buildTitle;
+    public static Method static_nmsBlock_getById;
 
     static {
         try {
+            nmsWorld_addEntity = nmsWorld.getMethod("addEntity", nmsEntity);
             nmsBlock_getMaterial = nmsBlock.getMethod("getMaterial");
             nmsMaterial_isSolid = nmsMaterial.getMethod("isSolid");
             nmsPlayerConnection_sendPacket = nmsPlayerConnection.getMethod("sendPacket", nmsPacket);
+            nmsEntity_getBukkitEntity = nmsEntity.getMethod("getBukkitEntity");
             nmsEntity_setEntityID = nmsEntity.getMethod("d", int.class);
             nmsEntity_setLocation = nmsEntity.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
             nmsEntity_setCustomName = nmsEntity.getMethod("setCustomName", String.class);
             nmsEntity_setCustomNameVisible = nmsEntity.getMethod("setCustomNameVisible", boolean.class);
+            nmsWatchableObject_getIndex = nmsWatchableObject.getMethod("a");
 
             static_nmsChatSerializer_buildTitle = nmsChatSerializer.getMethod("a", String.class);
             static_nmsBlock_getById = nmsBlock.getMethod("getById", int.class);
@@ -144,9 +155,9 @@ public class ReflectionUtil {
 
     //〓 Nms Object 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
-    protected static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
-    protected static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
+    public static Object enumTitleAction_PerformTitle = nmsEnumTitleAction.getEnumConstants()[0];
+    public static Object enumTitleAction_PerformSubTitle = nmsEnumTitleAction.getEnumConstants()[1];
+    public static Object enumClientCommand_PerformRespawn = nmsEnumClientCommand.getEnumConstants()[0];
 
     //〓 Nms Field 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -166,13 +177,13 @@ public class ReflectionUtil {
 
     //〓 Craft Class 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Class<?> craftWorld = getCraftClass("CraftWorld");
-    protected static Class<?> craftItemStack = getCraftClass("inventory.CraftItemStack");
+    public static Class<?> craftWorld = getCraftClass("CraftWorld");
+    public static Class<?> craftItemStack = getCraftClass("inventory.CraftItemStack");
 
     //〓 Craft Method 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    protected static Method craftWorld_getHandle;
-    protected static Method static_craftItemStack_asNMSCopy;
+    public static Method craftWorld_getHandle;
+    public static Method static_craftItemStack_asNMSCopy;
 
     static {
         try {
@@ -188,7 +199,25 @@ public class ReflectionUtil {
     //〓 Craft Method List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** EntityXxxxxクラス毎のgetHandleメソッド */
-    protected static HashMap<String, Method> craftEntity_getHandle = new HashMap<String, Method>();
+    public static HashMap<String, Method> craftEntity_getHandle = new HashMap<String, Method>();
+
+    //〓 Ypl Class 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Class<?> yplCustomKart = getYPLKartClass("CustomArmorStand");
+
+    //〓 Ypl Constructor 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Constructor<?> constructor_yplCustomKart;
+
+    static {
+        try {
+            constructor_yplCustomKart = yplCustomKart.getConstructor(nmsWorld, Kart.class, KartType.class, Location.class);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 

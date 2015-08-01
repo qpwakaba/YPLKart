@@ -46,11 +46,11 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         this.target = target;
         this.shooter = shooter;
-        this.adjustdamage = RaceManager.getRace(shooter).getCharacter().getAdjustAttackDamage();
-        this.lap = RaceManager.getRace(shooter).getLapCount();
+        this.adjustdamage = RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
+        this.lap = RaceManager.getRacer(shooter).getLapCount();
         this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
-        shooterpassedcheckpoint = RaceManager.getRace(shooter).getPassedCheckPoint();
+        shooterpassedcheckpoint = RaceManager.getRacer(shooter).getPassedCheckPoint();
 
         Util.removeEntityCollision(this.projectile);
     }
@@ -113,7 +113,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         }
 
         //チェックポイントの更新
-        Racer r = RaceManager.getRace(this.shooter);
+        Racer r = RaceManager.getRacer(this.shooter);
         ArrayList<Entity> checkpointlist = new ArrayList<Entity>();
 
         //アカこうらを1位から2位に向け発射した場合
@@ -125,7 +125,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
             for (Entity e : templist) {
                 if (this.shooterpassedcheckpoint.contains(lap + e.getUniqueId().toString())) {
-                    if (!RaceManager.getRace(this.target).getPassedCheckPoint()
+                    if (!RaceManager.getRacer(this.target).getPassedCheckPoint()
                             .contains(lap + e.getUniqueId().toString()))
                         if (!this.turtlepassedcheckpoint.contains(lap + e.getUniqueId().toString()))
                             checkpointlist.add(e);

@@ -421,7 +421,7 @@ public class Util extends ReflectionUtil {
                     c.sendMessageEntryPlayer(MessageEnum.racePlayerDead
                             , new Object[] { c, (Player) damaged });
 
-                final Racer r = RaceManager.getRace(p);
+                final Racer r = RaceManager.getRacer(p);
 
                 p.setWalkSpeed(r.getCharacter().getPenaltyWalkSpeed());
                 p.setNoDamageTicks(r.getCharacter().getPenaltyAntiReskillSecond() * 20);

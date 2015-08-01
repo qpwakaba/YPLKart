@@ -26,7 +26,7 @@ public class SendCountDownTitleTask extends BukkitRunnable {
     public void run() {
         life++;
 
-        if (RaceManager.getRace(this.p).getGoal()) {
+        if (RaceManager.getRacer(this.p).getGoal()) {
             this.cancel();
             return;
         }

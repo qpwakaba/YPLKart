@@ -1130,7 +1130,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //横方向への移動入力値を基にYawを変更
         Player player = (Player) human.getBukkitEntity();
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
-            if (RaceManager.getRace(player).isSneaking()) {
+            if (RaceManager.getRacer(player).isSneaking()) {
                 setYaw(this, (float) (getYaw(this) - getSideMotionInput(human)
                         * getKart().getDriftCorneringPower()));
             } else {
@@ -1380,7 +1380,7 @@ public class CustomArmorStand extends EntityArmorStand {
 
         EntityHuman human = (EntityHuman) getPassenger(this);
         Player player = (Player) human.getBukkitEntity();
-        Racer r = RaceManager.getRace(player);
+        Racer r = RaceManager.getRacer(player);
 
         //キラー使用中
         if (r.getUsingKiller() != null) {
@@ -1410,7 +1410,7 @@ public class CustomArmorStand extends EntityArmorStand {
             //周囲のプレイヤーへダメージ
             Util.createSafeExplosion(player, getBukkitEntity().getLocation()
                     , ItemEnum.KILLER.getMovingDamage()
-                    + RaceManager.getRace(player).getCharacter().getAdjustAttackDamage(), 4);
+                    + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 4);
         } else {
             //レースが開始されるまで動かない
             if (!RaceManager.isRacing(human.getUniqueID())) {
@@ -1512,7 +1512,7 @@ public class CustomArmorStand extends EntityArmorStand {
     /** ドリフト中の火花パーティクルを生成する */
     public void playDriftEffect(EntityHuman human) {
         Player player = (Player) human.getBukkitEntity();
-        if (RaceManager.getRace(player).isSneaking()) {
+        if (RaceManager.getRacer(player).isSneaking()) {
 
             //スピードスタックが100を越える場合のみ火花のパーティクルを生成する
             if (100 < getSpeedStack()) {
@@ -1565,7 +1565,7 @@ public class CustomArmorStand extends EntityArmorStand {
      */
     private double calcSpeedStack(EntityHuman human) {
         Player player = (Player) human.getBukkitEntity();
-        Racer race = RaceManager.getRace(player);
+        Racer race = RaceManager.getRacer(player);
 
         double speedStack = 0;
 
