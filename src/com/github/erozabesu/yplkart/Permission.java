@@ -200,13 +200,21 @@ public enum Permission {
      * @return playerがパーミッションを所有しているかどうか
      */
     public static Boolean hasPermission(Player player, Permission permission, boolean noMessage) {
-        if (!permission.getSettingNodeValue())
+        if (permission == null) {
             return true;
-        if (player.hasPermission(permission.getPermission()))
-            return true;
+        }
 
-        if (noMessage)
+        if (!permission.getSettingNodeValue()) {
+            return true;
+        }
+
+        if (player.hasPermission(permission.getPermission())) {
+            return true;
+        }
+
+        if (noMessage) {
             return false;
+        }
 
         MessageEnum.noPermission.sendConvertedMessage(player, permission.getPermission());
         return false;
