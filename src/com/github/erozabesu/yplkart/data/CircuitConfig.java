@@ -233,7 +233,7 @@ public class CircuitConfig {
                 }
 
                 //テキストメッセージの送信
-                Object[] messagePartsLapTime = new Object[] { oldLapTimeObject.getLapTime(), lapTime };
+                Number[] messagePartsLapTime = new Number[] { oldLapTimeObject.getLapTime(), lapTime };
                 MessageEnum.raceHighScore.sendConvertedMessage(player
                         , new Object[] { circuitDataName, messagePartsLapTime });
             } else {
