@@ -162,12 +162,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
             super.write(ctx, msg, promise);
 
         /*
-         * カートエンティティに利用しているアーマースタンド(以下AS)エンティティのMarkerNBTが
-         * 1.8R1には実装されていないため、1.8R1のみASエンティティが移動時のパケットを変更する
-         *
-         * MarkerNBTを有効にしているASは、プレイヤー搭乗時の登場位置が地面に接する位置まで下がるが、
-         * そうでない場合は目線の高さまで上がってしまう。
-         * これに対処するため、移動中のY座標をずらし地中に半分埋めることで、
+         * 移動中のY座標をずらし地中に半分埋めることで、
          * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
@@ -191,12 +186,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
             super.write(ctx, msg, promise);
 
         /*
-         * カートエンティティに利用しているアーマースタンド(以下AS)エンティティのMarkerNBTが
-         * 1.8R1には実装されていないため、1.8R1のみASエンティティスポーン時のパケットを変更する
-         *
-         * MarkerNBTを有効にしているASは、プレイヤー搭乗時の登場位置が地面に接する位置まで下がるが、
-         * そうでない場合は目線の高さまで上がってしまう。
-         * これに対処するため、スポーン座標のY座標をずらし地中に半分埋めることで、
+         * スポーン座標のY座標をずらし地中に半分埋めることで、
          * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
