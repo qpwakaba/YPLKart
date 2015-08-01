@@ -3,6 +3,7 @@ package com.github.erozabesu.yplkart.data;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Entity;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.DisplayKart;
 import com.github.erozabesu.yplkart.object.Kart;
 
@@ -197,5 +199,28 @@ public class DisplayKartConfig {
         for (Chunk chunk : world.getLoadedChunks()) {
             respawnKart(chunk);
         }
+    }
+
+    /** 全DisplayKartオブジェクトのEntityを再生成する */
+    public static void respawnAllKart() {
+        //全カートエンティティをデスポーン
+        //リロードした場合はエンティティの自動消滅が行われないため、明示的にデスポーンさせる
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (RaceManager.isKartEntity(entity)) {
+                    entity.remove();
+                }
+            }
+        }
+
+        //レースカート以外のカートエンティティをリスポーン
+        //遅延させなければ、既に同名のエンティティが存在している判定が出力され、正しく動作しない
+        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                for (World world : Bukkit.getWorlds()) {
+                    respawnKart(world);
+                }
+            }
+        }, 5);
     }
 }

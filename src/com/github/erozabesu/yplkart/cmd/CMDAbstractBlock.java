@@ -11,6 +11,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
@@ -361,6 +362,10 @@ public class CMDAbstractBlock extends CMDAbstract {
         RaceManager.endAllCircuit();
 
         ConfigManager.reloadAllConfig();
+
+        //全DisplayKartオブジェクトのEntityを再生成する
+        DisplayKartConfig.respawnAllKart();
+
         MessageEnum.cmdReload.sendConvertedMessage(null);
     }
 

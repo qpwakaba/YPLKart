@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.cmd.CMD;
@@ -41,25 +40,8 @@ public class YPLKart extends JavaPlugin {
         new ItemListener(this);
         new NettyListener(this);
 
-        //全カートエンティティをデスポーン
-        //リロードした場合はエンティティの自動消滅が行われないため、明示的にデスポーンさせる
-        for (World world : Bukkit.getWorlds()) {
-            for (Entity entity : world.getEntities()) {
-                if (RaceManager.isKartEntity(entity)) {
-                    entity.remove();
-                }
-            }
-        }
-
-        //レースカート以外のカートエンティティをリスポーン
-        //遅延させなければ、既に同名のエンティティが存在している判定が出力され、正しく動作しない
-        Bukkit.getScheduler().runTaskLater(getInstance(), new Runnable() {
-            public void run() {
-                for (World world : Bukkit.getWorlds()) {
-                    DisplayKartConfig.respawnKart(world);
-                }
-            }
-        }, 5);
+        //全DisplayKartオブジェクトのEntityを再生成する
+        DisplayKartConfig.respawnAllKart();
 
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
