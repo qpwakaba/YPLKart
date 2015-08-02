@@ -610,6 +610,17 @@ public class RaceManager {
         }
     }
 
+    /**
+     * カートエンティティをデスポーンさせる。<br>
+     * 登録されているデータも削除する必要があるため、カートエンティティをデスポーンさせる場合は<br>
+     * 必ずこのメソッドを経由すること。
+     * @param entity デスポーンさせるカートエンティティ
+     */
+    public static void removeKartEntity(Entity entity) {
+        removeKartEntityIdMap(entity.getEntityId());
+        entity.remove();
+    }
+
     public static Entity createRacingKart(Location location, Kart kart) {
         Entity entity = createCustomKart(location, kart, KartType.RacingKart);
 
@@ -652,14 +663,18 @@ public class RaceManager {
             Object customKart = ReflectionUtil.constructor_yplCustomKart
                     .newInstance(craftWorld, kart, kartType, location);
 
-            ReflectionUtil.nmsWorld_addEntity.invoke(craftWorld, customKart);
-
+            //個別情報の格納
             entity = (Entity) ReflectionUtil.nmsEntity_getBukkitEntity.invoke(customKart);
             entity.setCustomNameVisible(false);
             entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
-                    YPLKart.getInstance(), new Object[]{kartType, customKart}));
+                    YPLKart.getInstance(), new Object[]{kart, kartType, customKart}));
 
+            //EntityIDの格納
             putKartEntityIdMap(entity);
+
+            //エンティティのスポーン
+            //必ずEntityIDの格納後に行う
+            ReflectionUtil.nmsWorld_addEntity.invoke(craftWorld, customKart);
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
