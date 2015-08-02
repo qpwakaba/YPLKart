@@ -219,6 +219,20 @@ public class ReflectionUtil {
         }
     }
 
+    //〓 Ypl Method 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Method yplCustomKart_setParameter;
+
+    static {
+        try {
+            yplCustomKart_setParameter = yplCustomKart.getMethod("setParameter", Kart.class);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static String getBukkitVersion() {

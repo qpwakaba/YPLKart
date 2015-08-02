@@ -2,6 +2,7 @@ package com.github.erozabesu.yplkart.object;
 
 import io.netty.channel.ChannelHandlerContext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class Racer {
@@ -608,30 +610,45 @@ public class Racer {
 
         Player player = getPlayer();
         Entity vehicle = player.getVehicle();
+
+        //既に何かのエンティティに搭乗している
         if (vehicle != null) {
+
+            //既にカートエンティティに搭乗している場合、パラメータの割り当てのみ行いreturn
             if (RaceManager.isKartEntity(vehicle)) {
+
+                //メタデータからCustomArmorStandオブジェクトを取得
                 Object customKartObject =
                         RaceManager.getCustomMinecartObjectFromEntityMetaData(vehicle);
 
                 try {
+                    //新たなKartオブジェクトのパラメータを割り当てる
                     Entity cart = (Entity) Util.getBukkitEntityFromNmsEntity(customKartObject);
                     cart.setCustomName(kart.getKartName());
                     cart.setCustomNameVisible(false);
 
-                    customKartObject.getClass().getMethod("setParameter", Kart.class).invoke(customKartObject, kart);
+                    ReflectionUtil.yplCustomKart_setParameter.invoke(customKartObject, kart);
                     return;
-                } catch (NoSuchMethodException e) {
-                    RaceManager.leaveRacingKart(player);
-                } catch (Exception e) {
+                } catch (IllegalArgumentException e) {
                     e.printStackTrace();
-                    return;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
+
+            //カートエンティティ以外に搭乗している場合は降ろし、新規に生成したカートに搭乗させる
             } else {
                 player.leaveVehicle();
             }
         }
+
+        //新規に生成したカートエンティティに搭乗させる
         Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), kart);
         kartEntity.setPassenger(player);
+
+        //搭乗させるだけだと同期が取れず、クライアント側では搭乗していない状態で描画されるため、
+        //パケットを送信し明示的に搭乗させる。
         PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
