@@ -42,6 +42,10 @@ import com.github.erozabesu.yplkart.utils.Particle;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * カートエンティティとしてスポーンさせるアーマースタンドエンティティクラス
+ * @author erozabesu
+ */
 public class CustomArmorStand extends EntityArmorStand {
 
     /** デフォルトヘッドポーズ */

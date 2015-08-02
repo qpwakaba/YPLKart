@@ -42,6 +42,10 @@ import com.github.erozabesu.yplkart.utils.Particle;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * カートエンティティとしてスポーンさせるアーマースタンドエンティティクラス
+ * @author erozabesu
+ */
 public class CustomArmorStand extends EntityArmorStand {
 
     /** デフォルトヘッドポーズ */
@@ -286,7 +290,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //superしていないため念のためやっておく
         this.justCreated = false;
         this.world.methodProfiler.b();
-
+        removeBoundingBox(true);
         //XXX: CraftBukkit Unstable 1.8.1以前ではMarker機能がないため、この行以降は存在しない
         //よく分からない
         boolean hasMarker = hasMarker();
@@ -302,7 +306,7 @@ public class CustomArmorStand extends EntityArmorStand {
 
         this.bj = hasMarker;
 
-        removeBoundingBox(true);
+
     }
 
     //エンティティ同士の衝突

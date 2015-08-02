@@ -93,12 +93,12 @@ public enum ConfigEnum {
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** コンフィグキーを変更する */
+    /** @param コンフィグキー */
     public void getKey(String configKey) {
         this.configKey = configKey;
     }
 
-    /** コンフィグバリュー変更する */
+    /** @param コンフィグバリュー */
     public void setValue(Object configValue){
         this.configValue = configValue;
     }
