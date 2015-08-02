@@ -13,12 +13,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -65,6 +67,66 @@ public class DataListener implements Listener {
         if (!YPLKart.isPluginEnabled(e.getWorld()))
             return;
         DisplayKartConfig.respawnKart(e.getWorld());
+    }
+
+    /**
+     * 左クリックによるディスプレイカートの搭乗、削除。<br>
+     * アーマースタンドエンティティのMarkerNBTをtrueにしている影響で、<br>
+     * クリックによる接触判定がフックできないため、左クリック時に周囲のカートエンティティを取得し、<br>
+     * 間接的に接触している。<br>
+     * 左クリックで搭乗、スニーク＋左クリックで削除を行う。
+     * @param event
+     */
+    @EventHandler
+    public void interactDisplayKart(PlayerInteractEvent event) {
+        //プラグインが有効かどうか
+        if (YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
+
+            //左クリックした場合
+            if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+                Player player = event.getPlayer();
+
+                //周囲のエンティティからカートエンティティを検出し格納
+                List<Entity> kartEntitiesList = new ArrayList<Entity>();
+                for (Entity nearbyEntity : player.getNearbyEntities(1.0D, 1.0D, 1.0D)) {
+                    if (RaceManager.isKartEntity(nearbyEntity)) {
+
+                        //レーシングカートは除外
+                        if (!RaceManager.isSpecificKartType(nearbyEntity, KartType.RacingKart)) {
+                            kartEntitiesList.add(nearbyEntity);
+                        }
+                    }
+                }
+
+                //周囲にカートエンティティがいるかどうか
+                if (0 < kartEntitiesList.size()) {
+
+                    //最寄のカートエンティティを取得
+                    Entity kartEntity = Util.getNearestEntity(kartEntitiesList, player.getLocation());
+
+                    //スニーク＋左クリック
+                    if (player.isSneaking()) {
+
+                        //パーミッションを所有しているかどうか
+                        if (Permission.hasPermission(player, Permission.OP_KART_REMOVE, false)) {
+
+                            //ローカルコンフィグファイルから削除
+                            DisplayKartConfig.deleteDisplayKart(player, kartEntity.getCustomName());
+
+                            //エンティティをデスポーン
+                            kartEntity.remove();
+                        }
+                    //左クリックのみ
+                    } else {
+
+                        //搭乗者がいない場合、搭乗させる
+                        if (kartEntity.getPassenger() == null) {
+                            kartEntity.setPassenger(player);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
