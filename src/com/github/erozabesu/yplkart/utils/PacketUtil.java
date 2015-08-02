@@ -221,6 +221,25 @@ public class PacketUtil extends ReflectionUtil {
         }
     }
 
+    /**
+     * 引数entityがデスポーンするパケットを引数targetに送信する
+     * @param target パケットを送信するプレイヤー
+     * @param entity デスポーンさせるエンティティ
+     */
+    public static void sendEntityDestroyPacket(Player target, Entity entity) {
+        Object packet = null;
+
+        packet = getEntityDestroyPacket(entity.getEntityId());
+
+        if (target == null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                sendPacket(player, packet);
+            }
+        } else {
+            sendPacket(target, packet);
+        }
+    }
+
     /* プレイヤーをテレポート後即エンティティに搭乗させると、
      * サーバーとクライアントで情報の食い違いが発生するため、それを正すためだけの処理
      * クライアント側では搭乗された判定が行われないため、搭乗状態のはずが自由移動できてしまう
