@@ -270,48 +270,68 @@ public class DataListener implements Listener {
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
+    public void onRespawn(PlayerRespawnEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
             return;
         }
-        if (!RaceManager.isStandBy(e.getPlayer().getUniqueId())) {
+        if (!RaceManager.isStandBy(event.getPlayer().getUniqueId())) {
             return;
         }
 
-        final Player p = e.getPlayer();
-        final Racer r = RaceManager.getRacer(p);
+        final Player player = event.getPlayer();
+        final Racer racer = RaceManager.getRacer(player);
 
+        //リスポーン直後はプレイヤーに関する操作は通らないため利用可能になってから実行する
         Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
             public void run() {
-                p.setSprinting(true);
-                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-                p.setWalkSpeed(r.getCharacter().getPenaltyWalkSpeed());
-                p.setNoDamageTicks(r.getCharacter().getPenaltyAntiReskillSecond() * 20);
-                r.recoveryKart();
-                r.setDeathPenaltyTitleSendTask(
-                        new SendBlinkingTitleTask(p, r.getCharacter().getPenaltySecond(),
+
+                //FOVの初期化用
+                player.setSprinting(true);
+
+                //演出
+                player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+
+                //プレイヤーのフィジカルにデスペナルティを適用
+                player.setWalkSpeed(racer.getCharacter().getPenaltyWalkSpeed());
+                player.setNoDamageTicks(racer.getCharacter().getPenaltyAntiReskillSecond() * 20);
+
+                //生前カートに搭乗していた場合はカートエンティティを再生成し搭乗する
+                racer.recoveryKart();
+
+                //デスペナルティ用タイトルメッセージを点滅表示
+                racer.setDeathPenaltyTitleSendTask(
+                        new SendBlinkingTitleTask(player, racer.getCharacter().getPenaltySecond(),
                                 MessageEnum.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
                         );
             }
         });
 
-        r.setDeathPenaltyTask(
+        //デスペナルティの効果時間が終了した場合、プレイヤーのフィジカルを本来の数値に戻す
+        racer.setDeathPenaltyTask(
                 Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
                     public void run() {
-                        p.setWalkSpeed(r.getCharacter().getWalkSpeed());
-                        p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-                        p.setSprinting(true);
-                        r.setDeathPenaltyTask(null);
+                        //フィジカルを本来の数値に戻す
+                        player.setWalkSpeed(racer.getCharacter().getWalkSpeed());
+
+                        //演出
+                        player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+
+                        //FOVの初期化用
+                        player.setSprinting(true);
+
+                        //変数の初期化
+                        racer.setDeathPenaltyTask(null);
                     }
-                }, r.getCharacter().getPenaltySecond() * 20 + 3)
+                }, racer.getCharacter().getPenaltySecond() * 20 + 3)
                 );
 
-        if (r.getLastPassedCheckPoint() != null) {
-            Location respawn = r.getLastPassedCheckPoint().getLocation()
+        //最後に通過したチェックポイントの座標にリスポーンする
+        if (racer.getLastPassedCheckPoint() != null) {
+            Location respawn = racer.getLastPassedCheckPoint().getLocation()
                     .add(0, -RaceManager.checkPointHeight, 0);
-            e.setRespawnLocation(
+            event.setRespawnLocation(
                     new Location(respawn.getWorld()
-                            , respawn.getX(), respawn.getY(), respawn.getZ(), r.getLastYaw(), 0));
+                            , respawn.getX(), respawn.getY(), respawn.getZ(), racer.getLastYaw(), 0));
         }
     }
 
