@@ -162,54 +162,48 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
             super.write(ctx, msg, promise);
 
         /*
-         * 1.8R1にはアーマースタンドのMarkerNBTが実装されていないため、
          * 移動中のY座標をずらし地中に半分埋めることで、
-         * クライアント描画時の搭乗位置を地面の高さまで下げて代用する
+         * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
-            if (ReflectionUtil.getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
-                int entityId = (Integer) ReflectionUtil.getFieldValue(
-                        ReflectionUtil.field_PacketPlayOutEntityTeleport_EntityId, msg);
-                Entity kartEntity = RaceManager.getKartEntityByEntityId(entityId);
+            int entityId = (Integer) ReflectionUtil.getFieldValue(
+                    ReflectionUtil.field_PacketPlayOutEntityTeleport_EntityId, msg);
+            Entity kartEntity = RaceManager.getKartEntityByEntityId(entityId);
 
-                if (kartEntity != null) {
-                    if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
-                        Location location = kartEntity.getLocation();
-                        int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
-                        byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
+            if (kartEntity != null) {
+                if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                    Location location = kartEntity.getLocation();
+                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
+                    byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
-                        ReflectionUtil.setFieldValue(
-                                ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationY, msg, locationY);
-                        ReflectionUtil.setFieldValue(
-                                ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationYaw, msg, yaw);
-                    }
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationY, msg, locationY);
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationYaw, msg, yaw);
                 }
             }
 
             super.write(ctx, msg, promise);
 
         /*
-         * 1.8R1にはアーマースタンドのMarkerNBTが実装されていないため、
          * スポーン座標のY座標をずらし地中に半分埋めることで、
-         * クライアント描画時の搭乗位置を地面の高さまで下げて代用する
+         * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
-            if (ReflectionUtil.getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
-                int id = (Integer) ReflectionUtil.getFieldValue(
-                        ReflectionUtil.field_PacketPlayOutSpawnEntity_EntityId, msg);
-                Entity kartEntity = RaceManager.getKartEntityByEntityId(id);
+            int id = (Integer) ReflectionUtil.getFieldValue(
+                    ReflectionUtil.field_PacketPlayOutSpawnEntity_EntityId, msg);
+            Entity kartEntity = RaceManager.getKartEntityByEntityId(id);
 
-                if (kartEntity != null) {
-                    if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
-                        Location location = kartEntity.getLocation();
-                        int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
-                        byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
+            if (kartEntity != null) {
+                if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                    Location location = kartEntity.getLocation();
+                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
+                    byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
-                        ReflectionUtil.setFieldValue(
-                                ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationY, msg, locationY);
-                        ReflectionUtil.setFieldValue(
-                                ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationYaw, msg, yaw);
-                    }
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationY, msg, locationY);
+                    ReflectionUtil.setFieldValue(
+                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationYaw, msg, yaw);
                 }
             }
 

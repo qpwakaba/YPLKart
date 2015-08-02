@@ -9,11 +9,13 @@ import net.minecraft.server.v1_8_R2.AxisAlignedBB;
 import net.minecraft.server.v1_8_R2.Block;
 import net.minecraft.server.v1_8_R2.BlockPosition;
 import net.minecraft.server.v1_8_R2.Blocks;
+import net.minecraft.server.v1_8_R2.DamageSource;
 import net.minecraft.server.v1_8_R2.Entity;
 import net.minecraft.server.v1_8_R2.EntityArmorStand;
 import net.minecraft.server.v1_8_R2.EntityHuman;
 import net.minecraft.server.v1_8_R2.ItemStack;
 import net.minecraft.server.v1_8_R2.MathHelper;
+import net.minecraft.server.v1_8_R2.Vec3D;
 import net.minecraft.server.v1_8_R2.Vector3f;
 import net.minecraft.server.v1_8_R2.World;
 
@@ -29,6 +31,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.object.Kart;
@@ -187,7 +190,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //カートタイプによって異なる項目を設定
         setYaw(this, location.getYaw());
         if (getKartType().equals(KartType.DisplayKart)) {
-            setPosition(location.getX(), location.getY(), location.getZ());
+            setPosition(location.getX(), location.getY() - 0.5D, location.getZ());
             setPitch(this, -location.getPitch());
             setYawPitch(getYaw(this), -getPitch(this));
             setGravity(false);
@@ -203,7 +206,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //外見とかコリジョンとか
         setArms(true);
         setInvisible(true);
-        setMarker(true);//XXX: CraftBukkit Unstable
+        setMarker(false);//XXX: CraftBukkit Unstable
         setBasePlate(true);
         setNoclip(this, !hasGravity());
 
@@ -287,7 +290,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //superしていないため念のためやっておく
         this.justCreated = false;
         this.world.methodProfiler.b();
-        removeBoundingBox(true);
+
         //XXX: CraftBukkit Unstable 1.8.1以前ではMarker機能がないため、この行以降は存在しない
         //よく分からない
         boolean hasMarker = hasMarker();
@@ -303,7 +306,7 @@ public class CustomArmorStand extends EntityArmorStand {
 
         this.bj = hasMarker;
 
-
+        removeBoundingBox(true);
     }
 
     //エンティティ同士の衝突
@@ -357,27 +360,74 @@ public class CustomArmorStand extends EntityArmorStand {
         }
     }
 
-    /*
+    /**
      * leftClicked<br>
      * アーマースタンドを左クリックした場合<br>
      * 通常ダメージを受けた場合の処理を行うが、プレイヤーの左クリック以外ではダメージを受けないよう変更している<br>
      * カートの破壊パーミッションを所有している場合のみカートエンティティを削除する
      */
-    //@Override
-    //public boolean damageEntity(DamageSource damagesource, float f) {
-        //XXX: CraftBukkit Unstable 1.8R2以降はMarkerNBTをtrueにしているため、このメソッドは呼び出されない
-    //}
+    @Override
+    public boolean damageEntity(DamageSource damagesource, float f) {
+        if (!isClientSide(this) && !this.dead) {
+            if (!(damagesource.getEntity() instanceof EntityHuman)) {
+                return false;
+            }
 
-    /*
+            Player player = (Player) damagesource.getEntity().getBukkitEntity();
+            if (!Permission.hasPermission(player, Permission.OP_KART_REMOVE, false)) {
+                return false;
+            }
+
+            if (getPassenger(this) != null) {
+                getPassenger(this).mount(null);
+            }
+
+            if (getKartType().equals(KartType.DisplayKart)) {
+                DisplayKartConfig.deleteDisplayKart(player, this.getCustomName());
+            }
+
+            removeEntity();
+        }
+        return true;
+    }
+
+    /**
      * rightClicked<br>
      * アーマースタンドを右クリックした場合<br>
      * 通常アーマースタンドにアイテムを装備させる、もしくはアイテムを剥ぎ取る操作を行うがキャンセルし、
      * 搭乗可能な状態なら搭乗させる
      */
-    //@Override
-    //public boolean a(EntityHuman entityhuman, Vec3D vec3d) {
-        //XXX: CraftBukkit Unstable 1.8R2以降はMarkerNBTをtrueにしているため、このメソッドは呼び出されない
-    //}
+    @Override
+    public boolean a(EntityHuman entityhuman, Vec3D vec3d) {
+
+        //既に搭乗者が居た場合
+        //搭乗者がクリックしたプレイヤー以外
+        if (getPassenger(this) != null && getPassenger(this) != entityhuman) {
+
+            //搭乗者がプレイヤーエンティティ
+            if (!(getPassenger(this) instanceof EntityHuman)) {
+                //何もせずリターン
+                return false;
+
+            //搭乗者がプレイヤーエンティティ以外のエンティティ
+            } else {
+                //カートから降ろす
+                getPassenger(this).mount(null);
+            }
+        }
+
+        //レースカート以外のカートであれば搭乗させる
+        if (!getKartType().equals(KartType.RacingKart)) {
+            if (!isClientSide(this)) {
+                entityhuman.mount(this);
+            }
+        }
+
+        return false;
+
+        //アイテム操作はキャンセル
+        //return super.a(entityhuman, vec3d);
+    }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
