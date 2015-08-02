@@ -624,6 +624,10 @@ public class Racer {
         //新規に生成したカートエンティティに搭乗させる
         Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), kart);
         kartEntity.setPassenger(player);
+
+        //クライアントで搭乗が解除されている状態で描画されるのを回避するため
+        //issue#109
+        PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
     private void recoveryExp() {
