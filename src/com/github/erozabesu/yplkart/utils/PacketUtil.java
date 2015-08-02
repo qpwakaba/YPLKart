@@ -242,6 +242,12 @@ public class PacketUtil extends ReflectionUtil {
         }, 5);
     }
 
+    /**
+     * 引数entityを引数locationへテレポートさせるパケットを引数targetへ送信する
+     * @param target パケットを送信するプレイヤー
+     * @param entity テレポートさせるエンティティ
+     * @param location テレポートする座標
+     */
     public static void sendEntityTeleportPacket(Player target, Entity entity, Location location) {
         Object packet = null;
 
