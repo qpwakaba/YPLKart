@@ -15,14 +15,13 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.listener.NettyListener;
+import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
-
-    private static double locationYOffset = 1.4D;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -172,8 +171,9 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             if (kartEntity != null) {
                 if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                    Kart kartObject = RaceManager.getKartObjectByEntityMetaData(kartEntity);
                     Location location = kartEntity.getLocation();
-                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
+                    int locationY = (int) ((location.getY() + kartObject.getMountPositionOffset()) * 32.0D);
                     byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
                     ReflectionUtil.setFieldValue(
@@ -196,8 +196,9 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             if (kartEntity != null) {
                 if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                    Kart kartObject = RaceManager.getKartObjectByEntityMetaData(kartEntity);
                     Location location = kartEntity.getLocation();
-                    int locationY = (int) ((location.getY() - locationYOffset) * 32.0D);
+                    int locationY = (int) ((location.getY() -1.4D + kartObject.getMountPositionOffset()) * 32.0D);
                     byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
                     ReflectionUtil.setFieldValue(

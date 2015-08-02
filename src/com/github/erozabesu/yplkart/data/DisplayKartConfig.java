@@ -208,7 +208,7 @@ public class DisplayKartConfig {
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (RaceManager.isKartEntity(entity)) {
-                    entity.remove();
+                    RaceManager.removeKartEntity(entity);
                 }
             }
         }

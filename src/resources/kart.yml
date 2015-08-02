@@ -1,6 +1,4 @@
 Standard:
-  display_material: bowl
-  display_material_data: 0
   weight: 1.0
   max_speed: 250.0
   acceleration: 1.0
@@ -9,9 +7,10 @@ Standard:
   speed_decrease_on_drift: 2.0
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
-Survival:
-  display_material: string
+  mount_position_offset: 0.0
+  display_material: "bowl"
   display_material_data: 0
+Survival:
   weight: 1.5
   max_speed: 220.0
   acceleration: 1.0
@@ -20,9 +19,10 @@ Survival:
   speed_decrease_on_drift: 2.0
   default_cornering_power: 1.0
   drift_cornering_power: 6.5
-Accel:
-  display_material: feather
+  mount_position_offset: 0.0
+  display_material: "string"
   display_material_data: 0
+Accel:
   weight: 0.8
   max_speed: 180.0
   acceleration: 4.0
@@ -31,9 +31,10 @@ Accel:
   speed_decrease_on_drift: 2.0
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
-Tricky:
-  display_material: sulphur
+  mount_position_offset: 0.0
+  display_material: "feather"
   display_material_data: 0
+Tricky:
   weight: 0.5
   max_speed: 300.0
   acceleration: 0.7
@@ -42,9 +43,10 @@ Tricky:
   speed_decrease_on_drift: 2.0
   default_cornering_power: 1.5
   drift_cornering_power: 6.5
-Flexible:
-  display_material: seeds
+  mount_position_offset: 0.0
+  display_material: "sulphur"
   display_material_data: 0
+Flexible:
   weight: 1.0
   max_speed: 200.0
   acceleration: 1.5
@@ -53,9 +55,10 @@ Flexible:
   speed_decrease_on_drift: 5.0
   default_cornering_power: 1.7
   drift_cornering_power: 6.5
-Straight:
-  display_material: wheat
+  mount_position_offset: 0.0
+  display_material: "seeds"
   display_material_data: 0
+Straight:
   weight: 0.5
   max_speed: 300.0
   acceleration: 2.5
@@ -64,9 +67,10 @@ Straight:
   speed_decrease_on_drift: 2.5
   default_cornering_power: 1.0
   drift_cornering_power: 4.0
-Power:
-  display_material: flint
+  mount_position_offset: 0.0
+  display_material: "wheat"
   display_material_data: 0
+Power:
   weight: 4.0
   max_speed: 200.0
   acceleration: 0.7
@@ -75,9 +79,10 @@ Power:
   speed_decrease_on_drift: 1.5
   default_cornering_power: 1.5
   drift_cornering_power: 5.5
-Jalopy:
-  display_material: leather
+  mount_position_offset: 0.0
+  display_material: "flint"
   display_material_data: 0
+Jalopy:
   weight: 1.0
   max_speed: 200.0
   acceleration: 0.8
@@ -86,3 +91,6 @@ Jalopy:
   speed_decrease_on_drift: 2.0
   default_cornering_power: 1.0
   drift_cornering_power: 5.0
+  mount_position_offset: 0.0
+  display_material: "leather"
+  display_material_data: 0

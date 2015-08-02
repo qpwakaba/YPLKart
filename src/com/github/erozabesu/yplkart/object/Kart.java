@@ -16,6 +16,9 @@ public class Kart {
     /** カート名 */
     private String kartName;
 
+    /** プレイヤーの搭乗位置のY座標に対するオフセット */
+    private double mountPositionOffset;
+
     /** ブロックマテリアル */
     private Material displayMaterial;
 
@@ -58,6 +61,8 @@ public class Kart {
 
         ConfigManager config = ConfigManager.KART_CONFIG;
 
+        setMountPositionOffset(config.getDouble(key + ".mount_position_offset"));
+
         setDisplayMaterial(config.getMaterial(key + ".display_material"));
         setDisplayMaterialData(config.getByte(key + ".display_material_data"));
 
@@ -81,6 +86,8 @@ public class Kart {
     public Kart(String kartName, Material displayMaterial, byte displayMaterialData) {
         setKartName(kartName);
 
+        setMountPositionOffset(-1.4D);
+
         setDisplayMaterial(displayMaterial);
         setDisplayMaterialData(displayMaterialData);
 
@@ -99,6 +106,11 @@ public class Kart {
     /** @return kartName カート名 */
     public String getKartName() {
         return kartName;
+    }
+
+    /** @return mountPositionOffset プレイヤーの搭乗位置のY座標に対するオフセット */
+    public double getMountPositionOffset() {
+        return mountPositionOffset;
     }
 
     /** @return displayMaterial ブロックマテリアル */
@@ -156,6 +168,11 @@ public class Kart {
     /** @param kartName セットするカート名 */
     private void setKartName(String kartName) {
         this.kartName = kartName;
+    }
+
+    /** @param mountPositionOffset プレイヤーの搭乗位置のY座標に対するオフセット */
+    public void setMountPositionOffset(double mountPositionOffset) {
+        this.mountPositionOffset = mountPositionOffset;
     }
 
     /** @param displayMaterial セットするブロックマテリアル */

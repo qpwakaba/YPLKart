@@ -2,7 +2,6 @@ package com.github.erozabesu.yplkart.object;
 
 import io.netty.channel.ChannelHandlerContext;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -26,7 +25,6 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class Racer {
@@ -595,10 +593,9 @@ public class Racer {
         this.keyarmor = armor;
     }
 
-    /*
-     * 既にカート搭乗中に再度別のカートに乗る場合はパラメータの再設定と見た目・名前の更新のみ行う。
-     * サーバーがリロードされていた場合NoSuchMethodExceptionが出力されるため、
-     * その場合は古いカートを撤去し新しいカートに搭乗させる。
+    /**
+     * カートエンティティをRacerオブジェクトに格納されている選択カート情報を元にリスポーンさせ、<br>
+     * プレイヤーを搭乗させる。
      */
     public void recoveryKart() {
         if (getPlayer() == null) {
@@ -614,30 +611,11 @@ public class Racer {
         //既に何かのエンティティに搭乗している
         if (vehicle != null) {
 
-            //既にカートエンティティに搭乗している場合、パラメータの割り当てのみ行いreturn
+            //カートエンティティに搭乗している場合、カートエンティティを削除
             if (RaceManager.isKartEntity(vehicle)) {
+                RaceManager.removeKartEntity(vehicle);
 
-                //メタデータからCustomArmorStandオブジェクトを取得
-                Object customKartObject =
-                        RaceManager.getCustomMinecartObjectFromEntityMetaData(vehicle);
-
-                try {
-                    //新たなKartオブジェクトのパラメータを割り当てる
-                    Entity cart = (Entity) Util.getBukkitEntityFromNmsEntity(customKartObject);
-                    cart.setCustomName(kart.getKartName());
-                    cart.setCustomNameVisible(false);
-
-                    ReflectionUtil.yplCustomKart_setParameter.invoke(customKartObject, kart);
-                    return;
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-
-            //カートエンティティ以外に搭乗している場合は降ろし、新規に生成したカートに搭乗させる
+            //カートエンティティ以外に搭乗している場合は降ろす
             } else {
                 player.leaveVehicle();
             }
@@ -646,10 +624,6 @@ public class Racer {
         //新規に生成したカートエンティティに搭乗させる
         Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), kart);
         kartEntity.setPassenger(player);
-
-        //搭乗させるだけだと同期が取れず、クライアント側では搭乗していない状態で描画されるため、
-        //パケットを送信し明示的に搭乗させる。
-        PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
     private void recoveryExp() {

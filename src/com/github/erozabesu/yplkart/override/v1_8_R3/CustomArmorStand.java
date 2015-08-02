@@ -190,7 +190,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //カートタイプによって異なる項目を設定
         setYaw(this, location.getYaw());
         if (getKartType().equals(KartType.DisplayKart)) {
-            setPosition(location.getX(), location.getY() - 0.5D, location.getZ());
+            setPosition(location.getX(), location.getY(), location.getZ());
             setPitch(this, -location.getPitch());
             setYawPitch(getYaw(this), -getPitch(this));
             setGravity(false);
@@ -239,7 +239,7 @@ public class CustomArmorStand extends EntityArmorStand {
         setLastLocationY(this, getLocationY(this));
         setLastLocationZ(this, getLocationZ(this));
 
-        //ディスプレイカートの場合何もしないモーションを0に固定
+        //ディスプレイカートの場合何もしない
         if (getKartType().equals(KartType.DisplayKart)) {
             // Do nothing
 

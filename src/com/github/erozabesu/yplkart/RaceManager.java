@@ -483,6 +483,35 @@ public class RaceManager {
         return null;
     }
 
+    /**
+     * 引数entityのMetadataからKartオブジェクトを取得し返す
+     * @param entity Kartオブジェクトを取得するEntity
+     * @return 取得したKartオブジェクト
+     */
+    public static Kart getKartObjectByEntityMetaData(Entity entity) {
+        List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
+        if (metaDataList.size() != 0) {
+            MetadataValue metaData = metaDataList.get(0);
+            if (metaData != null) {
+                Object metaDataValue = metaData.value();
+                if (metaDataValue.getClass().isArray()) {
+                    //MetaDataが配列の場合
+                    for (Object values : (Object[]) metaDataValue) {
+                        if (values instanceof Kart) {
+                            return (Kart) values;
+                        }
+                    }
+                } else {
+                    //MetaDataが単数の場合
+                    if (metaDataValue instanceof Kart) {
+                        return (Kart) metaDataValue;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     // 〓 Util Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /*
