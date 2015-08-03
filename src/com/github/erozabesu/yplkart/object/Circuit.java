@@ -83,11 +83,11 @@ public class Circuit {
 
                     Scoreboards.entryCircuit(uuid);
                     race.init();
-                    race.setEntry(name);
+                    race.setCircuitName(name);
                     RaceManager.clearCharacterRaceData(uuid);
                     RaceManager.clearKartRaceData(uuid);
                     RaceManager.leaveRacingKart(player);
-                    race.setStandBy(true);
+                    race.setStandby(true);
                     race.savePlayerData();
 
                     player.getInventory().clear();
@@ -587,7 +587,7 @@ public class Circuit {
                 id = i.next();
                 if (RaceManager.isEntry(id)
                         //&& RaceManager.getRace(id).getStart()
-                        && !RaceManager.getRace(id).getGoal())
+                        && !RaceManager.getRace(id).isGoal())
                     return false;
             }
         } else {

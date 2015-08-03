@@ -88,16 +88,6 @@ public class DataListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void saveLastStepBlock(PlayerMoveEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
-            return;
-        if (!RaceManager.isStandBy(e.getPlayer().getUniqueId()))
-            return;
-
-        RaceManager.getRacer(e.getPlayer()).setLastStepBlock(Util.getGroundBlockID(e.getFrom()));
-    }
-
     //スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
     @EventHandler
     public void cancelMove(PlayerMoveEvent e) {
@@ -117,82 +107,109 @@ public class DataListener implements Listener {
         }
     }
 
+    /**
+     * スタートブロック・ゴールブロックを跨いだ際に、プレイヤーの周回数を加算、もしくは減算する
+     * @param event
+     */
     @EventHandler
-    public void saveLapcount(PlayerMoveEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
-            return;
-        Player p = e.getPlayer();
-        if (!RaceManager.isStandBy(p.getUniqueId()))
-            return;
-        Racer r = RaceManager.getRacer(p);
-        if (r.getGoal())
-            return;
-        if (r.getLapStepCool())
+    public void saveLapcount(PlayerMoveEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld()))
             return;
 
-        int lapcount = r.getLapCount();
+        //マッチングが終了しているプレイヤー以外は除外
+        Player player = event.getPlayer();
+        if (!RaceManager.isStandBy(player.getUniqueId())) {
+            return;
+        }
 
-        if (r.getLastStepBlock().equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
-            if (Util.getGroundBlockID(e.getTo()).equalsIgnoreCase(
-                    (String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
-                //正常ルート
-                if (lapcount == CircuitConfig.getCircuitData(r.getEntry()).getNumberOfLaps()) {
-                    r.setGoal();
+        //ゴールしているプレイヤーは除外
+        Racer racer = RaceManager.getRacer(player);
+        if (racer.isGoal()) {
+            return;
+        }
+
+        String fromBlockId = Util.getGroundBlockID(event.getFrom());
+        String toBlockId = Util.getGroundBlockID(event.getTo());
+
+        //現在の週回数
+        int currentLaps = racer.getCurrentLaps();
+
+        //正常に進行している場合
+        if (fromBlockId.equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
+            if (toBlockId.equalsIgnoreCase((String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
+
+                //サーキットの周回数を達成した場合ゴールする
+                if (currentLaps == CircuitConfig.getCircuitData(racer.getCircuitName()).getNumberOfLaps()) {
+                    racer.runRaceEndProcess();
                 } else {
-                    if (lapcount == 0) {
-                        r.setStart(true, e.getFrom(), e.getTo());
+
+                    //周回数が0週の場合スタートフラグをtrueにする
+                    if (currentLaps == 0) {
+                        racer.setStart(true);
+
+                        //レース前から所持していたレース用アイテムを削除
+                        ItemEnum.removeAllKeyItems(player);
+
+                    //2周目以降。周回数が変動したことをプレイヤーに通知する
                     } else {
-                        MessageEnum.raceUpdateLap.sendConvertedMessage(p,
-                                new Object[] { (lapcount + 1), RaceManager.getCircuit(r.getEntry()) });
+                        MessageEnum.raceUpdateLap.sendConvertedMessage(player,
+                                new Object[] { (currentLaps + 1), RaceManager.getCircuit(racer.getCircuitName()) });
                     }
-                    r.setLapCount(lapcount + 1);
+
+                    //周回数を加算
+                    racer.setCurrentLaps(currentLaps + 1);
                 }
-                r.setCool();
             }
-        } else if (r.getLastStepBlock().equalsIgnoreCase(
-                (String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
-            if (Util.getGroundBlockID(e.getTo()).equalsIgnoreCase(
-                    (String) ConfigEnum.START_BLOCK_ID.getValue())) {
-                //逆走
-                MessageEnum.raceReverseRun.sendConvertedMessage(p, RaceManager.getCircuit(r.getEntry()));
-                if (lapcount <= 0)
-                    r.setLapCount(0);
-                else {
-                    r.setLapCount(lapcount - 1);
+
+        //逆走している場合
+        } else if (fromBlockId.equalsIgnoreCase((String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
+            if (toBlockId.equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
+
+                //逆走していることをプレイヤーに通知
+                MessageEnum.raceReverseRun.sendConvertedMessage(player, RaceManager.getCircuit(racer.getCircuitName()));
+
+                //周回数を減算
+                if (currentLaps <= 0) {
+                    racer.setCurrentLaps(0);
+                } else {
+                    racer.setCurrentLaps(currentLaps - 1);
                 }
-                r.setCool();
             }
         }
     }
 
+    /**
+     * 周囲のチェックポイントを取得し格納する
+     * @param event
+     */
     @EventHandler
-    public void RunningRank(PlayerMoveEvent e) {//順位
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld())) {
+    public void RunningRank(PlayerMoveEvent event) {//順位
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
         }
-        Player p = e.getPlayer();
-        if (!RaceManager.isRacing(p.getUniqueId())) {
+        Player player = event.getPlayer();
+        if (!RaceManager.isRacing(player.getUniqueId())) {
             return;
         }
-        if (RaceManager.getRacer(p).getLapCount() < 1) {
-            return;
-        }
-
-        Racer r = RaceManager.getRacer(p);
-
-        ArrayList<String> checkpoint = RaceManager.getNearbyCheckpointID(
-                e.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, r.getEntry());
-        if (checkpoint == null) {
+        if (RaceManager.getRacer(player).getCurrentLaps() < 1) {
             return;
         }
 
-        Iterator<String> i = checkpoint.iterator();
-        String id;
-        String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+        Racer racer = RaceManager.getRacer(player);
+
+        ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(
+                event.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, racer.getCircuitName());
+        if (checkPointEntityList == null) {
+            return;
+        }
+
+        Iterator<Entity> i = checkPointEntityList.iterator();
+        Entity checkPointEntity;
+        String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         while (i.hasNext()) {
-            id = i.next();
-            r.addPassedCheckPoint(lap + id);
-            r.setLastPassedCheckPoint(id);
+            checkPointEntity = i.next();
+            racer.addPassedCheckPoint(currentLaps + checkPointEntity.getUniqueId().toString());
+            racer.setLastPassedCheckPointEntity(checkPointEntity);
         }
     }
 
@@ -218,12 +235,15 @@ public class DataListener implements Listener {
 
         final Player p = e.getPlayer();
         if (RaceManager.isStandBy(p.getUniqueId())) {
-            Racer r = RaceManager.getRacer(p);
-            p.teleport(r.getGoalPositionOnQuit());
+            Racer racer = RaceManager.getRacer(p);
+
+            //レース中のパラメータを復元する
+            racer.getRacingPlayerObject().recoveryAll();
+
+            //カートエンティティを再生成し搭乗する
+            racer.recoveryKart();
+
             Scoreboards.showBoard(p.getUniqueId());
-            r.recoveryPhysicalOnQuit();
-            r.recoveryInventoryOnQuit();
-            r.recoveryKart();
         }
     }
 
@@ -251,16 +271,15 @@ public class DataListener implements Listener {
             Scoreboards.hideBoard(player.getUniqueId());
 
             r.savePlayerDataOnQuit();
-            r.saveInventoryOnQuit();
 
             RaceManager.leaveRacingKart(player);
-            r.recoveryInventory();
-            r.recoveryPhysical();
-            player.teleport(r.getGoalPosition());
+
+            //レース前のパラメータを復元する
+            r.getBeforePlayerObject().recoveryAll();
 
             //ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
-            if (r.getGoal()) {
-                player.teleport(r.getGoalPosition());
+            if (r.isGoal()) {
+                r.getBeforePlayerObject().recoveryLocation();
                 r.init();
             }
         } else if (RaceManager.isEntry(player.getUniqueId())
@@ -326,8 +345,8 @@ public class DataListener implements Listener {
                 );
 
         //最後に通過したチェックポイントの座標にリスポーンする
-        if (racer.getLastPassedCheckPoint() != null) {
-            Location respawn = racer.getLastPassedCheckPoint().getLocation()
+        if (racer.getLastPassedCheckPointEntity() != null) {
+            Location respawn = racer.getLastPassedCheckPointEntity().getLocation()
                     .add(0, -RaceManager.checkPointHeight, 0);
             event.setRespawnLocation(
                     new Location(respawn.getWorld()
@@ -417,7 +436,7 @@ public class DataListener implements Listener {
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
             if (r.getCharacter() == null) {
                 MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getEntry()));
+                        p, RaceManager.getCircuit(r.getCircuitName()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         RaceManager.showSelectMenu(p, true);
@@ -427,7 +446,7 @@ public class DataListener implements Listener {
             }
             if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                 MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getEntry()));
+                        p, RaceManager.getCircuit(r.getCircuitName()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         RaceManager.showSelectMenu(p, false);
@@ -438,7 +457,7 @@ public class DataListener implements Listener {
         } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
             if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                 MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getEntry()));
+                        p, RaceManager.getCircuit(r.getCircuitName()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         RaceManager.showSelectMenu(p, false);
@@ -448,7 +467,7 @@ public class DataListener implements Listener {
             }
             if (r.getCharacter() == null) {
                 MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getEntry()));
+                        p, RaceManager.getCircuit(r.getCircuitName()));
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         RaceManager.showSelectMenu(p, true);
@@ -506,7 +525,7 @@ public class DataListener implements Listener {
                 if (RaceManager.isStandBy(id)) {
                     if (r.getCharacter() == null) {
                         MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                                p, RaceManager.getCircuit(r.getEntry()));
+                                p, RaceManager.getCircuit(r.getCircuitName()));
                     } else {
                         p.closeInventory();
 
@@ -549,7 +568,7 @@ public class DataListener implements Listener {
                 if (RaceManager.isStandBy(id)) {
                     if (r.getKart() == null) {
                         MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                                p, RaceManager.getCircuit(r.getEntry()));
+                                p, RaceManager.getCircuit(r.getCircuitName()));
                     } else {
                         p.closeInventory();
 

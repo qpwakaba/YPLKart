@@ -78,7 +78,7 @@ public class RaceManager {
 
     public static Circuit getCircuit(UUID id) {
         try {
-            return circuit.get(getRace(id).getEntry());
+            return circuit.get(getRace(id).getCircuitName());
         } catch (NullPointerException ex) {
             return null;
         }
@@ -118,7 +118,7 @@ public class RaceManager {
      */
     public static void putRacer(UUID uuid, Racer racer) {
         if (racer == null) {
-            racerDataMap.put(uuid, new Racer(uuid.toString()));
+            racerDataMap.put(uuid, new Racer(uuid));
         } else {
             racerDataMap.put(uuid, racer);
         }
@@ -202,7 +202,7 @@ public class RaceManager {
 
     public static void setEntryRaceData(UUID id, String circuitname) {
         if (isEntry(id)) {
-            String oldcircuitname = Util.convertInitialUpperString(getRace(id).getEntry());
+            String oldcircuitname = Util.convertInitialUpperString(getRace(id).getCircuitName());
             MessageEnum.raceEntryAlready.sendConvertedMessage(id, oldcircuitname);
         } else {
             Circuit c = setupCircuit(circuitname);
@@ -210,7 +210,7 @@ public class RaceManager {
                 c.entryReservePlayer(id);
                 MessageEnum.raceEntryFull.sendConvertedMessage(id, c);
             } else {
-                getRace(id).setEntry(circuitname);
+                getRace(id).setCircuitName(circuitname);
 
                 if (c.isStarted()) {
                     c.entryReservePlayer(id);
@@ -249,7 +249,7 @@ public class RaceManager {
 
         PacketUtil.disguiseLivingEntity(null, p, character.getNmsClass(), 0, 0, 0);
         character.playMenuSelectSound(p);
-        MessageEnum.raceCharacter.sendConvertedMessage(id, new Object[] { character, getCircuit(r.getEntry()) });
+        MessageEnum.raceCharacter.sendConvertedMessage(id, new Object[] { character, getCircuit(r.getCircuitName()) });
     }
 
     public static void setKartRaceData(UUID id, Kart kart) {
@@ -266,7 +266,7 @@ public class RaceManager {
         r.setKart(kart);
         r.recoveryKart();
 
-        MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getEntry()) });
+        MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getCircuitName()) });
     }
 
     public static void clearEntryRaceData(UUID id) {
@@ -279,14 +279,13 @@ public class RaceManager {
 
             Player p = Bukkit.getPlayer(id);
             if (p != null) {
-                if (!r.getGoal()) {
+                if (!r.isGoal()) {
                     clearCharacterRaceData(id);
                     clearKartRaceData(id);
                     leaveRacingKart(p);
                     if (isStandBy(id)) {
-                        r.recoveryInventory();
-                        r.recoveryPhysical();
-                        p.teleport(r.getGoalPosition());
+                        //全パラメータを復元する
+                        r.getBeforePlayerObject().recoveryAll();
                     }
                 }
                 MessageEnum.raceExit.sendConvertedMessage(id, c);
@@ -303,7 +302,7 @@ public class RaceManager {
         getRace(id).setCharacter(null);
         Player p = Bukkit.getPlayer(id);
         if (p != null) {
-            getRace(id).recoveryPhysical();
+            getRace(id).getBeforePlayerObject().recoveryPhysical();
             PacketUtil.returnOriginalPlayer(p);
             MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
         }
@@ -322,11 +321,9 @@ public class RaceManager {
         Entity vehicle = player.getVehicle();
         if (vehicle != null) {
             if (isSpecificKartType(vehicle, KartType.RacingKart)) {
-                getRacer(player).setCMDForceLeave(true);
                 player.leaveVehicle();
                 removeKartEntityIdMap(vehicle.getEntityId());
                 vehicle.remove();
-                getRacer(player).setCMDForceLeave(false);
             }
         }
     }
@@ -342,7 +339,7 @@ public class RaceManager {
     public static List<Player> getGoalPlayer(String circuitname) {
         ArrayList<Player> goalplayer = new ArrayList<Player>();
         for (Player p : getEntryPlayer(circuitname)) {
-            if (getRacer(p).getGoal())
+            if (getRacer(p).isGoal())
                 goalplayer.add(p);
         }
         return goalplayer;
@@ -351,7 +348,7 @@ public class RaceManager {
     public static List<Player> getRacingPlayer(String circuitname) {
         ArrayList<Player> list = new ArrayList<Player>();
         for (Player p : getEntryPlayer(circuitname)) {
-            if (!getRacer(p).getGoal())
+            if (!getRacer(p).isGoal())
                 list.add(p);
         }
         return list;
@@ -369,8 +366,8 @@ public class RaceManager {
     public static Integer getRank(Player p) {
         HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
 
-        for (Player entryplayer : getRacingPlayer(getRacer(p).getEntry())) {
-            count.put(entryplayer.getUniqueId(), getRacer(entryplayer).getPassedCheckPoint().size());
+        for (Player entryplayer : getRacingPlayer(getRacer(p).getCircuitName())) {
+            count.put(entryplayer.getUniqueId(), getRacer(entryplayer).getPassedCheckPointList().size());
         }
 
         List<Map.Entry<UUID, Integer>> entry = new ArrayList<Map.Entry<UUID, Integer>>(count.entrySet());
@@ -410,16 +407,16 @@ public class RaceManager {
     }
 
     public static List<Entity> getNearbyUnpassedCheckpoint(Location l, double radius, Racer r) {
-        String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+        String lap = r.getCurrentLaps() <= 0 ? "" : String.valueOf(r.getCurrentLaps());
         List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
 
         List<Entity> nearbycheckpoint = new ArrayList<Entity>();
         for (Entity e : entityList) {
             //プレイヤーとの高低差が一定以上のチェックポイントはスルー
             if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCustomWitherSkull(e, r.getEntry()))
-                    if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(r.getEntry()))
-                        if (!r.getPassedCheckPoint().contains(lap + e.getUniqueId().toString()))
+                if (isCustomWitherSkull(e, r.getCircuitName()))
+                    if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(r.getCircuitName()))
+                        if (!r.getPassedCheckPointList().contains(lap + e.getUniqueId().toString()))
                             nearbycheckpoint.add(e);
         }
 
@@ -519,7 +516,7 @@ public class RaceManager {
      * 行動の制限等は掛かりません
      */
     public static Boolean isEntry(UUID id) {
-        if (getRace(id).getEntry() != "")
+        if (getRace(id).getCircuitName() != "")
             return true;
         return false;
     }
@@ -532,7 +529,7 @@ public class RaceManager {
      */
     public static Boolean isStandBy(UUID id) {
         if (isEntry(id))
-            if (getRace(id).getStandBy())
+            if (getRace(id).isStandby())
                 return true;
         return false;
     }

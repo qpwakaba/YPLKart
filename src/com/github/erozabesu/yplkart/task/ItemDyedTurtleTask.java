@@ -47,10 +47,10 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         this.target = target;
         this.shooter = shooter;
         this.adjustdamage = RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
-        this.lap = RaceManager.getRacer(shooter).getLapCount();
+        this.lap = RaceManager.getRacer(shooter).getCurrentLaps();
         this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
 
-        shooterpassedcheckpoint = RaceManager.getRacer(shooter).getPassedCheckPoint();
+        shooterpassedcheckpoint = RaceManager.getRacer(shooter).getPassedCheckPointList();
 
         Util.removeEntityCollision(this.projectile);
     }
@@ -119,13 +119,13 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         //アカこうらを1位から2位に向け発射した場合
         if (this.targetreverse) {
             ArrayList<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    this.projectile.getLocation().add(-this.motX * 3, 0, -this.motZ * 3), 30, r.getEntry());
+                    this.projectile.getLocation().add(-this.motX * 3, 0, -this.motZ * 3), 30, r.getCircuitName());
             if (templist == null)
                 return;
 
             for (Entity e : templist) {
                 if (this.shooterpassedcheckpoint.contains(lap + e.getUniqueId().toString())) {
-                    if (!RaceManager.getRacer(this.target).getPassedCheckPoint()
+                    if (!RaceManager.getRacer(this.target).getPassedCheckPointList()
                             .contains(lap + e.getUniqueId().toString()))
                         if (!this.turtlepassedcheckpoint.contains(lap + e.getUniqueId().toString()))
                             checkpointlist.add(e);
@@ -134,7 +134,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
             //その他
         } else {
             ArrayList<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    this.projectile.getLocation().add(this.motX * 3, 0, this.motZ * 3), 30, r.getEntry());
+                    this.projectile.getLocation().add(this.motX * 3, 0, this.motZ * 3), 30, r.getCircuitName());
             if (templist == null)
                 return;
 

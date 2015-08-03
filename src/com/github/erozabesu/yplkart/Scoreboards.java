@@ -11,6 +11,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -87,7 +88,7 @@ public class Scoreboards {
     }
 
     public static void entryCircuit(UUID id) {
-        String entry = RaceManager.getRace(id).getEntry();
+        String entry = RaceManager.getRace(id).getCircuitName();
         if (entry.equalsIgnoreCase(""))
             return;
 
@@ -105,7 +106,7 @@ public class Scoreboards {
     }
 
     public static void exitCircuit(UUID id) {
-        String entry = RaceManager.getRace(id).getEntry();
+        String entry = RaceManager.getRace(id).getCircuitName();
         if (entry.equalsIgnoreCase(""))
             return;
 
@@ -125,12 +126,13 @@ public class Scoreboards {
     }
 
     public static void setPoint(UUID id) {
-        String entry = RaceManager.getRace(id).getEntry();
+        Racer racer = RaceManager.getRace(id);
+        String entry = racer.getCircuitName();
         if (entry.equalsIgnoreCase(""))
             return;
 
         scoreboard.get(entry).getObjective(YPLKart.PLUGIN_NAME).getScore(getPlayerRegisterName(id))
-                .setScore(RaceManager.getRace(id).getPoint());
+                .setScore(racer.getPassedCheckPointList().size());
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -147,7 +149,7 @@ public class Scoreboards {
     }
 
     public static void showBoard(UUID id) {
-        String entry = RaceManager.getRace(id).getEntry();
+        String entry = RaceManager.getRace(id).getCircuitName();
         if (entry.equalsIgnoreCase(""))
             return;
 

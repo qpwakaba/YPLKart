@@ -1,19 +1,13 @@
 package com.github.erozabesu.yplkart.object;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
@@ -27,267 +21,320 @@ import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
-public class Racer {
-    private UUID id;
-    private Location goalposition;
-    private double maxhealth;
-    private double health;
-    private int hunger;
-    private float walkspeed;
-    private int level;
-    private float exp;
-    private ArrayList<ItemStack> inventory;
-    private ArrayList<ItemStack> armorcontents;
+public class Racer extends PlayerObject{
 
-    private Location quitposition;
-    private double quitmaxhealth;
-    private double quithealth;
-    private int quithunger;
-    private float quitwalkspeed;
-    private int quitlevel;
-    private float quitexp;
-    private ArrayList<ItemStack> quitinventory;
-    private ArrayList<ItemStack> quitarmorcontents;
+    /** レース開始前のプレイヤー情報 */
+    private PlayerObject beforePlayerObject;
 
+    /** レース中ログアウトしたプレイヤーのプレイヤー情報 */
+    private PlayerObject racingPlayerObject;
+
+    /** エントリーしているサーキット名 */
+    private String circuitName;
+
+    /** 選択キャラクター */
     private Character character;
+
+    /** 選択カート */
     private Kart kart;
 
-    private String entry;
-    private boolean standby;
-    private boolean goal;
-    private boolean start;
+    /** マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
+    private boolean isStandby;
+
+    /** レースをゴールしているかどうか */
+    private boolean isGoal;
+
+    /** レースをスタートしているかどうか */
+    private boolean isStart;
+
+    /** レースの周回数 */
+    private int currentLaps;
 
     /**
-     * プレイヤーがスニークしているかどうか
-     * @see com.github.erozabesu.yplkart.override.PlayerChannelHandler#channelRead(ChannelHandlerContext , Object)
+     * 通過済みのチェックポイントリスト<br>
+     * this.currentLaps + チェックポイントエンティティのUUID がStringとして格納される
      */
-    private boolean isSneaking;
+    private ArrayList<String> passedCheckPointList;
 
-    private String laststepblock;
-    private int lapcount;
-    private boolean lapstepcool;
+    /** 最後に通過したチェックポイントエンティティ */
+    private Entity lastPassedCheckPointEntity;
 
-    private float lastyaw;
+    /** デスペナルティタスク */
+    private BukkitTask deathPenaltyTask;
 
-    private String lastpassedcheckpoint;
-    private int point;
-    private String firstpassedcheckpoint;
-    private ArrayList<String> passedcheckpoint;
+    /** デスペナルティ用点滅タイトル表示タスク */
+    private BukkitTask deathPenaltyTitleSendTask;
 
-    private ArrayList<ItemStack> keyitem;
-    private ArrayList<ItemStack> keyarmor;
-
-    private BukkitTask deathpenaltytask;
-    private BukkitTask deathpenaltytitlesendtask;
+    /** 移動速度上昇タスク */
     private BukkitTask itemPositiveSpeedTask;
+
+    /** 移動速度低下タスク */
     private BukkitTask itemNegativeSpeedTask;
-    private BukkitTask playerLookingUpdateTask;
 
-    /*
-     * キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する
+    /** キラーを使用した際の、周囲にある最寄の未通過のチェックポイントを格納する */
+    private Entity killerFirstPassedCheckPointEntity;
+
+    /** ダッシュボードを踏んで加速している状態かどうか */
+    private boolean isStepDashBoard;
+
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * コンストラクタ
+     * @param uuid プレイヤーUUID
      */
-    private Entity usingKiller;
-
-    private boolean cmdForceLeave;
-
-    private boolean stepDashBoard;
-
-    public Racer(String id) {
-        this.id = UUID.fromString(id);
+    public Racer(UUID uuid) {
+        super(uuid);
         init();
     }
 
+    /**
+     * メンバ変数を初期化する。<br>
+     * Racerオブジェクトはサーバーがリロードされるまで同一のプレイヤーに対し使い回されるため、<br>
+     * メンバ変数を初期化するメソッドが別途用意されている。
+     */
     public void init() {
-        Player p = getPlayer();
-        if (p != null) {
-            this.goalposition = getPlayer().getLocation().add(0, 1, 0);
-            this.maxhealth = p.getMaxHealth();
-            this.health = p.getHealth();
-            this.hunger = p.getFoodLevel();
-            this.walkspeed = p.getWalkSpeed();
-            this.level = p.getLevel();
-            this.exp = p.getExp();
-        }
-        this.inventory = new ArrayList<ItemStack>();
-        this.armorcontents = new ArrayList<ItemStack>();
+        setBeforePlayerObject(null);
+        setRacingPlayerObject(null);
 
-        this.quitposition = this.goalposition;
-        this.quitmaxhealth = this.maxhealth;
-        this.quithealth = this.health;
-        this.quithunger = this.hunger;
-        this.quitwalkspeed = this.walkspeed;
-        this.quitlevel = this.level;
-        this.quitexp = this.exp;
-        this.quitinventory = new ArrayList<ItemStack>();
-        this.quitarmorcontents = new ArrayList<ItemStack>();
+        setCircuitName("");
 
-        this.entry = "";
-        this.standby = false;
-        this.start = false;
-        this.goal = false;
+        setStandby(false);
+        setStart(false);
+        setGoal(false);
 
-        this.laststepblock = null;
-        this.lapcount = 0;
-        this.lapstepcool = false;
+        setCurrentLaps(0);
 
-        this.lastyaw = 0;
+        setPassedCheckPointList(new ArrayList<String>());
+        setLastPassedCheckPointEntity(null);
 
-        this.lastpassedcheckpoint = "";
-        this.point = 0;
-        this.firstpassedcheckpoint = "";
-        this.passedcheckpoint = new ArrayList<String>();
+        setDeathPenaltyTask(null);
+        setDeathPenaltyTitleSendTask(null);
+        setItemPositiveSpeedTask(null);
+        setItemNegativeSpeedTask(null);
 
-        this.deathpenaltytask = null;
-        this.deathpenaltytitlesendtask = null;
-        this.itemPositiveSpeedTask = null;
-        this.itemNegativeSpeedTask = null;
-        this.usingKiller = null;
+        setKillerFirstPassedCheckPointEntity(null);
 
-        this.cmdForceLeave = false;
-
-        this.stepDashBoard = false;
+        setStepDashBoard(false);
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public UUID getUUID() {
-        return this.id;
+    /** @return レース開始前のプレイヤー情報 */
+    public PlayerObject getBeforePlayerObject() {
+        return beforePlayerObject;
     }
 
-    public Player getPlayer() {
-        return Bukkit.getPlayer(getUUID());
+    /** @return レース中ログアウトしたプレイヤーのプレイヤー情報 */
+    public PlayerObject getRacingPlayerObject() {
+        return racingPlayerObject;
     }
 
-    public Location getGoalPosition() {
-        return this.goalposition;
+    /** @return エントリーしているサーキット名 */
+    public String getCircuitName() {
+        return circuitName;
     }
 
-    public Location getGoalPositionOnQuit() {
-        return this.quitposition;
-    }
-
-    public String getEntry() {
-        return this.entry;
-    }
-
-    public boolean getStandBy() {
-        return this.standby;
-    }
-
-    public boolean getGoal() {
-        return this.goal;
-    }
-
-    public boolean getStart() {
-        return this.start;
-    }
-
+    /** @return 選択キャラクター */
     public Character getCharacter() {
-        return this.character;
+        return character;
     }
 
+    /** @return 選択カート */
     public Kart getKart() {
-        return this.kart;
+        return kart;
     }
 
-    public int getLapCount() {
-        return this.lapcount;
+    /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
+    public boolean isStandby() {
+        return isStandby;
     }
 
-    public boolean getLapStepCool() {
-        return this.lapstepcool;
+    /** @return レースをゴールしているかどうか */
+    public boolean isGoal() {
+        return isGoal;
     }
 
-    /** @return isSneaking スニークしているかどうか */
-    public boolean isSneaking() {
-        return isSneaking;
+    /** @return レースをスタートしているかどうか */
+    public boolean isStart() {
+        return isStart;
     }
 
-    public String getLastStepBlock() {
-        if (this.laststepblock == null)
-            return "";
-        return this.laststepblock;
+    /** @return レースの周回数 */
+    public int getCurrentLaps() {
+        return this.currentLaps;
     }
 
-    public float getLastYaw() {
-        return this.lastyaw;
+    /** @return 通過済みのチェックポイントリスト */
+    public ArrayList<String> getPassedCheckPointList() {
+        return this.passedCheckPointList;
     }
 
-    public int getPoint() {
-        return this.point;
+    /** @return 最後に通過したチェックポイントエンティティ */
+    public Entity getLastPassedCheckPointEntity() {
+        return this.lastPassedCheckPointEntity;
     }
 
-    public String getFirstPassedCheckPoint() {
-        if (this.firstpassedcheckpoint.equalsIgnoreCase(""))
-            return "";
-        return this.firstpassedcheckpoint;
-    }
-
-    public ArrayList<String> getPassedCheckPoint() {
-        return this.passedcheckpoint;
-    }
-
-    public Entity getLastPassedCheckPoint() {
-        if (getPlayer() == null) {
-            return null;
-        }
-
-        for (Entity entity : getPlayer().getWorld().getEntities()) {
-            if (entity.getUniqueId().toString().equalsIgnoreCase(this.lastpassedcheckpoint))
-                return entity;
-        }
-        return null;
-    }
-
+    /** @return デスペナルティタスク */
     public BukkitTask getDeathPenaltyTask() {
-        return this.deathpenaltytask;
+        return deathPenaltyTask;
     }
 
+    /** @return デスペナルティ用点滅タイトル表示タスク */
     public BukkitTask getDeathPenaltySendTitleTask() {
-        return this.deathpenaltytitlesendtask;
+        return deathPenaltyTitleSendTask;
     }
 
+    /** @return 移動速度上昇タスク */
     public BukkitTask getItemPositiveSpeed() {
-        return this.itemPositiveSpeedTask;
+        return itemPositiveSpeedTask;
     }
 
+    /** @return 移動速度低下タスク */
     public BukkitTask getItemNegativeSpeed() {
-        return this.itemNegativeSpeedTask;
+        return itemNegativeSpeedTask;
     }
 
-    public BukkitTask getPlayerLookingUpdateTask() {
-        return this.playerLookingUpdateTask;
-    }
-
+    /** @return キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
     public Entity getUsingKiller() {
-        return this.usingKiller;
+        return killerFirstPassedCheckPointEntity;
     }
 
-    public boolean getCMDFroceLeave() {
-        return this.cmdForceLeave;
-    }
-
+    /** @return ダッシュボードを踏んで加速している状態かどうか */
     public boolean isStepDashBoard() {
-        return this.stepDashBoard;
+        return isStepDashBoard;
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /** @param beforePlayerObject レース開始前のプレイヤー情報 */
+    public void setBeforePlayerObject(PlayerObject beforePlayerObject) {
+        this.beforePlayerObject = beforePlayerObject;
+    }
+
+    /** @param racingPlayerObject レース中ログアウトしたプレイヤーのプレイヤー情報 */
+    public void setRacingPlayerObject(PlayerObject racingPlayerObject) {
+        this.racingPlayerObject = racingPlayerObject;
+    }
+
+    /** @param circuitName エントリーしているサーキット名 */
+    public void setCircuitName(String circuitName) {
+        this.circuitName = circuitName;
+    }
+
+    /** @param character 選択キャラクター */
     public void setCharacter(Character character) {
         this.character = character;
     }
 
+    /** @param kart 選択カート */
     public void setKart(Kart kart) {
         this.kart = kart;
     }
 
-    public void setEntry(String circuitname) {
-        this.entry = circuitname;
+    /** @param value マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
+    public void setStandby(boolean value) {
+        this.isStandby = value;
     }
 
-    public void setGoal() {
-        this.goal = true;
-        final String entry = getEntry();
+    /** @param value レースをゴールしているかどうか */
+    public void setGoal(boolean value) {
+        this.isGoal = value;
+    }
+
+    /** @param value レースをスタートしているかどうか */
+    public void setStart(boolean value) {
+        this.isStart = value;
+    }
+
+    /** @param value レースの周回数 */
+    public void setCurrentLaps(int value) {
+        this.currentLaps = value;
+    }
+
+    /** @param passedCheckPointList 通過済みのチェックポイントリスト */
+    public void setPassedCheckPointList(ArrayList<String> passedCheckPointList) {
+        this.passedCheckPointList = passedCheckPointList;
+    }
+
+    /** @param lastPassedCheckPointEntity 最後に通過したチェックポイントエンティティ */
+    public void setLastPassedCheckPointEntity(Entity lastPassedCheckPointEntity) {
+        this.lastPassedCheckPointEntity = lastPassedCheckPointEntity;
+    }
+
+    /** @param newtask デスペナルティタスク */
+    public void setDeathPenaltyTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.deathPenaltyTask != null) {
+            this.deathPenaltyTask.cancel();
+        }
+
+        this.deathPenaltyTask = newtask;
+    }
+
+    /** @param newtask デスペナルティ用点滅タイトル表示タスク */
+    public void setDeathPenaltyTitleSendTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.deathPenaltyTitleSendTask != null) {
+            this.deathPenaltyTitleSendTask.cancel();
+        }
+
+        this.deathPenaltyTitleSendTask = newtask;
+    }
+
+    /** @param newtask 移動速度上昇タスク */
+    public void setItemPositiveSpeedTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.itemPositiveSpeedTask != null) {
+            this.itemPositiveSpeedTask.cancel();
+        }
+
+        this.itemPositiveSpeedTask = newtask;
+    }
+
+    /** @param newtask 移動速度低下タスク */
+    public void setItemNegativeSpeedTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.itemNegativeSpeedTask != null) {
+            this.itemNegativeSpeedTask.cancel();
+        }
+
+        this.itemNegativeSpeedTask = newtask;
+    }
+
+    /** @param entity キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
+    public void setKillerFirstPassedCheckPointEntity(Entity killerFirstPassedCheckPointEntity) {
+        this.killerFirstPassedCheckPointEntity = killerFirstPassedCheckPointEntity;
+    }
+
+    /** @param isStepDashBoard ダッシュボードを踏んで加速している状態かどうか */
+    public void setStepDashBoard(boolean isStepDashBoard) {
+        this.isStepDashBoard = isStepDashBoard;
+    }
+
+    //〓 Get/Set 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 通過済みのチェックポイントリストに値を追加し、スコアボードを更新する。<br>
+     * 追加する値は、this.currentLaps + チェックポイントエンティティのUUID<br>
+     * のフォーマットのStringを与えること。
+     * @param value 追加するチェックポイント
+     */
+    public void addPassedCheckPoint(String value) {
+        if (getPassedCheckPointList().contains(value)) {
+            return;
+        }
+        getPassedCheckPointList().add(value);
+        Scoreboards.setPoint(this.getUUID());
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** レースの終了処理を行う */
+    public void runRaceEndProcess() {
+        setGoal(true);
+
+        final String entry = getCircuitName();
 
         Util.createSignalFireworks(getPlayer().getLocation());
         Util.createFlowerShower(getPlayer(), 20);
@@ -299,7 +346,6 @@ public class Racer {
         String message = MessageEnum.titleGoalRank.getConvertedMessage(new Object[] { new Number[] {
                 RaceManager.getGoalPlayer(entry).size(), (double) (currentmillisecond / 1000) } });
         PacketUtil.sendTitle(getPlayer(), message, 10, 100, 10, true);
-        setPoint(getPassedCheckPoint().size() + (RaceManager.getRacingPlayer(entry).size()) * 10);
 
         Circuit circuit = RaceManager.getCircuit(entry);
         if (CircuitConfig.getCircuitData(entry).getBroadcastGoalMessage()) {
@@ -324,132 +370,27 @@ public class Racer {
 
         //終了処理 順序に注意
         setStart(false);
-        RaceManager.clearCharacterRaceData(getUUID());
-        RaceManager.clearKartRaceData(getUUID());
+        RaceManager.clearCharacterRaceData(this.getUUID());
+        RaceManager.clearKartRaceData(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
         ItemEnum.removeAllKeyItems(getPlayer());
+        //TODO
         getPlayer().getInventory().clear(-1, -1);
-        recoveryInventory();
-        recoveryExp();
-        getPlayer().teleport(goalposition);
+        getBeforePlayerObject().recoveryInventory();
+        getBeforePlayerObject().recoveryExp();
+        getBeforePlayerObject().recoveryLocation();
     }
 
-    public void setStandBy(boolean value) {
-        this.standby = value;
-    }
-
-    public void setStart(boolean value) {
-        this.start = value;
-    }
-
-    public void setStart(boolean value, Location from, Location to) {
-        setStart(value);
-        ItemEnum.removeAllKeyItems(getPlayer());
-
-        Vector v = Util.getVectorToLocation(from, to);
-        Location l = getPlayer().getLocation().add(v.getX() * 5, 0, v.getZ() * 5);
-
-        ArrayList<Entity> checkpoint = RaceManager.getNearbyCheckpoint(l, 20, getEntry());
-
-        if (checkpoint != null) {
-            setFirstPassedCheckPoint(checkpoint.get(0).getUniqueId().toString());
-        }
-    }
-
-    public void setLapStepCool(boolean value) {
-        this.lapstepcool = value;
-    }
-
-    /** @param isSneaking スニークしているかどうか */
-    public void setSneaking(boolean isSneaking) {
-        this.isSneaking = isSneaking;
-    }
-
-    public void setLastStepBlock(String value) {
-        this.laststepblock = value;
-    }
-
-    public void setLapCount(int value) {
-        this.lapcount = value;
-    }
-
-    /*public void setPassedCheckPoint(Player p, ArrayList<String> value){
-    	passedcheckpoint.put(p.getUniqueId(), value);
-    }*/
-
-    public void addPassedCheckPoint(String value) {
-        if (getPassedCheckPoint().contains(value))
-            return;
-        getPassedCheckPoint().add(value);
-        setPoint(getPassedCheckPoint().size());
-        Scoreboards.setPoint(getUUID());
-    }
-
-    public void setPoint(int value) {
-        this.point = value;
-    }
-
-    public void setFirstPassedCheckPoint(String value) {
-        this.firstpassedcheckpoint = value;
-    }
-
-    public void setLastPassedCheckPoint(String value) {
-        this.lastpassedcheckpoint = value;
-    }
-
-    public void setLastYaw(float value) {
-        this.lastyaw = value;
-    }
-
-    //スタートブロックを１チックで２度踏んでしまわないようにインターバルを作る
-    public void setCool() {
-        setLapStepCool(true);
-        YPLKart.getInstance().getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                setLapStepCool(false);
-            }
-        }, 5L);
-    }
-
-    public void setDeathPenaltyTask(BukkitTask newtask) {
-        if (this.deathpenaltytask != null)
-            this.deathpenaltytask.cancel();
-
-        this.deathpenaltytask = newtask;
-    }
-
-    public void setDeathPenaltyTitleSendTask(BukkitTask newtask) {
-        if (this.deathpenaltytitlesendtask != null)
-            this.deathpenaltytitlesendtask.cancel();
-
-        this.deathpenaltytitlesendtask = newtask;
-    }
-
-    public void setItemPositiveSpeedTask(BukkitTask newtask) {
-        if (this.itemPositiveSpeedTask != null)
-            this.itemPositiveSpeedTask.cancel();
-
-        this.itemPositiveSpeedTask = newtask;
-    }
-
-    public void setItemNegativeSpeedTask(BukkitTask newtask) {
-        if (this.itemNegativeSpeedTask != null)
-            this.itemNegativeSpeedTask.cancel();
-
-        this.itemNegativeSpeedTask = newtask;
-    }
-
-    public void setPlayerLookingUpdateTask(BukkitTask newtask) {
-        if (this.playerLookingUpdateTask != null)
-            this.playerLookingUpdateTask.cancel();
-
-        this.playerLookingUpdateTask = newtask;
-    }
-
-    public void setUsingKiller(int life, Entity nearestunpassedcheckpoint) {
+    /**
+     * キラー使用者のカートエンティティをキラー用に初期化し、<br>
+     * キラーの効果時間が切れた際に元の状態に初期化するタスクを起動する
+     * @param life キラーの効果時間
+     * @param nearestUnpassedCheckPoint 最寄の未通過のチェックポイントエンティティ
+     */
+    public void runKillerInitializeTask(int life, Entity nearestUnpassedCheckPoint) {
         final Player player = getPlayer();
 
-        this.usingKiller = nearestunpassedcheckpoint;
+        setKillerFirstPassedCheckPointEntity(nearestUnpassedCheckPoint);
 
         //ランニングレース中にキラーを使用した場合、新規にキラー用カートエンティティを生成し搭乗する
         if (getKart() == null) {
@@ -459,7 +400,7 @@ public class Racer {
 
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
             public void run() {
-                usingKiller = null;
+                setKillerFirstPassedCheckPointEntity(null);
 
                 //ランニングレース中にキラーを使用した場合、登場中のキラー用カートエンティティを降りる
                 if (getKart() == null) {
@@ -469,128 +410,35 @@ public class Racer {
         }, life * 20);
     }
 
-    public void setCMDForceLeave(boolean value) {
-        this.cmdForceLeave = value;
-    }
+    /**
+     * ダッシュボードを連続して踏めないよう、効果時間中はフラグをtrueにし、<br>
+     * 効果時間が切れた場合はフラグをfalseに戻すタスクを起動する。
+     */
+    public void runStepDashBoardInitializeTask() {
+        int effectSecond = ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
+                + RaceManager.getRacer(getPlayer()).getCharacter().getAdjustPositiveEffectSecond()) * 20;
 
-    public void setStepDashBoard() {
-        this.stepDashBoard = true;
+        setStepDashBoard(true);
+
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(),new Runnable() {
             public void run() {
-                stepDashBoard = false;
+                setStepDashBoard(false);
             }
-        }, ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
-                + RaceManager.getRacer(getPlayer())
-                .getCharacter().getAdjustPositiveEffectSecond()) * 20);
+        }, effectSecond);
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
+    /** レース開始前のプレイヤーの情報を格納する */
     public void savePlayerData() {
-        if (getPlayer() == null)
-            return;
-        Player p = getPlayer();
-
-        this.goalposition = p.getLocation().add(0, 1, 0);
-        this.maxhealth = p.getMaxHealth();
-        this.health = p.getHealth();
-        this.hunger = p.getFoodLevel();
-        this.walkspeed = p.getWalkSpeed();
-        this.level = p.getLevel();
-        this.exp = p.getExp();
-
-        saveInventory();
+        if (getPlayer() != null) {
+            setBeforePlayerObject(new PlayerObject(getUUID()));
+        }
     }
 
+    /** レース中ログアウトしたプレイヤーの情報を格納する */
     public void savePlayerDataOnQuit() {
-        if (getPlayer() == null)
-            return;
-        Player p = getPlayer();
-
-        this.quitposition = p.getLocation().add(0, 1, 0);
-        this.quitmaxhealth = p.getMaxHealth();
-        this.quithealth = p.getHealth();
-        this.quithunger = p.getFoodLevel();
-        this.quitwalkspeed = p.getWalkSpeed();
-        this.quitlevel = p.getLevel();
-        this.quitexp = p.getExp();
-    }
-
-    public void saveInventory() {
-        if (getPlayer() == null)
-            return;
-        PlayerInventory inv = getPlayer().getInventory();
-        ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
-        ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
-
-        for (ItemStack slot : inv.getContents()) {
-            inventory.add(slot);
+        if (getPlayer() != null) {
+            setRacingPlayerObject(new PlayerObject(getUUID()));
         }
-        armorcontents.add(inv.getHelmet());
-        armorcontents.add(inv.getChestplate());
-        armorcontents.add(inv.getLeggings());
-        armorcontents.add(inv.getBoots());
-
-        this.inventory = inventory;
-        this.armorcontents = armorcontents;
-    }
-
-    public void saveInventoryOnQuit() {
-        if (getPlayer() == null)
-            return;
-        PlayerInventory inv = getPlayer().getInventory();
-        ArrayList<ItemStack> inventory = new ArrayList<ItemStack>();
-        ArrayList<ItemStack> armorcontents = new ArrayList<ItemStack>();
-
-        for (ItemStack slot : inv.getContents()) {
-            inventory.add(slot);
-        }
-        armorcontents.add(inv.getHelmet());
-        armorcontents.add(inv.getChestplate());
-        armorcontents.add(inv.getLeggings());
-        armorcontents.add(inv.getBoots());
-
-        this.quitinventory = inventory;
-        this.quitarmorcontents = armorcontents;
-    }
-
-    public void saveKeyItem() {
-        if (getPlayer() == null)
-            return;
-        PlayerInventory inv = getPlayer().getInventory();
-        ArrayList<ItemStack> contents = new ArrayList<ItemStack>();
-        ArrayList<ItemStack> armor = new ArrayList<ItemStack>();
-        for (ItemStack slot : inv.getContents()) {
-            if (slot == null)
-                contents.add(null);
-            else if (ItemEnum.isKeyItem(slot))
-                contents.add(slot);
-            else
-                contents.add(null);
-        }
-
-        if (ItemEnum.isKeyItem(inv.getHelmet()))
-            armor.add(inv.getHelmet());
-        else
-            armor.add(null);
-
-        if (ItemEnum.isKeyItem(inv.getChestplate()))
-            armor.add(inv.getChestplate());
-        else
-            armor.add(null);
-
-        if (ItemEnum.isKeyItem(inv.getLeggings()))
-            armor.add(inv.getLeggings());
-        else
-            armor.add(null);
-
-        if (ItemEnum.isKeyItem(inv.getBoots()))
-            armor.add(inv.getBoots());
-        else
-            armor.add(null);
-
-        this.keyitem = contents;
-        this.keyarmor = armor;
     }
 
     /**
@@ -630,56 +478,6 @@ public class Racer {
         PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
-    private void recoveryExp() {
-        Player p = getPlayer();
-        if (p == null)
-            return;
-
-        p.setLevel(this.level);
-        p.setExp(this.exp);
-    }
-
-    private void recoveryExpOnQuit() {
-        Player p = getPlayer();
-        if (p == null)
-            return;
-
-        p.setLevel(this.quitlevel);
-        p.setExp(this.quitexp);
-    }
-
-    public void recoveryPhysical() {
-        final Player p = getPlayer();
-        if (p == null)
-            return;
-
-        p.setMaxHealth(this.maxhealth);
-        p.setFoodLevel(this.hunger);
-        p.setWalkSpeed(this.walkspeed);
-        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                if (getPlayer() != null)
-                    p.setHealth(health);
-            }
-        }, 5L);
-    }
-
-    public void recoveryPhysicalOnQuit() {
-        final Player p = getPlayer();
-        if (p == null)
-            return;
-
-        p.setMaxHealth(this.quitmaxhealth);
-        p.setFoodLevel(this.quithunger);
-        p.setWalkSpeed(this.quitwalkspeed);
-        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                if (getPlayer() != null)
-                    p.setHealth(quithealth);
-            }
-        }, 5L);
-    }
-
     public void recoveryCharacterPhysical() {
         final Player p = getPlayer();
         if (p == null)
@@ -693,85 +491,5 @@ public class Racer {
                     p.setHealth(character.getMaxHealth());
             }
         }, 5L);
-    }
-
-    public void recoveryInventory() {
-        if (getPlayer() == null)
-            return;
-        recoveryExp();
-        if (!this.inventory.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            for (int i = 0; i < 36; i++) {
-                inv.setItem(i, inventory.get(i));
-            }
-        }
-
-        if (!this.armorcontents.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            if (this.armorcontents.get(0) != null)
-                inv.setHelmet(this.armorcontents.get(0));
-            if (this.armorcontents.get(1) != null)
-                inv.setChestplate(this.armorcontents.get(1));
-            if (this.armorcontents.get(2) != null)
-                inv.setLeggings(this.armorcontents.get(2));
-            if (this.armorcontents.get(3) != null)
-                inv.setBoots(this.armorcontents.get(3));
-        }
-
-        this.inventory = new ArrayList<ItemStack>();
-        this.armorcontents = new ArrayList<ItemStack>();
-    }
-
-    public void recoveryInventoryOnQuit() {
-        if (getPlayer() == null)
-            return;
-        recoveryExpOnQuit();
-        if (!this.quitinventory.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            for (int i = 0; i < 36; i++) {
-                inv.setItem(i, quitinventory.get(i));
-            }
-        }
-
-        if (!this.quitarmorcontents.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            if (this.quitarmorcontents.get(0) != null)
-                inv.setHelmet(this.quitarmorcontents.get(0));
-            if (this.quitarmorcontents.get(1) != null)
-                inv.setChestplate(this.quitarmorcontents.get(1));
-            if (this.quitarmorcontents.get(2) != null)
-                inv.setLeggings(this.quitarmorcontents.get(2));
-            if (this.quitarmorcontents.get(3) != null)
-                inv.setBoots(this.quitarmorcontents.get(3));
-        }
-
-        this.quitinventory = new ArrayList<ItemStack>();
-        this.quitarmorcontents = new ArrayList<ItemStack>();
-    }
-
-    public void recoveryKeyItem() {
-        if (getPlayer() == null)
-            return;
-        if (!this.inventory.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            for (int i = 0; i < 36; i++) {
-                inv.setItem(i, inventory.get(i));
-            }
-        }
-
-        if (!this.armorcontents.isEmpty()) {
-            PlayerInventory inv = getPlayer().getInventory();
-            if (this.armorcontents.get(0) != null)
-                inv.setHelmet(this.armorcontents.get(0));
-            if (this.armorcontents.get(1) != null)
-                inv.setChestplate(this.armorcontents.get(1));
-            if (this.armorcontents.get(2) != null)
-                inv.setLeggings(this.armorcontents.get(2));
-            if (this.armorcontents.get(3) != null)
-                inv.setBoots(this.armorcontents.get(3));
-        }
-
-        this.keyitem = new ArrayList<ItemStack>();
-        this.keyarmor = new ArrayList<ItemStack>();
     }
 }

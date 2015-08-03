@@ -1199,7 +1199,7 @@ public class CustomArmorStand extends EntityArmorStand {
         //初回起動時のみ
         if (getKillerPassedCheckPointList() == null) {
             //キラー使用者が通過済みのチェックポイントリストを引き継ぐ
-            setKillerPassedCheckPointList(new ArrayList<String>(r.getPassedCheckPoint()));
+            setKillerPassedCheckPointList(new ArrayList<String>(r.getPassedCheckPointList()));
 
             //キラー使用時に取得した、最寄の未通過のチェックポイントを格納
             setKillerLastPassedCheckPoint(r.getUsingKiller());
@@ -1225,14 +1225,14 @@ public class CustomArmorStand extends EntityArmorStand {
         }
 
         //周囲のチェックポイントを取得し、検出できなかった場合return
-        ArrayList<org.bukkit.entity.Entity> chackPointList = RaceManager.getNearbyCheckpoint(location, 40, r.getEntry());
+        ArrayList<org.bukkit.entity.Entity> chackPointList = RaceManager.getNearbyCheckpoint(location, 40, r.getCircuitName());
         if (chackPointList == null) {
             return;
         }
 
         //周囲のチェックポイントの内、未通過のチェックポイントを抽出
         ArrayList<org.bukkit.entity.Entity> unpassedCheckPointList = new ArrayList<org.bukkit.entity.Entity>();
-        String lap = r.getLapCount() <= 0 ? "" : String.valueOf(r.getLapCount());
+        String lap = r.getCurrentLaps() <= 0 ? "" : String.valueOf(r.getCurrentLaps());
         for (org.bukkit.entity.Entity checkPoint : chackPointList) {
             if (!this.getKillerPassedCheckPointList().contains(lap + checkPoint.getUniqueId().toString())) {
                 unpassedCheckPointList.add(checkPoint);

@@ -289,7 +289,7 @@ public class ItemListener extends RaceManager implements Listener {
                                     }
                                 }, 2 * 20L + 10L);
 
-                                int denominator = getRacingPlayer(getRacer(p).getEntry()).size();
+                                int denominator = getRacingPlayer(getRacer(p).getCircuitName()).size();
                                 //denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
                                 if (denominator == 0)
                                     denominator = 1;
@@ -356,7 +356,7 @@ public class ItemListener extends RaceManager implements Listener {
 
                 if (p.getVehicle() != null) {
                     if (isSpecificKartType(p.getVehicle(), KartType.RacingKart)) {
-                        getRacer(p).setStepDashBoard();
+                        getRacer(p).runStepDashBoardInitializeTask();
                         p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
                         return;
                     }
@@ -542,7 +542,7 @@ public class ItemListener extends RaceManager implements Listener {
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public void itemTeresa(Player user) {
-        List<Player> entry = getRacingPlayer(getRacer(user).getEntry());
+        List<Player> entry = getRacingPlayer(getRacer(user).getCircuitName());
         if (entry.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -585,7 +585,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemThunder(Player user) {
-        List<Player> list = getRacingPlayer(getRacer(user).getEntry());
+        List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
         if (list.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -619,7 +619,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemGesso(Player user) {
-        List<Player> list = getRacingPlayer(getRacer(user).getEntry());
+        List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
         if (list.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
@@ -676,7 +676,7 @@ public class ItemListener extends RaceManager implements Listener {
     public void itemRedturtle(Player user) {
         if (!isRacing(user.getUniqueId()))
             return;
-        if (getRacingPlayer(getRacer(user).getEntry()).size() <= 1) {
+        if (getRacingPlayer(getRacer(user).getCircuitName()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -698,17 +698,17 @@ public class ItemListener extends RaceManager implements Listener {
         int rank = getRank(user);
         Player target = null;
         if (rank == 1)
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), rank + 1), turtle, false, true)
+            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), rank + 1), turtle, false, true)
                     .runTaskTimer(YPLKart.getInstance(), 0, 1);
         else
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), rank - 1), turtle, false, false)
+            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), rank - 1), turtle, false, false)
                     .runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemThornedturtle(Player user) {
         if (!isRacing(user.getUniqueId()))
             return;
-        if (getRacingPlayer(getRacer(user).getEntry()).size() <= 1) {
+        if (getRacingPlayer(getRacer(user).getCircuitName()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -733,7 +733,7 @@ public class ItemListener extends RaceManager implements Listener {
         turtle.setCustomNameVisible(false);
         turtle.setDropItem(false);
 
-        new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getEntry(), 1), turtle, true, false).runTaskTimer(
+        new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), 1), turtle, true, false).runTaskTimer(
                 pl, 0, 1);
     }
 
@@ -767,7 +767,7 @@ public class ItemListener extends RaceManager implements Listener {
         new SendCountDownTitleTask(user, life, MessageEnum.titleUsingKiller.getMessage()).runTaskTimer(
                 YPLKart.getInstance(), 0, 1);
 
-        r.setUsingKiller(life, unpassedcheckpoint);
+        r.runKillerInitializeTask(life, unpassedcheckpoint);
     }
 
     public static void setNegativeItemSpeed(final Player p, int second, int level, Sound sound) {
