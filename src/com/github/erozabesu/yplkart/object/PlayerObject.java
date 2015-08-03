@@ -87,57 +87,57 @@ public class PlayerObject {
 
     /** @return UUID */
     public UUID getUUID() {
-        return uuid;
+        return this.uuid;
     }
 
     /** @return 座標 */
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     /** @return 最大体力 */
     public double getMaxHealth() {
-        return maxHealth;
+        return this.maxHealth;
     }
 
     /** @return 体力 */
     public double getHealth() {
-        return health;
+        return this.health;
     }
 
     /** @return 空腹度 */
     public int getHunger() {
-        return hunger;
+        return this.hunger;
     }
 
     /** @return 歩行速度 */
     public float getWalkSpeed() {
-        return walkSpeed;
+        return this.walkSpeed;
     }
 
     /** @return 経験値LV */
     public int getLevel() {
-        return level;
+        return this.level;
     }
 
     /** @return 経験値 */
     public float getExp() {
-        return exp;
+        return this.exp;
     }
 
     /** @return インベントリ */
     public ArrayList<ItemStack> getInventory() {
-        return inventory;
+        return this.inventory;
     }
 
     /** @return アーマーインベントリ */
     public ArrayList<ItemStack> getArmorContents() {
-        return armorContents;
+        return this.armorContents;
     }
 
     /** @return スニークしているかどうか */
     public boolean isSneaking() {
-        return isSneaking;
+        return this.isSneaking;
     }
 
     /** @return リスポーン時のプレイヤーの向き */

@@ -122,42 +122,42 @@ public class Racer extends PlayerObject{
 
     /** @return レース開始前のプレイヤー情報 */
     public PlayerObject getBeforePlayerObject() {
-        return beforePlayerObject;
+        return this.beforePlayerObject;
     }
 
     /** @return レース中ログアウトしたプレイヤーのプレイヤー情報 */
     public PlayerObject getRacingPlayerObject() {
-        return racingPlayerObject;
+        return this.racingPlayerObject;
     }
 
     /** @return エントリーしているサーキット名 */
     public String getCircuitName() {
-        return circuitName;
+        return this.circuitName;
     }
 
     /** @return 選択キャラクター */
     public Character getCharacter() {
-        return character;
+        return this.character;
     }
 
     /** @return 選択カート */
     public Kart getKart() {
-        return kart;
+        return this.kart;
     }
 
     /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     public boolean isStandby() {
-        return isStandby;
+        return this.isStandby;
     }
 
     /** @return レースをゴールしているかどうか */
     public boolean isGoal() {
-        return isGoal;
+        return this.isGoal;
     }
 
     /** @return レースをスタートしているかどうか */
     public boolean isStart() {
-        return isStart;
+        return this.isStart;
     }
 
     /** @return レースの周回数 */
@@ -177,32 +177,32 @@ public class Racer extends PlayerObject{
 
     /** @return デスペナルティタスク */
     public BukkitTask getDeathPenaltyTask() {
-        return deathPenaltyTask;
+        return this.deathPenaltyTask;
     }
 
     /** @return デスペナルティ用点滅タイトル表示タスク */
     public BukkitTask getDeathPenaltySendTitleTask() {
-        return deathPenaltyTitleSendTask;
+        return this.deathPenaltyTitleSendTask;
     }
 
     /** @return 移動速度上昇タスク */
     public BukkitTask getItemPositiveSpeed() {
-        return itemPositiveSpeedTask;
+        return this.itemPositiveSpeedTask;
     }
 
     /** @return 移動速度低下タスク */
     public BukkitTask getItemNegativeSpeed() {
-        return itemNegativeSpeedTask;
+        return this.itemNegativeSpeedTask;
     }
 
     /** @return キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
     public Entity getUsingKiller() {
-        return killerFirstPassedCheckPointEntity;
+        return this.killerFirstPassedCheckPointEntity;
     }
 
     /** @return ダッシュボードを踏んで加速している状態かどうか */
     public boolean isStepDashBoard() {
-        return isStepDashBoard;
+        return this.isStepDashBoard;
     }
 
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -325,7 +325,21 @@ public class Racer extends PlayerObject{
             return;
         }
         getPassedCheckPointList().add(value);
-        Scoreboards.setPoint(this.getUUID());
+        Scoreboards.setPoint(getUUID());
+    }
+
+    /** レース開始前のプレイヤーの情報を格納する */
+    public void savePlayerData() {
+        if (getPlayer() != null) {
+            setBeforePlayerObject(new PlayerObject(getUUID()));
+        }
+    }
+
+    /** レース中ログアウトしたプレイヤーの情報を格納する */
+    public void savePlayerDataOnQuit() {
+        if (getPlayer() != null) {
+            setRacingPlayerObject(new PlayerObject(getUUID()));
+        }
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -425,20 +439,6 @@ public class Racer extends PlayerObject{
                 setStepDashBoard(false);
             }
         }, effectSecond);
-    }
-
-    /** レース開始前のプレイヤーの情報を格納する */
-    public void savePlayerData() {
-        if (getPlayer() != null) {
-            setBeforePlayerObject(new PlayerObject(getUUID()));
-        }
-    }
-
-    /** レース中ログアウトしたプレイヤーの情報を格納する */
-    public void savePlayerDataOnQuit() {
-        if (getPlayer() != null) {
-            setRacingPlayerObject(new PlayerObject(getUUID()));
-        }
     }
 
     /**
