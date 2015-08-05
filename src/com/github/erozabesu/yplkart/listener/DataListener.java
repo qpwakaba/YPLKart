@@ -140,7 +140,7 @@ public class DataListener implements Listener {
 
                 //サーキットの周回数を達成した場合ゴールする
                 if (currentLaps == CircuitConfig.getCircuitData(racer.getCircuitName()).getNumberOfLaps()) {
-                    racer.runRaceEndProcess();
+                    racer.endRace();
                 } else {
 
                     //周回数が0週の場合スタートフラグをtrueにする

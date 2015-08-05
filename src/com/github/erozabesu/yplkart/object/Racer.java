@@ -14,7 +14,6 @@ import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
-import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
@@ -321,54 +320,82 @@ public class Racer extends PlayerObject{
         }
     }
 
-    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Race Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** レースの終了処理を行う */
-    public void runRaceEndProcess() {
+    public void endRace() {
         setGoal(true);
 
-        final String entry = getCircuitName();
-
+        //演出パーティクル
         Util.createSignalFireworks(getPlayer().getLocation());
         Util.createFlowerShower(getPlayer(), 20);
 
-        double currentmillisecond = RaceManager.getCircuit(entry).getLapMilliSeconds();
+        //リザルトメッセージの送信
+        sendResult();
 
-        new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!" + ChatColor.GOLD, "O", 1, false).runTaskTimer(
-                YPLKart.getInstance(), 0, 1);
-        String message = MessageEnum.titleGoalRank.getConvertedMessage(new Object[] { new Number[] {
-                RaceManager.getGoalPlayer(entry).size(), (double) (currentmillisecond / 1000) } });
-        PacketUtil.sendTitle(getPlayer(), message, 10, 100, 10, true);
+        //リザルトをローカルファイルへ保存
+        saveResult();
 
-        Circuit circuit = RaceManager.getCircuit(entry);
-        if (CircuitConfig.getCircuitData(entry).getBroadcastGoalMessage()) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                MessageEnum.raceGoal.sendConvertedMessage(p,
-                        new Object[] {
-                                getPlayer(),
-                                circuit,
-                                new Number[] { RaceManager.getGoalPlayer(entry).size(),
-                                        (double) (currentmillisecond / 1000) } });
-            }
-        } else {
-            circuit.sendMessageEntryPlayer(MessageEnum.raceGoal, new Object[] { getPlayer(), circuit,
-                    new Number[] { RaceManager.getGoalPlayer(entry).size(), (double) (currentmillisecond / 1000) } });
-        }
-
-        if (getKart() == null) {
-            CircuitConfig.addRaceLapTime(getPlayer(), entry, currentmillisecond / 1000, false);
-        } else {
-            CircuitConfig.addRaceLapTime(getPlayer(), entry, currentmillisecond / 1000, true);
-        }
-
-        //終了処理 順序に注意
+        //初期化 順序に注意
         setStart(false);
         RaceManager.clearCharacterRaceData(this.getUUID());
         RaceManager.clearKartRaceData(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
-        ItemEnum.removeAllKeyItems(getPlayer());
         recoveryAll();
     }
+
+    /**
+     * レースのリザルトをゴールしたプレイヤーに送信する。<br>
+     * また、全体通知機能がtrueであればサーバーの全プレイヤーに、<br>
+     * falseであればレースの参加者のみに併せて送信する。
+     */
+    private void sendResult() {
+        String circuitName = getCircuitName();
+        Circuit circuit = RaceManager.getCircuit(circuitName);
+        double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
+        int currentRank = RaceManager.getGoalPlayer(circuitName).size();
+        Number[] messagePartsRaceResult = new Number[]{currentRank, lapTime};
+
+        //〓ゴールしたプレイヤー向けメッセージ送信
+
+        //演出のGOALタイトルを送信
+        new SendExpandedTitleTask(getPlayer(), 5, "GOAL!!!" + ChatColor.GOLD, "O", 1, false).runTaskTimer(
+                YPLKart.getInstance(), 0, 1);
+
+        //リザルトのサブタイトルを送信
+        String messageResultTitle = MessageEnum.titleGoalRank.getConvertedMessage(new Object[]{messagePartsRaceResult});
+        PacketUtil.sendTitle(getPlayer(), messageResultTitle, 10, 100, 10, true);
+
+        //〓全体メッセージ送信
+
+        Object[] messageBroadcastParts = new Object[]{getPlayer(), circuit, messagePartsRaceResult};
+
+        //全体通知機能がtrueであれば、ゴールしたプレイヤーのリザルトをサーバーの全プレイヤーに送信する
+        if (CircuitConfig.getCircuitData(circuitName).getBroadcastGoalMessage()) {
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                MessageEnum.raceGoal.sendConvertedMessage(other, messageBroadcastParts);
+            }
+
+        //全体通知機能がfalseであれば、ゴールしたプレイヤーのリザルトをレースの参加者のみに送信する
+        } else {
+            circuit.sendMessageEntryPlayer(MessageEnum.raceGoal, messageBroadcastParts);
+        }
+    }
+
+    /** レースのラップタイムをローカルファイルへ保存する */
+    public void saveResult() {
+        String circuitName = getCircuitName();
+        double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
+
+        //ローカルファイルへリザルトの保存
+        if (getKart() == null) {
+            CircuitConfig.addRaceLapTime(getPlayer(), circuitName, lapTime, false);
+        } else {
+            CircuitConfig.addRaceLapTime(getPlayer(), circuitName, lapTime, true);
+        }
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * キラー使用者のカートエンティティをキラー用に初期化し、<br>

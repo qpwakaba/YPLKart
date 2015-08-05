@@ -535,7 +535,7 @@ public class Circuit {
         return this.laptime;
     }
 
-    public int getLapMilliSeconds() {
+    public int getLapMilliSecond() {
         return laptime * 50;
     }
 
