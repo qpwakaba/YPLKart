@@ -304,16 +304,16 @@ public class PlayerObject {
         if (!getArmorContents().isEmpty()) {
             PlayerInventory inv = player.getInventory();
             if (getArmorContents().get(0) != null) {
-                inv.setHelmet(getArmorContents().get(0));
+                inv.setHelmet(getArmorContents().get(3));
             }
             if (getArmorContents().get(1) != null) {
-                inv.setChestplate(getArmorContents().get(1));
+                inv.setChestplate(getArmorContents().get(2));
             }
             if (getArmorContents().get(2) != null) {
-                inv.setLeggings(getArmorContents().get(2));
+                inv.setLeggings(getArmorContents().get(1));
             }
             if (getArmorContents().get(3) != null){
-                inv.setBoots(getArmorContents().get(3));
+                inv.setBoots(getArmorContents().get(0));
             }
         }
     }

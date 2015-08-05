@@ -85,7 +85,6 @@ public class Circuit {
                     race.applyRaceParameter();
                     race.setCircuitName(name);
                     race.setStandby(true);
-                    System.out.println(race.getMaxHealth());
                     RaceManager.clearCharacterRaceData(uuid);
                     RaceManager.clearKartRaceData(uuid);
                     RaceManager.leaveRacingKart(player);
