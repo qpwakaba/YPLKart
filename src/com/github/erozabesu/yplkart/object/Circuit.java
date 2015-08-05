@@ -82,18 +82,13 @@ public class Circuit {
                     Racer race = RaceManager.getRacer(player);
 
                     Scoreboards.entryCircuit(uuid);
-                    race.init();
+                    race.applyRaceParameter();
                     race.setCircuitName(name);
+                    race.setStandby(true);
+                    System.out.println(race.getMaxHealth());
                     RaceManager.clearCharacterRaceData(uuid);
                     RaceManager.clearKartRaceData(uuid);
                     RaceManager.leaveRacingKart(player);
-                    race.setStandby(true);
-                    race.savePlayerData();
-
-                    player.getInventory().clear();
-                    player.getInventory().setArmorContents(null);
-                    player.setLevel(0);
-                    player.setExp(0);
 
                     player.leaveVehicle();
                     player.teleport(position.get(count));

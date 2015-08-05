@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,6 +23,9 @@ public class PlayerObject {
 
     /** UUID */
     private UUID uuid;
+
+    /** ゲームモード */
+    private GameMode gameMode;
 
     /** 座標 */
     private Location location;
@@ -65,13 +69,24 @@ public class PlayerObject {
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public PlayerObject(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
+        setUUID(uuid);
+
+        initializePlayerObject();
+
+        setSneaking(false);
+        setLastYaw(0);
+    }
+
+    public void initializePlayerObject() {
+        Player player = getPlayer();
         if (player == null) {
             return;
         }
-        setUUID(uuid);
+
+        setGameMode(player.getGameMode());
         setLocation(player.getLocation());
         setMaxHealth(player.getMaxHealth());
+
         setHealth(player.getHealth());
         setHunger(player.getFoodLevel());
         setWalkSpeed(player.getWalkSpeed());
@@ -79,8 +94,6 @@ public class PlayerObject {
         setExp(player.getExp());
         setInventory(new ArrayList<ItemStack>(Arrays.asList(player.getInventory().getContents())));
         setArmorContents(new ArrayList<ItemStack>(Arrays.asList(player.getInventory().getArmorContents())));
-        setSneaking(false);
-        setLastYaw(0);
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -88,6 +101,11 @@ public class PlayerObject {
     /** @return UUID */
     public UUID getUUID() {
         return this.uuid;
+    }
+
+    /** @return ゲームモード */
+    public GameMode getGameMode() {
+        return gameMode;
     }
 
     /** @return 座標 */
@@ -152,6 +170,11 @@ public class PlayerObject {
         this.uuid = uuid;
     }
 
+    /** @param gameMode ゲームモード */
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
     /** @param location 座標 */
     public void setLocation(Location location) {
         this.location = location;
@@ -214,6 +237,15 @@ public class PlayerObject {
         return Bukkit.getPlayer(getUUID());
     }
 
+    /** ゲームモードを復元する */
+    public void recoveryGameMode() {
+        Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+        player.setGameMode(getGameMode());
+    }
+
     /** 座標へテレポートする */
     public void recoveryLocation() {
         Player player = getPlayer();
@@ -260,6 +292,8 @@ public class PlayerObject {
             return;
         }
 
+        player.getInventory().clear();
+
         if (!getInventory().isEmpty()) {
             PlayerInventory inv = player.getInventory();
             for (int i = 0; i < 36; i++) {
@@ -294,5 +328,25 @@ public class PlayerObject {
         recoveryPhysical();
         recoveryExp();
         recoveryInventory();
+        recoveryGameMode();
+    }
+
+    /** レース用の初期パラメータを適用する */
+    public void applyRaceParameter() {
+        Player player = this.getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        //現プレイヤーデータの保存
+        initializePlayerObject();
+
+        player.setGameMode(GameMode.ADVENTURE);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setHealth(player.getMaxHealth());
+        player.setLevel(0);
+        player.setExp(0);
+        player.setFoodLevel(20);
     }
 }

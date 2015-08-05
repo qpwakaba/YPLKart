@@ -285,13 +285,13 @@ public class RaceManager {
                     leaveRacingKart(p);
                     if (isStandBy(id)) {
                         //全パラメータを復元する
-                        r.getBeforePlayerObject().recoveryAll();
+                        r.recoveryAll();
                     }
                 }
                 MessageEnum.raceExit.sendConvertedMessage(id, c);
             }
 
-            r.init();
+            r.initializeRacer();
         }
     }
 
@@ -302,7 +302,7 @@ public class RaceManager {
         getRace(id).setCharacter(null);
         Player p = Bukkit.getPlayer(id);
         if (p != null) {
-            getRace(id).getBeforePlayerObject().recoveryPhysical();
+            getRace(id).recoveryPhysical();
             PacketUtil.returnOriginalPlayer(p);
             MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
         }

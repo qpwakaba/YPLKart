@@ -275,12 +275,12 @@ public class DataListener implements Listener {
             RaceManager.leaveRacingKart(player);
 
             //レース前のパラメータを復元する
-            r.getBeforePlayerObject().recoveryAll();
+            r.recoveryAll();
 
             //ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
             if (r.isGoal()) {
-                r.getBeforePlayerObject().recoveryLocation();
-                r.init();
+                r.recoveryLocation();
+                r.initializeRacer();
             }
         } else if (RaceManager.isEntry(player.getUniqueId())
                 && !RaceManager.isStandBy(player.getUniqueId())) {

@@ -23,9 +23,6 @@ import com.github.erozabesu.yplkart.utils.Util;
 
 public class Racer extends PlayerObject{
 
-    /** レース開始前のプレイヤー情報 */
-    private PlayerObject beforePlayerObject;
-
     /** レース中ログアウトしたプレイヤーのプレイヤー情報 */
     private PlayerObject racingPlayerObject;
 
@@ -85,7 +82,7 @@ public class Racer extends PlayerObject{
      */
     public Racer(UUID uuid) {
         super(uuid);
-        init();
+        initializeRacer();
     }
 
     /**
@@ -93,8 +90,7 @@ public class Racer extends PlayerObject{
      * Racerオブジェクトはサーバーがリロードされるまで同一のプレイヤーに対し使い回されるため、<br>
      * メンバ変数を初期化するメソッドが別途用意されている。
      */
-    public void init() {
-        setBeforePlayerObject(null);
+    public void initializeRacer() {
         setRacingPlayerObject(null);
 
         setCircuitName("");
@@ -119,11 +115,6 @@ public class Racer extends PlayerObject{
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return レース開始前のプレイヤー情報 */
-    public PlayerObject getBeforePlayerObject() {
-        return this.beforePlayerObject;
-    }
 
     /** @return レース中ログアウトしたプレイヤーのプレイヤー情報 */
     public PlayerObject getRacingPlayerObject() {
@@ -206,11 +197,6 @@ public class Racer extends PlayerObject{
     }
 
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param beforePlayerObject レース開始前のプレイヤー情報 */
-    public void setBeforePlayerObject(PlayerObject beforePlayerObject) {
-        this.beforePlayerObject = beforePlayerObject;
-    }
 
     /** @param racingPlayerObject レース中ログアウトしたプレイヤーのプレイヤー情報 */
     public void setRacingPlayerObject(PlayerObject racingPlayerObject) {
@@ -328,13 +314,6 @@ public class Racer extends PlayerObject{
         Scoreboards.setPoint(getUUID());
     }
 
-    /** レース開始前のプレイヤーの情報を格納する */
-    public void savePlayerData() {
-        if (getPlayer() != null) {
-            setBeforePlayerObject(new PlayerObject(getUUID()));
-        }
-    }
-
     /** レース中ログアウトしたプレイヤーの情報を格納する */
     public void savePlayerDataOnQuit() {
         if (getPlayer() != null) {
@@ -388,11 +367,7 @@ public class Racer extends PlayerObject{
         RaceManager.clearKartRaceData(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
         ItemEnum.removeAllKeyItems(getPlayer());
-        //TODO
-        getPlayer().getInventory().clear(-1, -1);
-        getBeforePlayerObject().recoveryInventory();
-        getBeforePlayerObject().recoveryExp();
-        getBeforePlayerObject().recoveryLocation();
+        recoveryAll();
     }
 
     /**
