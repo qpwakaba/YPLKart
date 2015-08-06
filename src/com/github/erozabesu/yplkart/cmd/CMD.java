@@ -60,7 +60,7 @@ public class CMD implements CommandExecutor {
                 this.cmd.debug();
             } else {
                 ItemEnum item = null;
-                if ((item = ItemEnum.getItemFromCommandKey(args[0])) != null) {
+                if ((item = ItemEnum.getItemByCommandKey(args[0])) != null) {
                     this.cmd.additem(item.getItem(), item.getCmdPermission());
                 }
             }

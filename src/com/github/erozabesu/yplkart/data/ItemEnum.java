@@ -592,13 +592,28 @@ public enum ItemEnum {
     }
 
     /**
+     * 引数itemStackと一致するEnumItemを返す
+     * @param itemStack 比較するアイテムスタック
+     * @return 引数itemStackと一致するEnumItem
+     */
+    public static ItemEnum getItemByItemStack(ItemStack itemStack) {
+        for (ItemEnum item : values()) {
+            if (item.isSimilar(itemStack)) {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * commandKeyと一致するenum要素名のenumを返す
      * 大文字小文字は考慮しない
      * Tierが-1以下のアイテムは含まれない
      * @param commandKey enum要素名
      * @return ItemType
       */
-    public static ItemEnum getItemFromCommandKey(String commandKey) {
+    public static ItemEnum getItemByCommandKey(String commandKey) {
         for (ItemEnum item : values()) {
             if (-1 < item.getTier()) {
                 String itemName = item.name();
