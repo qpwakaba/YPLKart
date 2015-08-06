@@ -31,25 +31,30 @@ public enum ItemEnum {
     CHECKPOINT_TOOL(
             "check_point_tool",
             Permission.OP_CMD_CIRCUIT,
+            Permission.OP_CMD_CIRCUIT,
             "チェックポイントツール",
             ""),
     ITEMBOX_TOOL(
             "itembox_tool",
+            Permission.OP_CMD_ITEMBOXTOOL,
             Permission.OP_CMD_ITEMBOXTOOL,
             "アイテムボックスツール",
             "アイテムボックスを設置します。"),
     ITEMBOX_TOOL_TIER2(
             "itembox_tool",
             Permission.OP_CMD_ITEMBOXTOOL,
+            Permission.OP_CMD_ITEMBOXTOOL,
             "高級アイテムボックスツール",
             "1段階豪華なアイテムをゲットできるアイテムボックスを設置します。"),
     FAKE_ITEMBOX_TOOL(
             "itembox_tool",
             Permission.OP_CMD_ITEMBOXTOOL,
+            Permission.OP_CMD_ITEMBOXTOOL,
             "にせアイテムボックスツール",
             "にせアイテムボックスを設置します。当たっても復活します。"),
     MENU(
             "menu",
+            null,
             null,
             "メニューを開きます",
             ""),
@@ -57,61 +62,73 @@ public enum ItemEnum {
     STAR(
             "star",
             Permission.USE_STAR,
+            Permission.ITEMCMD_STAR,
             "スーパースター",
             "一定時間無敵になり、ぶつかったプレイヤーがひどい目に遭います。さらにスピードも速くなります。"),
     MUSHROOM(
             "mushroom",
             Permission.USE_MUSHROOM,
+            Permission.ITEMCMD_MUSHROOM,
             "ダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
     POWERFULL_MUSHROOM(
             "powerfull_mushroom",
             Permission.USE_POWERFULLMUSHROOM,
+            Permission.ITEMCMD_POWERFULLMUSHROOM,
             "パワフルダッシュキノコ",
             "一定時間プレイヤーのスピードが上がります。"),
     TURTLE(
             "turtle",
             Permission.USE_TURTLE,
+            Permission.ITEMCMD_TURTLE,
             "ミドリこうら",
             "投げると直進し、当たったプレイヤーを爆破します。"),
     RED_TURTLE(
             "red_turtle",
             Permission.USE_REDTURTLE,
+            Permission.ITEMCMD_REDTURTLE,
             "アカこうら",
             "投げると前方のプレイヤーを追いかけ、当たったプレイヤーを爆破します。"),
     THORNED_TURTLE(
             "thorned_turtle",
             Permission.USE_THORNEDTURTLE,
+            Permission.ITEMCMD_THORNEDTURTLE,
             "トゲゾーこうら",
             "投げると先頭のプレイヤーを追いかけ、当たったプレイヤーを爆破します。先頭のプレイヤーに追いつくまで、他のプレイヤーに当たっても進み続けます。"),
     BANANA(
             "banana",
             Permission.USE_BANANA,
+            Permission.ITEMCMD_BANANA,
             "バナナ",
             "コースに設置でき、接触したプレイヤーを減速させます。"),
     FAKE_ITEMBOX(
             "fake_itembox",
             Permission.USE_FAKEITEMBOX,
+            Permission.ITEMCMD_FAKEITEMBOX,
             "にせアイテムボックス",
             "アイテムボックスにそっくりですが、触れると減速します。"),
     THUNDER(
             "thunder",
             Permission.USE_THUNDER,
+            Permission.ITEMCMD_THUNDER,
             "サンダー",
             "ライバルのプレイヤーが一定時間遅くなります。"),
     TERESA(
             "teresa",
             Permission.USE_TERESA,
+            Permission.ITEMCMD_TERESA,
             "テレサ",
             "一定時間透明になり、ライバルの攻撃を受けなくなります。さらにランダムでライバルからアイテムを奪います。"),
     GESSO(
             "gesso",
             Permission.USE_GESSO,
+            Permission.ITEMCMD_GESSO,
             "ゲッソー",
             "自分より上位のプレイヤーの画面に墨を吐いて画面を見難くします。"),
     KILLER(
             "killer",
             Permission.USE_KILLER,
+            Permission.ITEMCMD_KILLER,
             "キラー",
             "");
 
@@ -121,8 +138,11 @@ public enum ItemEnum {
     /** コンフィグキー */
     private String configKey;
 
-    /** パーミッションノード */
-    private Permission permission;
+    /** アイテム使用パーミッション */
+    private Permission usePermission;
+
+    /** コマンドからのアイテム呼び出しパーミッション */
+    private Permission cmdPermission;
 
     /**
      * アイテム階級
@@ -187,15 +207,17 @@ public enum ItemEnum {
      * enumの静的データを格納する
      * 動的データ（コンフィグ）の読み込みはstatic.reload()メソッドで明示的に行う
      * static.reload()はConfigManager.reload()から実行される
-     * @param permission パーミッションノード
+     * @param usePermission アイテム使用パーミッションノード
+     * @param cmdPermission コマンドからのアイテム呼び出しパーミッションノード
      * @param configKey コンフィグキー
      * @param displayName アイテム名
      * @param lore アイテムロア
      */
-    private ItemEnum(String configKey, Permission permission, String displayName, String lore) {
+    private ItemEnum(String configKey, Permission usePermission, Permission cmdPermission, String displayName, String lore) {
         setCommandKey(name());
         setConfigKey(configKey);
-        setPermission(permission);
+        setUsePermission(usePermission);
+        setCmdPermission(cmdPermission);
         setDisplayName(displayName);
         setLore(lore);
     }
@@ -293,9 +315,14 @@ public enum ItemEnum {
         return configKey;
     }
 
-    /** @return permission パーミッションノード */
-    public Permission getPermission() {
-        return permission;
+    /** @return permission アイテム使用パーミッション */
+    public Permission getUsePermission() {
+        return usePermission;
+    }
+
+    /** @return コマンドからのアイテム呼び出しパーミッション */
+    public Permission getCmdPermission() {
+        return cmdPermission;
     }
 
     /** @return tier アイテム階級 */
@@ -385,9 +412,14 @@ public enum ItemEnum {
         this.configKey = configKey;
     }
 
-    /** @param permission セットするパーミッションノード */
-    public void setPermission(Permission permission) {
-        this.permission = permission;
+    /** @param permission アイテム使用パーミッション */
+    public void setUsePermission(Permission usePermission) {
+        this.usePermission = usePermission;
+    }
+
+    /** @param cmdPermission コマンドからのアイテム呼び出しパーミッション */
+    public void setCmdPermission(Permission cmdPermission) {
+        this.cmdPermission = cmdPermission;
     }
 
     /** @param tier セットするアイテム階級 */
@@ -619,7 +651,7 @@ public enum ItemEnum {
         while (iterator.hasNext()) {
             itemEnum = iterator.next();
 
-            if (!Permission.hasPermission(player, itemEnum.getPermission(), true)) {
+            if (!Permission.hasPermission(player, itemEnum.getUsePermission(), true)) {
                 iterator.remove();
             }
         }

@@ -688,31 +688,35 @@ public class CMDAbstractPlayer extends CMDAbstract {
 
     @Override
     void additem(ItemStack item, Permission permission) {
-        //ka {item}
+        //コマンド引数が不正
         if (item == null && permission == null) {
             SystemMessageEnum.referenceAddItem.sendConvertedMessage(this.getPlayer());
             SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
+
+        //ka {item} : コマンドのターゲットは自分自身
         } else if (getLength() == 1) {
-            if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false))
+            if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false)) {
                 return;
+            }
 
             this.getPlayer().getInventory().addItem(item);
             MessageEnum.cmdItem.sendConvertedMessage(this.getPlayer(), item);
         } else if (getLength() == 2) {
-            //ka {item} 64
+            //ka {item} {amount} : コマンドのターゲットは自分自身
             if (Util.isNumber(getArgs()[1])) {
-                if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false))
+                if (!Permission.hasCMDPermission(this.getPlayer(), permission, false, false)) {
                     return;
+                }
 
                 item.setAmount(Integer.valueOf(getArgs()[1]));
                 this.getPlayer().getInventory().addItem(item);
                 MessageEnum.cmdItem.sendConvertedMessage(this.getPlayer(), item);
+
+            //ka {item} {other player} : コマンドのターゲットは他プレイヤー
             } else {
-                if (permission.isOpPerm()) {
-                    if (!Permission.hasPermission(this.getPlayer(), permission, false))
-                        return;
-                } else if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false))
+                if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false)) {
                     return;
+                }
 
                 //ka {item} all
                 if (getArgs()[1].equalsIgnoreCase("all")) {
@@ -721,7 +725,8 @@ public class CMDAbstractPlayer extends CMDAbstract {
                         MessageEnum.cmdItem.sendConvertedMessage(other, item);
                     }
                     MessageEnum.cmdItemAll.sendConvertedMessage(this.getPlayer(), item);
-                    //ka {item} {player}
+
+                //ka {item} {player}
                 } else {
                     if (!Util.isOnline(getArgs()[1])) {
                         MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
@@ -734,16 +739,19 @@ public class CMDAbstractPlayer extends CMDAbstract {
                     MessageEnum.cmdItemOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, item });
                 }
             }
+
+        //全てコマンドのターゲットは他プレイヤー
         } else if (getLength() == 3) {
-            if (permission.isOpPerm()) {
-                if (!Permission.hasPermission(this.getPlayer(), permission, false))
-                    return;
-            } else if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false))
+            if (!Permission.hasCMDPermission(this.getPlayer(), permission, true, false)) {
                 return;
+            }
+
+            //コマンド引数が不正
             if (!Util.isNumber(getArgs()[2])) {
                 SystemMessageEnum.referenceAddItemOther.sendConvertedMessage(this.getPlayer());
                 return;
             }
+
             item.setAmount(Integer.valueOf(getArgs()[2]));
 
             //ka {item} all 64

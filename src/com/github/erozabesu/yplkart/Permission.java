@@ -241,7 +241,6 @@ public enum Permission {
             if (!permission.getSettingNodeOtherValue())
                 return true;
             if (permission.getPermission().contains("itemcmd")) {
-                System.out.println(permission.getPermItemCMDOther());
                 if (player.hasPermission(permission.getPermItemCMDOther()))
                     return true;
             } else {
