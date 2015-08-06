@@ -532,11 +532,6 @@ public class Racer extends PlayerObject{
 
         p.setMaxHealth(this.character.getMaxHealth());
         p.setWalkSpeed(this.character.getWalkSpeed());
-        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                if (getPlayer() != null)
-                    p.setHealth(character.getMaxHealth());
-            }
-        }, 5L);
+        p.setHealth(this.character.getMaxHealth());
     }
 }

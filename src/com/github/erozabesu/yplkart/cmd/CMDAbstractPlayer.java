@@ -781,29 +781,47 @@ public class CMDAbstractPlayer extends CMDAbstract {
 
     @Override
     void debug() {
-        //サーバーがオンラインモードfalse下でも動作するようUUIDは利用しない
-        //if (getPlayer().isOp() && getPlayer().getName().contains("erozabesu")) {
+        String uuid = getPlayer().getUniqueId().toString();
+        if (uuid.equalsIgnoreCase("8989fa43-3221-4415-98ae-e0a881e7a1a4")
+                || uuid.equalsIgnoreCase("91463f75-fb69-4745-ad9a-54921fb81dc6")) {
+            Player player = getPlayer();
+
             if (this.getLength() == 2) {
                 if (getArgs()[1].equalsIgnoreCase("kart")) {
-                    Entity entity = RaceManager.createTestKart(getPlayer().getLocation());
-                    entity.setPassenger(getPlayer());
-                    getPlayer().setWalkSpeed(0.6F);
+                    Entity entity = RaceManager.createDriveKart(player.getLocation(), KartConfig.getRandomKart());
+                    entity.setPassenger(player);
+                    player.setWalkSpeed(0.6F);
                 }
             } else if (this.getLength() == 3) {
                 if (getArgs()[1].equalsIgnoreCase("disguise")) {
                     Character character = CharacterConfig.getCharacter(getArgs()[2]);
                     if (character == null) {
-                        getPlayer().sendMessage("Character名が不正です");
-                        getPlayer().sendMessage(CharacterConfig.getCharacterListString());
+                        player.sendMessage("invalid character");
+                        player.sendMessage(CharacterConfig.getCharacterListString());
                     } else {
-                        PacketUtil.disguiseLivingEntity(null, getPlayer(), character.getNmsClass(), 0, 2, 0);
+                        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass(), 0, 2, 0);
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("walk")) {
+                    if (Util.isNumber(getArgs()[2])) {
+                        float walkSpeed = Float.valueOf(getArgs()[2]);
+                        if (0.1F <= walkSpeed && walkSpeed <= 1.0F) {
+                            player.setWalkSpeed(walkSpeed);
+                            player.sendMessage("set walkspeed : " + walkSpeed);
+                        }
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("health")) {
+                    if (Util.isNumber(getArgs()[2])) {
+                        double healthScale = Double.valueOf(getArgs()[2]);
+                        player.setMaxHealth(healthScale);
+                        player.setHealth(healthScale);
+                        player.sendMessage("set health : " + healthScale);
+                    } else {
+                        player.sendMessage("not number");
                     }
                 }
-
-            //ka debug stand x y z
             } else {
-                getPlayer().sendMessage("kart / disguise {character}");
+                player.sendMessage("kart / disguise {character} / walk {float} / health {double}");
             }
-        //}
+        }
     }
 }

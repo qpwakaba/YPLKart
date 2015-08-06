@@ -191,8 +191,8 @@ public class CustomArmorStand extends EntityArmorStand {
         setYaw(this, location.getYaw());
         if (getKartType().equals(KartType.DisplayKart)) {
             setPosition(location.getX(), location.getY(), location.getZ());
-            setPitch(this, -location.getPitch());
-            setYawPitch(getYaw(this), -getPitch(this));
+            setPitch(this, location.getPitch());
+            setYawPitch(getYaw(this), getPitch(this));
             setGravity(false);
         } else {
             setPosition(location.getX(), location.getY() + 1, location.getZ());

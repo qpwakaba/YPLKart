@@ -13,8 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.github.erozabesu.yplkart.YPLKart;
-
 /**
  * プレイヤーの基本情報を格納するクラス
  * @author erozabesu
@@ -263,15 +261,9 @@ public class PlayerObject {
         }
 
         player.setMaxHealth(getMaxHealth());
+        player.setHealth(getHealth());
         player.setFoodLevel(getHunger());
         player.setWalkSpeed(getWalkSpeed());
-
-        //最大体力の変更は1チック以上遅延するため、体力の変更も遅延させる必要がある
-        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                player.setHealth(getHealth());
-            }
-        }, 5L);
     }
 
     /** 経験値を復元する */
@@ -344,6 +336,7 @@ public class PlayerObject {
         player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+        player.setMaxHealth(20.0D);
         player.setHealth(player.getMaxHealth());
         player.setLevel(0);
         player.setExp(0);

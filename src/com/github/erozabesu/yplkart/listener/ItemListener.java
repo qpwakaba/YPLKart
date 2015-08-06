@@ -148,17 +148,17 @@ public class ItemListener extends RaceManager implements Listener {
                 endercrystal.setCustomNameVisible(true);
                 b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
             }
+
+        //メニュー
+        } else if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
+            showSelectMenu(player, true);
         }
 
         //レース中のみ利用できるアイテム群
         if (isRacing(uuid)) {
 
-            //メニュー
-            if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
-                showSelectMenu(player, true);
-
             //ダッシュきのこ
-            } else if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
+            if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
                 Util.setItemDecrease(player);
                 setPositiveItemSpeed(player, ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
 

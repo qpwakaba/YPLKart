@@ -675,6 +675,14 @@ public class RaceManager {
         return entity;
     }
 
+    public static Entity createDriveKart(Location location, Kart kart) {
+        Entity entity = createCustomKart(location, kart, KartType.DriveKart);
+
+        entity.setCustomName(kart.getKartName());
+
+        return entity;
+    }
+
     /**
      * カスタムMinecartEntityを生成する
      * @param location 生成する座標
@@ -711,43 +719,6 @@ public class RaceManager {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return entity;
-    }
-
-    public static Entity createTestKart(Location location) {
-        Entity entity = null;
-        try {
-            Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
-            Class<?> customClass = ReflectionUtil.getYPLKartClass("CustomArmorStand");
-            Object customKart = customClass.getConstructor(
-                    ReflectionUtil.getNMSClass("World"), Kart.class, KartType.class, Location.class)
-                    .newInstance(craftWorld, KartConfig.getRandomKart(), KartType.RacingKart, location);
-
-            entity = (Entity) customKart.getClass().getMethod("getBukkitEntity").invoke(customKart);
-
-            craftWorld.getClass().getMethod("addEntity", ReflectionUtil.getNMSClass("Entity"))
-                    .invoke(craftWorld, customKart);
-
-            entity.setCustomNameVisible(false);
-            entity.setCustomName("Test_Minecart");
-            entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
-                    YPLKart.getInstance(), new Object[]{KartType.RacingKart, customKart}));
-
-            putKartEntityIdMap(entity);
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         return entity;
