@@ -429,7 +429,8 @@ public class Util extends ReflectionUtil {
 
                 //体力がダメージを上回っている
                 if (damage < player.getHealth()) {
-                    player.setHealth(player.getHealth() - damage);
+                    double newHealth = player.getHealth() -  damage;
+                    player.setHealth(newHealth);
 
                 //ダメージが体力を上回っている
                 } else {
