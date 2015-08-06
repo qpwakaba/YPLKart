@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,6 +17,7 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
@@ -297,29 +299,6 @@ public class Racer extends PlayerObject{
         this.isStepDashBoard = isStepDashBoard;
     }
 
-    //〓 Get/Set 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * 通過済みのチェックポイントリストに値を追加し、スコアボードを更新する。<br>
-     * 追加する値は、this.currentLaps + チェックポイントエンティティのUUID<br>
-     * のフォーマットのStringを与えること。
-     * @param value 追加するチェックポイント
-     */
-    public void addPassedCheckPoint(String value) {
-        if (getPassedCheckPointList().contains(value)) {
-            return;
-        }
-        getPassedCheckPointList().add(value);
-        Scoreboards.setPoint(getUUID());
-    }
-
-    /** レース中ログアウトしたプレイヤーの情報を格納する */
-    public void savePlayerDataOnQuit() {
-        if (getPlayer() != null) {
-            setRacingPlayerObject(new PlayerObject(getUUID()));
-        }
-    }
-
     //〓 Race Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** レースの終了処理を行う */
@@ -395,7 +374,29 @@ public class Racer extends PlayerObject{
         }
     }
 
-    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    /**
+     * 通過済みのチェックポイントリストに値を追加し、スコアボードを更新する。<br>
+     * 追加する値は、this.currentLaps + チェックポイントエンティティのUUID<br>
+     * のフォーマットのStringを与えること。
+     * @param value 追加するチェックポイント
+     */
+    public void addPassedCheckPoint(String value) {
+        if (getPassedCheckPointList().contains(value)) {
+            return;
+        }
+        getPassedCheckPointList().add(value);
+        Scoreboards.setPoint(getUUID());
+    }
+
+    /** レース中ログアウトしたプレイヤーの情報を格納する */
+    public void savePlayerDataOnQuit() {
+        if (getPlayer() != null) {
+            setRacingPlayerObject(new PlayerObject(getUUID()));
+        }
+    }
+
+
+    //〓 Task 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * キラー使用者のカートエンティティをキラー用に初期化し、<br>
@@ -442,6 +443,50 @@ public class Racer extends PlayerObject{
             }
         }, effectSecond);
     }
+
+    /**
+     * プレイヤーにデスペナルティのフィジカルパラメータを適用し、諸々の演出を再生する。<br>
+     * 同時に一定時間後にフィジカルを本来の数値に戻すタスクを起動する。
+     */
+    public void applyDeathPenalty() {
+        final Player player = this.getPlayer();
+        final Character character = this.getCharacter();
+
+        //プレイヤーのフィジカルにデスペナルティを適用
+        player.setWalkSpeed(character.getPenaltyWalkSpeed());
+        player.setNoDamageTicks(character.getPenaltyAntiReskillSecond() * 20);
+
+        //演出
+        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
+
+        //FOVの初期化用
+        player.setSprinting(true);
+
+        //デスペナルティの効果を初期化するタスクを起動
+        this.setDeathPenaltyTask(
+                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+
+                        //フィジカルを本来の数値に戻す
+                        player.setWalkSpeed(character.getWalkSpeed());
+
+                        //演出
+                        player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+
+                        //FOVの初期化用
+                        player.setSprinting(true);
+                    }
+                }, character.getPenaltySecond() * 20)
+                );
+
+        //デスペナルティ用タイトルメッセージを点滅表示
+        this.setDeathPenaltyTitleSendTask(
+                new SendBlinkingTitleTask(player, character.getPenaltySecond(),
+                        MessageEnum.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
+                );
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * カートエンティティをRacerオブジェクトに格納されている選択カート情報を元にリスポーンさせ、<br>

@@ -41,7 +41,6 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -304,45 +303,13 @@ public class DataListener implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
             public void run() {
 
-                //FOVの初期化用
-                player.setSprinting(true);
-
-                //演出
-                player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-
-                //プレイヤーのフィジカルにデスペナルティを適用
-                player.setWalkSpeed(racer.getCharacter().getPenaltyWalkSpeed());
-                player.setNoDamageTicks(racer.getCharacter().getPenaltyAntiReskillSecond() * 20);
+                //プレイヤーにデスペナルティを適用
+                racer.applyDeathPenalty();
 
                 //生前カートに搭乗していた場合はカートエンティティを再生成し搭乗する
                 racer.recoveryKart();
-
-                //デスペナルティ用タイトルメッセージを点滅表示
-                racer.setDeathPenaltyTitleSendTask(
-                        new SendBlinkingTitleTask(player, racer.getCharacter().getPenaltySecond(),
-                                MessageEnum.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
-                        );
             }
         });
-
-        //デスペナルティの効果時間が終了した場合、プレイヤーのフィジカルを本来の数値に戻す
-        racer.setDeathPenaltyTask(
-                Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
-                    public void run() {
-                        //フィジカルを本来の数値に戻す
-                        player.setWalkSpeed(racer.getCharacter().getWalkSpeed());
-
-                        //演出
-                        player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-
-                        //FOVの初期化用
-                        player.setSprinting(true);
-
-                        //変数の初期化
-                        racer.setDeathPenaltyTask(null);
-                    }
-                }, racer.getCharacter().getPenaltySecond() * 20 + 3)
-                );
 
         //最後に通過したチェックポイントの座標にリスポーンする
         if (racer.getLastPassedCheckPointEntity() != null) {

@@ -9,8 +9,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.Util;
 

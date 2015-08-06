@@ -30,9 +30,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.task.FlowerShowerTask;
-import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 
 public class Util extends ReflectionUtil {
 
@@ -397,51 +395,71 @@ public class Util extends ReflectionUtil {
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /**
+     * 引数damagedに引数damageの値だけダメージを与える。<br>
+     * 引数damagedがプレイヤー、かつレース中の場合、デスポーンしないよう仮想的に死亡状態を演出する。
+     * @param damaged ダメージを受けたエンティティ
+     * @param executor ダメージを与えたエンティティ、もしくはnull
+     * @param damage ダメージ値
+     */
     public static void addDamage(Entity damaged, Entity executor, int damage) {
-        if (!(damaged instanceof LivingEntity))
+        //非生物エンティティは除外
+        if (!(damaged instanceof LivingEntity)) {
             return;
-        if (damaged instanceof Player) {
-            final Player p = (Player) damaged;
-            if (0 < p.getNoDamageTicks())
-                return;
-            if (!RaceManager.isRacing(p.getUniqueId()))
-                return;
+        }
 
-            p.playEffect(EntityEffect.HURT);
+        LivingEntity damagedLiving = ((LivingEntity) damaged);
 
-            if (1 <= p.getHealth() - damage) {
-                p.setHealth(p.getHealth() - damage);
+        //無敵状態の場合は除外
+        if (0 < damagedLiving.getNoDamageTicks()) {
+            return;
+        }
+
+        //被ダメージエンティティがプレイヤーの場合
+        if (damagedLiving instanceof Player) {
+            Player player = (Player) damagedLiving;
+
+            //レース中でない場合は通常通りのダメージ処理
+            if (!RaceManager.isRacing(player.getUniqueId())) {
+                player.damage(damage, executor);
+
+            //レース中の場合、デスポーンしないよう仮想的に死亡した演出を行う
             } else {
-                Circuit c = RaceManager.getCircuit(p.getUniqueId());
-                p.setHealth(p.getMaxHealth());
-                if (executor != null)
-                    c.sendMessageEntryPlayer(MessageEnum.racePlayerKill, new Object[] { c,
-                            new Player[] { (Player) damaged, (Player) executor } });
-                else
-                    c.sendMessageEntryPlayer(MessageEnum.racePlayerDead
-                            , new Object[] { c, (Player) damaged });
+                player.playEffect(EntityEffect.HURT);
 
-                final Racer r = RaceManager.getRacer(p);
+                //体力がダメージを上回っている
+                if (damage < player.getHealth()) {
+                    player.setHealth(player.getHealth() - damage);
 
-                p.setWalkSpeed(r.getCharacter().getPenaltyWalkSpeed());
-                p.setNoDamageTicks(r.getCharacter().getPenaltyAntiReskillSecond() * 20);
-                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 0.5F);
-                r.setDeathPenaltyTask(
-                        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                            public void run() {
-                                p.setWalkSpeed(r.getCharacter().getWalkSpeed());
-                                p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-                                p.setSprinting(true);
-                            }
-                        }, r.getCharacter().getPenaltySecond() * 20)
-                        );
-                r.setDeathPenaltyTitleSendTask(
-                        new SendBlinkingTitleTask((Player) damaged, r.getCharacter().getPenaltySecond(),
-                                MessageEnum.titleDeathPanalty.getMessage()).runTaskTimer(YPLKart.getInstance(), 0, 1)
-                        );
+                //ダメージが体力を上回っている
+                } else {
+                    Circuit circuit = RaceManager.getCircuit(player.getUniqueId());
+
+                    //体力を最大値まで回復
+                    player.setHealth(player.getMaxHealth());
+
+                    //攻撃実行者が明確な場合、レース参加者に他殺のデスログを送信
+                    if (executor != null) {
+                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerKill, new Object[] { circuit,
+                                new Player[] { (Player) damaged, (Player) executor } });
+
+                    //攻撃実行者が不明の場合、レース参加者に死亡したことのみを伝えるデスログを送信
+                    } else {
+                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerDead
+                                , new Object[] { circuit, (Player) damaged });
+                    }
+
+                    //プレイヤーにデスペナルティを適用
+                    RaceManager.getRacer(player).applyDeathPenalty();
+                }
+
+                //連続してダメージを受けないようプレイヤーを少しの間無敵にする
+                player.setNoDamageTicks(5);
             }
+
+        //被ダメージエンティティがプレイヤー以外の場合
         } else {
-            ((LivingEntity) damaged).damage(damage, executor);
+            damagedLiving.damage(damage, executor);
         }
     }
 
