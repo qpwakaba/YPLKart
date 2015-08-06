@@ -141,6 +141,12 @@ public class Circuit {
         this.racestarttask = null;
     }
 
+    /**
+     * 開催されているレースを終了する。<br>
+     * 参加しているプレイヤーの情報はレース開始前の情報に復元される。<br>
+     * リザーブエントリーがある場合、リザーブエントリーを通常のエントリーに昇格し、<br>
+     * 新たにマッチングを開始する。
+     */
     public void endRace() {
         sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { circuit });
         Iterator<UUID> i = entry.iterator();
@@ -152,19 +158,22 @@ public class Circuit {
         }
 
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
-        final List<UUID> nextentry = new ArrayList<UUID>(reserveentry);
-        if (0 < nextentry.size()) {
-            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                public void run() {
-                    Circuit c = RaceManager.setupCircuit(name);
-                    for (UUID id : nextentry) {
-                        if (Bukkit.getPlayer(id) != null) {
-                            RaceManager.setEntryRaceData(id, name);
-                            c.entryPlayer(id);
+        //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
+        if (!YPLKart.getInstance().isEnabled()) {
+            final List<UUID> nextentry = new ArrayList<UUID>(reserveentry);
+            if (0 < nextentry.size()) {
+                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                    public void run() {
+                        Circuit c = RaceManager.setupCircuit(name);
+                        for (UUID id : nextentry) {
+                            if (Bukkit.getPlayer(id) != null) {
+                                RaceManager.setEntryRaceData(id, name);
+                                c.entryPlayer(id);
+                            }
                         }
                     }
-                }
-            }, 10);
+                }, 10);
+            }
         }
 
         //初期化

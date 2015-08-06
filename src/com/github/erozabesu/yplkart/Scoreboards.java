@@ -78,13 +78,17 @@ public class Scoreboards {
     }
 
     public static void endCircuit(String name) {
-        if (scoreboard.get(name) == null)
+        if (scoreboard.get(name) == null) {
             return;
+        }
 
         Scoreboard sb = scoreboard.get(name);
         Objective obj = sb.getObjective(DisplaySlot.SIDEBAR);
-        if (obj.getDisplayName().equalsIgnoreCase("ランキング"))
-            obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
+        if (obj != null) {
+            if (obj.getDisplayName().equalsIgnoreCase("ランキング")) {
+                obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
+            }
+        }
     }
 
     public static void entryCircuit(UUID id) {
