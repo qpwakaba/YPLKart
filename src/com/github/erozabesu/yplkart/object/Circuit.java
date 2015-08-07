@@ -476,6 +476,8 @@ public class Circuit {
                         if (RaceManager.getRacer(p).getCharacter() == null) {
                             RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
+
+                        //TODO: issue #79
                         if (RaceManager.getRacer(p).getKart() == null
                                 && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
                             RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
