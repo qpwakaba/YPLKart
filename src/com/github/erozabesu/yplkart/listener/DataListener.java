@@ -87,21 +87,29 @@ public class DataListener implements Listener {
         }
     }
 
-    //スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
+    /**
+     * スタンバイ状態～レースが開始されるまでの間、水平方向への移動を禁止する
+     * @param event
+     */
     @EventHandler
-    public void cancelMove(PlayerMoveEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
+    public void cancelMove(PlayerMoveEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
-        if (RaceManager.isStandBy(e.getPlayer().getUniqueId())
-                && !RaceManager.isRacing(e.getPlayer().getUniqueId())) {
-            if (!e.getFrom().equals(e.getTo())) {
-                Location from = e.getFrom();
-                Location to = e.getTo();
+        }
 
-                if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        if (RaceManager.isStandBy(uuid) && !RaceManager.isRacing(uuid)) {
+            if (!event.getFrom().equals(event.getTo())) {
+                Location from = event.getFrom();
+                Location to = event.getTo();
+
+                if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
                     return;
-                e.getPlayer().teleport(Util.adjustBlockLocation(from).add(0, 1, 0));
-                e.setCancelled(true);
+                }
+                player.teleport(Util.adjustBlockLocation(from).add(0, 1, 0));
+                event.setCancelled(true);
             }
         }
     }

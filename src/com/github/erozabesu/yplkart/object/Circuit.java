@@ -552,8 +552,6 @@ public class Circuit {
                         sendMessageEntryPlayer(MessageEnum.raceTimeUp, new Object[] { getInstance() });
                     } else if (remainTime < 0) {
                         endRace();
-                        getLimitTimeTask().cancel();
-                        setLimitTimeTask(null);
                     }
                 }
             }
@@ -569,9 +567,6 @@ public class Circuit {
         this.setDetectEndTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 if (isRaceEnd()) {
-                    getDetectEndTask().cancel();
-                    setDetectEndTask(null);
-
                     endRace();
                 }
             }

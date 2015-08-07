@@ -512,37 +512,43 @@ public class RaceManager {
 
     // 〓 Util Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /*
-     * レースに参加申請し、開始されるまで待機している状態です
-     * 行動の制限等は掛かりません
+    /**
+     * @param uuid チェックするレース参加プレイヤーのUUID
+     * @return レースに参加申請し、規定人数が揃うまで待機している状態かどうか
      */
-    public static Boolean isEntry(UUID id) {
-        if (getRace(id).getCircuitName() != "")
+    public static Boolean isEntry(UUID uuid) {
+        if (getRace(uuid).getCircuitName() != "")
             return true;
         return false;
     }
 
-    /*
-     * 申請していたレースが規定人数を満たし参加者が召集された状態です
-     * まだレースは開始されていません
-     * レースの終了までインベントリの操作等が出来ない代わりに
-     * 専用のアイテムが利用でき、キャラクター選択やレース専用カートへの搭乗が可能となります
+    /**
+     * 申請していたレースが規定人数を満たし参加者が召集された状態かどうか<br>
+     * メニュー選択をしている状態
+     * @param uuid チェックするレース参加プレイヤーのUUID
+     * @return 申請していたレースが規定人数を満たし参加者が召集された状態かどうか
      */
-    public static Boolean isStandBy(UUID id) {
-        if (isEntry(id))
-            if (getRace(id).isStandby())
+    public static Boolean isStandBy(UUID uuid) {
+        if (isEntry(uuid)) {
+            if (getRace(uuid).isStandby()) {
                 return true;
+            }
+        }
         return false;
     }
 
-    /*
-     * 申請していたレースが開始された状態です
+    /**
+     * @param uuid チェックするレース参加プレイヤーのUUID
+     * @return 申請していたレースのメニュー選択が終了し、スタートした状態かどうか
      */
-    public static Boolean isRacing(UUID id) {
-        if (isEntry(id))
-            if (isStandBy(id))
-                if (getCircuit(id).isStarted())
+    public static Boolean isRacing(UUID uuid) {
+        if (isEntry(uuid)) {
+            if (isStandBy(uuid)) {
+                if (getCircuit(uuid).isStarted()) {
                     return true;
+                }
+            }
+        }
         return false;
     }
 
