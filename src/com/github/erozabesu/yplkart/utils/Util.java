@@ -296,7 +296,7 @@ public class Util extends ReflectionUtil {
      */
     public static Entity getBukkitEntityFromNmsEntity(Object nmsEntity) {
         try {
-            return (Entity) nmsEntity.getClass().getMethod("getBukkitEntity").invoke(nmsEntity);
+            return (Entity) ReflectionUtil.nmsEntity_getBukkitEntity.invoke(nmsEntity);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -305,9 +305,8 @@ public class Util extends ReflectionUtil {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
+
         return null;
     }
 

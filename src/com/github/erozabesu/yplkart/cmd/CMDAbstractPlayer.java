@@ -807,7 +807,11 @@ public class CMDAbstractPlayer extends CMDAbstract {
                         if (0.1F <= walkSpeed && walkSpeed <= 1.0F) {
                             player.setWalkSpeed(walkSpeed);
                             player.sendMessage("set walkspeed : " + walkSpeed);
+                        } else {
+                            player.sendMessage("illeagal number. over speed");
                         }
+                    } else {
+                        player.sendMessage("not number");
                     }
                 } else if (getArgs()[1].equalsIgnoreCase("health")) {
                     if (Util.isNumber(getArgs()[2])) {

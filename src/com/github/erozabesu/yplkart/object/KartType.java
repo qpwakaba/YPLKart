@@ -1,7 +1,7 @@
 package com.github.erozabesu.yplkart.object;
 
 /**
- * RaceManager.isxxxxKart()メソッドで利用する
+ * カートの種類
  * @author erozabesu
  */
 public enum KartType {

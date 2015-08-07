@@ -133,7 +133,7 @@ public class RaceManager {
 
     public static void clearCircuitData(String circuitname) {
         if (circuit.get(circuitname) != null) {
-            circuit.get(circuitname).init();
+            circuit.get(circuitname).initialize();
             circuit.remove(circuitname);
         }
     }
@@ -269,29 +269,29 @@ public class RaceManager {
         MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getCircuitName()) });
     }
 
-    public static void clearEntryRaceData(UUID id) {
-        if (isEntry(id)) {
-            Scoreboards.exitCircuit(id);
+    public static void clearEntryRaceData(UUID uuid) {
+        if (isEntry(uuid)) {
+            Scoreboards.exitCircuit(uuid);
 
-            Racer r = getRace(id);
-            Circuit c = getCircuit(id);
-            c.exitPlayer(id);
+            Racer racer = getRace(uuid);
+            Circuit circuit = getCircuit(uuid);
+            circuit.exitPlayer(uuid);
 
-            Player p = Bukkit.getPlayer(id);
-            if (p != null) {
-                if (!r.isGoal()) {
-                    clearCharacterRaceData(id);
-                    clearKartRaceData(id);
-                    leaveRacingKart(p);
-                    if (isStandBy(id)) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                if (!racer.isGoal()) {
+                    clearCharacterRaceData(uuid);
+                    clearKartRaceData(uuid);
+                    leaveRacingKart(player);
+                    if (isStandBy(uuid)) {
                         //全パラメータを復元する
-                        r.recoveryAll();
+                        racer.recoveryAll();
                     }
                 }
-                MessageEnum.raceExit.sendConvertedMessage(id, c);
+                MessageEnum.raceExit.sendConvertedMessage(uuid, circuit);
             }
 
-            r.initializeRacer();
+            racer.initializeRacer();
         }
     }
 

@@ -432,7 +432,7 @@ public enum MessageEnum {
             }
         } else if (object instanceof Circuit) {
             basemessage = basemessage.replace("<circuitname>",
-                    Util.convertInitialUpperString(((Circuit) object).getName()));
+                    Util.convertInitialUpperString(((Circuit) object).getCircuitName()));
         } else if (object instanceof Character) {
             basemessage = basemessage.replace("<character>", ((Character) object).getCharacterName());
         } else if (object instanceof Kart) {

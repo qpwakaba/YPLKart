@@ -3,7 +3,7 @@ package com.github.erozabesu.yplkart.object;
 import java.util.UUID;
 
 /**
- * ラップタイムを格納するための雛形クラス
+ * ラップタイムを格納するオブジェクトクラス
  * @author erozabesu
  */
 public class LapTime implements Comparable {
@@ -21,7 +21,6 @@ public class LapTime implements Comparable {
 
     /**
      * コンストラクタ
-     * 雛形クラスなのでデータの格納を全てここで行う
      * @param numberOfLaps 周回数
      * @param uuid UUID
      * @param lapTime ラップタイム

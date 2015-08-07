@@ -26,130 +26,132 @@ import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * レースを開催する仮想サーキットオブジェクトクラス
+ * @author erozabesu
+ */
 public class Circuit {
-    private final Circuit circuit = this;
-    private String name;
-    private int laptime;
-    private int limittime;
-    private int matchingcountdown;
-    private int matchingcountdownfortitle;
-    private int racestartcountdown;
-    private boolean isstarted;
-    private boolean ismatching;
-    private BukkitTask countuptask;
-    private BukkitTask detectend;
-    private BukkitTask detectreadytask;
-    private BukkitTask matchingtask;
-    private BukkitTask matchingtitlesendertask;
-    private BukkitTask racestarttask;
-    private List<UUID> entry;
-    private List<UUID> reserveentry;
-    private List<UUID> matchingaccept;
-    private List<Entity> jammerentity;
 
-    /*
-     * マッチングの仕様
-     * 規定の参加人数を満たす
-     * 		レディタスクをキャンセルし、制限時間付きのマッチングタスクを起動
-     * 			コマンドから同意を得られたプレイヤーをリストアップ
-     * 			同意を得られなかったプレイヤー、制限時間内に返答がなかったプレイヤーはエントリーを取り消す
-     * 			最終的な参加人数が規定人数を満たしていればレースを開始する
-     * 			満たしていなければ最後に残ったエントリープレイヤーを引き継ぎ新規にレディタスクを起動し最初に戻る
-     *
-     * 			制限時間内に新規にエントリーしたプレイヤーがいた場合もマッチングタスクの範疇として扱う
-     * 			この場合は既に同意を得たものとし、制限時間が0になるまで待機してもらう
-     * 			制限時間を加算し、同じく同意を得る形にした場合、いたずら目的でエントリーを繰り返す
-     * 			プレイヤーが出る可能性があるためこの仕様に落ち着いた
+    /** サーキット名 */
+    private String circuitName;
+
+    /** サーキットに設置された妨害アイテムエンティティリスト */
+    private List<Entity> jammerEntityList;
+
+    /** エントリーしているプレイヤーのUUIDリスト */
+    private List<UUID> entryPlayerList;
+
+    /**
+     * リザーブエントリーしているプレイヤーのUUIDリスト<br>
+     * リザーブエントリーは、現在のエントリー人数が最大人数を上回っている、<br>
+     * もしくは既にレースがスタートしている場合に利用する、次回開催するレースに繰り越すエントリーリスト
      */
-    public Circuit(final String name) {
-        this.name = name;
-        this.limittime = CircuitConfig.getCircuitData(name).getLimitTime();
-        init();
+    private List<UUID> reserveEntryPlayerList;
 
-        runCountUpTask();
-        runDetectEndTask();
-        runDetectReadyTask();
+    /** レース参加の招待を承認したプレイヤーのUUIDリスト */
+    private List<UUID> matchingAcceptPlayerList;
+
+    /**
+     * 参加人数が最小人数を満たしているかを検知するタスク<br>
+     * 検知した場合タスクを停止し、matchingTaskを起動する
+     */
+    private BukkitTask detectReadyTask;
+
+    /** 参加者にレース参加の確認を行うタスク */
+    private BukkitTask matchingTask;
+
+    /** マッチングタスクの制限時間 */
+    private int matchingCountDownTime;
+
+    /** マッチングタスクが起動されているかどうか */
+    private boolean isMatching;
+
+    /** 参加者にキャラクター選択、カート選択をさせるタスク */
+    private BukkitTask standbyTask;
+
+    /** スタンバイタスクの制限時間 */
+    private int standbyCountDownTime;
+
+    /** レースの経過時間に応じ自動終了させるタスク */
+    private BukkitTask limitTimeTask;
+
+    /** レースが開始されてからの経過時間 */
+    private int currentTime;
+
+    /** 現在のエントリー人数、ゴール人数からレース終了を検知するタスク */
+    private BukkitTask detectEndTask;
+
+    /** レースが開始されているかどうか */
+    private boolean isStarted;
+
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public Circuit(String circuitName) {
+        this.setCircuitName(circuitName);
+        this.initialize();
+
+        this.runDetectReadyTask();
     }
 
-    private void setupRacer() {
-        List<Location> position = CircuitConfig.getCircuitData(name).getStartLocationList();
-        int count = 0;
+    public void initialize() {
+        this.setCurrentTime(0);
+        this.setMatchingCountDownTime(0);
+        this.setStandbyCountDownTime(0);
+        this.setStarted(false);
+        this.setMatching(false);
+        this.setEntryPlayerList(new ArrayList<UUID>());
+        this.setReserveEntryPlayerList(new ArrayList<UUID>());
+        this.setMatchingAcceptPlayerList(new ArrayList<UUID>());
+        this.setJammerEntityList(new ArrayList<Entity>());
 
-        for (UUID uuid : entry) {
-            if (Bukkit.getPlayer(uuid) != null) {
-                if (Bukkit.getPlayer(uuid).isOnline()) {
-                    Player player = Bukkit.getPlayer(uuid);
-                    Racer race = RaceManager.getRacer(player);
+        if (this.getDetectEndTask() != null)
+            getDetectEndTask().cancel();
+        this.setDetectEndTask(null);
 
-                    Scoreboards.entryCircuit(uuid);
-                    race.applyRaceParameter();
-                    race.setCircuitName(name);
-                    race.setStandby(true);
-                    RaceManager.clearCharacterRaceData(uuid);
-                    RaceManager.clearKartRaceData(uuid);
-                    RaceManager.leaveRacingKart(player);
+        if (this.getLimitTimeTask() != null)
+            this.getLimitTimeTask().cancel();
+        this.setLimitTimeTask(null);
 
-                    player.leaveVehicle();
-                    player.teleport(position.get(count));
-                    RaceManager.showSelectMenu(player, true);
-                    ItemEnum.addItem(player, ItemEnum.MENU.getItem());
+        if (this.getDetectReadyTask() != null)
+            this.getDetectReadyTask().cancel();
+        this.setDetectReadyTask(null);
 
-                    count++;
-                    continue;
-                }
-            }
-            exitPlayer(uuid);
+        if (this.getMatchingTask() != null)
+            this.getMatchingTask().cancel();
+        this.setMatchingTask(null);
+
+        if (this.getStandbyTask() != null)
+            this.getStandbyTask().cancel();
+        this.setStandbyTask(null);
+    }
+
+    //〓 Race Management 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * レースを開始する<br>
+     * 各タスクを起動し、演出を再生する
+     */
+    public void startRace() {
+        setStarted(true);
+        runLimitTimeCountDownTask();
+        runDetectEndTask();
+        for (Player p : getEntryPlayer()) {
+            Util.createSignalFireworks(p.getLocation());
+            Util.createFlowerShower(p, 5);
+            new SendExpandedTitleTask(p, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(
+                    YPLKart.getInstance(), 0, 1);
         }
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public void init() {
-        this.laptime = 0;
-        this.matchingcountdown = 0;
-        this.matchingcountdownfortitle = 0;
-        this.racestartcountdown = 0;
-        this.isstarted = false;
-        this.ismatching = false;
-        this.entry = new ArrayList<UUID>();
-        this.reserveentry = new ArrayList<UUID>();
-        this.matchingaccept = new ArrayList<UUID>();
-        this.jammerentity = new ArrayList<Entity>();
-
-        if (this.detectend != null)
-            detectend.cancel();
-        this.detectend = null;
-
-        if (this.countuptask != null)
-            this.countuptask.cancel();
-        this.countuptask = null;
-
-        if (this.detectreadytask != null)
-            this.detectreadytask.cancel();
-        this.detectreadytask = null;
-
-        if (this.matchingtask != null)
-            this.matchingtask.cancel();
-        this.matchingtask = null;
-
-        if (this.matchingtitlesendertask != null)
-            this.matchingtitlesendertask.cancel();
-        this.matchingtitlesendertask = null;
-
-        if (this.racestarttask != null)
-            this.racestarttask.cancel();
-        this.racestarttask = null;
-    }
-
     /**
-     * 開催されているレースを終了する。<br>
-     * 参加しているプレイヤーの情報はレース開始前の情報に復元される。<br>
+     * 開催されているレースを終了する<br>
+     * 参加しているプレイヤーの情報はレース開始前の情報に復元される<br>
      * リザーブエントリーがある場合、リザーブエントリーを通常のエントリーに昇格し、<br>
-     * 新たにマッチングを開始する。
+     * 新たにマッチングを開始する
      */
     public void endRace() {
-        sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { circuit });
-        Iterator<UUID> i = entry.iterator();
+        sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { getInstance() });
+        Iterator<UUID> i = getEntryPlayerList().iterator();
         UUID id;
         while (i.hasNext()) {
             id = i.next();
@@ -160,14 +162,14 @@ public class Circuit {
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
         //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
         if (!YPLKart.getInstance().isEnabled()) {
-            final List<UUID> nextentry = new ArrayList<UUID>(reserveentry);
+            final List<UUID> nextentry = new ArrayList<UUID>(getReserveEntryPlayerList());
             if (0 < nextentry.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        Circuit c = RaceManager.setupCircuit(name);
+                        Circuit c = RaceManager.setupCircuit(getCircuitName());
                         for (UUID id : nextentry) {
                             if (Bukkit.getPlayer(id) != null) {
-                                RaceManager.setEntryRaceData(id, name);
+                                RaceManager.setEntryRaceData(id, getCircuitName());
                                 c.entryPlayer(id);
                             }
                         }
@@ -178,273 +180,275 @@ public class Circuit {
 
         //初期化
         removeAllJammerEntity();
-        init();
-        RaceManager.clearCircuitData(name);
-        Scoreboards.endCircuit(name);
+        initialize();
+        RaceManager.clearCircuitData(getCircuitName());
+        Scoreboards.endCircuit(getCircuitName());
     }
 
-    public void entryPlayer(UUID id) {
-        if (!this.entry.contains(id))
-            this.entry.add(id);
+    /** エントリープレイヤーのパラメータをレース用に初期化し、レース開始地点にテレポートする */
+    private void setupRacer() {
+        List<Location> position = CircuitConfig.getCircuitData(getCircuitName()).getStartLocationList();
+        int count = 0;
 
-        if (this.reserveentry.contains(id))
-            this.reserveentry.remove(id);
+        for (UUID uuid : getEntryPlayerList()) {
+            if (Bukkit.getPlayer(uuid) != null) {
+                Player player = Bukkit.getPlayer(uuid);
+                Racer racer = RaceManager.getRacer(player);
+
+                //メッセージ送信
+                MessageEnum.raceStart.sendConvertedMessage(player, new Object[] {getInstance()});
+
+                //レース用スコアボードを表示
+                Scoreboards.entryCircuit(uuid);
+
+                //Racerオブジェクトの諸々
+                racer.applyRaceParameter();
+                racer.setCircuitName(getCircuitName());
+                racer.setStandby(true);
+                RaceManager.clearCharacterRaceData(uuid);
+                RaceManager.clearKartRaceData(uuid);
+                RaceManager.leaveRacingKart(player);
+
+                //開始地点にテレポート、メニュー表示
+                player.leaveVehicle();
+                player.teleport(position.get(count));
+                RaceManager.showSelectMenu(player, true);
+                ItemEnum.addItem(player, ItemEnum.MENU.getItem());
+
+                count++;
+                continue;
+            }
+
+            //オンラインではないプレイヤーは辞退
+            exitPlayer(uuid);
+        }
     }
 
-    public void entryPlayer(Player p) {
-        if (!this.entry.contains(p.getUniqueId()))
-            this.entry.add(p.getUniqueId());
+    /**
+     * プレイヤーをエントリーリストに追加する
+     * @param uuid 追加するプレイヤーのUUID
+     */
+    public void entryPlayer(UUID uuid) {
+        if (!this.getEntryPlayerList().contains(uuid)) {
+            this.getEntryPlayerList().add(uuid);
+        }
 
-        if (this.reserveentry.contains(p.getUniqueId()))
-            this.reserveentry.remove(p.getUniqueId());
+        if (this.getReserveEntryPlayerList().contains(uuid)) {
+            this.getReserveEntryPlayerList().remove(uuid);
+        }
     }
 
-    public void entryReservePlayer(UUID id) {
-        if (!this.reserveentry.contains(id))
-            this.reserveentry.add(id);
+    /**
+     * プレイヤーをリザーブエントリーリストに追加する
+     * @param uuid 追加するプレイヤーのUUID
+     */
+    public void entryReservePlayer(UUID uuid) {
+        if (!this.getReserveEntryPlayerList().contains(uuid)) {
+            this.getReserveEntryPlayerList().add(uuid);
+        }
 
-        if (this.entry.contains(id))
-            this.entry.remove(id);
+        if (this.getEntryPlayerList().contains(uuid)) {
+            this.getEntryPlayerList().remove(uuid);
+        }
     }
 
-    public void entryReservePlayer(Player p) {
-        if (!this.reserveentry.contains(p.getUniqueId()))
-            this.reserveentry.add(p.getUniqueId());
+    /**
+     * プレイヤーをエントリーリストから削除する
+     * @param uuid 追加するプレイヤーのUUID
+     */
+    public void exitPlayer(UUID uuid) {
+        if (this.getEntryPlayerList().contains(uuid))
+            this.getEntryPlayerList().remove(uuid);
 
-        if (this.entry.contains(p.getUniqueId()))
-            this.entry.remove(p.getUniqueId());
+        if (this.getReserveEntryPlayerList().contains(uuid))
+            this.getReserveEntryPlayerList().remove(uuid);
+
+        denyMatching(uuid);
     }
 
-    public void exitPlayer(UUID id) {
-        if (this.entry.contains(id))
-            this.entry.remove(id);
-
-        if (this.reserveentry.contains(id))
-            this.reserveentry.remove(id);
-
-        denyMatching(id);
+    /**
+     * レースへの招待TellRawメッセージを承認したプレイヤーリストに追加する
+     * @param uuid 追加するプレイヤーのUUID
+     */
+    public void acceptMatching(UUID uuid) {
+        if (!this.getMatchingAcceptPlayerList().contains(uuid)) {
+            this.getMatchingAcceptPlayerList().add(uuid);
+        }
     }
 
-    public void exitPlayer(Player p) {
-        if (this.entry.contains(p.getUniqueId()))
-            this.entry.remove(p.getUniqueId());
-
-        if (this.reserveentry.contains(p.getUniqueId()))
-            this.reserveentry.remove(p.getUniqueId());
-
-        denyMatching(p.getUniqueId());
+    /**
+     * レースへの招待TellRawメッセージを承認したプレイヤーリストから削除する
+     * @param uuid 追加するプレイヤーのUUID
+     */
+    public void denyMatching(UUID uuid) {
+        if (this.getMatchingAcceptPlayerList().contains(uuid)) {
+            this.getMatchingAcceptPlayerList().remove(uuid);
+        }
     }
 
-    public void acceptMatching(UUID id) {
-        if (!this.matchingaccept.contains(id))
-            this.matchingaccept.add(id);
+    /**
+     * 引数entityをサーキットに設置された妨害エンティティリストに追加する
+     * @param entity 追加するエンティティ
+     */
+    public void addJammerEntity(Entity entity) {
+        this.getJammerEntityList().add(entity);
     }
 
-    public void acceptMatching(Player p) {
-        if (!this.matchingaccept.contains(p.getUniqueId()))
-            this.matchingaccept.add(p.getUniqueId());
-    }
-
-    public void denyMatching(UUID id) {
-        if (this.matchingaccept.contains(id))
-            this.matchingaccept.remove(id);
-    }
-
-    public void denyMatching(Player p) {
-        if (this.matchingaccept.contains(p.getUniqueId()))
-            this.matchingaccept.remove(p.getUniqueId());
-    }
-
-    public void setStart(boolean value) {
-        this.isstarted = value;
-    }
-
-    public void setMatching(boolean value) {
-        this.ismatching = value;
-    }
-
-    public void addJammerEntity(Entity e) {
-        this.jammerentity.add(e);
-    }
-
+    /**
+     * 引数entityをサーキットに設置された妨害エンティティリストから削除する
+     * @param entity 追加するエンティティ
+     */
     public void removeJammerEntity(Entity entity) {
-        if (this.jammerentity.contains(entity))
-            this.jammerentity.remove(entity);
+        if (this.getJammerEntityList().contains(entity)) {
+            this.getJammerEntityList().remove(entity);
+        }
     }
 
+    /** サーキットに設置された全妨害エンティティをデスポーンする */
     public void removeAllJammerEntity() {
-        if (this.jammerentity.size() != 0) {
-            for (Entity e : this.jammerentity) {
-                if (!e.isDead())
-                    e.remove();
+        if (this.getJammerEntityList().size() != 0) {
+            for (Entity entity : this.getJammerEntityList()) {
+                if (!entity.isDead()) {
+                    entity.remove();
+                }
             }
-            this.jammerentity.clear();
+            this.getJammerEntityList().clear();
         }
     }
 
-    public void runCountUpTask() {
-        if (this.countuptask != null)
-            this.countuptask.cancel();
+    //〓 Race Management Task 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-        this.countuptask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                if (isStarted()) {
-                    laptime++;
-
-                    if (laptime % 20 == 0) {
-                        int remaintime = limittime - laptime / 20;
-                        if (remaintime == 60) {
-                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 60 });
-                        } else if (remaintime == 30) {
-                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 30 });
-                        } else if (remaintime == 10) {
-                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { circuit, (int) 10 });
-                        } else if (0 < remaintime && remaintime < 10) {
-                            sendMessageEntryPlayer(MessageEnum.raceTimeLimitCountDown, new Object[] { circuit, remaintime });
-                        } else if (remaintime == 0) {
-                            sendMessageEntryPlayer(MessageEnum.raceTimeUp, new Object[] { circuit });
-                            endRace();
-                        }
-                    }
-                }
-            }
-        }, 0, 1);
-    }
-
-    public void runDetectEndTask() {
-        if (this.detectend != null)
-            this.detectend.cancel();
-
-        this.detectend = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                if (isRaceEnd()) {
-                    endRace();
-                }
-            }
-        }, 10, 100);
-    }
-
+    /** エントリープレイヤーが規定人数を満たしたことを検知するタスクを起動する */
     public void runDetectReadyTask() {
-        if (this.detectreadytask != null)
-            this.detectreadytask.cancel();
-
-        this.detectreadytask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                //エントリーしたプレイヤーが規定人数以上
-                if (entry.size() < CircuitConfig.getCircuitData(name).getMinPlayer())
-                    return;
-                //オンラインのプレイヤー人数が規定人数以上
-                if (getEntryPlayer().size() < CircuitConfig.getCircuitData(name).getMinPlayer())
-                    return;
-                runMatchingTask();
-                detectreadytask.cancel();
-                detectreadytask = null;
-            }
-        }, 0, 100);
-    }
-
-    public void runMatchingTask() {
-        if (this.matchingtask != null)
-            this.matchingtask.cancel();
-
-        this.matchingcountdown = CircuitConfig.getCircuitData(this.name).getMatchingTime();
-        setMatching(true);
-        String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
-
-        runMatchingTitleSendTask();
-        for (UUID id : entry) {
-            Player p = Bukkit.getPlayer(id);
-            p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-            MessageEnum.raceReady.sendConvertedMessage(p, circuit);
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + p.getName() + tellraw);
+        if (this.getDetectReadyTask() != null) {
+            this.getDetectReadyTask().cancel();
         }
 
-        this.matchingtask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+        this.setDetectReadyTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
-                matchingcountdown--;
-                if (matchingcountdown < 0) {
-                    Iterator<UUID> exitlist = entry.iterator();
-                    UUID exitid;
-                    while (exitlist.hasNext()) {
-                        exitid = exitlist.next();
-                        if (!Bukkit.getPlayer(exitid).isOnline() || !matchingaccept.contains(exitid)) {
-                            exitlist.remove();
-                            denyMatching(exitid);
-                            RaceManager.clearEntryRaceData(exitid);
-                        }
-                    }
 
-                    if (CircuitConfig.getCircuitData(name).getMinPlayer() <= matchingaccept.size()) {
-                        matchingaccept.clear();
-                        matchingcountdown = 0;
-                        matchingtask.cancel();
-                        matchingtask = null;
-
-                        setupRacer();
-                        Scoreboards.startCircuit(name);
-                        sendMessageEntryPlayer(MessageEnum.raceStart, new Object[] { circuit });
-
-                        runRaceStartTask();
-                        return;
-                    }
-
-                    //マッチングに失敗した場合
-                    sendMessageEntryPlayer(MessageEnum.raceMatchingFailed, new Object[] { circuit });
-                    setMatching(false);
-                    matchingaccept.clear();
-                    matchingcountdown = 0;
-                    matchingtask.cancel();
-                    matchingtask = null;
-
-                    //リザーブエントリーがあればエントリーに昇格する
-                    Iterator<UUID> i = reserveentry.iterator();
-                    UUID id = null;
-                    while (i.hasNext()) {
-                        id = i.next();
-                        if (!isFillPlayer()) {
-                            i.remove();
-                            entryPlayer(id);
-                        } else {
-                            break;
-                        }
-                    }
-
-                    runDetectReadyTask();
-                }
-            }
-        }, 0, 20);
-    }
-
-    public void runMatchingTitleSendTask() {
-        if (this.matchingtitlesendertask != null)
-            this.matchingtitlesendertask.cancel();
-
-        this.matchingcountdownfortitle = CircuitConfig.getCircuitData(this.name).getMatchingTime() + 1;
-
-        this.matchingtitlesendertask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                matchingcountdownfortitle--;
-                if (matchingcountdownfortitle < 0) {
-                    matchingcountdownfortitle = 0;
-                    matchingtitlesendertask.cancel();
-                    matchingtitlesendertask = null;
+                //エントリーしたプレイヤーが規定人数以上
+                if (getEntryPlayerList().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
                     return;
                 }
-
-                for (UUID id : entry) {
-                    Player p = Bukkit.getPlayer(id);
-                    if (p != null || RaceManager.isEntry(id)) {
-                        PacketUtil.sendTitle(p, MessageEnum.titleRacePrepared.getMessage(), 0, 25, 0, false);
-                        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(matchingcountdownfortitle), 0, 25, 0,
-                                true);
-                    }
+                //オンラインのプレイヤー人数が規定人数以上
+                if (getEntryPlayer().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
+                    return;
                 }
+                runMatchingTask();
+                getDetectReadyTask().cancel();
+                setDetectReadyTask(null);
             }
-        }, 0, 20);
+        }, 0, 100));
     }
 
-    /*
-     * レース開始地点に参加者をテレポート後に起動
+    /** 参加者にレース参加の確認を行うタスクを起動する */
+    public void runMatchingTask() {
+        if (this.getMatchingTask() != null) {
+            this.getMatchingTask().cancel();
+        }
+
+        //ローカルファイルのサーキット設定データ
+        final CircuitData circuitData = CircuitConfig.getCircuitData(this.getCircuitName());
+
+        //タスクの制限時間を初期化
+        this.setMatchingCountDownTime(circuitData.getMatchingTime());
+
+        //フラグON
+        this.setMatching(true);
+
+        //参加者に承認・拒否を促すTellRawコマンドメッセージを送信
+        this.sendRaceInviteMessage();
+
+        //エントリーしたプレイヤーからレース参加の意思決定を募るタスクを起動する
+        this.setMatchingTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+
+                //制限時間1秒経過
+                setMatchingCountDownTime(getMatchingCountDownTime() - 1);
+
+                //制限時間が残っている場合、参加者にカウントダウンタイトルメッセージを送信
+                if (0 < getMatchingCountDownTime()) {
+                    Player entryPlayer = null;
+                    for (UUID id : getEntryPlayerList()) {
+                        if ((entryPlayer = Bukkit.getPlayer(id)) != null) {
+                            PacketUtil.sendTitle(entryPlayer, MessageEnum.titleRacePrepared.getMessage(), 0, 25, 0, false);
+                            PacketUtil.sendTitle(entryPlayer
+                                    , MessageEnum.titleCountDown.getConvertedMessage(getMatchingCountDownTime())
+                                    , 0, 25, 0, true);
+
+                            //カウントダウン効果音の再生
+                            playCountDownSound(entryPlayer, getMatchingCountDownTime());
+                        }
+                    }
+
+                //タイムアップ
+                } else {
+
+                    //参加拒否したプレイヤーをエントリー取り消し
+                    Iterator<UUID> denyPlayerList = getEntryPlayerList().iterator();
+                    UUID denyPlayerUUID;
+                    while (denyPlayerList.hasNext()) {
+                        denyPlayerUUID = denyPlayerList.next();
+                        if (!Bukkit.getPlayer(denyPlayerUUID).isOnline() || !getMatchingAcceptPlayerList().contains(denyPlayerUUID)) {
+                            denyPlayerList.remove();
+                            denyMatching(denyPlayerUUID);
+                            RaceManager.clearEntryRaceData(denyPlayerUUID);
+                        }
+                    }
+
+                    //参加承認したプレイヤーがサーキットの規定人数を満たしていればレースを開始する
+                    if (circuitData.getMinPlayer() <= getMatchingAcceptPlayerList().size()) {
+
+                        //プレイヤーの状態をレース用に初期化
+                        setupRacer();
+
+                        //スコアボードのタイトルを 参加申請中→ランキング に書き換え
+                        Scoreboards.startCircuit(getCircuitName());
+
+                        //スタンバイタスクへ進む
+                        runStandbyTask();
+
+                    //参加承認したプレイヤーがサーキットの規定人数を下回る場合runDetectReadyTaskを再起動する
+                    } else {
+
+                        //規定人数の参加承認に失敗したことを参加者に通知
+                        sendMessageEntryPlayer(MessageEnum.raceMatchingFailed, new Object[] { getInstance() });
+                        setMatching(false);
+
+                        //リザーブエントリーがあればサーキットの最大人数以内でエントリーに昇格する
+                        Iterator<UUID> reservePlayerList = getReserveEntryPlayerList().iterator();
+                        UUID reservePlayer = null;
+                        while (reservePlayerList.hasNext()) {
+                            reservePlayer = reservePlayerList.next();
+
+                            //エントリーがサーキットの最大人数を下回る場合追加エントリー
+                            if (!isFillPlayer()) {
+                                reservePlayerList.remove();
+                                entryPlayer(reservePlayer);
+
+                            //最大人数を満たしている場合引き続きリザーブエントリーとして保留
+                            } else {
+                                break;
+                            }
+                        }
+
+                        //1段階前のタスクに戻る
+                        runDetectReadyTask();
+                    }
+
+                    //初期化
+                    getMatchingAcceptPlayerList().clear();
+                    setMatchingCountDownTime(0);
+                    getMatchingTask().cancel();
+                    setMatchingTask(null);
+                }
+            }
+        }, 0, 20));
+    }
+
+    /**
+     * レース開始地点に参加者をテレポート後に起動する<br>
      * メニューを表示し、制限時間内にキャラクター・カートを選択させる
      * 制限時間経過後キャラクター・カートがnullだった場合はランダム選択させ、
      * レース開始のカウントダウンをスタートする
@@ -452,22 +456,22 @@ public class Circuit {
      * 所持品のキーアイテム削除はプレイヤーがスタートブロックを踏んだ際に行う
      * カウントダウン終了と同時にstartフラグをtrueに切り替える
      */
-    public void runRaceStartTask() {
-        if (this.racestarttask != null)
-            this.racestarttask.cancel();
+    public void runStandbyTask() {
+        if (this.getStandbyTask() != null)
+            this.getStandbyTask().cancel();
 
-        this.racestartcountdown = CircuitConfig.getCircuitData(this.name).getMenuTime() + 12;
+        this.setStandbyCountDownTime(CircuitConfig.getCircuitData(this.getCircuitName()).getMenuTime() + 12);
 
-        this.racestarttask = Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+        this.setStandbyTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
-                racestartcountdown--;
-                if (12 < racestartcountdown) {
+                setStandbyCountDownTime(getStandbyCountDownTime() - 1);
+                if (12 < getStandbyCountDownTime()) {
                     for (Player p : getEntryPlayer()) {
-                        int count = racestartcountdown - 12;
+                        int count = getStandbyCountDownTime() - 12;
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceMenu.getMessage(), 0, 25, 0, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(count), 0, 25, 0, true);
                     }
-                } else if (racestartcountdown == 12) {
+                } else if (getStandbyCountDownTime() == 12) {
                     for (Player p : getEntryPlayer()) {
                         if (RaceManager.getRacer(p).getCharacter() == null) {
                             RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
@@ -481,75 +485,107 @@ public class Circuit {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStandby.getMessage(), 10, 40, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStandbySub.getMessage(), 10, 40, 10, true);
                     }
-                } else if (racestartcountdown == 10) {
+                } else if (getStandbyCountDownTime() == 10) {
                     for (Player p : getEntryPlayer()) {
                         PacketUtil.sendTitle(
                                 p, MessageEnum.titleRaceLaps.getConvertedMessage(
-                                        CircuitConfig.getCircuitData(name).getNumberOfLaps())
+                                        CircuitConfig.getCircuitData(getCircuitName()).getNumberOfLaps())
                                         , 10, 40, 10, false);
-                        PacketUtil.sendTitle(
-                                p, MessageEnum.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
                     }
-                } else if (racestartcountdown == 8) {
+                } else if (getStandbyCountDownTime() == 8) {
                     for (Player p : getEntryPlayer()) {
-                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(CircuitConfig.getCircuitData(name).getLimitTime()), 10,
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(
+                                CircuitConfig.getCircuitData(getCircuitName()).getLimitTime()), 10,
                                 40, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
                     }
-                } else if (racestartcountdown == 6) {
+                } else if (getStandbyCountDownTime() == 6) {
                     for (Player p : getEntryPlayer()) {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceReady.getMessage(), 10, 20, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceReadySub.getMessage(), 10, 20, 10, true);
                     }
-                } else if (0 < racestartcountdown && racestartcountdown < 4) {
+                } else if (0 < getStandbyCountDownTime() && getStandbyCountDownTime() < 4) {
                     for (Player p : getEntryPlayer()) {
                         p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
-                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(racestartcountdown), 0, 20,
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(getStandbyCountDownTime()), 0, 20,
                                 0, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDownSub.getMessage(), 0, 20, 0, true);
                     }
-                } else if (racestartcountdown == 0) {
-                    setStart(true);
-                    for (Player p : getEntryPlayer()) {
-                        Util.createSignalFireworks(p.getLocation());
-                        Util.createFlowerShower(p, 5);
-                        p.playSound(p.getLocation(), Sound.AMBIENCE_THUNDER, 1.0F, 2.8F);
-                        new SendExpandedTitleTask(p, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(
-                                YPLKart.getInstance(), 0, 1);
-                    }
-                } else if (racestartcountdown < 0) {
-                    racestartcountdown = 0;
-                    racestarttask.cancel();
-                    racestarttask = null;
+                } else if (getStandbyCountDownTime() == 0) {
+                    startRace();
+                } else if (getStandbyCountDownTime() < 0) {
+                    setStandbyCountDownTime(0);
+                    getStandbyTask().cancel();
+                    setStandbyTask(null);
                     return;
                 }
             }
-        }, 0, 20);
+        }, 0, 20));
     }
 
-    public void sendMessageEntryPlayer(MessageEnum message, Object[] object) {
-        for (Player p : getEntryPlayer()) {
-            message.sendConvertedMessage(p, object);
+    /** レースの経過時間に応じ自動終了させるタスクを起動する */
+    public void runLimitTimeCountDownTask() {
+        if (this.getLimitTimeTask() != null) {
+            this.getLimitTimeTask().cancel();
         }
+
+        final int limitTime = CircuitConfig.getCircuitData(getCircuitName()).getLimitTime();
+
+        this.setLimitTimeTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                setCurrentTime(getCurrentTime() + 1);
+
+                if (getCurrentTime() % 20 == 0) {
+                    int remainTime = limitTime - getCurrentTime() / 20;
+                    if (remainTime == 60) {
+                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 60 });
+                    } else if (remainTime == 30) {
+                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 30 });
+                    } else if (remainTime == 10) {
+                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 10 });
+                    } else if (0 < remainTime && remainTime < 10) {
+                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitCountDown, new Object[] { getInstance(), remainTime });
+                    } else if (remainTime == 0) {
+                        sendMessageEntryPlayer(MessageEnum.raceTimeUp, new Object[] { getInstance() });
+                    } else if (remainTime < 0) {
+                        endRace();
+                        getLimitTimeTask().cancel();
+                        setLimitTimeTask(null);
+                    }
+                }
+            }
+        }, 0, 1));
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    /** 現在のレース参加者の状態からレースの終了を検知し、終了処理を行うタスクを起動する */
+    public void runDetectEndTask() {
+        if (this.getDetectEndTask() != null) {
+            this.getDetectEndTask().cancel();
+        }
 
-    public String getName() {
-        return this.name;
+        this.setDetectEndTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                if (isRaceEnd()) {
+                    getDetectEndTask().cancel();
+                    setDetectEndTask(null);
+
+                    endRace();
+                }
+            }
+        }, 10, 100));
     }
 
-    public int getLapTime() {
-        return this.laptime;
-    }
+    //〓 Get/Set 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /** @return レーススタートからの経過時間を、チック→ミリ秒に変換し返す */
     public int getLapMilliSecond() {
-        return laptime * 50;
+        return getCurrentTime() * 50;
     }
 
     public List<Player> getEntryPlayer() {
         List<Player> entry = new ArrayList<Player>();
-        for (UUID id : this.entry) {
+        for (UUID id : this.getEntryPlayerList()) {
             if (Bukkit.getPlayer(id) != null)
                 entry.add(Bukkit.getPlayer(id));
         }
@@ -558,39 +594,28 @@ public class Circuit {
 
     public List<UUID> getEntryPlayerID() {
         List<UUID> entry = new ArrayList<UUID>();
-        for (UUID id : this.entry) {
+        for (UUID id : this.getEntryPlayerList()) {
             if (Bukkit.getPlayer(id) != null)
                 entry.add(id);
         }
         return entry;
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public boolean isStarted() {
-        return this.isstarted;
-    }
-
-    public boolean isMatching() {
-        return this.ismatching;
-    }
-
     public boolean isFillPlayer() {
-        if (CircuitConfig.getCircuitData(this.name).getMaxPlayer() <= this.entry.size())
+        if (CircuitConfig.getCircuitData(this.getCircuitName()).getMaxPlayer() <= this.getEntryPlayerList().size()) {
             return true;
+        }
         return false;
     }
 
-    //レースが終了しているかどうか判定する
+    /** @return 開催されているレースがあるかどうか */
     public boolean isRaceEnd() {
         Iterator<UUID> i = getEntryPlayerID().iterator();
         UUID id;
         if (isStarted()) {
             while (i.hasNext()) {
                 id = i.next();
-                if (RaceManager.isEntry(id)
-                        //&& RaceManager.getRace(id).getStart()
-                        && !RaceManager.getRace(id).isGoal())
+                if (RaceManager.isEntry(id) && !RaceManager.getRace(id).isGoal())
                     return false;
             }
         } else {
@@ -604,7 +629,211 @@ public class Circuit {
         return true;
     }
 
-    public boolean isJammerEntity(Entity e) {
-        return jammerentity.contains(e) ? true : false;
+    public boolean isJammerEntity(Entity entity) {
+        return getJammerEntityList().contains(entity);
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * レース参加者にメッセージを送信する
+     * @param message MessageEnum
+     * @param object タグ変換する変数
+     */
+    public void sendMessageEntryPlayer(MessageEnum message, Object[] object) {
+        for (Player p : getEntryPlayer()) {
+            message.sendConvertedMessage(p, object);
+        }
+    }
+
+    /** レース参加者にレースへ招待するメッセージを送信する */
+    public void sendRaceInviteMessage() {
+        String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
+
+        for (UUID uuid : getEntryPlayerList()) {
+            Player player = Bukkit.getPlayer(uuid);
+            player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
+            MessageEnum.raceReady.sendConvertedMessage(player, getInstance());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + tellraw);
+        }
+    }
+
+    /**
+     * 引数countDownTimeの数値に応じてカウントダウンの音声を再生する
+     * @param countDownTime 秒数
+     */
+    public void playCountDownSound(Player player, int countDownTime) {
+        Location location = player.getLocation();
+
+        if (countDownTime % 10 == 0) {
+            player.playSound(location, Sound.DOOR_OPEN, 0.3F, 4.0F);
+        } else if (30 < countDownTime) {
+            player.playSound(location, Sound.CLICK, 0.3F, 4.0F);
+        } else if (20 < countDownTime) {
+            player.playSound(location, Sound.CLICK, 0.3F, 4.0F);
+        } else if (10 < countDownTime) {
+            player.playSound(location, Sound.CLICK, 0.3F, 4.0F);
+        } else if (countDownTime <= 10) {
+            player.playSound(location, Sound.ITEM_BREAK, 0.2F, 4.0F);
+        }
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return このクラスのインスタンス */
+    public Circuit getInstance() {
+        return this;
+    }
+
+    /** @return サーキット名 */
+    public String getCircuitName() {
+        return this.circuitName;
+    }
+
+    /** @return サーキットに設置された妨害アイテムエンティティリスト */
+    public List<Entity> getJammerEntityList() {
+        return this.jammerEntityList;
+    }
+
+    /** @return エントリーしているプレイヤーのUUIDリスト */
+    public List<UUID> getEntryPlayerList() {
+        return this.entryPlayerList;
+    }
+
+    /** @return リザーブエントリーしているプレイヤーのUUIDリスト */
+    public List<UUID> getReserveEntryPlayerList() {
+        return this.reserveEntryPlayerList;
+    }
+
+    /** @return レース参加の招待を承認したプレイヤーのUUIDリスト */
+    public List<UUID> getMatchingAcceptPlayerList() {
+        return this.matchingAcceptPlayerList;
+    }
+
+    /** @return 参加人数が最小人数を満たしているかを検知するタスク */
+    public BukkitTask getDetectReadyTask() {
+        return this.detectReadyTask;
+    }
+
+    /** @return 参加者にレース参加の確認を行うタスク */
+    public BukkitTask getMatchingTask() {
+        return this.matchingTask;
+    }
+
+    /** @return マッチングタスクの制限時間 */
+    public int getMatchingCountDownTime() {
+        return this.matchingCountDownTime;
+    }
+
+    /** @return マッチングタスクが起動されているかどうか */
+    public boolean isMatching() {
+        return this.isMatching;
+    }
+
+    /** @return 参加者にキャラクター選択、カート選択をさせるタスク */
+    public BukkitTask getStandbyTask() {
+        return this.standbyTask;
+    }
+
+    /** @return スタンバイタスクの制限時間 */
+    public int getStandbyCountDownTime() {
+        return this.standbyCountDownTime;
+    }
+
+    /** @return レースの経過時間に応じ自動終了させるタスク */
+    public BukkitTask getLimitTimeTask() {
+        return this.limitTimeTask;
+    }
+
+    /** @return レースが開始されてからの経過時間 */
+    public int getCurrentTime() {
+        return this.currentTime;
+    }
+
+    /** @return 現在のエントリー人数、ゴール人数からレース終了を検知するタスク */
+    public BukkitTask getDetectEndTask() {
+        return this.detectEndTask;
+    }
+
+    /** @return レースが開始されているかどうか */
+    public boolean isStarted() {
+        return this.isStarted;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param circuitName サーキット名 */
+    public void setCircuitName(String circuitName) {
+        this.circuitName = circuitName;
+    }
+
+    /** @param jammerEntityList サーキットに設置された妨害アイテムエンティティリスト */
+    public void setJammerEntityList(List<Entity> jammerEntityList) {
+        this.jammerEntityList = jammerEntityList;
+    }
+
+    /** @param entryPlayerList エントリーしているプレイヤーのUUIDリスト */
+    public void setEntryPlayerList(List<UUID> entryPlayerList) {
+        this.entryPlayerList = entryPlayerList;
+    }
+
+    /** @param reserveEntryPlayerList リザーブエントリーしているプレイヤーのUUIDリスト */
+    public void setReserveEntryPlayerList(List<UUID> reserveEntryPlayerList) {
+        this.reserveEntryPlayerList = reserveEntryPlayerList;
+    }
+
+    /** @param matchingAcceptPlayerList レース参加の招待を承認したプレイヤーのUUIDリスト */
+    public void setMatchingAcceptPlayerList(List<UUID> matchingAcceptPlayerList) {
+        this.matchingAcceptPlayerList = matchingAcceptPlayerList;
+    }
+
+    /** @param detectReadyTask 参加人数が最小人数を満たしているかを検知するタスク */
+    public void setDetectReadyTask(BukkitTask detectReadyTask) {
+        this.detectReadyTask = detectReadyTask;
+    }
+
+    /** @param matchingTask 参加者にレース参加の確認を行うタスク */
+    public void setMatchingTask(BukkitTask matchingTask) {
+        this.matchingTask = matchingTask;
+    }
+
+    /** @param matchingCountDownTime マッチングタスクの制限時間 */
+    public void setMatchingCountDownTime(int matchingCountDownTime) {
+        this.matchingCountDownTime = matchingCountDownTime;
+    }
+
+    /** @param isMatching マッチングタスクが起動されているかどうか */
+    public void setMatching(boolean isMatching) {
+        this.isMatching = isMatching;
+    }
+
+    /** @param standbyTask 参加者にキャラクター選択、カート選択をさせるタスク */
+    public void setStandbyTask(BukkitTask standbyTask) {
+        this.standbyTask = standbyTask;
+    }
+
+    /** @param standbyCountDownTime スタンバイタスクの制限時間 */
+    public void setStandbyCountDownTime(int standbyCountDownTime) {
+        this.standbyCountDownTime = standbyCountDownTime;
+    }
+
+    /** @param limitTimeTask レースの経過時間に応じ自動終了させるタスク */
+    public void setLimitTimeTask(BukkitTask limitTimeTask) {
+        this.limitTimeTask = limitTimeTask;
+    }
+
+    /** @param currentTime レースが開始されてからの経過時間 */
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+    }
+
+    /** @param detectEndTask 現在のエントリー人数、ゴール人数からレース終了を検知するタスク */
+    public void setDetectEndTask(BukkitTask detectEndTask) {
+        this.detectEndTask = detectEndTask;
+    }
+
+    /** @param value レースが開始されているかどうか */
+    public void setStarted(boolean isStarted) {
+        this.isStarted = isStarted;
     }
 }
