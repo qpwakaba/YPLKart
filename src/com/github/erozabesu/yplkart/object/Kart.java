@@ -49,7 +49,7 @@ public class Kart {
     /** ドリフト時のコーナリング力 */
     private double driftCorneringPower;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
@@ -101,7 +101,37 @@ public class Kart {
         setDriftCorneringPower(5.5D);
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return メニュー用アイテム */
+    public ItemStack getMenuItem() {
+        ItemStack item = new ItemStack(getDisplayMaterial(), 1, (short) 10, getDisplayMaterialData());
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(getKartName());
+        meta.setLore(MessageEnum.replaceLine(MessageEnum.replaceChatColor(getParameter())));
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    /** @return カートのパラメーター一覧 */
+    public String getParameter() {
+        String[] parameter = new String[] {
+                String.valueOf(getWeight()),
+                String.valueOf(getMaxSpeed()),
+                String.valueOf(getAcceleration()),
+                String.valueOf(getDefaultCorneringPower()),
+                String.valueOf(getDriftCorneringPower()),
+                String.valueOf(getSpeedDecreaseOnDrift()),
+                String.valueOf(getSpeedDecreaseOnDirt()),
+                String.valueOf(getClimbableHeight())
+        };
+
+        return MessageEnum.tableKartParameter.getConvertedMessage(new Object[] {parameter});
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return kartName カート名 */
     public String getKartName() {
@@ -163,9 +193,9 @@ public class Kart {
         return driftCorneringPower;
     }
 
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** @param kartName セットするカート名 */
+    /** @param kartName カート名 */
     private void setKartName(String kartName) {
         this.kartName = kartName;
     }
@@ -175,83 +205,53 @@ public class Kart {
         this.mountPositionOffset = mountPositionOffset;
     }
 
-    /** @param displayMaterial セットするブロックマテリアル */
+    /** @param displayMaterial ブロックマテリアル */
     private void setDisplayMaterial(Material displayMaterial) {
         this.displayMaterial = displayMaterial;
     }
 
-    /** @param displayMaterialData セットするブロックマテリアルデータ */
+    /** @param displayMaterialData ブロックマテリアルデータ */
     private void setDisplayMaterialData(byte displayMaterialData) {
         this.displayMaterialData = displayMaterialData;
     }
 
-    /** @param weight セットする重量 */
+    /** @param weight 重量 */
     private void setWeight(double weight) {
         this.weight = weight;
     }
 
-    /** @param maxSpeed セットする最高速度 */
+    /** @param maxSpeed 最高速度 */
     private void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
-    /** @param acceleration セットする加速力 */
+    /** @param acceleration 加速力 */
     private void setAcceleration(double acceleration) {
         this.acceleration = acceleration;
     }
 
-    /** @param climbableHeight セットする乗り越えられるブロックの高さ */
+    /** @param climbableHeight 乗り越えられるブロックの高さ */
     private void setClimbableHeight(float climbableHeight) {
         this.climbableHeight = climbableHeight;
     }
 
-    /** @param speedDecreaseOnDirt セットするダート時の減速率 */
+    /** @param speedDecreaseOnDirt ダート時の減速率 */
     private void setSpeedDecreaseOnDirt(double speedDecreaseOnDirt) {
         this.speedDecreaseOnDirt = speedDecreaseOnDirt;
     }
 
-    /** @param speedDecreaseOnDrift セットするドリフト時の減速率 */
+    /** @param speedDecreaseOnDrift ドリフト時の減速率 */
     private void setSpeedDecreaseOnDrift(double speedDecreaseOnDrift) {
         this.speedDecreaseOnDrift = speedDecreaseOnDrift;
     }
 
-    /** @param defaultCorneringPower セットするコーナリング力 */
+    /** @param defaultCorneringPower コーナリング力 */
     private void setDefaultCorneringPower(double defaultCorneringPower) {
         this.defaultCorneringPower = defaultCorneringPower;
     }
 
-    /** @param driftCorneringPower セットするドリフト時のコーナリング力 */
+    /** @param driftCorneringPower ドリフト時のコーナリング力 */
     private void setDriftCorneringPower(double driftCorneringPower) {
         this.driftCorneringPower = driftCorneringPower;
-    }
-
-    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return メニュー用アイテム */
-    public ItemStack getMenuItem() {
-        ItemStack item = new ItemStack(getDisplayMaterial(), 1, (short) 10, getDisplayMaterialData());
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(getKartName());
-        meta.setLore(MessageEnum.replaceLine(MessageEnum.replaceChatColor(getParameter())));
-
-        item.setItemMeta(meta);
-
-        return item;
-    }
-
-    /** @return カートのパラメーター一覧 */
-    public String getParameter() {
-        String[] parameter = new String[] {
-                String.valueOf(getWeight()),
-                String.valueOf(getMaxSpeed()),
-                String.valueOf(getAcceleration()),
-                String.valueOf(getDefaultCorneringPower()),
-                String.valueOf(getDriftCorneringPower()),
-                String.valueOf(getSpeedDecreaseOnDrift()),
-                String.valueOf(getSpeedDecreaseOnDirt()),
-                String.valueOf(getClimbableHeight())
-        };
-
-        return MessageEnum.tableKartParameter.getConvertedMessage(new Object[] {parameter});
     }
 }

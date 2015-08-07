@@ -94,6 +94,121 @@ public class PlayerObject {
         setArmorContents(new ArrayList<ItemStack>(Arrays.asList(player.getInventory().getArmorContents())));
     }
 
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return プレイヤー */
+    public Player getPlayer() {
+        return Bukkit.getPlayer(getUUID());
+    }
+
+    /** ゲームモードを復元する */
+    public void recoveryGameMode() {
+        Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+        player.setGameMode(getGameMode());
+    }
+
+    /** 座標へテレポートする */
+    public void recoveryLocation() {
+        Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+        player.teleport(getLocation());
+    }
+
+    /** フィジカルを復元する */
+    public void recoveryPhysical() {
+        final Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        player.setMaxHealth(getMaxHealth());
+        player.setHealth(getHealth());
+        player.setFoodLevel(getHunger());
+        player.setWalkSpeed(getWalkSpeed());
+    }
+
+    /** 経験値を復元する */
+    public void recoveryExp() {
+        Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        player.setLevel(getLevel());
+        player.setExp(getExp());
+    }
+
+    /** インベントリを復元する */
+    public void recoveryInventory() {
+        Player player = getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        player.getInventory().clear();
+
+        if (!getInventory().isEmpty()) {
+            PlayerInventory inv = player.getInventory();
+            for (int i = 0; i < 36; i++) {
+                inv.setItem(i, getInventory().get(i));
+            }
+        }
+
+        if (!getArmorContents().isEmpty()) {
+            PlayerInventory inv = player.getInventory();
+            if (getArmorContents().get(0) != null) {
+                inv.setHelmet(getArmorContents().get(3));
+            }
+            if (getArmorContents().get(1) != null) {
+                inv.setChestplate(getArmorContents().get(2));
+            }
+            if (getArmorContents().get(2) != null) {
+                inv.setLeggings(getArmorContents().get(1));
+            }
+            if (getArmorContents().get(3) != null){
+                inv.setBoots(getArmorContents().get(0));
+            }
+        }
+    }
+
+    /** 全パラメータを復元する */
+    public void recoveryAll() {
+        if (getPlayer() == null) {
+            return;
+        }
+
+        recoveryLocation();
+        recoveryPhysical();
+        recoveryExp();
+        recoveryInventory();
+        recoveryGameMode();
+    }
+
+    /** レース用の初期パラメータを適用する */
+    public void applyRaceParameter() {
+        Player player = this.getPlayer();
+        if (player == null) {
+            return;
+        }
+
+        //現プレイヤーデータの保存
+        initializePlayerObject();
+
+        player.setGameMode(GameMode.ADVENTURE);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setMaxHealth(20.0D);
+        player.setHealth(player.getMaxHealth());
+        player.setLevel(0);
+        player.setExp(0);
+        player.setFoodLevel(20);
+    }
+
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return UUID */
@@ -226,120 +341,5 @@ public class PlayerObject {
     /** @param value リスポーン時のプレイヤーの向き */
     public void setLastYaw(float value) {
         this.lastYaw = value;
-    }
-
-    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return プレイヤー */
-    public Player getPlayer() {
-        return Bukkit.getPlayer(getUUID());
-    }
-
-    /** ゲームモードを復元する */
-    public void recoveryGameMode() {
-        Player player = getPlayer();
-        if (player == null) {
-            return;
-        }
-        player.setGameMode(getGameMode());
-    }
-
-    /** 座標へテレポートする */
-    public void recoveryLocation() {
-        Player player = getPlayer();
-        if (player == null) {
-            return;
-        }
-        player.teleport(getLocation());
-    }
-
-    /** フィジカルを復元する */
-    public void recoveryPhysical() {
-        final Player player = getPlayer();
-        if (player == null) {
-            return;
-        }
-
-        player.setMaxHealth(getMaxHealth());
-        player.setHealth(getHealth());
-        player.setFoodLevel(getHunger());
-        player.setWalkSpeed(getWalkSpeed());
-    }
-
-    /** 経験値を復元する */
-    public void recoveryExp() {
-        Player player = getPlayer();
-        if (player == null) {
-            return;
-        }
-
-        player.setLevel(getLevel());
-        player.setExp(getExp());
-    }
-
-    /** インベントリを復元する */
-    public void recoveryInventory() {
-        Player player = getPlayer();
-        if (player == null) {
-            return;
-        }
-
-        player.getInventory().clear();
-
-        if (!getInventory().isEmpty()) {
-            PlayerInventory inv = player.getInventory();
-            for (int i = 0; i < 36; i++) {
-                inv.setItem(i, getInventory().get(i));
-            }
-        }
-
-        if (!getArmorContents().isEmpty()) {
-            PlayerInventory inv = player.getInventory();
-            if (getArmorContents().get(0) != null) {
-                inv.setHelmet(getArmorContents().get(3));
-            }
-            if (getArmorContents().get(1) != null) {
-                inv.setChestplate(getArmorContents().get(2));
-            }
-            if (getArmorContents().get(2) != null) {
-                inv.setLeggings(getArmorContents().get(1));
-            }
-            if (getArmorContents().get(3) != null){
-                inv.setBoots(getArmorContents().get(0));
-            }
-        }
-    }
-
-    /** 全パラメータを復元する */
-    public void recoveryAll() {
-        if (getPlayer() == null) {
-            return;
-        }
-
-        recoveryLocation();
-        recoveryPhysical();
-        recoveryExp();
-        recoveryInventory();
-        recoveryGameMode();
-    }
-
-    /** レース用の初期パラメータを適用する */
-    public void applyRaceParameter() {
-        Player player = this.getPlayer();
-        if (player == null) {
-            return;
-        }
-
-        //現プレイヤーデータの保存
-        initializePlayerObject();
-
-        player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.setMaxHealth(20.0D);
-        player.setHealth(player.getMaxHealth());
-        player.setLevel(0);
-        player.setExp(0);
-        player.setFoodLevel(20);
     }
 }

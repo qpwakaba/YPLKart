@@ -74,7 +74,7 @@ public class Character {
     /** デスペナルティ時の歩行速度 */
     private float penaltyWalkSpeed;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
@@ -114,7 +114,51 @@ public class Character {
         setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed"));
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return メニュー用アイテム */
+    public ItemStack getMenuItem() {
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+
+        meta.setOwner(getMenuHeadBlockPlayerName());
+        meta.setDisplayName(ChatColor.GREEN + getCharacterName());
+        meta.setLore(MessageEnum.replaceLine(
+                MessageEnum.replaceChatColor(getParameter())));
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    /** @return キャラクターのパラメーター一覧 */
+    public String getParameter() {
+        String[] parameter = new String[] {
+                String.valueOf(getMaxHealth()),
+                String.valueOf(getWalkSpeed()),
+                String.valueOf(getAdjustMaxSlotSize()
+                        + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
+                Util.convertSignNumber(getAdjustMaxStackSize()),
+                Util.convertSignNumber(getAdjustAttackDamage()),
+                String.valueOf(getPenaltyAntiReskillSecond()),
+                String.valueOf(getPenaltySecond()),
+                String.valueOf(getPenaltyWalkSpeed()),
+                Util.convertSignNumber(getAdjustPositiveEffectLevel()),
+                Util.convertSignNumber(getAdjustPositiveEffectSecond()),
+                Util.convertSignNumberR(getAdjustNegativeEffectLevel()),
+                Util.convertSignNumberR(getAdjustNegativeEffectSecond())
+        };
+
+        return MessageEnum.tableCharacterParameter.getConvertedMessage(new Object[] {parameter});
+    }
+
+    public void playMenuSelectSound(Player player) {
+        player.playSound(player.getLocation(), this.getMenuClickSound()
+                , this.getMenuClickSoundVolume(), this.getMenuClickSoundPitch());
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return キャラクター名 */
     public String getCharacterName() {
@@ -209,139 +253,95 @@ public class Character {
         return this.penaltyWalkSpeed;
     }
 
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** @param characterName セットするキャラクター名 */
+    /** @param characterName キャラクター名 */
     public void setCharacterName(String characterName) {
         this.characterName = characterName;
     }
 
-    /** @param nmsClass セットするnmsEntityクラス */
+    /** @param nmsClass nmsEntityクラス */
     public void setNmsClass(Class<?> nmsClass) {
         this.nmsClass = nmsClass;
     }
 
-    /** @param menuHeadBlockPlayerName セットするヘッドブロックのプレイヤー名 */
+    /** @param menuHeadBlockPlayerName ヘッドブロックのプレイヤー名 */
     public void setMenuHeadBlockPlayerName(String menuHeadBlockPlayerName) {
         this.menuHeadBlockPlayerName = menuHeadBlockPlayerName;
     }
 
-    /** @param menuClickSound セットするメニュークリック時の効果音 */
+    /** @param menuClickSound メニュークリック時の効果音 */
     public void setMenuClickSound(Sound menuClickSound) {
         this.menuClickSound = menuClickSound;
     }
 
-    /** @param menuClickSoundVolume セットするメニュークリック時の効果音の音量 */
+    /** @param menuClickSoundVolume メニュークリック時の効果音の音量 */
     public void setMenuClickSoundVolume(float menuClickSoundVolume) {
         this.menuClickSoundVolume = menuClickSoundVolume;
     }
 
-    /** @param menuClickSoundPitch セットするメニュークリック時の効果音のピッチ */
+    /** @param menuClickSoundPitch メニュークリック時の効果音のピッチ */
     public void setMenuClickSoundPitch(float menuClickSoundPitch) {
         this.menuClickSoundPitch = menuClickSoundPitch;
     }
 
-    /** @param adjustMaxSlotSize セットする最大スロット数補正 */
+    /** @param adjustMaxSlotSize 最大スロット数補正 */
     public void setAdjustMaxSlotSize(int adjustMaxSlotSize) {
         this.adjustMaxSlotSize = adjustMaxSlotSize;
     }
 
-    /** @param adjustMaxStackSize セットする最大スタック数補正 */
+    /** @param adjustMaxStackSize 最大スタック数補正 */
     public void setAdjustMaxStackSize(int adjustMaxStackSize) {
         this.adjustMaxStackSize = adjustMaxStackSize;
     }
 
-    /** @param adjustPositiveEffectSecond セットするスピードエフェクトの秒数補正 */
+    /** @param adjustPositiveEffectSecond スピードエフェクトの秒数補正 */
     public void setAdjustPositiveEffectSecond(int adjustPositiveEffectSecond) {
         this.adjustPositiveEffectSecond = adjustPositiveEffectSecond;
     }
 
-    /** @param adjustPositiveEffectLevel セットするスピードエフェクトのLV補正 */
+    /** @param adjustPositiveEffectLevel スピードエフェクトのLV補正 */
     public void setAdjustPositiveEffectLevel(int adjustPositiveEffectLevel) {
         this.adjustPositiveEffectLevel = adjustPositiveEffectLevel;
     }
 
-    /** @param adjustNegativeEffectSecond セットするスロウエフェクトの秒数補正 */
+    /** @param adjustNegativeEffectSecond スロウエフェクトの秒数補正 */
     public void setAdjustNegativeEffectSecond(int adjustNegativeEffectSecond) {
         this.adjustNegativeEffectSecond = adjustNegativeEffectSecond;
     }
 
-    /** @param adjustNegativeEffectLevel セットするスロウエフェクトのLV補正 */
+    /** @param adjustNegativeEffectLevel スロウエフェクトのLV補正 */
     public void setAdjustNegativeEffectLevel(int adjustNegativeEffectLevel) {
         this.adjustNegativeEffectLevel = adjustNegativeEffectLevel;
     }
 
-    /** @param adjustAttackDamage セットする攻撃力補正 */
+    /** @param adjustAttackDamage 攻撃力補正 */
     public void setAdjustAttackDamage(int adjustAttackDamage) {
         this.adjustAttackDamage = adjustAttackDamage;
     }
 
-    /** @param maxHealth セットする最大体力 */
+    /** @param maxHealth 最大体力 */
     public void setMaxHealth(double maxHealth) {
         this.maxHealth = maxHealth;
     }
 
-    /** @param walkSpeed セットする歩行速度 */
+    /** @param walkSpeed 歩行速度 */
     public void setWalkSpeed(float walkSpeed) {
         this.walkSpeed = walkSpeed;
     }
 
-    /** @param penaltyAntiReskillSecond セットする死亡後無敵状態になる秒数 */
+    /** @param penaltyAntiReskillSecond 死亡後無敵状態になる秒数 */
     public void setPenaltyAntiReskillSecond(int penaltyAntiReskillSecond) {
         this.penaltyAntiReskillSecond = penaltyAntiReskillSecond;
     }
 
-    /** @param penaltySecond セットするデスペナルティの秒数 */
+    /** @param penaltySecond デスペナルティの秒数 */
     public void setPenaltySecond(int penaltySecond) {
         this.penaltySecond = penaltySecond;
     }
 
-    /** @param penaltyWalkSpeed セットするデスペナルティ時の歩行速度 */
+    /** @param penaltyWalkSpeed デスペナルティ時の歩行速度 */
     public void setPenaltyWalkSpeed(float penaltyWalkSpeed) {
         this.penaltyWalkSpeed = penaltyWalkSpeed;
-    }
-
-    //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return メニュー用アイテム */
-    public ItemStack getMenuItem() {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-
-        meta.setOwner(getMenuHeadBlockPlayerName());
-        meta.setDisplayName(ChatColor.GREEN + getCharacterName());
-        meta.setLore(MessageEnum.replaceLine(
-                MessageEnum.replaceChatColor(getParameter())));
-
-        item.setItemMeta(meta);
-
-        return item;
-    }
-
-    /** @return キャラクターのパラメーター一覧 */
-    public String getParameter() {
-        String[] parameter = new String[] {
-                String.valueOf(getMaxHealth()),
-                String.valueOf(getWalkSpeed()),
-                String.valueOf(getAdjustMaxSlotSize()
-                        + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
-                Util.convertSignNumber(getAdjustMaxStackSize()),
-                Util.convertSignNumber(getAdjustAttackDamage()),
-                String.valueOf(getPenaltyAntiReskillSecond()),
-                String.valueOf(getPenaltySecond()),
-                String.valueOf(getPenaltyWalkSpeed()),
-                Util.convertSignNumber(getAdjustPositiveEffectLevel()),
-                Util.convertSignNumber(getAdjustPositiveEffectSecond()),
-                Util.convertSignNumberR(getAdjustNegativeEffectLevel()),
-                Util.convertSignNumberR(getAdjustNegativeEffectSecond())
-        };
-
-        return MessageEnum.tableCharacterParameter.getConvertedMessage(new Object[] {parameter});
-    }
-
-    public void playMenuSelectSound(Player player) {
-        player.playSound(player.getLocation(), this.getMenuClickSound()
-                , this.getMenuClickSoundVolume(), this.getMenuClickSoundPitch());
     }
 }

@@ -115,190 +115,6 @@ public class Racer extends PlayerObject{
         setStepDashBoard(false);
     }
 
-    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return レース中ログアウトしたプレイヤーのプレイヤー情報 */
-    public PlayerObject getRacingPlayerObject() {
-        return this.racingPlayerObject;
-    }
-
-    /** @return エントリーしているサーキット名 */
-    public String getCircuitName() {
-        return this.circuitName;
-    }
-
-    /** @return 選択キャラクター */
-    public Character getCharacter() {
-        return this.character;
-    }
-
-    /** @return 選択カート */
-    public Kart getKart() {
-        return this.kart;
-    }
-
-    /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
-    public boolean isStandby() {
-        return this.isStandby;
-    }
-
-    /** @return レースをゴールしているかどうか */
-    public boolean isGoal() {
-        return this.isGoal;
-    }
-
-    /** @return レースをスタートしているかどうか */
-    public boolean isStart() {
-        return this.isStart;
-    }
-
-    /** @return レースの周回数 */
-    public int getCurrentLaps() {
-        return this.currentLaps;
-    }
-
-    /** @return 通過済みのチェックポイントリスト */
-    public ArrayList<String> getPassedCheckPointList() {
-        return this.passedCheckPointList;
-    }
-
-    /** @return 最後に通過したチェックポイントエンティティ */
-    public Entity getLastPassedCheckPointEntity() {
-        return this.lastPassedCheckPointEntity;
-    }
-
-    /** @return デスペナルティタスク */
-    public BukkitTask getDeathPenaltyTask() {
-        return this.deathPenaltyTask;
-    }
-
-    /** @return デスペナルティ用点滅タイトル表示タスク */
-    public BukkitTask getDeathPenaltySendTitleTask() {
-        return this.deathPenaltyTitleSendTask;
-    }
-
-    /** @return 移動速度上昇タスク */
-    public BukkitTask getItemPositiveSpeed() {
-        return this.itemPositiveSpeedTask;
-    }
-
-    /** @return 移動速度低下タスク */
-    public BukkitTask getItemNegativeSpeed() {
-        return this.itemNegativeSpeedTask;
-    }
-
-    /** @return キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
-    public Entity getUsingKiller() {
-        return this.killerFirstPassedCheckPointEntity;
-    }
-
-    /** @return ダッシュボードを踏んで加速している状態かどうか */
-    public boolean isStepDashBoard() {
-        return this.isStepDashBoard;
-    }
-
-    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param racingPlayerObject レース中ログアウトしたプレイヤーのプレイヤー情報 */
-    public void setRacingPlayerObject(PlayerObject racingPlayerObject) {
-        this.racingPlayerObject = racingPlayerObject;
-    }
-
-    /** @param circuitName エントリーしているサーキット名 */
-    public void setCircuitName(String circuitName) {
-        this.circuitName = circuitName;
-    }
-
-    /** @param character 選択キャラクター */
-    public void setCharacter(Character character) {
-        this.character = character;
-    }
-
-    /** @param kart 選択カート */
-    public void setKart(Kart kart) {
-        this.kart = kart;
-    }
-
-    /** @param value マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
-    public void setStandby(boolean value) {
-        this.isStandby = value;
-    }
-
-    /** @param value レースをゴールしているかどうか */
-    public void setGoal(boolean value) {
-        this.isGoal = value;
-    }
-
-    /** @param value レースをスタートしているかどうか */
-    public void setStart(boolean value) {
-        this.isStart = value;
-    }
-
-    /** @param value レースの周回数 */
-    public void setCurrentLaps(int value) {
-        this.currentLaps = value;
-    }
-
-    /** @param passedCheckPointList 通過済みのチェックポイントリスト */
-    public void setPassedCheckPointList(ArrayList<String> passedCheckPointList) {
-        this.passedCheckPointList = passedCheckPointList;
-    }
-
-    /** @param lastPassedCheckPointEntity 最後に通過したチェックポイントエンティティ */
-    public void setLastPassedCheckPointEntity(Entity lastPassedCheckPointEntity) {
-        this.lastPassedCheckPointEntity = lastPassedCheckPointEntity;
-    }
-
-    /** @param newtask デスペナルティタスク */
-    public void setDeathPenaltyTask(BukkitTask newtask) {
-        //重複しないよう既に起動中のタスクがあればキャンセルする
-        if (this.deathPenaltyTask != null) {
-            this.deathPenaltyTask.cancel();
-        }
-
-        this.deathPenaltyTask = newtask;
-    }
-
-    /** @param newtask デスペナルティ用点滅タイトル表示タスク */
-    public void setDeathPenaltyTitleSendTask(BukkitTask newtask) {
-        //重複しないよう既に起動中のタスクがあればキャンセルする
-        if (this.deathPenaltyTitleSendTask != null) {
-            this.deathPenaltyTitleSendTask.cancel();
-        }
-
-        this.deathPenaltyTitleSendTask = newtask;
-    }
-
-    /** @param newtask 移動速度上昇タスク */
-    public void setItemPositiveSpeedTask(BukkitTask newtask) {
-        //重複しないよう既に起動中のタスクがあればキャンセルする
-        if (this.itemPositiveSpeedTask != null) {
-            this.itemPositiveSpeedTask.cancel();
-        }
-
-        this.itemPositiveSpeedTask = newtask;
-    }
-
-    /** @param newtask 移動速度低下タスク */
-    public void setItemNegativeSpeedTask(BukkitTask newtask) {
-        //重複しないよう既に起動中のタスクがあればキャンセルする
-        if (this.itemNegativeSpeedTask != null) {
-            this.itemNegativeSpeedTask.cancel();
-        }
-
-        this.itemNegativeSpeedTask = newtask;
-    }
-
-    /** @param entity キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
-    public void setKillerFirstPassedCheckPointEntity(Entity killerFirstPassedCheckPointEntity) {
-        this.killerFirstPassedCheckPointEntity = killerFirstPassedCheckPointEntity;
-    }
-
-    /** @param isStepDashBoard ダッシュボードを踏んで加速している状態かどうか */
-    public void setStepDashBoard(boolean isStepDashBoard) {
-        this.isStepDashBoard = isStepDashBoard;
-    }
-
     //〓 Race Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** レースの終了処理を行う */
@@ -535,5 +351,189 @@ public class Racer extends PlayerObject{
         player.setWalkSpeed(this.getCharacter().getWalkSpeed());
         player.setHealth(this.getCharacter().getMaxHealth());
         player.getInventory().setHelmet(this.getCharacter().getMenuItem());
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return レース中ログアウトしたプレイヤーのプレイヤー情報 */
+    public PlayerObject getRacingPlayerObject() {
+        return this.racingPlayerObject;
+    }
+
+    /** @return エントリーしているサーキット名 */
+    public String getCircuitName() {
+        return this.circuitName;
+    }
+
+    /** @return 選択キャラクター */
+    public Character getCharacter() {
+        return this.character;
+    }
+
+    /** @return 選択カート */
+    public Kart getKart() {
+        return this.kart;
+    }
+
+    /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
+    public boolean isStandby() {
+        return this.isStandby;
+    }
+
+    /** @return レースをゴールしているかどうか */
+    public boolean isGoal() {
+        return this.isGoal;
+    }
+
+    /** @return レースをスタートしているかどうか */
+    public boolean isStart() {
+        return this.isStart;
+    }
+
+    /** @return レースの周回数 */
+    public int getCurrentLaps() {
+        return this.currentLaps;
+    }
+
+    /** @return 通過済みのチェックポイントリスト */
+    public ArrayList<String> getPassedCheckPointList() {
+        return this.passedCheckPointList;
+    }
+
+    /** @return 最後に通過したチェックポイントエンティティ */
+    public Entity getLastPassedCheckPointEntity() {
+        return this.lastPassedCheckPointEntity;
+    }
+
+    /** @return デスペナルティタスク */
+    public BukkitTask getDeathPenaltyTask() {
+        return this.deathPenaltyTask;
+    }
+
+    /** @return デスペナルティ用点滅タイトル表示タスク */
+    public BukkitTask getDeathPenaltySendTitleTask() {
+        return this.deathPenaltyTitleSendTask;
+    }
+
+    /** @return 移動速度上昇タスク */
+    public BukkitTask getItemPositiveSpeed() {
+        return this.itemPositiveSpeedTask;
+    }
+
+    /** @return 移動速度低下タスク */
+    public BukkitTask getItemNegativeSpeed() {
+        return this.itemNegativeSpeedTask;
+    }
+
+    /** @return キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
+    public Entity getUsingKiller() {
+        return this.killerFirstPassedCheckPointEntity;
+    }
+
+    /** @return ダッシュボードを踏んで加速している状態かどうか */
+    public boolean isStepDashBoard() {
+        return this.isStepDashBoard;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param racingPlayerObject レース中ログアウトしたプレイヤーのプレイヤー情報 */
+    public void setRacingPlayerObject(PlayerObject racingPlayerObject) {
+        this.racingPlayerObject = racingPlayerObject;
+    }
+
+    /** @param circuitName エントリーしているサーキット名 */
+    public void setCircuitName(String circuitName) {
+        this.circuitName = circuitName;
+    }
+
+    /** @param character 選択キャラクター */
+    public void setCharacter(Character character) {
+        this.character = character;
+    }
+
+    /** @param kart 選択カート */
+    public void setKart(Kart kart) {
+        this.kart = kart;
+    }
+
+    /** @param value マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
+    public void setStandby(boolean value) {
+        this.isStandby = value;
+    }
+
+    /** @param value レースをゴールしているかどうか */
+    public void setGoal(boolean value) {
+        this.isGoal = value;
+    }
+
+    /** @param value レースをスタートしているかどうか */
+    public void setStart(boolean value) {
+        this.isStart = value;
+    }
+
+    /** @param value レースの周回数 */
+    public void setCurrentLaps(int value) {
+        this.currentLaps = value;
+    }
+
+    /** @param passedCheckPointList 通過済みのチェックポイントリスト */
+    public void setPassedCheckPointList(ArrayList<String> passedCheckPointList) {
+        this.passedCheckPointList = passedCheckPointList;
+    }
+
+    /** @param lastPassedCheckPointEntity 最後に通過したチェックポイントエンティティ */
+    public void setLastPassedCheckPointEntity(Entity lastPassedCheckPointEntity) {
+        this.lastPassedCheckPointEntity = lastPassedCheckPointEntity;
+    }
+
+    /** @param newtask デスペナルティタスク */
+    public void setDeathPenaltyTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.deathPenaltyTask != null) {
+            this.deathPenaltyTask.cancel();
+        }
+
+        this.deathPenaltyTask = newtask;
+    }
+
+    /** @param newtask デスペナルティ用点滅タイトル表示タスク */
+    public void setDeathPenaltyTitleSendTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.deathPenaltyTitleSendTask != null) {
+            this.deathPenaltyTitleSendTask.cancel();
+        }
+
+        this.deathPenaltyTitleSendTask = newtask;
+    }
+
+    /** @param newtask 移動速度上昇タスク */
+    public void setItemPositiveSpeedTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.itemPositiveSpeedTask != null) {
+            this.itemPositiveSpeedTask.cancel();
+        }
+
+        this.itemPositiveSpeedTask = newtask;
+    }
+
+    /** @param newtask 移動速度低下タスク */
+    public void setItemNegativeSpeedTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.itemNegativeSpeedTask != null) {
+            this.itemNegativeSpeedTask.cancel();
+        }
+
+        this.itemNegativeSpeedTask = newtask;
+    }
+
+    /** @param entity キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
+    public void setKillerFirstPassedCheckPointEntity(Entity killerFirstPassedCheckPointEntity) {
+        this.killerFirstPassedCheckPointEntity = killerFirstPassedCheckPointEntity;
+    }
+
+    /** @param isStepDashBoard ダッシュボードを踏んで加速している状態かどうか */
+    public void setStepDashBoard(boolean isStepDashBoard) {
+        this.isStepDashBoard = isStepDashBoard;
     }
 }

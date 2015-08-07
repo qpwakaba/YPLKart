@@ -73,7 +73,7 @@ public class CircuitData {
     /** 参加者のカートレースラップ記録 */
     private List<LapTime> kartLapTime = new ArrayList<LapTime>();
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
@@ -147,171 +147,7 @@ public class CircuitData {
         }
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return configKey サーキット名 */
-    public String getCircuitDataName() {
-        return circuitDataName;
-    }
-
-    /** @return ワールド名 */
-    public String getWorldName() {
-        return worldName;
-    }
-
-    /** @return locationX x座標 */
-    public double getLocationX() {
-        return locationX;
-    }
-
-    /** @return locationY y座標 */
-    public double getLocationY() {
-        return locationY;
-    }
-
-    /** @return locationZ z座標 */
-    public double getLocationZ() {
-        return locationZ;
-    }
-
-    /** @return locationYaw Yaw */
-    public float getLocationYaw() {
-        return locationYaw;
-    }
-
-    /** @return locationPitch Pitch */
-    public float getLocationPitch() {
-        return locationPitch;
-    }
-
-    /** @return numberOfLaps 周回数 */
-    public int getNumberOfLaps() {
-        return numberOfLaps;
-    }
-
-    /** @return minPlayer 最小プレイ人数 */
-    public int getMinPlayer() {
-        return minPlayer;
-    }
-
-    /** @return maxPlayer 最大プレイ人数 */
-    public int getMaxPlayer() {
-        return maxPlayer;
-    }
-
-    /** @return matchingTime マッチング猶予時間 */
-    public int getMatchingTime() {
-        return matchingTime;
-    }
-
-    /** @return menuTime メニュー選択猶予時間 */
-    public int getMenuTime() {
-        return menuTime;
-    }
-
-    /** @return limitTime レース終了までのタイムリミット */
-    public int getLimitTime() {
-        return limitTime;
-    }
-
-    /** @return broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
-    public boolean getBroadcastGoalMessage() {
-        return broadcastGoalMessage;
-    }
-
-    /** @return runLapTime 参加者のランニングレースラップ記録 */
-    public List<LapTime> getRunLapTimeList() {
-        return runLapTime;
-    }
-
-    /** @return kartLapTime 参加者のカートレースラップ記録 */
-    public List<LapTime> getKartLapTimeList() {
-        return kartLapTime;
-    }
-
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param configKey セットするサーキット名 */
-    public void setCircuitDataName(String circuitDataName) {
-        this.circuitDataName = (String) circuitDataName;
-    }
-
-    /** @param worldName セットするワールド名 */
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
-    }
-
-    /** @param locationX セットするx座標 */
-    public void setLocationX(double locationX) {
-        this.locationX = locationX;
-    }
-
-    /** @param locationY セットするy座標 */
-    public void setLocationY(double locationY) {
-        this.locationY = locationY;
-    }
-
-    /** @param locationZ セットするz座標 */
-    public void setLocationZ(double locationZ) {
-        this.locationZ = locationZ;
-    }
-
-    /** @param locationYaw セットするYaw */
-    public void setLocationYaw(float locationYaw) {
-        this.locationYaw = locationYaw;
-    }
-
-    /** @param locationPitch セットするPitch */
-    public void setLocationPitch(float locationPitch) {
-        this.locationPitch = locationPitch;
-    }
-
-    /** @param numberOfLaps セットする周回数 */
-    public void setNumberOfLaps(int numberOfLaps) {
-        this.numberOfLaps = numberOfLaps;
-    }
-
-    /** @param minPlayer セットする最小プレイ人数 */
-    public void setMinPlayer(int minPlayer) {
-        this.minPlayer = minPlayer;
-    }
-
-    /** @param maxPlayer セットする最大プレイ人数 */
-    public void setMaxPlayer(int maxPlayer) {
-        this.maxPlayer = maxPlayer;
-    }
-
-    /** @param matchingTime セットするマッチング猶予時間 */
-    public void setMatchingTime(int matchingTime) {
-        this.matchingTime = matchingTime;
-    }
-
-    /** @param menuTime セットするメニュー選択猶予時間 */
-    public void setMenuTime(int menuTime) {
-        this.menuTime = menuTime;
-    }
-
-    /** @param limitTime セットするレース終了までのタイムリミット */
-    public void setLimitTime(int limitTime) {
-        this.limitTime = limitTime;
-    }
-
-    /** @param broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
-    public void setBroadcastGoalMessage(boolean broadcastGoalMessage) {
-        this.broadcastGoalMessage = broadcastGoalMessage;
-    }
-
-    /** @param runLapTimeList セットする参加者のランニングレースラップ記録 */
-    public void setRunLapTimeList(List<LapTime> runLapTimeList) {
-        this.runLapTime = runLapTimeList;
-    }
-
-    /** @param kartLapTimeList セットする参加者のカートレースラップ記録 */
-    public void setKartLapTimeList(List<LapTime> kartLapTimeList) {
-        this.kartLapTime = kartLapTimeList;
-    }
-
-    //〓 list/map 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 List/Map 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 引数uuidと一致するUUIDキーを持つLapTimeオブジェクトを返す
@@ -385,7 +221,7 @@ public class CircuitData {
         }
     }
 
-    //〓 file 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 File 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * メンバ変数の設定データをローカルコンフィグに新しい値として上書きし
@@ -457,7 +293,7 @@ public class CircuitData {
         return new CircuitData(getCircuitDataName());
     }
 
-    //〓 util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param location セットするレースの開始座標 */
     public void setStartLocation(Location location) {
@@ -754,5 +590,169 @@ public class CircuitData {
         }
 
         return lapTimeMap;
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return configKey サーキット名 */
+    public String getCircuitDataName() {
+        return circuitDataName;
+    }
+
+    /** @return ワールド名 */
+    public String getWorldName() {
+        return worldName;
+    }
+
+    /** @return locationX x座標 */
+    public double getLocationX() {
+        return locationX;
+    }
+
+    /** @return locationY y座標 */
+    public double getLocationY() {
+        return locationY;
+    }
+
+    /** @return locationZ z座標 */
+    public double getLocationZ() {
+        return locationZ;
+    }
+
+    /** @return locationYaw Yaw */
+    public float getLocationYaw() {
+        return locationYaw;
+    }
+
+    /** @return locationPitch Pitch */
+    public float getLocationPitch() {
+        return locationPitch;
+    }
+
+    /** @return numberOfLaps 周回数 */
+    public int getNumberOfLaps() {
+        return numberOfLaps;
+    }
+
+    /** @return minPlayer 最小プレイ人数 */
+    public int getMinPlayer() {
+        return minPlayer;
+    }
+
+    /** @return maxPlayer 最大プレイ人数 */
+    public int getMaxPlayer() {
+        return maxPlayer;
+    }
+
+    /** @return matchingTime マッチング猶予時間 */
+    public int getMatchingTime() {
+        return matchingTime;
+    }
+
+    /** @return menuTime メニュー選択猶予時間 */
+    public int getMenuTime() {
+        return menuTime;
+    }
+
+    /** @return limitTime レース終了までのタイムリミット */
+    public int getLimitTime() {
+        return limitTime;
+    }
+
+    /** @return broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
+    public boolean getBroadcastGoalMessage() {
+        return broadcastGoalMessage;
+    }
+
+    /** @return runLapTime 参加者のランニングレースラップ記録 */
+    public List<LapTime> getRunLapTimeList() {
+        return runLapTime;
+    }
+
+    /** @return kartLapTime 参加者のカートレースラップ記録 */
+    public List<LapTime> getKartLapTimeList() {
+        return kartLapTime;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param configKey サーキット名 */
+    public void setCircuitDataName(String circuitDataName) {
+        this.circuitDataName = (String) circuitDataName;
+    }
+
+    /** @param worldName ワールド名 */
+    public void setWorldName(String worldName) {
+        this.worldName = worldName;
+    }
+
+    /** @param locationX x座標 */
+    public void setLocationX(double locationX) {
+        this.locationX = locationX;
+    }
+
+    /** @param locationY y座標 */
+    public void setLocationY(double locationY) {
+        this.locationY = locationY;
+    }
+
+    /** @param locationZ z座標 */
+    public void setLocationZ(double locationZ) {
+        this.locationZ = locationZ;
+    }
+
+    /** @param locationYaw Yaw */
+    public void setLocationYaw(float locationYaw) {
+        this.locationYaw = locationYaw;
+    }
+
+    /** @param locationPitch Pitch */
+    public void setLocationPitch(float locationPitch) {
+        this.locationPitch = locationPitch;
+    }
+
+    /** @param numberOfLaps 周回数 */
+    public void setNumberOfLaps(int numberOfLaps) {
+        this.numberOfLaps = numberOfLaps;
+    }
+
+    /** @param minPlayer 最小プレイ人数 */
+    public void setMinPlayer(int minPlayer) {
+        this.minPlayer = minPlayer;
+    }
+
+    /** @param maxPlayer 最大プレイ人数 */
+    public void setMaxPlayer(int maxPlayer) {
+        this.maxPlayer = maxPlayer;
+    }
+
+    /** @param matchingTime マッチング猶予時間 */
+    public void setMatchingTime(int matchingTime) {
+        this.matchingTime = matchingTime;
+    }
+
+    /** @param menuTime メニュー選択猶予時間 */
+    public void setMenuTime(int menuTime) {
+        this.menuTime = menuTime;
+    }
+
+    /** @param limitTime レース終了までのタイムリミット */
+    public void setLimitTime(int limitTime) {
+        this.limitTime = limitTime;
+    }
+
+    /** @param broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
+    public void setBroadcastGoalMessage(boolean broadcastGoalMessage) {
+        this.broadcastGoalMessage = broadcastGoalMessage;
+    }
+
+    /** @param runLapTimeList 参加者のランニングレースラップ記録 */
+    public void setRunLapTimeList(List<LapTime> runLapTimeList) {
+        this.runLapTime = runLapTimeList;
+    }
+
+    /** @param kartLapTimeList 参加者のカートレースラップ記録 */
+    public void setKartLapTimeList(List<LapTime> kartLapTimeList) {
+        this.kartLapTime = kartLapTimeList;
     }
 }

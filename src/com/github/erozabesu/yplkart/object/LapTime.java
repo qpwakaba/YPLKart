@@ -17,7 +17,7 @@ public class LapTime implements Comparable {
     /** ラップタイム */
     private double lapTime;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
@@ -31,41 +31,7 @@ public class LapTime implements Comparable {
         setLapTime(lapTime);
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return numberOfLaps 周回数 */
-    public int getNumberOfLaps() {
-        return numberOfLaps;
-    }
-
-    /** @return uuid UUID */
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    /** @return lapTime ラップタイム */
-    public double getLapTime() {
-        return lapTime;
-    }
-
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param numberOfLaps セットする周回数 */
-    public void setNumberOfLaps(int numberOfLaps) {
-        this.numberOfLaps = numberOfLaps;
-    }
-
-    /** @param uuid セットするUUID */
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    /** @param lapTime セットするラップタイム */
-    public void setLapTime(double lapTime) {
-        this.lapTime = lapTime;
-    }
-
-    //〓 util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 他のLapTimeオブジェクトのラップタイムと値を比較する
@@ -93,5 +59,39 @@ public class LapTime implements Comparable {
         } else {
             return 0;
         }
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return numberOfLaps 周回数 */
+    public int getNumberOfLaps() {
+        return numberOfLaps;
+    }
+
+    /** @return uuid UUID */
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    /** @return lapTime ラップタイム */
+    public double getLapTime() {
+        return lapTime;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param numberOfLaps 周回数 */
+    public void setNumberOfLaps(int numberOfLaps) {
+        this.numberOfLaps = numberOfLaps;
+    }
+
+    /** @param uuid UUID */
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    /** @param lapTime ラップタイム */
+    public void setLapTime(double lapTime) {
+        this.lapTime = lapTime;
     }
 }

@@ -32,7 +32,7 @@ public class DisplayKart {
     /** Yaw */
     private float locationYaw;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public DisplayKart(String configKey) {
         setConfigKey(configKey);
@@ -62,7 +62,68 @@ public class DisplayKart {
         saveConfiguration();
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 File 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * メンバ変数の設定データをローカルコンフィグに新しい値として上書きし
+     * ローカルファイルに保存する
+     * ゲーム内から動的に変更される設定データを扱うため用意されている
+     * コマンド等で設定データが変更された場合逐一上書きすること
+     */
+    public void saveConfiguration() {
+        String configKey = getConfigKey();
+
+        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
+
+        //設定データに値を上書き
+        config.setValue(configKey + ".kart_type", getKartObjectKey());
+        config.setValue(configKey + ".world", getWorldName());
+        config.setValue(configKey + ".x", getLocationX());
+        config.setValue(configKey + ".y", getLocationY());
+        config.setValue(configKey + ".z", getLocationZ());
+        config.setValue(configKey + ".pitch", getLocationPitch());
+        config.setValue(configKey + ".yaw", getLocationYaw());
+
+        //設定データをローカルファイルに保存
+        config.saveConfiguration();
+    }
+
+    /** ローカルコンフィグファイルから全データを削除する */
+    public void deleteConfiguration() {
+        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
+
+        config.setValue(getConfigKey(), null);
+
+        //設定データをローカルファイルに保存
+        config.saveConfiguration();
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param location セットする座標 */
+    public void setLocation(Location location) {
+        setWorldName(location.getWorld().getName());
+        setLocationX(location.getX());
+        setLocationY(location.getY());
+        setLocationZ(location.getZ());
+        setLocationPitch(location.getPitch());
+        setLocationYaw(location.getYaw());
+    }
+
+    /** @return 座標 */
+    public Location getLocation() {
+        World world = Bukkit.getWorld(getWorldName());
+
+        if (world == null) {
+            return null;
+        }
+
+        return new Location(world
+                , getLocationX(), getLocationY(), getLocationZ()
+                , getLocationYaw(), getLocationPitch());
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return configKey コンフィグキー */
     public String getConfigKey() {
@@ -104,106 +165,45 @@ public class DisplayKart {
         return locationPitch;
     }
 
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** @param configKey セットするコンフィグキー */
+    /** @param configKey コンフィグキー */
     public void setConfigKey(String configKey) {
         this.configKey = configKey;
     }
 
-    /** @param kartObjectKey セットするカートオブジェクト */
+    /** @param kartObjectKey カートオブジェクト */
     public void setKartObjectKey(String kartObjectKey) {
         this.kartObjectKey = kartObjectKey;
     }
 
-    /** @param worldName セットするワールド名 */
+    /** @param worldName ワールド名 */
     public void setWorldName(String worldName) {
         this.worldName = worldName;
     }
 
-    /** @param locationX セットするx座標 */
+    /** @param locationX x座標 */
     public void setLocationX(double locationX) {
         this.locationX = locationX;
     }
 
-    /** @param locationY セットするy座標 */
+    /** @param locationY y座標 */
     public void setLocationY(double locationY) {
         this.locationY = locationY;
     }
 
-    /** @param locationZ セットするz座標 */
+    /** @param locationZ z座標 */
     public void setLocationZ(double locationZ) {
         this.locationZ = locationZ;
     }
 
-    /** @param locationYaw セットするYaw */
+    /** @param locationYaw Yaw */
     public void setLocationYaw(float locationYaw) {
         this.locationYaw = locationYaw;
     }
 
-    /** @param locationPitch セットするPitch */
+    /** @param locationPitch Pitch */
     public void setLocationPitch(float locationPitch) {
         this.locationPitch = locationPitch;
-    }
-
-    //〓 file 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * メンバ変数の設定データをローカルコンフィグに新しい値として上書きし
-     * ローカルファイルに保存する
-     * ゲーム内から動的に変更される設定データを扱うため用意されている
-     * コマンド等で設定データが変更された場合逐一上書きすること
-     */
-    public void saveConfiguration() {
-        String configKey = getConfigKey();
-
-        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
-
-        //設定データに値を上書き
-        config.setValue(configKey + ".kart_type", getKartObjectKey());
-        config.setValue(configKey + ".world", getWorldName());
-        config.setValue(configKey + ".x", getLocationX());
-        config.setValue(configKey + ".y", getLocationY());
-        config.setValue(configKey + ".z", getLocationZ());
-        config.setValue(configKey + ".pitch", getLocationPitch());
-        config.setValue(configKey + ".yaw", getLocationYaw());
-
-        //設定データをローカルファイルに保存
-        config.saveConfiguration();
-    }
-
-    /** ローカルコンフィグファイルから全データを削除する */
-    public void deleteConfiguration() {
-        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
-
-        config.setValue(getConfigKey(), null);
-
-        //設定データをローカルファイルに保存
-        config.saveConfiguration();
-    }
-
-    //〓 util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param location セットする座標 */
-    public void setLocation(Location location) {
-        setWorldName(location.getWorld().getName());
-        setLocationX(location.getX());
-        setLocationY(location.getY());
-        setLocationZ(location.getZ());
-        setLocationPitch(location.getPitch());
-        setLocationYaw(location.getYaw());
-    }
-
-    /** @return 座標 */
-    public Location getLocation() {
-        World world = Bukkit.getWorld(getWorldName());
-
-        if (world == null) {
-            return null;
-        }
-
-        return new Location(world
-                , getLocationX(), getLocationY(), getLocationZ()
-                , getLocationYaw(), getLocationPitch());
     }
 }
