@@ -419,7 +419,7 @@ public class Util extends ReflectionUtil {
             Player player = (Player) damagedLiving;
 
             //レース中でない場合は通常通りのダメージ処理
-            if (!RaceManager.isStarted(player.getUniqueId())) {
+            if (!RaceManager.isStillRacing(player.getUniqueId())) {
                 player.damage(damage, executor);
 
             //レース中の場合、デスポーンしないよう仮想的に死亡した演出を行う
@@ -569,17 +569,23 @@ public class Util extends ReflectionUtil {
         l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
         ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
         for (LivingEntity damaged : entities) {
-            if (executor != null)
-                if (damaged.getUniqueId() == executor.getUniqueId())
+            if (executor != null) {
+                if (damaged.getUniqueId() == executor.getUniqueId()) {
                     continue;
-            if (0 < damaged.getNoDamageTicks())
+                }
+            }
+            if (0 < damaged.getNoDamageTicks()) {
                 continue;
-            if (damaged.isDead())
+            }
+            if (damaged.isDead()) {
                 continue;
-            if (!(damaged instanceof Player))
+            }
+            if (!(damaged instanceof Player)) {
                 continue;
-            if (!RaceManager.isStarted(((Player) damaged).getUniqueId()))
+            }
+            if (!RaceManager.isStillRacing(((Player) damaged).getUniqueId())) {
                 continue;
+            }
 
             Vector v = Util.getVectorToLocation(damaged.getLocation(), l);
             v.setX(v.clone().multiply(-1).getX());

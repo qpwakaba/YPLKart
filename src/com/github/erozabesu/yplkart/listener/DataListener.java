@@ -195,14 +195,14 @@ public class DataListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (!RaceManager.isStarted(player.getUniqueId())) {
-            return;
-        }
-        if (RaceManager.getRacer(player).getCurrentLaps() < 1) {
+        if (!RaceManager.isStillRacing(player.getUniqueId())) {
             return;
         }
 
         Racer racer = RaceManager.getRacer(player);
+        if (racer.getCurrentLaps() < 1) {
+            return;
+        }
 
         ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(
                 event.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, racer.getCircuitName());
@@ -228,7 +228,7 @@ public class DataListener implements Listener {
         if (!(e.getEntity() instanceof Player)) {
             return;
         }
-        if (!RaceManager.isStarted(((Player) e.getEntity()).getUniqueId())) {
+        if (!RaceManager.isStillRacing(((Player) e.getEntity()).getUniqueId())) {
             return;
         }
         e.setCancelled(true);
@@ -340,9 +340,6 @@ public class DataListener implements Listener {
         }
     }
 
-    //キラー使用中の窒素ダメージを無効
-    //カート搭乗中の落下ダメージを無効
-    //スタンバイ状態～レース開始までのダメージを無効
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent event) {
         if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
@@ -354,26 +351,34 @@ public class DataListener implements Listener {
         if (event.getCause() == DamageCause.VOID) {
             return;
         }
-        Player p = (Player) event.getEntity();
 
-        if (RaceManager.isStarted(p.getUniqueId())) {
-            if (RaceManager.getRacer(p).getUsingKiller() != null) {
+        Player player = (Player) event.getEntity();
+        UUID uuid = player.getUniqueId();
+
+        if (RaceManager.isStillRacing(uuid)) {
+
+            //キラー使用中の窒素ダメージを無効
+            if (RaceManager.getRacer(player).getUsingKiller() != null) {
                 if (event.getCause() == DamageCause.SUFFOCATION) {
                     event.setCancelled(true);
                     return;
                 }
             }
+
+            //カート搭乗中の落下ダメージを無効
             if (event.getCause() == DamageCause.FALL) {
-                if (p.getVehicle() != null) {
-                    if (RaceManager.isSpecificKartType(p.getVehicle(), KartType.RacingKart)) {
+                if (player.getVehicle() != null) {
+                    if (RaceManager.isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
                         event.setCancelled(true);
                     }
                 }
             }
-        } else if (RaceManager.isStandBy(p.getUniqueId())
-                && !RaceManager.isStarted(p.getUniqueId())) {
-            if (event.getCause() != DamageCause.VOID)
+
+        //スタンバイ状態～レース開始までのダメージを無効
+        } else if (RaceManager.isStandBy(uuid) && !RaceManager.isStarted(uuid)) {
+            if (event.getCause() != DamageCause.VOID) {
                 event.setCancelled(true);
+            }
         }
     }
 
@@ -476,20 +481,25 @@ public class DataListener implements Listener {
         }
 
         Player player = (Player) e.getWhoClicked();
+        UUID uuid = player.getUniqueId();
 
         //クライアントを×ボタン等で強制終了した場合、プレイヤーはオフラインになるためreturn
         if (!player.isOnline()) {
             return;
         }
 
-        //召集後はインベントリの操作をさせない
+        //既にゴールしている場合はreturn
+        if (RaceManager.getRace(uuid).isGoal()) {
+            return;
+        }
+
+        //スタンバイ状態以降はインベントリの操作をさせない
         if (RaceManager.isStandBy(player.getUniqueId())) {
             e.setCancelled(true);
             player.updateInventory();
         }
 
-        UUID uuid = player.getUniqueId();
-        Racer r = RaceManager.getRacer(player);
+        Racer racer = RaceManager.getRacer(player);
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
             e.setCancelled(true);
             player.updateInventory();
@@ -515,14 +525,14 @@ public class DataListener implements Listener {
             } else if (EnumSelectMenu.CHARACTER_NEXT.equalsIgnoreCase(clickedItemName)
                     || EnumSelectMenu.CHARACTER_PREVIOUS.equalsIgnoreCase(clickedItemName)) {
                 if (RaceManager.isStandBy(uuid)) {
-                    if (r.getCharacter() == null) {
+                    if (racer.getCharacter() == null) {
                         MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                                player, RaceManager.getCircuit(r.getCircuitName()));
+                                player, RaceManager.getCircuit(racer.getCircuitName()));
                     } else {
                         player.closeInventory();
 
                         //kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
-                        if (r.getKart() != null)
+                        if (racer.getKart() != null)
                             RaceManager.showSelectMenu(player, false);
                     }
                 } else {
@@ -558,14 +568,14 @@ public class DataListener implements Listener {
                     || EnumSelectMenu.KART_PREVIOUS.equalsIgnoreCase(clicked)) {
                 //ネクストプレビューボタン
                 if (RaceManager.isStandBy(uuid)) {
-                    if (r.getKart() == null) {
+                    if (racer.getKart() == null) {
                         MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                                player, RaceManager.getCircuit(r.getCircuitName()));
+                                player, RaceManager.getCircuit(racer.getCircuitName()));
                     } else {
                         player.closeInventory();
 
                         //character == nullの場合はonInventoryCloseで強制的にメニューが表示される
-                        if (r.getCharacter() != null) {
+                        if (racer.getCharacter() != null) {
                             RaceManager.showSelectMenu(player, true);
                         }
                     }

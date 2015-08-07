@@ -154,8 +154,8 @@ public class ItemListener extends RaceManager implements Listener {
             showSelectMenu(player, true);
         }
 
-        //レース中のみ利用できるアイテム群
-        if (isStarted(uuid) && !getRace(uuid).isGoal()) {
+        //レース中、かつゴールしていない状態のみ利用できるアイテム群
+        if (isStillRacing(uuid)) {
 
             //ダッシュきのこ
             if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
@@ -231,28 +231,30 @@ public class ItemListener extends RaceManager implements Listener {
 
     //TODO 冗長
     @EventHandler
-    public void onInteractObjectEntity(PlayerMoveEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
+    public void onInteractObjectEntity(PlayerMoveEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
-        final Player p = e.getPlayer();
-        final UUID id = p.getUniqueId();
-        if (!isStarted(id))
+        }
+        final Player player = event.getPlayer();
+        final UUID uuid = player.getUniqueId();
+        if (!isStillRacing(uuid)) {
             return;
+        }
 
-        List<Entity> entities = p.getNearbyEntities(0.7, 2, 0.7);
+        List<Entity> entities = player.getNearbyEntities(0.7, 2, 0.7);
 
         for (final Entity entity : entities) {
             if (entity.getCustomName() != null) {
                 if (entity instanceof FallingBlock) {
                     if (entity.getCustomName().equalsIgnoreCase(ItemEnum.BANANA.getDisplayName())) {
-                        if (Permission.hasPermission(p, Permission.INTERACT_BANANA, false)) {
-                            RaceManager.getCircuit(id).removeJammerEntity(entity);
+                        if (Permission.hasPermission(player, Permission.INTERACT_BANANA, false)) {
+                            RaceManager.getCircuit(uuid).removeJammerEntity(entity);
                             entity.remove();
 
-                            if (p.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractBanana.sendConvertedMessage(p,
-                                        RaceManager.getCircuit(id));
-                                setNegativeItemSpeed(p, ItemEnum.BANANA.getEffectSecond(),
+                            if (player.getNoDamageTicks() == 0) {
+                                MessageEnum.raceInteractBanana.sendConvertedMessage(player,
+                                        RaceManager.getCircuit(uuid));
+                                setNegativeItemSpeed(player, ItemEnum.BANANA.getEffectSecond(),
                                         ItemEnum.BANANA.getEffectLevel(), Sound.SLIME_WALK);
                             }
                         }
@@ -260,19 +262,19 @@ public class ItemListener extends RaceManager implements Listener {
                 } else if (entity instanceof EnderCrystal) {
                     //偽アイテムボックス
                     if (entity.getCustomName().equalsIgnoreCase(FakeItemBoxName)) {
-                        if (Permission.hasPermission(p, Permission.INTERACT_FAKEITEMBOX, false)) {
+                        if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
 
-                            if (p.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(p,
-                                        RaceManager.getCircuit(id));
-                                Util.createSafeExplosion(null, p.getLocation(),
+                            if (player.getNoDamageTicks() == 0) {
+                                MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player,
+                                        RaceManager.getCircuit(uuid));
+                                Util.createSafeExplosion(null, player.getLocation(),
                                         ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1);
                             }
                         }
                         //偽アイテムボックス復活するタイプ
                     } else if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameFake)) {
-                        if (Permission.hasPermission(p, Permission.INTERACT_FAKEITEMBOX, false)) {
+                        if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
 
                             pl.getServer().getScheduler().runTaskLater(pl, new Runnable() {
@@ -284,17 +286,17 @@ public class ItemListener extends RaceManager implements Listener {
                                 }
                             }, 2 * 20L + 10L);
 
-                            if (p.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractBanana.sendConvertedMessage(p, RaceManager.getCircuit(id));
-                                Util.createSafeExplosion(null, p.getLocation(),
+                            if (player.getNoDamageTicks() == 0) {
+                                MessageEnum.raceInteractBanana.sendConvertedMessage(player, RaceManager.getCircuit(uuid));
+                                Util.createSafeExplosion(null, player.getLocation(),
                                         ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1);
                             }
                         }
                     } else if (entity.getCustomName().contains(ItemBoxName)) {
-                        if (Permission.hasPermission(p, Permission.INTERACT_ITEMBOX, false)) {
-                            if (itemboxCool.get(p) == null)
-                                itemboxCool.put(p, false);
-                            if (!itemboxCool.get(p)) {
+                        if (Permission.hasPermission(player, Permission.INTERACT_ITEMBOX, false)) {
+                            if (itemboxCool.get(player) == null)
+                                itemboxCool.put(player, false);
+                            if (!itemboxCool.get(player)) {
                                 entity.remove();
                                 Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
                                     public void run() {
@@ -310,11 +312,11 @@ public class ItemListener extends RaceManager implements Listener {
                                     }
                                 }, 2 * 20L + 10L);
 
-                                int denominator = getRacingPlayer(getRacer(p).getCircuitName()).size();
+                                int denominator = getRacingPlayer(getRacer(player).getCircuitName()).size();
                                 //denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
                                 if (denominator == 0)
                                     denominator = 1;
-                                int rank = getRank(p);
+                                int rank = getRank(player);
                                 if (rank == 0)
                                     rank = 1;
 
@@ -337,12 +339,12 @@ public class ItemListener extends RaceManager implements Listener {
                                     if (tier < 4)
                                         tier++;
 
-                                Inventory i = p.getInventory();
-                                ItemEnum.addRandomItemFromTier(p, tier);
-                                itemboxCool.put(p, true);
+                                Inventory i = player.getInventory();
+                                ItemEnum.addRandomItemFromTier(player, tier);
+                                itemboxCool.put(player, true);
                                 pl.getServer().getScheduler().runTaskLater(pl, new Runnable() {
                                     public void run() {
-                                        itemboxCool.put(p, false);
+                                        itemboxCool.put(player, false);
                                     }
                                 }, 30L);
                             }
@@ -354,41 +356,43 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     @EventHandler
-    public void onStepSpeedBlock(PlayerMoveEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
+    public void onStepSpeedBlock(PlayerMoveEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
-        if (!isStarted(e.getPlayer().getUniqueId()))
+        }
+        if (!isStillRacing(event.getPlayer().getUniqueId())) {
             return;
+        }
 
-        final Player p = e.getPlayer();
-        final UUID id = p.getUniqueId();
+        final Player player = event.getPlayer();
+        final UUID uuid = player.getUniqueId();
 
-        if (Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_BASE
-                || Util.getGroundBlockMaterial(p.getLocation()) == Material.PISTON_STICKY_BASE) {
-            if (Permission.hasPermission(p, Permission.INTERACT_DASHBOARD, false)) {
-                if (boostRailCool.get(p) != null)
-                    if (boostRailCool.get(p))
+        if (Util.getGroundBlockMaterial(player.getLocation()) == Material.PISTON_BASE
+                || Util.getGroundBlockMaterial(player.getLocation()) == Material.PISTON_STICKY_BASE) {
+            if (Permission.hasPermission(player, Permission.INTERACT_DASHBOARD, false)) {
+                if (boostRailCool.get(player) != null)
+                    if (boostRailCool.get(player))
                         return;
                 Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        boostRailCool.put(p, false);
+                        boostRailCool.put(player, false);
                     }
                 }, 10L);
 
-                if (p.getVehicle() != null) {
-                    if (isSpecificKartType(p.getVehicle(), KartType.RacingKart)) {
-                        getRacer(p).runStepDashBoardInitializeTask();
-                        p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
+                if (player.getVehicle() != null) {
+                    if (isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
+                        getRacer(player).runStepDashBoardInitializeTask();
+                        player.playSound(event.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
                         return;
                     }
                 }
 
-                setPositiveItemSpeed(p
+                setPositiveItemSpeed(player
                         , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
                         , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
                         , Sound.EXPLODE);
                 //p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
-                boostRailCool.put(p, true);
+                boostRailCool.put(player, true);
             }
         }
 
@@ -539,25 +543,37 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     @EventHandler
-    public void onPickupItem(PlayerPickupItemEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld()))
+    public void onPickupItem(PlayerPickupItemEvent event) {
+        Player player = event.getPlayer();
+        if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
-        if (!isStandBy(e.getPlayer().getUniqueId()))
+        }
+        if (!isStandBy(player.getUniqueId())) {
             return;
-        e.setCancelled(true);
+        }
+        if (getRace(player.getUniqueId()).isGoal()) {
+            return;
+        }
+        event.setCancelled(true);
     }
 
     @EventHandler
-    public void onDropItem(PlayerDropItemEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld()))
+    public void onDropItem(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
-        if (!isStandBy(e.getPlayer().getUniqueId()))
+        }
+        if (!isStandBy(player.getUniqueId())) {
             return;
+        }
+        if (getRace(player.getUniqueId()).isGoal()) {
+            return;
+        }
 
-        if (ItemEnum.MENU.isSimilar(e.getItemDrop().getItemStack()))
-            e.setCancelled(true);
+        if (ItemEnum.MENU.isSimilar(event.getItemDrop().getItemStack()))
+            event.setCancelled(true);
         else
-            e.getItemDrop().remove();
+            event.getItemDrop().remove();
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

@@ -553,6 +553,23 @@ public class RaceManager {
     }
 
     /**
+     * @param uuid チェックするレース参加プレイヤーのUUID
+     * @return レースがスタートしており、かつまだゴールしていない状態かどうか
+     */
+    public static Boolean isStillRacing(UUID uuid) {
+        if (isEntry(uuid)) {
+            if (isStandBy(uuid)) {
+                if (getCircuit(uuid).isStarted()) {
+                    if (!getRace(uuid).isGoal()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 引数entityが引数kartTypeのエンティティかどうか判別する
      * @param entity 判別するエンティティ
      * @param kartType 判別するKartType
