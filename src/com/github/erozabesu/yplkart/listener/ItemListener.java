@@ -155,7 +155,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         //レース中のみ利用できるアイテム群
-        if (isRacing(uuid)) {
+        if (isRacing(uuid) && !getRace(uuid).isGoal()) {
 
             //ダッシュきのこ
             if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
