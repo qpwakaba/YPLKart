@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -35,6 +36,14 @@ public class Racer extends PlayerObject{
 
     /** 選択カート */
     private Kart kart;
+
+    /**
+     * 搭乗しているカートエンティティの座標
+     * カートエンティティを再生成した際のYawを固定するため、
+     * レースがスタンバイ状態に移行し、レース開始地点にテレポートする際の座標、<br>
+     * もしくは、ログアウト時のカートエンティティの座標を格納する
+     */
+    private Location kartEntityLocation;
 
     /** マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     private boolean isStandby;
@@ -95,6 +104,8 @@ public class Racer extends PlayerObject{
         setRacingPlayerObject(null);
 
         setCircuitName("");
+
+        setKartEntityLocation(null);
 
         setStandby(false);
         setStart(false);
@@ -304,6 +315,26 @@ public class Racer extends PlayerObject{
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /** 搭乗しているカートエンティティの座標を格納する */
+    public void saveKartEntityLocation() {
+        if (getPlayer() == null) {
+            return;
+        }
+        if (getKart() == null) {
+            return;
+        }
+
+        Entity vehicle = getPlayer().getVehicle();
+        if (vehicle == null) {
+            return;
+        }
+        if (!RaceManager.isSpecificKartType(vehicle, KartType.RacingKart)) {
+            return;
+        }
+
+        setKartEntityLocation(vehicle.getLocation());
+    }
+
     /**
      * カートエンティティをRacerオブジェクトに格納されている選択カート情報を元にリスポーンさせ、<br>
      * プレイヤーを搭乗させる。
@@ -333,7 +364,7 @@ public class Racer extends PlayerObject{
         }
 
         //新規に生成したカートエンティティに搭乗させる
-        Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), kart);
+        Entity kartEntity = RaceManager.createRacingKart(RaceManager.getRace(getUUID()).getKartEntityLocation(), kart);
         kartEntity.setPassenger(player);
 
         //クライアントで搭乗が解除されている状態で描画されるのを回避するため
@@ -373,6 +404,11 @@ public class Racer extends PlayerObject{
     /** @return 選択カート */
     public Kart getKart() {
         return this.kart;
+    }
+
+    /** @return 搭乗しているカートエンティティの座標 */
+    public Location getKartEntityLocation() {
+        return kartEntityLocation;
     }
 
     /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
@@ -455,6 +491,11 @@ public class Racer extends PlayerObject{
     /** @param kart 選択カート */
     public void setKart(Kart kart) {
         this.kart = kart;
+    }
+
+    /** @param kartEntityLocation 搭乗しているカートエンティティの座標 */
+    public void setKartEntityLocation(Location kartEntityLocation) {
+        this.kartEntityLocation = kartEntityLocation;
     }
 
     /** @param value マッチングが終了し、レース開始地点にテレポートされた状態かどうか */

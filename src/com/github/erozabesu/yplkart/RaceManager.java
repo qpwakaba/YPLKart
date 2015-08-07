@@ -264,6 +264,7 @@ public class RaceManager {
         }
 
         Racer racer = getRace(uuid);
+        racer.saveKartEntityLocation();
         racer.setKart(kart);
         racer.recoveryKart();
 

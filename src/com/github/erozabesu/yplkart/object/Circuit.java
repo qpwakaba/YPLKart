@@ -205,6 +205,7 @@ public class Circuit {
                 racer.applyRaceParameter();
                 racer.setCircuitName(getCircuitName());
                 racer.setStandby(true);
+                racer.setKartEntityLocation(position.get(count));
                 RaceManager.clearCharacterRaceData(uuid);
                 RaceManager.clearKartRaceData(uuid);
                 RaceManager.leaveRacingKart(player);

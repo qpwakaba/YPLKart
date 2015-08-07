@@ -266,13 +266,13 @@ public class DataListener implements Listener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
+    public void onQuit(PlayerQuitEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
             return;
         }
 
-        Player player = e.getPlayer();
-        Racer r = RaceManager.getRacer(player);
+        Player player = event.getPlayer();
+        Racer racer = RaceManager.getRacer(player);
 
         //ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
         //ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
@@ -288,17 +288,17 @@ public class DataListener implements Listener {
         if (RaceManager.isStandBy(player.getUniqueId())) {
             Scoreboards.hideBoard(player.getUniqueId());
 
-            r.savePlayerDataOnQuit();
-
+            racer.savePlayerDataOnQuit();
+            racer.saveKartEntityLocation();
             RaceManager.leaveRacingKart(player);
 
             //レース前のパラメータを復元する
-            r.recoveryAll();
+            racer.recoveryAll();
 
             //ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
-            if (r.isGoal()) {
-                r.recoveryLocation();
-                r.initializeRacer();
+            if (racer.isGoal()) {
+                racer.recoveryLocation();
+                racer.initializeRacer();
             }
         } else if (RaceManager.isEntry(player.getUniqueId())
                 && !RaceManager.isStandBy(player.getUniqueId())) {
