@@ -100,7 +100,7 @@ public class DataListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        if (RaceManager.isStandBy(uuid) && !RaceManager.isRacing(uuid)) {
+        if (RaceManager.isStandBy(uuid) && !RaceManager.isStarted(uuid)) {
             if (!event.getFrom().equals(event.getTo())) {
                 Location from = event.getFrom();
                 Location to = event.getTo();
@@ -195,7 +195,7 @@ public class DataListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (!RaceManager.isRacing(player.getUniqueId())) {
+        if (!RaceManager.isStarted(player.getUniqueId())) {
             return;
         }
         if (RaceManager.getRacer(player).getCurrentLaps() < 1) {
@@ -228,7 +228,7 @@ public class DataListener implements Listener {
         if (!(e.getEntity() instanceof Player)) {
             return;
         }
-        if (!RaceManager.isRacing(((Player) e.getEntity()).getUniqueId())) {
+        if (!RaceManager.isStarted(((Player) e.getEntity()).getUniqueId())) {
             return;
         }
         e.setCancelled(true);
@@ -356,7 +356,7 @@ public class DataListener implements Listener {
         }
         Player p = (Player) event.getEntity();
 
-        if (RaceManager.isRacing(p.getUniqueId())) {
+        if (RaceManager.isStarted(p.getUniqueId())) {
             if (RaceManager.getRacer(p).getUsingKiller() != null) {
                 if (event.getCause() == DamageCause.SUFFOCATION) {
                     event.setCancelled(true);
@@ -371,7 +371,7 @@ public class DataListener implements Listener {
                 }
             }
         } else if (RaceManager.isStandBy(p.getUniqueId())
-                && !RaceManager.isRacing(p.getUniqueId())) {
+                && !RaceManager.isStarted(p.getUniqueId())) {
             if (event.getCause() != DamageCause.VOID)
                 event.setCancelled(true);
         }

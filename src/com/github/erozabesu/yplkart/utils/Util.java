@@ -419,7 +419,7 @@ public class Util extends ReflectionUtil {
             Player player = (Player) damagedLiving;
 
             //レース中でない場合は通常通りのダメージ処理
-            if (!RaceManager.isRacing(player.getUniqueId())) {
+            if (!RaceManager.isStarted(player.getUniqueId())) {
                 player.damage(damage, executor);
 
             //レース中の場合、デスポーンしないよう仮想的に死亡した演出を行う
@@ -578,7 +578,7 @@ public class Util extends ReflectionUtil {
                 continue;
             if (!(damaged instanceof Player))
                 continue;
-            if (!RaceManager.isRacing(((Player) damaged).getUniqueId()))
+            if (!RaceManager.isStarted(((Player) damaged).getUniqueId()))
                 continue;
 
             Vector v = Util.getVectorToLocation(damaged.getLocation(), l);

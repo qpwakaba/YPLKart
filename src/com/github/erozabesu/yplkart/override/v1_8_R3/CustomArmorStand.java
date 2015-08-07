@@ -1416,7 +1416,7 @@ public class CustomArmorStand extends EntityArmorStand {
                     + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 4);
         } else {
             //レースが開始されるまで動かない
-            if (!RaceManager.isRacing(human.getUniqueID())) {
+            if (!RaceManager.isStarted(human.getUniqueID())) {
                 return;
             }
 

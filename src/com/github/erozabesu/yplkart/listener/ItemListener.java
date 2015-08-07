@@ -155,7 +155,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         //レース中のみ利用できるアイテム群
-        if (isRacing(uuid) && !getRace(uuid).isGoal()) {
+        if (isStarted(uuid) && !getRace(uuid).isGoal()) {
 
             //ダッシュきのこ
             if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
@@ -236,7 +236,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         final Player p = e.getPlayer();
         final UUID id = p.getUniqueId();
-        if (!isRacing(id))
+        if (!isStarted(id))
             return;
 
         List<Entity> entities = p.getNearbyEntities(0.7, 2, 0.7);
@@ -357,7 +357,7 @@ public class ItemListener extends RaceManager implements Listener {
     public void onStepSpeedBlock(PlayerMoveEvent e) {
         if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
             return;
-        if (!isRacing(e.getPlayer().getUniqueId()))
+        if (!isStarted(e.getPlayer().getUniqueId()))
             return;
 
         final Player p = e.getPlayer();

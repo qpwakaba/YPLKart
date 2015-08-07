@@ -541,7 +541,7 @@ public class RaceManager {
      * @param uuid チェックするレース参加プレイヤーのUUID
      * @return 申請していたレースのメニュー選択が終了し、スタートした状態かどうか
      */
-    public static Boolean isRacing(UUID uuid) {
+    public static Boolean isStarted(UUID uuid) {
         if (isEntry(uuid)) {
             if (isStandBy(uuid)) {
                 if (getCircuit(uuid).isStarted()) {
