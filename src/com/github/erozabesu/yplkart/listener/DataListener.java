@@ -456,18 +456,24 @@ public class DataListener implements Listener {
             return;
         }
 
-        //召集後はインベントリの操作をさせない
-        if (RaceManager.isStandBy(((Player) e.getWhoClicked()).getUniqueId())) {
-            e.setCancelled(true);
-            ((Player) e.getWhoClicked()).updateInventory();
+        Player player = (Player) e.getWhoClicked();
+
+        //クライアントを×ボタン等で強制終了した場合、プレイヤーはオフラインになるためreturn
+        if (!player.isOnline()) {
+            return;
         }
 
-        Player p = (Player) e.getWhoClicked();
-        UUID id = p.getUniqueId();
-        Racer r = RaceManager.getRacer(p);
+        //召集後はインベントリの操作をさせない
+        if (RaceManager.isStandBy(player.getUniqueId())) {
+            e.setCancelled(true);
+            player.updateInventory();
+        }
+
+        UUID uuid = player.getUniqueId();
+        Racer r = RaceManager.getRacer(player);
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
             e.setCancelled(true);
-            p.updateInventory();
+            player.updateInventory();
 
             ItemStack item = e.getCurrentItem();
             if (item == null) {
@@ -482,36 +488,36 @@ public class DataListener implements Listener {
 
             //キャンセルボタン
             if (EnumSelectMenu.CHARACTER_CANCEL.equalsIgnoreCase(clickedItemName)) {
-                p.closeInventory();
+                player.closeInventory();
                 //ランダムボタン
             } else if (EnumSelectMenu.CHARACTER_RANDOM.equalsIgnoreCase(clickedItemName)) {
-                RaceManager.setCharacterRaceData(id, CharacterConfig.getRandomCharacter());
+                RaceManager.setCharacterRaceData(uuid, CharacterConfig.getRandomCharacter());
                 //ネクストプレビューボタン
             } else if (EnumSelectMenu.CHARACTER_NEXT.equalsIgnoreCase(clickedItemName)
                     || EnumSelectMenu.CHARACTER_PREVIOUS.equalsIgnoreCase(clickedItemName)) {
-                if (RaceManager.isStandBy(id)) {
+                if (RaceManager.isStandBy(uuid)) {
                     if (r.getCharacter() == null) {
                         MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                                p, RaceManager.getCircuit(r.getCircuitName()));
+                                player, RaceManager.getCircuit(r.getCircuitName()));
                     } else {
-                        p.closeInventory();
+                        player.closeInventory();
 
                         //kart == nullの場合はonInventoryCloseで強制的にメニューが表示される
                         if (r.getKart() != null)
-                            RaceManager.showSelectMenu(p, false);
+                            RaceManager.showSelectMenu(player, false);
                     }
                 } else {
-                    p.closeInventory();
-                    RaceManager.showSelectMenu(p, false);
+                    player.closeInventory();
+                    RaceManager.showSelectMenu(player, false);
                 }
                 //キャラクター選択
             } else if (CharacterConfig.getCharacter(clickedItemName) != null) {
-                RaceManager.setCharacterRaceData(id, CharacterConfig.getCharacter(clickedItemName));
+                RaceManager.setCharacterRaceData(uuid, CharacterConfig.getCharacter(clickedItemName));
             }
-            p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
+            player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
         } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
             e.setCancelled(true);
-            p.updateInventory();
+            player.updateInventory();
 
             ItemStack item = e.getCurrentItem();
             if (item == null) {
@@ -525,34 +531,34 @@ public class DataListener implements Listener {
 
             if (EnumSelectMenu.KART_CANCEL.equalsIgnoreCase(clicked)) {
                 //キャンセルボタン
-                p.closeInventory();
+                player.closeInventory();
             } else if (EnumSelectMenu.KART_RANDOM.equalsIgnoreCase(clicked)) {
                 //ランダムボタン
-                RaceManager.setKartRaceData(id, KartConfig.getRandomKart());
+                RaceManager.setKartRaceData(uuid, KartConfig.getRandomKart());
             } else if (EnumSelectMenu.KART_NEXT.equalsIgnoreCase(clicked)
                     || EnumSelectMenu.KART_PREVIOUS.equalsIgnoreCase(clicked)) {
                 //ネクストプレビューボタン
-                if (RaceManager.isStandBy(id)) {
+                if (RaceManager.isStandBy(uuid)) {
                     if (r.getKart() == null) {
                         MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                                p, RaceManager.getCircuit(r.getCircuitName()));
+                                player, RaceManager.getCircuit(r.getCircuitName()));
                     } else {
-                        p.closeInventory();
+                        player.closeInventory();
 
                         //character == nullの場合はonInventoryCloseで強制的にメニューが表示される
                         if (r.getCharacter() != null) {
-                            RaceManager.showSelectMenu(p, true);
+                            RaceManager.showSelectMenu(player, true);
                         }
                     }
                 } else {
-                    p.closeInventory();
-                    RaceManager.showSelectMenu(p, true);
+                    player.closeInventory();
+                    RaceManager.showSelectMenu(player, true);
                 }
             } else if (KartConfig.getKart(clicked) != null) {
                 //カート選択
-                RaceManager.setKartRaceData(id, KartConfig.getKart(clicked));
+                RaceManager.setKartRaceData(uuid, KartConfig.getKart(clicked));
             }
-            p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 1.0F);
+            player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
         }
     }
 }
