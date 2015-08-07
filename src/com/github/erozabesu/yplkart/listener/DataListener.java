@@ -245,10 +245,12 @@ public class DataListener implements Listener {
             //カート、もしくはキャラクターが未選択の場合強制的にランダム選択する : issue #121
             if (racer.getCharacter() == null) {
                 RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
+                ItemEnum.removeAllKeyItems(p);
             }
             //TODO: issue #79
             if (racer.getKart() == null) {
                 RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
+                ItemEnum.removeAllKeyItems(p);
             }
 
             Scoreboards.showBoard(p.getUniqueId());
