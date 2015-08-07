@@ -228,45 +228,46 @@ public class RaceManager {
         }
     }
 
-    public static void setCharacterRaceData(UUID id, Character character) {
+    public static void setCharacterRaceData(UUID uuid, Character character) {
         //レース開始前はなにもしない
-        if (!isStandBy(id)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(id, getCircuit(id));
+        if (!isStandBy(uuid)) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(uuid, getCircuit(uuid));
             return;
         }
+
+        Player player = Bukkit.getPlayer(uuid);
+
         //プレイヤーがオフライン
-        if (Bukkit.getPlayer(id) == null) {
-            MessageEnum.invalidPlayer.sendConvertedMessage(null, id);
+        if (player == null) {
             return;
         }
 
-        final Player p = Bukkit.getPlayer(id);
-        Racer r = getRace(id);
+        Racer racer = getRace(uuid);
 
-        r.setCharacter(character);
-        r.recoveryCharacterPhysical();
-        p.getInventory().setHelmet(character.getMenuItem());
+        racer.setCharacter(character);
+        racer.recoveryCharacter();
 
-        PacketUtil.disguiseLivingEntity(null, p, character.getNmsClass(), 0, 0, 0);
-        character.playMenuSelectSound(p);
-        MessageEnum.raceCharacter.sendConvertedMessage(id, new Object[] { character, getCircuit(r.getCircuitName()) });
+        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass(), 0, 0, 0);
+        character.playMenuSelectSound(player);
+        MessageEnum.raceCharacter.sendConvertedMessage(uuid, new Object[] { character, getCircuit(racer.getCircuitName()) });
     }
 
-    public static void setKartRaceData(UUID id, Kart kart) {
-        if (!isStandBy(id)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(id, getCircuit(id));
-            return;
-        }
-        if (Bukkit.getPlayer(id) == null) {
-            MessageEnum.invalidPlayer.sendConvertedMessage(null, id);
+    public static void setKartRaceData(UUID uuid, Kart kart) {
+        if (!isStandBy(uuid)) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(uuid, getCircuit(uuid));
             return;
         }
 
-        Racer r = getRace(id);
-        r.setKart(kart);
-        r.recoveryKart();
+        //プレイヤーがオフライン
+        if (Bukkit.getPlayer(uuid) == null) {
+            return;
+        }
 
-        MessageEnum.raceKart.sendConvertedMessage(id, new Object[] { kart, getCircuit(r.getCircuitName()) });
+        Racer racer = getRace(uuid);
+        racer.setKart(kart);
+        racer.recoveryKart();
+
+        MessageEnum.raceKart.sendConvertedMessage(uuid, new Object[] { kart, getCircuit(racer.getCircuitName()) });
     }
 
     public static void clearEntryRaceData(UUID uuid) {

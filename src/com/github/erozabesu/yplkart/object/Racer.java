@@ -525,13 +525,15 @@ public class Racer extends PlayerObject{
         PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
-    public void recoveryCharacterPhysical() {
-        final Player p = getPlayer();
-        if (p == null)
+    public void recoveryCharacter() {
+        Player player = getPlayer();
+        if (player == null) {
             return;
+        }
 
-        p.setMaxHealth(this.character.getMaxHealth());
-        p.setWalkSpeed(this.character.getWalkSpeed());
-        p.setHealth(this.character.getMaxHealth());
+        player.setMaxHealth(this.getCharacter().getMaxHealth());
+        player.setWalkSpeed(this.getCharacter().getWalkSpeed());
+        player.setHealth(this.getCharacter().getMaxHealth());
+        player.getInventory().setHelmet(this.getCharacter().getMenuItem());
     }
 }
