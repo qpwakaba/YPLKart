@@ -152,7 +152,7 @@ public class CustomArmorStand extends EntityArmorStand {
     /** エンティティ同士の衝突 */
     @Override
     public void collide(Entity entity) {
-        KartUtil.moveEntityByCollision(this, entity);
+        KartUtil.moveByCollision(this, entity);
     }
 
     /** アーマースタンドを左クリックした場合 */

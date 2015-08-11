@@ -320,7 +320,7 @@ public class KartUtil extends ReflectionUtil {
      * @param nmsEntityKart 接触したNmsEntity
      * @param nmsEntityOther 接触されたNmsEntity
      */
-    public static void moveEntityByCollision(Object nmsEntityKart, Object nmsEntityOther) {
+    public static void moveByCollision(Object nmsEntityKart, Object nmsEntityOther) {
         Object nmsWorld = invoke(Methods.nmsEntity_getWorld, nmsEntityKart);
 
         //クライアントと同期不要な場合return
@@ -402,7 +402,6 @@ public class KartUtil extends ReflectionUtil {
                 Entity otherPassenger = Util.getEndPassenger(entityOther);
                 Util.addDamage(otherPassenger, kartPassenger, (int) crashDamage);
                 Util.addDamage(kartPassenger, null, (int) (crashDamage / 3.0D));
-
 
                 //スピードスタックの減衰
                 double nmsEntityKartSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);

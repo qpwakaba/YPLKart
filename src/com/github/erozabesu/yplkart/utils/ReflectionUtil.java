@@ -177,19 +177,6 @@ public class ReflectionUtil {
         }
     }
 
-   /* public static Object invoke(Method method, Object instance) {
-        try {
-            return method.invoke(instance);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }*/
-
     public static Object invoke(Method method, Object instance, Object... objects) {
         try {
             return method.invoke(instance, objects);

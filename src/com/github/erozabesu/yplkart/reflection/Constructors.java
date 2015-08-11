@@ -32,10 +32,6 @@ public class Constructors extends ReflectionUtil{
 
     public static HashMap<String, Constructor<?>> nmsEntity_Constructor = new HashMap<String, Constructor<?>>();
 
-    //〓 Craft 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-        // none
-
     //〓 Ypl 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Constructor<?> constructor_yplCustomKart = ReflectionUtil.getConstructor(Classes.yplCustomKart, Classes.nmsWorld, Kart.class, KartType.class, Location.class);
