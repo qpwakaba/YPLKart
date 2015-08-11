@@ -156,6 +156,11 @@ public class KartUtil extends ReflectionUtil {
         if (!(Boolean) ReflectionUtil.getFieldValue(Fields.nmsWorld_isClientSide, nmsWorld) && !isDead) {
             Object nmsDamagerEntity = invoke(Methods.nmsDamageSource_getEntity, damageSource);
 
+            //窒息等のダメージ要因がエンティティ以外の場合は除外
+            if (nmsDamagerEntity == null) {
+                return false;
+            }
+
             if (!instanceOf(nmsDamagerEntity, Classes.nmsEntityPlayer)) {
                 return false;
             }
