@@ -407,22 +407,49 @@ public class KartUtil extends ReflectionUtil {
                 crashSpeed *= crashSpeed;
                 crashSpeed *= 1000.0D; // ノーマライズ
 
-                //TODO: issue #123
                 /*
-                 * 衝撃係数を基に、重量でダメージを付与
+                 * 衝撃係数を基に、重量でダメージを付与し、ダメージ量に応じた演出を再生
                  */
                 Entity kartPassenger = Util.getEndPassenger(entityKart);
                 Entity otherPassenger = Util.getEndPassenger(entityOther);
+                float soundVolume = (float) (0.5F + crashSpeed / 10.0D);
+                if (4.0F < soundVolume) {
+                    soundVolume = 4.0F;
+                }
                 if (kartPassenger instanceof LivingEntity) {
                     long ownDamage = Math.round(crashSpeed / 2.0D / kartWeight);
                     if (1 <= ownDamage) {
-                        //Util.addDamage(kartPassenger, null, (int) (crashDamage / 4.0D / kart.getWeight()));
+                        //Util.addDamage(kartPassenger, null, (int) ownDamage);
+                        if (kartPassenger instanceof Player) {
+                            Player kartPlayer = (Player) kartPassenger;
+                            Location location = kartPlayer.getLocation();
+                            kartPlayer.playSound(
+                                    kartPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 2.0F);
+                            kartPlayer.playSound(
+                                    kartPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 0.5F);
+                            kartPlayer.playSound(
+                                    kartPassenger.getLocation(), Sound.IRONGOLEM_HIT, soundVolume, 0.5F);
+                            Particle.sendToLocation("CRIT", location, 0, 0, 0, 1, 10);
+                            Particle.sendToLocation("CLOUD", location, 0, 0, 0, 1, 10);
+                        }
                     }
                 }
                 if (otherPassenger instanceof LivingEntity) {
                     long otherDamage = Math.round(crashSpeed / 2.0D / otherWeight);
                     if (1 <= otherDamage) {
                         Util.addDamage(otherPassenger, kartPassenger, (int) otherDamage);
+                        if (otherPassenger instanceof Player) {
+                            Player otherPlayer = (Player) otherPassenger;
+                            Location location = otherPlayer.getLocation();
+                            otherPlayer.playSound(
+                                    otherPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 2.0F);
+                            otherPlayer.playSound(
+                                    otherPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 0.5F);
+                            otherPlayer.playSound(
+                                    otherPassenger.getLocation(), Sound.IRONGOLEM_HIT, soundVolume, 0.5F);
+                            Particle.sendToLocation("CRIT", location, 0, 0, 0, 1, 10);
+                            Particle.sendToLocation("CLOUD", location, 0, 0, 0, 1, 10);
+                        }
                     }
                 }
 
