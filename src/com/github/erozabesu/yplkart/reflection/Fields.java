@@ -43,6 +43,12 @@ public class Fields extends ReflectionUtil {
     public static Field nmsEntity_motX = getField(Classes.nmsEntity, "motX");
     public static Field nmsEntity_motY = getField(Classes.nmsEntity, "motY");
     public static Field nmsEntity_motZ = getField(Classes.nmsEntity, "motZ");
+
+    /** @return float */
+    public static Field nmsEntity_width = getField(Classes.nmsEntity, "width");
+
+    /** @return float */
+    public static Field nmsEntity_length = getField(Classes.nmsEntity, "length");
     public static Field nmsEntity_passenger = getField(Classes.nmsEntity, "passenger");
     public static Field nmsEntity_vehicle = getField(Classes.nmsEntity, "vehicle");
 

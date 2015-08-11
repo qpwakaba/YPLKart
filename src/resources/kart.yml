@@ -71,7 +71,7 @@ Straight:
   display_material: "wheat"
   display_material_data: 0
 Power:
-  weight: 4.0
+  weight: 2.0
   max_speed: 200.0
   acceleration: 0.7
   climbable_height: 1.0

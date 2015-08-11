@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -373,49 +374,76 @@ public class KartUtil extends ReflectionUtil {
                 Entity entityKart = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart);
                 Entity entityOther = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityOther);
                 Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
+                Kart otherKart = RaceManager.getKartObjectByEntityMetaData(entityOther);
 
+                //重量
+                double kartWeight = kart.getWeight();
+                double otherWeight;
+                if (otherKart == null) {
+                    //カートエンティティでない場合、width,lengthフィールドの値から重量を算出
+                    float otherWidth = (Float) getFieldValue(Fields.nmsEntity_width, nmsEntityOther);
+                    float otherLength = (Float) getFieldValue(Fields.nmsEntity_length, nmsEntityOther);
+                    otherWeight = otherWidth * otherWidth * otherLength;
+                } else {
+                    otherWeight = otherKart.getWeight();
+                }
+
+                //モーション値
                 final double kartMotionX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
                 final double kartMotionZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
                 final double otherMotionX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityOther);
                 final double otherMotionZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityOther);
+                double kartMotionSpeed = calcMotionSpeed(kartMotionX, kartMotionZ) * kartWeight;
+                double otherMotionSpeed = calcMotionSpeed(otherMotionX, otherMotionZ) * otherWeight;
 
-                //nmsKartEntityのモーション値
-                double kartMotionSpeed = calcMotionSpeed(kartMotionX, kartMotionZ) * kart.getWeight();
-
-                //nmsKartEntityのモーション値。カートエンティティの場合モーション値にウェイト値を掛け合わせる
-                double otherMotionSpeed = calcMotionSpeed(otherMotionX, otherMotionZ);
-                if (RaceManager.isKartEntity(entityOther)) {
-                    otherMotionSpeed *= ((Kart) invoke(Methods.Ypl_getKart, nmsEntityOther)).getWeight();
-                }
-
-                //相手側のcollideメソッドと処理が重複するため、nmsEntityOtherモーション値が劣っている場合return
+                //相手側のcollideメソッドと処理が重複するため、衝突者のモーション値が劣っている場合return
                 if (kartMotionSpeed < otherMotionSpeed) {
                     return;
                 }
 
-                double crashSpeed = (kartMotionSpeed - otherMotionSpeed) * 1000.0D;
+                //お互いのモーション値の差から衝突の衝撃係数を算出
+                double crashSpeed = (kartMotionSpeed - otherMotionSpeed);
+                //数値の幅を後半大きく伸びる曲線状に
+                crashSpeed *= crashSpeed;
+                crashSpeed *= 1000.0D; // ノーマライズ
 
                 //TODO: issue #123
-                //衝突スピードを基にダメージを付与
-                double crashDamage = 20.0D * (crashSpeed / 300.0D);
+                /*
+                 * 衝撃係数を基に、重量でダメージを付与
+                 */
                 Entity kartPassenger = Util.getEndPassenger(entityKart);
                 Entity otherPassenger = Util.getEndPassenger(entityOther);
-                Util.addDamage(otherPassenger, kartPassenger, (int) crashDamage);
-                Util.addDamage(kartPassenger, null, (int) (crashDamage / 3.0D));
+                if (kartPassenger instanceof LivingEntity) {
+                    long ownDamage = Math.round(crashSpeed / 2.0D / kartWeight);
+                    if (1 <= ownDamage) {
+                        //Util.addDamage(kartPassenger, null, (int) (crashDamage / 4.0D / kart.getWeight()));
+                    }
+                }
+                if (otherPassenger instanceof LivingEntity) {
+                    long otherDamage = Math.round(crashSpeed / 2.0D / otherWeight);
+                    if (1 <= otherDamage) {
+                        Util.addDamage(otherPassenger, kartPassenger, (int) otherDamage);
+                    }
+                }
 
-                //スピードスタックの減衰
+                //衝撃係数をスピードスタックの減衰率に変換
+                //カートエンティティがトップスピードで静止したエンティティに衝突した際に、
+                //8割程度のスピードスタックが消失するよう変換
+                crashSpeed *= 3.5D;
+
+                //衝突者のスピードスタックを重量を加味した上で減衰
                 double nmsEntityKartSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
-                invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, nmsEntityKartSpeedStack - crashSpeed);
+                invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, nmsEntityKartSpeedStack - (crashSpeed / kartWeight));
 
-                //nmsEntityOtherがカートエンティティだった場合、nmsEntityOtherのスピードスタックも減衰
-                if (RaceManager.isKartEntity(entityOther)) {
+                //衝突されたエンティティがカートエンティティだった場合、重量を加味した上でスピードスタックを減衰
+                if (otherKart != null) {
                     double nmsEntityOtherSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityOther);
-                    invoke(Methods.Ypl_setSpeedStack, nmsEntityOther, nmsEntityOtherSpeedStack - crashSpeed);
+                    invoke(Methods.Ypl_setSpeedStack, nmsEntityOther, nmsEntityOtherSpeedStack
+                            - (crashSpeed / otherWeight));
                 }
 
                 //nmsEntityKartに衝突モーションの適用
-                crashMotionX *= 2.0D;
-                crashMotionZ *= 2.0D;
+                crashMotionX *= 2.0D;                crashMotionZ *= 2.0D;
                 setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, kartMotionX - crashMotionX);
                 setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, kartMotionZ - crashMotionZ);
 
