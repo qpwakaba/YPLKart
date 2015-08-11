@@ -18,6 +18,8 @@ import com.github.erozabesu.yplkart.listener.NettyListener;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.reflection.Fields;
+import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
@@ -45,7 +47,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
             //エンティティから降りるかどうか
             boolean unmount = (Boolean) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayInSteerVehicle_isUnmount, msg);
+                    Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg);
 
             //NetworkManagerからプレイヤーを取得
             Object networkManager = ctx.pipeline().toMap().get("packet_handler");
@@ -56,7 +58,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                 if (unmount) {
                     if (RaceManager.isStandBy(player.getUniqueId())) {
                         ReflectionUtil.setFieldValue(
-                                ReflectionUtil.field_PacketPlayInSteerVehicle_isUnmount, msg, false);
+                                Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg, false);
 
                         //擬似スニークフラグをtrueにする
                         RaceManager.getRacer(player).setSneaking(true);
@@ -82,7 +84,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
         if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityMetadata")) {
             int entityId = (Integer) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayOutEntityMetadata_EntityId, msg);
+                    Fields.nmsPacketPlayOutEntityMetadata_EntityId, msg);
 
             Player player = NettyListener.getPlayerByEntityId(entityId);
 
@@ -102,7 +104,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
                     //NBTが格納されているリストを取得
                     List<Object> watchableObjectList = (List<Object>) ReflectionUtil.getFieldValue(
-                            ReflectionUtil.field_PacketPlayOutEntityMetadata_WatchableObject, msg);
+                            Fields.nmsPacketPlayOutEntityMetadata_WatchableObject, msg);
                     Iterator iterator = watchableObjectList.iterator();
 
                     Object watchableObject = null;
@@ -110,7 +112,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                     //該当indexのNBTを破棄
                     while (iterator.hasNext()) {
                         watchableObject = iterator.next();
-                        int index = (Integer) ReflectionUtil.nmsWatchableObject_getIndex.invoke(watchableObject);
+                        int index = (Integer) Methods.nmsWatchableObject_getIndex.invoke(watchableObject);
                         if (index == 10 || index == 16 || index == 17 || index == 18) {
                             iterator.remove();
                         }
@@ -123,7 +125,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
         //Human以外のキャラクターを選択している場合、選択キャラクターのエンティティタイプに外見を偽装
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutNamedEntitySpawn")) {
             UUID uuid = (UUID) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayOutNamedEntitySpawn_UUID, msg);
+                    Fields.nmsPacketPlayOutNamedEntitySpawn_UUID, msg);
             Player player = Bukkit.getPlayer(uuid);
             Racer r = RaceManager.getRacer(player);
 
@@ -141,8 +143,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
 
         //Human以外のキャラクターを選択している場合、装備の情報を全て破棄する
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityEquipment")) {
-            int entityId = (Integer) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayOutEntityEquipment_EntityId, msg);
+            int entityId = (Integer) ReflectionUtil.getFieldValue(Fields.nmsPacketPlayOutEntityEquipment_EntityId, msg);
             Player player = NettyListener.getPlayerByEntityId(entityId);
 
             if (player != null) {
@@ -165,8 +166,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
          * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
-            int entityId = (Integer) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayOutEntityTeleport_EntityId, msg);
+            int entityId = (Integer) ReflectionUtil.getFieldValue(Fields.nmsPacketPlayOutEntityTeleport_EntityId, msg);
             Entity kartEntity = RaceManager.getKartEntityByEntityId(entityId);
 
             if (kartEntity != null) {
@@ -177,9 +177,9 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                     byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
                     ReflectionUtil.setFieldValue(
-                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationY, msg, locationY);
+                            Fields.nmsPacketPlayOutEntityTeleport_LocationY, msg, locationY);
                     ReflectionUtil.setFieldValue(
-                            ReflectionUtil.field_PacketPlayOutEntityTeleport_LocationYaw, msg, yaw);
+                            Fields.nmsPacketPlayOutEntityTeleport_LocationYaw, msg, yaw);
                 }
             }
 
@@ -190,8 +190,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
          * クライアント描画時の搭乗位置を地面の高さまで下げる
          */
         } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
-            int id = (Integer) ReflectionUtil.getFieldValue(
-                    ReflectionUtil.field_PacketPlayOutSpawnEntity_EntityId, msg);
+            int id = (Integer) ReflectionUtil.getFieldValue(Fields.nmsPacketPlayOutSpawnEntity_EntityId, msg);
             Entity kartEntity = RaceManager.getKartEntityByEntityId(id);
 
             if (kartEntity != null) {
@@ -202,9 +201,9 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                     byte yaw = (byte) (location.getYaw() * 256 / 360.0F);
 
                     ReflectionUtil.setFieldValue(
-                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationY, msg, locationY);
+                            Fields.nmsPacketPlayOutSpawnEntity_LocationY, msg, locationY);
                     ReflectionUtil.setFieldValue(
-                            ReflectionUtil.field_PacketPlayOutSpawnEntity_LocationYaw, msg, yaw);
+                            Fields.nmsPacketPlayOutSpawnEntity_LocationYaw, msg, yaw);
                 }
             }
 

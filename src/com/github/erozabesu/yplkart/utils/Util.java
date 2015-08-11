@@ -1,7 +1,9 @@
 package com.github.erozabesu.yplkart.utils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -30,9 +33,15 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.reflection.Classes;
+import com.github.erozabesu.yplkart.reflection.Constructors;
+import com.github.erozabesu.yplkart.reflection.Fields;
+import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.FlowerShowerTask;
 
 public class Util extends ReflectionUtil {
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * value以下の乱数を生成する
@@ -255,6 +264,24 @@ public class Util extends ReflectionUtil {
     }
 
     /**
+     * @param entity
+     * @return 引数entityが搭乗している一番下のエンティティ
+     */
+    public static Entity getEndVehicle(Entity entity) {
+        Entity vehicle = entity.getVehicle();
+
+        if (vehicle == null) {
+            return entity;
+        }
+
+        while (vehicle.getVehicle() != null) {
+            vehicle = vehicle.getVehicle();
+        }
+
+        return vehicle;
+    }
+
+    /**
      * passengerが搭乗している全Entityを返す
      * passengerが搭乗しているEntityが更に別のEntityに搭乗している場合を指す
      * @param passenger
@@ -270,6 +297,24 @@ public class Util extends ReflectionUtil {
         }
 
         return entitylist;
+    }
+
+    /**
+     * @param entity
+     * @return 引数entityが搭乗している一番上のエンティティ
+     */
+    public static Entity getEndPassenger(Entity entity) {
+        Entity passenger = entity.getPassenger();
+
+        if (passenger == null) {
+            return entity;
+        }
+
+        while (passenger.getPassenger() != null) {
+            passenger = passenger.getPassenger();
+        }
+
+        return passenger;
     }
 
     /**
@@ -289,6 +334,130 @@ public class Util extends ReflectionUtil {
         return entitylist;
     }
 
+    //〓 Reflection Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Location getStandingLocationByBoudingBox(Entity entity) {
+        Location location = entity.getLocation();
+        Object boudingBox = ReflectionUtil.invoke(Methods.nmsEntity_getBoundingBox, entity);
+
+        location.setX((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locX, entity));
+        location.setY((Double) ReflectionUtil.getFieldValue(Fields.nmsAxisAlignedBB_locYBottom, boudingBox));
+        location.setZ((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locZ, entity));
+
+        return location;
+    }
+
+    public static Object getBlockPosition(Location location) {
+        double locX = Math.floor(location.getX());
+        double locY = Math.floor(location.getY());
+        double locZ = Math.floor(location.getZ());
+
+        return ReflectionUtil.newInstance(Constructors.nmsBlockPosition, locX, locY, locZ);
+    }
+
+    //TODO: 動作確認
+    /**
+     * 現在座標のブロックがよじ登ることができるブロックかどうかを判別する
+     * @param entity
+     * @return よじ登ることができるブロックかどうか
+     */
+    public static boolean isClambableBlock(Location location) {
+        Material blockMaterial = location.getBlock().getType();
+
+        return (blockMaterial == Material.LADDER || blockMaterial == Material.VINE);
+    }
+
+    public static Object getCraftWorld(World world) {
+        try {
+            return Methods.craftWorld_getHandle.invoke(world);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Object getCraftEntity(Entity entity) {
+        try {
+            String className = entity.getClass().getSimpleName();
+            Method getHandle;
+
+            if (Methods.craftEntity_getHandle.containsKey(className)) {
+                getHandle = Methods.craftEntity_getHandle.get(className);
+            } else {
+                getHandle = entity.getClass().getMethod("getHandle");
+                Methods.craftEntity_getHandle.put(className, getHandle);
+            }
+
+            return ReflectionUtil.invoke(getHandle, entity);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Object getNewCraftEntityFromClass(World world, Class<?> nmsEntityClass) {
+        try {
+            Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
+
+            if (constructor == null) {
+                constructor = nmsEntityClass.getConstructor(Classes.nmsWorld);
+                Constructors.nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
+            }
+
+            return constructor.newInstance(getCraftWorld(world));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Object getNewCraftEntityFromClassName(World world, String classname) {
+        try {
+            Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(classname);
+
+            if (constructor == null) {
+                constructor = getNMSClass(classname).getConstructor(Classes.nmsWorld);
+                Constructors.nmsEntity_Constructor.put(classname, constructor);
+            }
+
+            return constructor.newInstance(getCraftWorld(world));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     /**
      * 引数nmsEntityオブジェクトからBukkitEntityを取得し返す
      * @param nmsEntity BukkitEntityを取得するNmsEntity
@@ -296,7 +465,7 @@ public class Util extends ReflectionUtil {
      */
     public static Entity getBukkitEntityFromNmsEntity(Object nmsEntity) {
         try {
-            return (Entity) ReflectionUtil.nmsEntity_getBukkitEntity.invoke(nmsEntity);
+            return (Entity) Methods.nmsEntity_getBukkitEntity.invoke(nmsEntity);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -307,6 +476,24 @@ public class Util extends ReflectionUtil {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    /**
+     * 引数itemStackからCraftItemStackを取得し返す
+     * @param itemStack ItemStack
+     * @return CraftItemStack
+     */
+    public static Object getCraftItemStack(ItemStack itemStack) {
+        try {
+            return Methods.static_craftItemStack_asNMSCopy.invoke(null, itemStack);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -376,9 +563,9 @@ public class Util extends ReflectionUtil {
      */
     public static Boolean isSolidBlock(Location location) {
         try {
-            return (Boolean) nmsMaterial_isSolid.invoke(
-                    nmsBlock_getMaterial.invoke(
-                            static_nmsBlock_getById.invoke(null, location.getBlock().getTypeId())));
+            return (Boolean) Methods.nmsMaterial_isSolid.invoke(
+                    Methods.nmsBlock_getMaterial.invoke(
+                            Methods.static_nmsBlock_getById.invoke(null, location.getBlock().getTypeId())));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -497,10 +684,11 @@ public class Util extends ReflectionUtil {
         }
     }
 
-    public static Location adjustBlockLocation(Location old) {
-        Location value = old.getBlock().getLocation();
-        return new Location(old.getWorld(), value.getX() + 0.5, value.getY(), value.getZ() + 0.5
-                , old.getYaw(), old.getPitch());
+    public static Location adjustBlockLocation(Location location) {
+        double x = location.getBlockX() + 0.5D;
+        double z = location.getBlockZ() + 0.5D;
+
+        return new Location(location.getWorld(), x, location.getY(), z, location.getYaw(), location.getPitch());
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

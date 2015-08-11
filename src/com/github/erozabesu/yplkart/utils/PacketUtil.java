@@ -16,8 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.reflection.Constructors;
+import com.github.erozabesu.yplkart.reflection.Methods;
+import com.github.erozabesu.yplkart.reflection.Objects;
 
-public class PacketUtil extends ReflectionUtil {
+public class PacketUtil {
 
     /**
      * PlayerとPlayerConnectionを格納するハッシュマップ
@@ -92,14 +95,14 @@ public class PacketUtil extends ReflectionUtil {
         }
 
         try {
-            Object craftEntity = getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
+            Object craftEntity = Util.getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
 
             Object entitydestroypacket = getEntityDestroyPacket(disguiseEntity.getEntityId());
             Object spawnentitypacket = getDisguiseLivingEntityPacket(disguiseEntity, nmsEntityClass
                     , offsetX, offsetY, offsetZ);
             Object attachentitypacket = null;
             if (disguiseEntity.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftEntity, getCraftEntity(disguiseEntity.getVehicle()));
+                attachentitypacket = getAttachEntityPacket(craftEntity, Util.getCraftEntity(disguiseEntity.getVehicle()));
             }
 
             Object handpacket = getEquipmentPacket(disguiseEntity, 0, new ItemStack(Material.AIR));
@@ -147,13 +150,13 @@ public class PacketUtil extends ReflectionUtil {
 
     public static void returnOriginalPlayer(Player player) {
         try {
-            Object craftentity = getCraftEntity(player);
+            Object craftentity = Util.getCraftEntity(player);
 
             Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
             Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
             Object attachentitypacket = null;
             if (player.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftentity, getCraftEntity(player.getVehicle()));
+                attachentitypacket = getAttachEntityPacket(craftentity, Util.getCraftEntity(player.getVehicle()));
             }
             Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
             Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
@@ -246,14 +249,15 @@ public class PacketUtil extends ReflectionUtil {
      * 移動しても、サーバーでは搭乗状態になっているため、すぐもとの場所に戻される
      * 数チック後にエンティティに搭乗するパケットを再送し食い違いを修正する
      */
-    public static void sendOwnAttachEntityPacket(final Player p) {
-        if (p.getVehicle() == null)
+    public static void sendOwnAttachEntityPacket(final Player player) {
+        if (player.getVehicle() == null) {
             return;
+        }
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 try {
-                    Object attachentitypacket = getAttachEntityPacket(getCraftEntity(p), getCraftEntity(p.getVehicle()));
-                    sendPacket(p, attachentitypacket);
+                    Object attachentitypacket = getAttachEntityPacket(Util.getCraftEntity(player), Util.getCraftEntity(player.getVehicle()));
+                    sendPacket(player, attachentitypacket);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -326,16 +330,18 @@ public class PacketUtil extends ReflectionUtil {
      * @param nmsEntityClass スポーンさせるエンティティのNmsEntityClass
      * @return 引数entityと同様の情報を持った、引数nmsEntityClassクラスのエンティティがスポーンするパケット
      */
-    public static Object getDisguiseLivingEntityPacket(Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ){
+    public static Object getDisguiseLivingEntityPacket(
+            Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ){
         try {
-            Object craftEntity = getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
+            Object craftEntity = Util.getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
             Location location = entity.getLocation();
 
-            nmsEntity_setLocation.invoke(craftEntity, location.getX() + offsetX, location.getY() + offsetY
+            Methods.nmsEntity_setLocation
+            .invoke(craftEntity, location.getX() + offsetX, location.getY() + offsetY
                     , location.getZ() + offsetZ, location.getYaw(), location.getPitch());
-            nmsEntity_setEntityID.invoke(craftEntity, entity.getEntityId());
-            nmsEntity_setCustomName.invoke(craftEntity, entity.getName());
-            nmsEntity_setCustomNameVisible.invoke(craftEntity, true);
+            Methods.nmsEntity_setEntityID.invoke(craftEntity, entity.getEntityId());
+            Methods.nmsEntity_setCustomName.invoke(craftEntity, entity.getName());
+            Methods.nmsEntity_setCustomNameVisible.invoke(craftEntity, true);
 
             return getSpawnEntityLivingPacket(craftEntity);
         } catch (IllegalArgumentException e) {
@@ -351,26 +357,26 @@ public class PacketUtil extends ReflectionUtil {
 
     // itemslot: 0-hand / 4-head / 3-chest / 2-leggings / 1-boots
     private static Object getEquipmentPacket(Entity entity, int itemslot, ItemStack equipment) throws Exception {
-        return constructor_nmsPacketPlayOutEntityEquipment.newInstance(entity.getEntityId(), itemslot,
-                getCraftItemStack(equipment));
+        return Constructors.nmsPacketPlayOutEntityEquipment.newInstance(entity.getEntityId(), itemslot,
+                Util.getCraftItemStack(equipment));
     }
 
     private static Object getTitlePacket(String text, boolean issubtitle) throws Exception {
         ChatColor color = Util.getChatColorFromText(text);
         text = ChatColor.stripColor(text);
-        Object title = static_nmsChatSerializer_buildTitle.invoke(
+        Object title = Methods.static_nmsChatSerializer_buildTitle.invoke(
                 null, "{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
 
-        return constructor_nmsPacketPlayOutTitle.newInstance(issubtitle ?
-                enumTitleAction_PerformSubTitle : enumTitleAction_PerformTitle, title);
+        return Constructors.nmsPacketPlayOutTitle.newInstance(issubtitle ?
+                Objects.nmsEnumTitleAction_PerformSubTitle : Objects.nmsEnumTitleAction_PerformTitle, title);
     }
 
     private static Object getTitleLengthPacket(int fadein, int length, int fadeout) throws Exception {
-        return constructor_nmsPacketPlayOutTitle_Length.newInstance(fadein, length, fadeout);
+        return Constructors.nmsPacketPlayOutTitle_Length.newInstance(fadein, length, fadeout);
     }
 
     private static Object getClientCommandPacket() throws Exception {
-        return constructor_nmsPacketPlayInClientCommand.newInstance(enumClientCommand_PerformRespawn);
+        return Constructors.nmsPacketPlayInClientCommand.newInstance(Objects.nmsEnumClientCommand_PerformRespawn);
     }
 
     /**
@@ -380,7 +386,7 @@ public class PacketUtil extends ReflectionUtil {
     public static Object getEntityDestroyPacket(int entityId){
         Object packet = null;
         try {
-            packet = constructor_nmsPacketPlayOutEntityDestroy.newInstance(new int[] { entityId });
+            packet = Constructors.nmsPacketPlayOutEntityDestroy.newInstance(new int[] { entityId });
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -402,7 +408,7 @@ public class PacketUtil extends ReflectionUtil {
     private static Object getSpawnNamedEntityPacket(Object craftPlayer) {
         Object packet = null;
         try {
-            packet = constructor_nmsPacketPlayOutNamedEntitySpawn.newInstance(craftPlayer);
+            packet = Constructors.nmsPacketPlayOutNamedEntitySpawn.newInstance(craftPlayer);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -424,7 +430,7 @@ public class PacketUtil extends ReflectionUtil {
     private static Object getSpawnEntityLivingPacket(Object craftLivingEntity) {
         Object packet = null;
         try {
-            packet = constructor_nmsPacketPlayOutSpawnEntityLiving.newInstance(craftLivingEntity);
+            packet = Constructors.nmsPacketPlayOutSpawnEntityLiving.newInstance(craftLivingEntity);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -445,7 +451,7 @@ public class PacketUtil extends ReflectionUtil {
     private static Object getAttachEntityPacket(Object passenger, Object vehicle) {
         Object packet = null;
         try {
-            packet = constructor_nmsPacketPlayOutAttachEntity.newInstance(0, passenger, vehicle);
+            packet = Constructors.nmsPacketPlayOutAttachEntity.newInstance(0, passenger, vehicle);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -478,7 +484,7 @@ public class PacketUtil extends ReflectionUtil {
             byte yaw = (byte) (location.getYaw() * (255.0F / 360.0F));
             byte pitch = (byte) (location.getPitch() * (255.0F / 360.0F));
 
-            packet = constructor_nmsPacketPlayOutEntityTeleport
+            packet = Constructors.nmsPacketPlayOutEntityTeleport
                     .newInstance(entityId, x, y, z, yaw, pitch, false);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -496,7 +502,7 @@ public class PacketUtil extends ReflectionUtil {
         Object packet = null;
 
         try {
-            packet = constructor_nmsPacketPlayOutSpawnEntity.newInstance(craftEntity, objectID, objectData);
+            packet = Constructors.nmsPacketPlayOutSpawnEntity.newInstance(craftEntity, objectID, objectData);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -521,7 +527,7 @@ public class PacketUtil extends ReflectionUtil {
         Object packet = null;
 
         try {
-            packet = constructor_nmsPacketPlayOutEntityEquipment.newInstance(entityId, itemSlot, equipItemStack);
+            packet = Constructors.nmsPacketPlayOutEntityEquipment.newInstance(entityId, itemSlot, equipItemStack);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -539,7 +545,7 @@ public class PacketUtil extends ReflectionUtil {
 
     private static void sendPacket(Player p, Object packet) {
         try {
-            nmsPlayerConnection_sendPacket.invoke(getPlayerConnection(p), packet);
+            Methods.nmsPlayerConnection_sendPacket.invoke(getPlayerConnection(p), packet);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -563,8 +569,8 @@ public class PacketUtil extends ReflectionUtil {
         Object connection = getPlayerConnectionMap().get(player);
 
         if (connection == null) {
-            Object craftPlayer = ReflectionUtil.getCraftEntity(player);
-            Field connectionField = getField(craftPlayer, "playerConnection");
+            Object craftPlayer = Util.getCraftEntity(player);
+            Field connectionField = ReflectionUtil.getField(craftPlayer, "playerConnection");
 
             connection = connectionField.get(craftPlayer);
             putPlayerConnection(player, connection);
@@ -578,7 +584,7 @@ public class PacketUtil extends ReflectionUtil {
         Object network = getNetworkManagerMap().get(player);
 
         if (network == null) {
-            Field networkField = getField(playerconnection, "networkManager");
+            Field networkField = ReflectionUtil.getField(playerconnection, "networkManager");
             network = networkField.get(playerconnection);
             putNetworkManager(player, network);
         }
@@ -591,7 +597,7 @@ public class PacketUtil extends ReflectionUtil {
         Channel channel = getChannelMap().get(player);
 
         if (channel == null) {
-            String version = getBukkitVersion();
+            String version = ReflectionUtil.getBukkitVersion();
             Field channelField = null;
 
             if (version.equalsIgnoreCase("v1_8_R1")) {

@@ -791,9 +791,20 @@ public class CMDAbstractPlayer extends CMDAbstract {
                     Entity entity = RaceManager.createDriveKart(player.getLocation(), KartConfig.getRandomKart());
                     entity.setPassenger(player);
                     player.setWalkSpeed(0.6F);
+                    player.sendMessage("ride random kart");
                 }
             } else if (this.getLength() == 3) {
-                if (getArgs()[1].equalsIgnoreCase("disguise")) {
+                if (getArgs()[1].equalsIgnoreCase("kart")) {
+                    Kart kart = KartConfig.getKart(getArgs()[2]);
+                    if (kart == null) {
+                        player.sendMessage("no kart registered by name \"" + getArgs()[2] + "\"");
+                    } else {
+                        Entity entity = RaceManager.createDriveKart(player.getLocation(), kart);
+                        entity.setPassenger(player);
+                        player.setWalkSpeed(0.6F);
+                        player.sendMessage("ride \"" + getArgs()[2] + "\" kart");
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("disguise")) {
                     Character character = CharacterConfig.getCharacter(getArgs()[2]);
                     if (character == null) {
                         player.sendMessage("invalid character");
@@ -821,6 +832,23 @@ public class CMDAbstractPlayer extends CMDAbstract {
                         player.sendMessage("set health : " + healthScale);
                     } else {
                         player.sendMessage("not number");
+                    }
+                }
+            } else if (this.getLength() == 4) {
+                if (getArgs()[1].equalsIgnoreCase("kart")) {
+                    Player targetPlayer = Bukkit.getPlayer(getArgs()[2]);
+                    if (targetPlayer == null) {
+                        player.sendMessage("invalid target player \"" + getArgs()[2] + "\"");
+                    } else {
+                        Kart kart = KartConfig.getKart(getArgs()[3]);
+                        if (kart == null) {
+                            player.sendMessage("no kart registered by name \"" + getArgs()[3] + "\"");
+                        } else {
+                            Entity entity = RaceManager.createDriveKart(player.getLocation(), kart);
+                            entity.setPassenger(player);
+                            player.setWalkSpeed(0.6F);
+                            player.sendMessage("ride \"" + getArgs()[3] + "\" kart");
+                        }
                     }
                 }
             } else {

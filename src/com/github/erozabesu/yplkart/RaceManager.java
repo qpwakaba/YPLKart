@@ -34,8 +34,9 @@ import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.reflection.Constructors;
+import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceManager {
@@ -458,7 +459,7 @@ public class RaceManager {
      * @param entity CustomMinecartObjectを取得するEntity
      * @return 取得したCustomMinecartObject
      */
-    public static Object getCustomMinecartObjectFromEntityMetaData(Entity entity) {
+    public static Object getCustomMinecartObjectByEntityMetaData(Entity entity) {
         List<MetadataValue> metaDataList = entity.getMetadata(YPLKart.PLUGIN_NAME);
         if (metaDataList.size() != 0) {
             MetadataValue metaData = metaDataList.get(0);
@@ -718,12 +719,12 @@ public class RaceManager {
     private static Entity createCustomKart(Location location, Kart kart, KartType kartType) {
         Entity entity = null;
         try {
-            Object craftWorld = ReflectionUtil.getCraftWorld(location.getWorld());
-            Object customKart = ReflectionUtil.constructor_yplCustomKart
+            Object craftWorld = Util.getCraftWorld(location.getWorld());
+            Object customKart = Constructors.constructor_yplCustomKart
                     .newInstance(craftWorld, kart, kartType, location);
 
             //個別情報の格納
-            entity = (Entity) ReflectionUtil.nmsEntity_getBukkitEntity.invoke(customKart);
+            entity = (Entity) Methods.nmsEntity_getBukkitEntity.invoke(customKart);
             entity.setCustomNameVisible(false);
             entity.setMetadata(YPLKart.PLUGIN_NAME, new FixedMetadataValue(
                     YPLKart.getInstance(), new Object[]{kart, kartType, customKart}));
@@ -733,7 +734,7 @@ public class RaceManager {
 
             //エンティティのスポーン
             //必ずEntityIDの格納後に行う
-            ReflectionUtil.nmsWorld_addEntity.invoke(craftWorld, customKart);
+            Methods.nmsWorld_addEntity.invoke(craftWorld, customKart);
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

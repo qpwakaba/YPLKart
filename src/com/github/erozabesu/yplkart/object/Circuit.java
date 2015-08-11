@@ -200,12 +200,12 @@ public class Circuit {
 
                 //レース用スコアボードを表示
                 Scoreboards.entryCircuit(uuid);
-
+                
                 //Racerオブジェクトの諸々
                 racer.applyRaceParameter();
                 racer.setCircuitName(getCircuitName());
                 racer.setStandby(true);
-                racer.setKartEntityLocation(position.get(count));
+                racer.setKartEntityLocation(Util.adjustBlockLocation(position.get(count)));
                 RaceManager.clearCharacterRaceData(uuid);
                 RaceManager.clearKartRaceData(uuid);
                 RaceManager.leaveRacingKart(player);

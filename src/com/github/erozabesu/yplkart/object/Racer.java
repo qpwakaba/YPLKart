@@ -20,6 +20,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
+import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -353,9 +354,11 @@ public class Racer extends PlayerObject{
         //既に何かのエンティティに搭乗している
         if (vehicle != null) {
 
-            //カートエンティティに搭乗している場合、カートエンティティを削除
+            //カートエンティティに搭乗している場合パラメータの変更のみ行いreturn
             if (RaceManager.isKartEntity(vehicle)) {
-                RaceManager.removeKartEntity(vehicle);
+                Object kartEntity = RaceManager.getCustomMinecartObjectByEntityMetaData(vehicle);
+                KartUtil.setParameter(kartEntity, getKart());
+                return;
 
             //カートエンティティ以外に搭乗している場合は降ろす
             } else {
@@ -369,7 +372,7 @@ public class Racer extends PlayerObject{
 
         //クライアントで搭乗が解除されている状態で描画されるのを回避するため
         //issue#109
-        PacketUtil.sendOwnAttachEntityPacket(player);
+        //PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
     public void recoveryCharacter() {
