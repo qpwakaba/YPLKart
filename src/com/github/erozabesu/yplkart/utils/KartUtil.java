@@ -321,10 +321,9 @@ public class KartUtil extends ReflectionUtil {
     }
 
     /**
-     * 引数nmsEntityKartに接触したNmsEntityに接触モーションを適用する
-     *
-     * @param nmsEntityKart 接触したNmsEntity
-     * @param nmsEntityOther 接触されたNmsEntity
+     * 引数nmsEntityKartが引数nmsEntityOtherに衝突した際の接触モーション、及びダメージを適用する
+     * @param nmsEntityKart 衝突したNmsEntity
+     * @param nmsEntityOther 衝突されたNmsEntity
      */
     public static void moveByCollision(Object nmsEntityKart, Object nmsEntityOther) {
         Object nmsWorld = invoke(Methods.nmsEntity_getWorld, nmsEntityKart);
@@ -367,17 +366,17 @@ public class KartUtil extends ReflectionUtil {
 
         if (0.02000000029802322D <= d2) {
 
-            //自身が無人カートの場合、無条件でモーションを固定し、相手に反発モーションを適用する
+            //衝突者が無人カートの場合モーションを固定し、相手のみに反発モーションを適用する
             if (getFieldValue(Fields.nmsEntity_passenger, nmsEntityKart) == null) {
                 setFieldValue(Fields.nmsEntity_motX, nmsEntityOther, crashMotionX);
                 setFieldValue(Fields.nmsEntity_motY, nmsEntityOther, getFieldValue(Fields.nmsEntity_motY, nmsEntityOther));
                 setFieldValue(Fields.nmsEntity_motZ, nmsEntityOther, crashMotionZ);
 
-            //自身が有人カートの場合、nmsEntityKartとnmsEntityOtherに衝突モーションを適用する
+            //衝突者が有人カートの場合、nmsEntityKartとnmsEntityOtherに衝突モーションを適用する
             //衝突モーションはお互いのモーション値の差(速度の差)を基に算出される
             } else {
 
-                //衝突対象が無人カートの場合、無条件でモーションを固定し、お互いに反発モーションを適用しreturnする
+                //衝突対象が無人カートの場合、自身のみに反発モーションを適用しreturnする
                 if (getFieldValue(Fields.nmsEntity_passenger, nmsEntityOther) == null) {
                     setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, -crashMotionX);
                     setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, getFieldValue(Fields.nmsEntity_motY, nmsEntityKart));
@@ -410,7 +409,7 @@ public class KartUtil extends ReflectionUtil {
                 double kartMotionSpeed = calcMotionSpeed(kartMotionX, kartMotionZ) * kartWeight;
                 double otherMotionSpeed = calcMotionSpeed(otherMotionX, otherMotionZ) * otherWeight;
 
-                //相手側のcollideメソッドと処理が重複するため、衝突者のモーション値が劣っている場合return
+                //衝突対象のcollideメソッドと処理が重複するため、衝突者のモーション値が劣っている場合return
                 if (kartMotionSpeed < otherMotionSpeed) {
                     return;
                 }
@@ -421,9 +420,7 @@ public class KartUtil extends ReflectionUtil {
                 crashSpeed *= crashSpeed;
                 crashSpeed *= 1000.0D; // ノーマライズ
 
-                /*
-                 * 衝撃係数を基に、重量でダメージを付与し、ダメージ量に応じた演出を再生
-                 */
+                //衝撃係数を基に、重量でダメージを付与し、ダメージ量に応じた演出を再生
                 Entity kartPassenger = Util.getEndPassenger(entityKart);
                 Entity otherPassenger = Util.getEndPassenger(entityOther);
                 float soundVolume = (float) (0.5F + crashSpeed / 10.0D);
@@ -476,19 +473,19 @@ public class KartUtil extends ReflectionUtil {
                 double nmsEntityKartSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
                 invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, nmsEntityKartSpeedStack - (crashSpeed / kartWeight));
 
-                //衝突されたエンティティがカートエンティティだった場合、重量を加味した上でスピードスタックを減衰
+                //衝突対象のエンティティがカートエンティティだった場合、重量を加味した上でスピードスタックを減衰
                 if (otherKart != null) {
                     double nmsEntityOtherSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityOther);
                     invoke(Methods.Ypl_setSpeedStack, nmsEntityOther, nmsEntityOtherSpeedStack
                             - (crashSpeed / otherWeight));
                 }
 
-                //nmsEntityKartに衝突モーションの適用
+                //衝突者に衝突モーションの適用
                 crashMotionX *= 2.0D;                crashMotionZ *= 2.0D;
                 setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, kartMotionX - crashMotionX);
                 setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, kartMotionZ - crashMotionZ);
 
-                //nmsEntityOtherに衝突モーションの適用
+                //衝突対象に衝突モーションの適用
                 crashMotionX *= 2.0D;
                 crashMotionZ *= 2.0D;
                 setFieldValue(Fields.nmsEntity_motX, nmsEntityOther, otherMotionX + crashMotionX);
