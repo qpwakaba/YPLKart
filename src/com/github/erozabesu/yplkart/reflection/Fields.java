@@ -24,6 +24,9 @@ public class Fields extends ReflectionUtil {
 
     public static Field nmsWorld_isClientSide;
 
+    /** @return double ブロックの高さ。通常ブロックなら1.0D、半ブロックなら0.5D */
+    public static Field nmsBlock_maxY = getField(Classes.nmsBlock, "maxY");
+
     public static Field nmsEntity_dead = getField(Classes.nmsEntity, "dead");
     public static Field nmsEntity_onGround = getField(Classes.nmsEntity, "onGround");
     public static Field nmsEntity_noclip;

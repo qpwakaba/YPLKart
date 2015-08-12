@@ -78,6 +78,7 @@ public class Methods extends ReflectionUtil {
     //〓 Craft 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Method craftWorld_getHandle =  getMethod(Classes.craftWorld, "getHandle");
+    public static Method craftBlock_getNMSBlock =  getMethod(Classes.craftBlock, "getNMSBlock");
     public static Method static_craftItemStack_asNMSCopy =  getMethod(Classes.craftItemStack, "asNMSCopy", ItemStack.class);
 
     //〓 Craft List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

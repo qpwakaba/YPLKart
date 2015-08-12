@@ -62,6 +62,7 @@ public class Classes extends ReflectionUtil{
     //〓 Craft 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Class<?> craftWorld = getCraftClass("CraftWorld");
+    public static Class<?> craftBlock = getCraftClass("block.CraftBlock");
     public static Class<?> craftEntity = getCraftClass("entity.CraftEntity");
     public static Class<?> craftItemStack = getCraftClass("inventory.CraftItemStack");
 
