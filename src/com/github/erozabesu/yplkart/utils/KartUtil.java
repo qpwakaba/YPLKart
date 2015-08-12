@@ -10,9 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
@@ -326,6 +328,8 @@ public class KartUtil extends ReflectionUtil {
      * @param nmsEntityOther 衝突されたNmsEntity
      */
     public static void moveByCollision(Object nmsEntityKart, Object nmsEntityOther) {
+        Entity entityKart = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart);
+        Entity entityOther = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityOther);
         Object nmsWorld = invoke(Methods.nmsEntity_getWorld, nmsEntityKart);
 
         //クライアントと同期不要な場合return
@@ -340,6 +344,11 @@ public class KartUtil extends ReflectionUtil {
 
         //接触対象が搭乗者の場合return
         if (nmsEntityOther == getFieldValue(Fields.nmsEntity_passenger, nmsEntityKart)) {
+            return;
+        }
+
+        //接触対象のエンティティによって接触判定から除外しreturn
+        if (entityOther instanceof EnderCrystal || entityOther instanceof WitherSkull) {
             return;
         }
 
@@ -384,8 +393,6 @@ public class KartUtil extends ReflectionUtil {
                     return;
                 }
 
-                Entity entityKart = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart);
-                Entity entityOther = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityOther);
                 Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
                 Kart otherKart = RaceManager.getKartObjectByEntityMetaData(entityOther);
 
