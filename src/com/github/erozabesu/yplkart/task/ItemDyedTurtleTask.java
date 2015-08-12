@@ -64,6 +64,16 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
     public void run() {
         life++;
 
+        Racer targerRacer = RaceManager.getRacer(target);
+
+        //ターゲットがゴールしている場合デスポーンしタスクを終了
+        if (targerRacer != null) {
+            if (targerRacer.isGoal()) {
+                die();
+                return;
+            }
+        }
+
         if (!Util.isOnline(target.getName()) || 60 < life / 20) {
             die();
             return;
@@ -125,7 +135,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
             for (Entity e : templist) {
                 if (this.shooterpassedcheckpoint.contains(lap + e.getUniqueId().toString())) {
-                    if (!RaceManager.getRacer(this.target).getPassedCheckPointList()
+                    if (!targerRacer.getPassedCheckPointList()
                             .contains(lap + e.getUniqueId().toString()))
                         if (!this.turtlepassedcheckpoint.contains(lap + e.getUniqueId().toString()))
                             checkpointlist.add(e);
