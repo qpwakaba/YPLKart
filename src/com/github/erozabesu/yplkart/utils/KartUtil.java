@@ -366,15 +366,24 @@ public class KartUtil extends ReflectionUtil {
         crashMotionZ *= 0.05000000074505806D;
 
         if (0.02000000029802322D <= d2) {
-            //nmsEntityKartが無人カートの場合、無条件でモーションを固定し、相手に反発モーションを適用する
+
+            //自身が無人カートの場合、無条件でモーションを固定し、相手に反発モーションを適用する
             if (getFieldValue(Fields.nmsEntity_passenger, nmsEntityKart) == null) {
                 setFieldValue(Fields.nmsEntity_motX, nmsEntityOther, crashMotionX);
                 setFieldValue(Fields.nmsEntity_motY, nmsEntityOther, getFieldValue(Fields.nmsEntity_motY, nmsEntityOther));
                 setFieldValue(Fields.nmsEntity_motZ, nmsEntityOther, crashMotionZ);
 
-            //nmsEntityKartが有人カートの場合、nmsEntityKartとnmsEntityOtherに衝突モーションを適用する
+            //自身が有人カートの場合、nmsEntityKartとnmsEntityOtherに衝突モーションを適用する
             //衝突モーションはお互いのモーション値の差(速度の差)を基に算出される
             } else {
+
+                //衝突対象が無人カートの場合、無条件でモーションを固定し、お互いに反発モーションを適用しreturnする
+                if (getFieldValue(Fields.nmsEntity_passenger, nmsEntityOther) == null) {
+                    setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, -crashMotionX);
+                    setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, getFieldValue(Fields.nmsEntity_motY, nmsEntityKart));
+                    setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, -crashMotionZ);
+                    return;
+                }
 
                 Entity entityKart = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart);
                 Entity entityOther = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityOther);
