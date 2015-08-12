@@ -517,10 +517,10 @@ public class KartUtil extends ReflectionUtil {
         invoke(Methods.Ypl_setKillerZ, kartEntity, 0);
 
         //横方向への移動入力値
-        float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman);
+        float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
 
         //縦方向への移動入力値
-        float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman);
+        float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
 
         //スピードスタックの算出、格納
         double speedStack = calcSpeedStack(kartEntity, entityHuman);
