@@ -466,12 +466,17 @@ public class Circuit {
         this.setStandbyTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 setStandbyCountDownTime(getStandbyCountDownTime() - 1);
+
+                //選択猶予時間がまだ残っている
                 if (12 < getStandbyCountDownTime()) {
                     for (Player p : getEntryPlayer()) {
                         int count = getStandbyCountDownTime() - 12;
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceMenu.getMessage(), 0, 25, 0, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(count), 0, 25, 0, true);
+                        playCountDownSound(p, count);
                     }
+
+                //選択猶予時間がタイムアップ
                 } else if (getStandbyCountDownTime() == 12) {
                     for (Player p : getEntryPlayer()) {
                         if (RaceManager.getRacer(p).getCharacter() == null) {
@@ -542,15 +547,30 @@ public class Circuit {
                 if (getCurrentTime() % 20 == 0) {
                     int remainTime = limitTime - getCurrentTime() / 20;
                     if (remainTime == 60) {
-                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 60 });
+                        for (Player p : getEntryPlayer()) {
+                            playCountDownSound(p, remainTime);
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 60 });
+                        }
                     } else if (remainTime == 30) {
-                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 30 });
+                        for (Player p : getEntryPlayer()) {
+                            playCountDownSound(p, remainTime);
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 30 });
+                        }
                     } else if (remainTime == 10) {
-                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitAlert, new Object[] { getInstance(), (int) 10 });
+                        for (Player p : getEntryPlayer()) {
+                            playCountDownSound(p, remainTime);
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 10 });
+                        }
                     } else if (0 < remainTime && remainTime < 10) {
-                        sendMessageEntryPlayer(MessageEnum.raceTimeLimitCountDown, new Object[] { getInstance(), remainTime });
+                        for (Player p : getEntryPlayer()) {
+                            playCountDownSound(p, remainTime);
+                            MessageEnum.raceTimeLimitCountDown.sendConvertedMessage(p, new Object[] { getInstance(), remainTime });
+                        }
                     } else if (remainTime == 0) {
-                        sendMessageEntryPlayer(MessageEnum.raceTimeUp, new Object[] { getInstance() });
+                        for (Player p : getEntryPlayer()) {
+                            p.playSound(p.getLocation(), Sound.ITEM_BREAK, 2.0F, 1.0F);
+                            MessageEnum.raceTimeUp.sendConvertedMessage(p, new Object[] { getInstance() });
+                        }
                     } else if (remainTime < 0) {
                         endRace();
                     }
@@ -658,6 +678,7 @@ public class Circuit {
 
     /**
      * 引数countDownTimeの数値に応じてカウントダウンの音声を再生する
+     * @param player 音声を再生するプレイヤー
      * @param countDownTime 秒数
      */
     public void playCountDownSound(Player player, int countDownTime) {
