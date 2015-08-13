@@ -182,10 +182,15 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                      * 座標から減算する
                      */
                     Block groundBlock = Util.getGroundBlock(location);
-                    Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
-                    Location groundBlockLocation = groundBlock.getLocation();
-                    groundBlockLocation.add(
-                            0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+                    Location groundBlockLocation;
+                    if (groundBlock == null) {
+                        groundBlockLocation = location;
+                    } else {
+                        Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
+                        groundBlockLocation = groundBlock.getLocation();
+                        groundBlockLocation.add(
+                                0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+                    }
 
                     //Y座標のオフセット
                     double offsetY = -0.5D + kartObject.getMountPositionOffset();
@@ -228,10 +233,15 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
                      * 座標から減算する
                      */
                     Block groundBlock = Util.getGroundBlock(location);
-                    Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
-                    Location groundBlockLocation = groundBlock.getLocation();
-                    groundBlockLocation.add(
-                            0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+                    Location groundBlockLocation;
+                    if (groundBlock == null) {
+                        groundBlockLocation = location;
+                    } else {
+                        Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
+                        groundBlockLocation = groundBlock.getLocation();
+                        groundBlockLocation.add(
+                                0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+                    }
 
                     //Y座標のオフセット
                     double offsetY = -0.5D + kartObject.getMountPositionOffset();
