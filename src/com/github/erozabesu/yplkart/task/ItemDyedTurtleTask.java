@@ -11,6 +11,7 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -81,7 +82,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         if (isthornedturtle) {
             Util.createSafeExplosion(this.shooter, this.projectile.getLocation()
-                    , ItemEnum.THORNED_TURTLE.getMovingDamage() + this.adjustdamage, 5);
+                    , ItemEnum.THORNED_TURTLE.getMovingDamage() + this.adjustdamage, 5, 0.0F, true, Particle.CRIT_MAGIC, Particle.PORTAL);
         }
 
         //モーション 読み込まれていないチャンクに居る場合はMotionの値ずつテレポートで移動させる
@@ -115,7 +116,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
                 if (target.getLocation().distance(this.projectile.getLocation()) < 3) {
                     Util.createSafeExplosion(this.shooter, target.getLocation()
-                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3);
+                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3, 2.0F, false, Particle.EXPLOSION_LARGE);
                     die();
                 }
                 return;

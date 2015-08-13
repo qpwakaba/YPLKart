@@ -200,7 +200,7 @@ public class Circuit {
 
                 //レース用スコアボードを表示
                 Scoreboards.entryCircuit(uuid);
-                
+
                 //Racerオブジェクトの諸々
                 racer.applyRaceParameter();
                 racer.setCircuitName(getCircuitName());

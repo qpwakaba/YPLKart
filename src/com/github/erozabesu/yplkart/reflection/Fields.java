@@ -55,6 +55,15 @@ public class Fields extends ReflectionUtil {
     public static Field nmsEntity_passenger = getField(Classes.nmsEntity, "passenger");
     public static Field nmsEntity_vehicle = getField(Classes.nmsEntity, "vehicle");
 
+    /** @return PlayerConnection */
+    public static Field nmsEntityPlayer_playerConnection = getField(Classes.nmsEntityPlayer, "playerConnection");
+
+    /** @return NetworkManager */
+    public static Field nmsPlayerConnection_networkManager = getField(Classes.nmsPlayerConnection, "networkManager");
+
+    /** @return Channel */
+    public static Field nmsNetworkManager_channel;
+
     public static Field nmsEntityHuman_forwardMotionInput;
     public static Field nmsEntityHuman_sideMotionInput;
 
@@ -65,11 +74,19 @@ public class Fields extends ReflectionUtil {
             nmsEntity_noclip = getField(Classes.nmsEntity, "T");
             nmsEntityHuman_forwardMotionInput = getField(Classes.nmsEntityHuman, "aY");
             nmsEntityHuman_sideMotionInput = getField(Classes.nmsEntityHuman, "aX");
+            nmsNetworkManager_channel = getField(Classes.nmsNetworkManager, "i");
+        }else if (getBukkitVersion().equalsIgnoreCase("v1_8_R2")) {
+            nmsWorld_isClientSide = getField(Classes.nmsWorld, "isClientSide");
+            nmsEntity_noclip = getField(Classes.nmsEntity, "noclip");
+            nmsEntityHuman_forwardMotionInput = getField(Classes.nmsEntityHuman, "ba");
+            nmsEntityHuman_sideMotionInput = getField(Classes.nmsEntityHuman, "aZ");
+            nmsNetworkManager_channel = getField(Classes.nmsNetworkManager, "k");
         } else {
             nmsWorld_isClientSide = getField(Classes.nmsWorld, "isClientSide");
             nmsEntity_noclip = getField(Classes.nmsEntity, "noclip");
             nmsEntityHuman_forwardMotionInput = getField(Classes.nmsEntityHuman, "ba");
             nmsEntityHuman_sideMotionInput = getField(Classes.nmsEntityHuman, "aZ");
+            nmsNetworkManager_channel = getField(Classes.nmsNetworkManager, "channel");
         }
     }
 }

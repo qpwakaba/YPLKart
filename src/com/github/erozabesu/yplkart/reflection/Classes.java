@@ -23,10 +23,12 @@ public class Classes extends ReflectionUtil{
     public static Class<?> nmsPacket = getNMSClass("Packet");
     public static Class<?> nmsWatchableObject = getNMSClass("DataWatcher$WatchableObject");
     public static Class<?> nmsPlayerConnection = getNMSClass("PlayerConnection");
+    public static Class<?> nmsNetworkManager = getNMSClass("NetworkManager");
     public static Class<?> nmsIChatBaseComponent = getNMSClass("IChatBaseComponent");
     public static Class<?> nmsChatSerializer = null;
-    public static Class<?> nmsEnumTitleAction = null;
     public static Class<?> nmsEnumClientCommand = null;
+    public static Class<?> nmsEnumParticle = getNMSClass("EnumParticle");
+    public static Class<?> nmsEnumTitleAction = null;
     public static Class<?> nmsPacketPlayInSteerVehicle = getNMSClass("PacketPlayInSteerVehicle");
     public static Class<?> nmsPacketPlayInUseEntity = getNMSClass("PacketPlayInUseEntity");
     public static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
@@ -40,6 +42,7 @@ public class Classes extends ReflectionUtil{
     public static Class<?> nmsPacketPlayOutSpawnEntity = getNMSClass("PacketPlayOutSpawnEntity");
     public static Class<?> nmsPacketPlayOutSpawnEntityLiving = getNMSClass("PacketPlayOutSpawnEntityLiving");
     public static Class<?> nmsPacketPlayOutTitle = getNMSClass("PacketPlayOutTitle");
+    public static Class<?> nmsPacketPlayOutWorldParticles = getNMSClass("PacketPlayOutWorldParticles");
     public static Class<?> nmsPacketPlayInClientCommand = getNMSClass("PacketPlayInClientCommand");
 
     //XXX: CraftBukkit Unstable

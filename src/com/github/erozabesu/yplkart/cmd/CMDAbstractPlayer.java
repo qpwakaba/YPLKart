@@ -19,6 +19,7 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
@@ -833,6 +834,13 @@ public class CMDAbstractPlayer extends CMDAbstract {
                     } else {
                         player.sendMessage("not number");
                     }
+                } else if (getArgs()[1].equalsIgnoreCase("particle")) {
+                    Particle particle = Particle.getParticleByName(getArgs()[2]);
+                    if (particle != null) {
+                        PacketUtil.sendParticlePacket(null, particle, getPlayer().getLocation(), 2.0F, 2.0F, 2.0F, 1.0F, 1, new int[]{});
+                    } else {
+                        player.sendMessage("not particle");
+                    }
                 }
             } else if (this.getLength() == 4) {
                 if (getArgs()[1].equalsIgnoreCase("kart")) {
@@ -849,6 +857,54 @@ public class CMDAbstractPlayer extends CMDAbstract {
                             player.setWalkSpeed(0.6F);
                             player.sendMessage("ride \"" + getArgs()[3] + "\" kart");
                         }
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("particle")) {
+                    Particle particle = Particle.getParticleByName(getArgs()[2]);
+                    if (particle != null) {
+                        if (Util.isNumber(getArgs()[3])) {
+                            PacketUtil.sendParticlePacket(null, particle, getPlayer().getLocation(), 2.0F, 2.0F, 2.0F, 1.0F, Integer.valueOf(getArgs()[3]), new int[]{});
+                        } else {
+                            player.sendMessage("not number");
+                        }
+                    } else {
+                        player.sendMessage("not particle");
+                    }
+                }
+            } else if (this.getLength() == 5) {
+                if (getArgs()[1].equalsIgnoreCase("particle")) {
+                    Particle particle = Particle.getParticleByName(getArgs()[2]);
+                    if (particle != null) {
+                        if (Util.isNumber(getArgs()[3]) && Util.isNumber(getArgs()[4])) {
+                            PacketUtil.sendParticlePacket(null, particle, getPlayer().getLocation(), 2.0F, 2.0F, 2.0F, 1.0F, Integer.valueOf(getArgs()[3]), new int[]{Integer.valueOf(getArgs()[4])});
+                        } else {
+                            player.sendMessage("not number");
+                        }
+                    } else {
+                        player.sendMessage("not particle");
+                    }
+                }
+            } else if (this.getLength() == 6) {
+                if (getArgs()[1].equalsIgnoreCase("particle")) {
+                    Particle particle = Particle.getParticleByName(getArgs()[2]);
+                    if (particle != null) {
+                        if (Util.isNumber(getArgs()[3]) && Util.isNumber(getArgs()[4]) && Util.isNumber(getArgs()[5])) {
+                            PacketUtil.sendParticlePacket(null, particle, getPlayer().getLocation(), 2.0F, 2.0F, 2.0F, 1.0F, Integer.valueOf(getArgs()[3]), new int[]{Integer.valueOf(getArgs()[4]) + (Integer.valueOf(getArgs()[5])<<12)});
+                        } else {
+                            player.sendMessage("not number");
+                        }
+                    } else {
+                        player.sendMessage("not particle");
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("itemparticle")) {
+                    Particle particle = Particle.getParticleByName(getArgs()[2]);
+                    if (particle != null) {
+                        if (Util.isNumber(getArgs()[3]) && Util.isNumber(getArgs()[4]) && Util.isNumber(getArgs()[5])) {
+                            PacketUtil.sendParticlePacket(null, particle, getPlayer().getLocation(), 2.0F, 2.0F, 2.0F, 1.0F, Integer.valueOf(getArgs()[3]), new int[]{Integer.valueOf(getArgs()[4]), Integer.valueOf(getArgs()[5])});
+                        } else {
+                            player.sendMessage("not number");
+                        }
+                    } else {
+                        player.sendMessage("not particle");
                     }
                 }
             } else {

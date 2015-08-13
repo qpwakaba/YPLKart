@@ -44,6 +44,7 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
@@ -269,10 +270,10 @@ public class ItemListener extends RaceManager implements Listener {
                                 MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player,
                                         RaceManager.getCircuit(uuid));
                                 Util.createSafeExplosion(null, player.getLocation(),
-                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1);
+                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 2.0F, false, Particle.EXPLOSION_LARGE);
                             }
                         }
-                        //偽アイテムボックス復活するタイプ
+                    //偽アイテムボックス復活するタイプ
                     } else if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameFake)) {
                         if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
@@ -289,7 +290,7 @@ public class ItemListener extends RaceManager implements Listener {
                             if (player.getNoDamageTicks() == 0) {
                                 MessageEnum.raceInteractBanana.sendConvertedMessage(player, RaceManager.getCircuit(uuid));
                                 Util.createSafeExplosion(null, player.getLocation(),
-                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1);
+                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 2.0F, false, Particle.EXPLOSION_LARGE);
                             }
                         }
                     } else if (entity.getCustomName().contains(ItemBoxName)) {
@@ -649,7 +650,7 @@ public class ItemListener extends RaceManager implements Listener {
 
             final Location loc = p.getLocation();
             w.strikeLightningEffect(loc);
-            Util.createSafeExplosion(user, loc, launchdamage, 5);
+            Util.createSafeExplosion(user, loc, launchdamage, 5, 1.0F, false, Particle.CLOUD);
             p.playSound(loc, Sound.SUCCESSFUL_HIT, 0.5F, 1.0F);
             p.playSound(loc, Sound.LEVEL_UP, 0.5F, -1.0F);
         }

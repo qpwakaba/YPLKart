@@ -37,6 +37,7 @@ import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceManager {
@@ -719,7 +720,7 @@ public class RaceManager {
     private static Entity createCustomKart(Location location, Kart kart, KartType kartType) {
         Entity entity = null;
         try {
-            Object craftWorld = Util.getCraftWorld(location.getWorld());
+            Object craftWorld = ReflectionUtil.invoke(Methods.craftWorld_getHandle, location.getWorld());
             Object customKart = Constructors.constructor_yplCustomKart
                     .newInstance(craftWorld, kart, kartType, location);
 

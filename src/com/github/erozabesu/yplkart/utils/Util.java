@@ -2,7 +2,6 @@ package com.github.erozabesu.yplkart.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,7 +23,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -32,6 +30,7 @@ import org.bukkit.util.Vector;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.reflection.Constructors;
@@ -160,16 +159,15 @@ public class Util extends ReflectionUtil {
      * @return offsetの数値だけ前後に移動した座標
      */
     public static Location getForwardLocationFromYaw(Location location, double offset) {
-        Location adjustlocation = adjustBlockLocation(location);
-        float yaw = adjustlocation.getYaw();
-        double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
-        double z = Math.cos(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
+        Vector direction = location.getDirection();
+        double x = direction.getX();
+        double z = direction.getZ();
 
-        return new Location(adjustlocation.getWorld(),
-                adjustlocation.getX() + x * offset,
-                adjustlocation.getY(),
-                adjustlocation.getZ() + z * offset,
-                yaw, adjustlocation.getPitch());
+        return new Location(location.getWorld(),
+                location.getX() + x * offset,
+                location.getY(),
+                location.getZ() + z * offset,
+                location.getYaw(), location.getPitch());
     }
 
     /**
@@ -367,95 +365,38 @@ public class Util extends ReflectionUtil {
         return (blockMaterial == Material.LADDER || blockMaterial == Material.VINE);
     }
 
-    public static Object getCraftWorld(World world) {
-        try {
-            return Methods.craftWorld_getHandle.invoke(world);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static Object getCraftEntity(Entity entity) {
-        try {
-            String className = entity.getClass().getSimpleName();
-            Method getHandle;
+        String className = entity.getClass().getSimpleName();
+        Method getHandle = Methods.craftEntity_getHandle.get(className);
 
-            if (Methods.craftEntity_getHandle.containsKey(className)) {
-                getHandle = Methods.craftEntity_getHandle.get(className);
-            } else {
-                getHandle = entity.getClass().getMethod("getHandle");
-                Methods.craftEntity_getHandle.put(className, getHandle);
-            }
-
-            return ReflectionUtil.invoke(getHandle, entity);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        if (getHandle == null) {
+            getHandle = getMethod(entity.getClass(), "getHandle");
+            Methods.craftEntity_getHandle.put(className, getHandle);
         }
 
-        return null;
+        return invoke(getHandle, entity);
     }
 
     public static Object getNewCraftEntityFromClass(World world, Class<?> nmsEntityClass) {
-        try {
-            Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
+        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
 
-            if (constructor == null) {
-                constructor = nmsEntityClass.getConstructor(Classes.nmsWorld);
-                Constructors.nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
-            }
-
-            return constructor.newInstance(getCraftWorld(world));
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+        if (constructor == null) {
+            constructor = getConstructor(nmsEntityClass, Classes.nmsWorld);
+            Constructors.nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
         }
 
-        return null;
+        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
     }
 
     public static Object getNewCraftEntityFromClassName(World world, String classname) {
-        try {
-            Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(classname);
+        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(classname);
 
-            if (constructor == null) {
-                constructor = getNMSClass(classname).getConstructor(Classes.nmsWorld);
-                Constructors.nmsEntity_Constructor.put(classname, constructor);
-            }
-
-            return constructor.newInstance(getCraftWorld(world));
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+        if (constructor == null) {
+            constructor = getConstructor(getNMSClass(classname), Classes.nmsWorld);
+            Constructors.nmsEntity_Constructor.put(classname, constructor);
         }
 
-        return null;
+        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
     }
 
     /**
@@ -464,37 +405,7 @@ public class Util extends ReflectionUtil {
      * @return BukkitEntity
      */
     public static Entity getBukkitEntityFromNmsEntity(Object nmsEntity) {
-        try {
-            return (Entity) Methods.nmsEntity_getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * 引数itemStackからCraftItemStackを取得し返す
-     * @param itemStack ItemStack
-     * @return CraftItemStack
-     */
-    public static Object getCraftItemStack(ItemStack itemStack) {
-        try {
-            return Methods.static_craftItemStack_asNMSCopy.invoke(null, itemStack);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntity);
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -751,10 +662,13 @@ public class Util extends ReflectionUtil {
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     //ブロック、非生物エンティティに影響しない爆発を発生
-    public static void createSafeExplosion(Player executor, Location l, int damage, int range) {
-        Particle.sendToLocation("CLOUD", l, 0, 0, 0, 1, 10);
-        Particle.sendToLocation("SMOKE_NORMAL", l, 0, 0, 0, 1, 10);
-        l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
+    public static void createSafeExplosion(Player executor, Location l, int damage, int range, float offset, boolean noSound, Particle...particles) {
+        for (Particle particle : particles) {
+            PacketUtil.sendParticlePacket(null, particle, l, offset, offset, offset, 1.0F, 20, new int[]{});
+        }
+        if (!noSound) {
+            l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
+        }
         ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
         for (LivingEntity damaged : entities) {
             if (executor != null) {

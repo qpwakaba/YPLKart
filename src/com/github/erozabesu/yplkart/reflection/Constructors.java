@@ -26,6 +26,7 @@ public class Constructors extends ReflectionUtil{
     public static Constructor<?> nmsPacketPlayOutSpawnEntityLiving = getConstructor(Classes.nmsPacketPlayOutSpawnEntityLiving, Classes.nmsEntityLiving);
     public static Constructor<?> nmsPacketPlayOutTitle = getConstructor(Classes.nmsPacketPlayOutTitle, Classes.nmsEnumTitleAction, Classes.nmsIChatBaseComponent);
     public static Constructor<?> nmsPacketPlayOutTitle_Length = getConstructor(Classes.nmsPacketPlayOutTitle, int.class, int.class, int.class);
+    public static Constructor<?> nmsPacketPlayOutWorldParticles = getConstructor(Classes.nmsPacketPlayOutWorldParticles, Classes.nmsEnumParticle, boolean.class, float.class, float.class, float.class, float.class, float.class, float.class, float.class, int.class, int[].class);
     public static Constructor<?> nmsPacketPlayInClientCommand = getConstructor(Classes.nmsPacketPlayInClientCommand, Classes.nmsEnumClientCommand);
 
     //〓 Nms List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

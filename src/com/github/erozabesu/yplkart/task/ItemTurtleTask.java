@@ -8,6 +8,7 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemTurtleTask extends BukkitRunnable {
@@ -59,7 +60,7 @@ public class ItemTurtleTask extends BukkitRunnable {
                     continue;
 
             //発射したプレイヤーにも跳ね返って自滅するよう1つ目の引数はnull
-            Util.createSafeExplosion(null, this.projectile.getLocation(), this.hitdamage, 3);
+            Util.createSafeExplosion(null, this.projectile.getLocation(), this.hitdamage, 3, 2.0F, false, Particle.EXPLOSION_LARGE);
 
             this.cancel();
             this.projectile.remove();

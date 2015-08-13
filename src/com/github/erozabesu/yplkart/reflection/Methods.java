@@ -27,8 +27,6 @@ public class Methods extends ReflectionUtil {
 
     public static Method nmsMaterial_isSolid = getMethod(Classes.nmsMaterial, "isSolid");
 
-    public static Method nmsPlayerConnection_sendPacket = getMethod(Classes.nmsPlayerConnection, "sendPacket", Classes.nmsPacket);
-
     public static Method nmsEntity_getBoundingBox = getMethod(Classes.nmsEntity, "getBoundingBox");
     public static Method nmsEntity_getBukkitEntity = getMethod(Classes.nmsEntity, "getBukkitEntity");
     public static Method nmsEntity_getCustomName = getMethod(Classes.nmsEntity, "getCustomName");
@@ -52,6 +50,9 @@ public class Methods extends ReflectionUtil {
     public static Method nmsEntityArmorStand_setRightArmPose = getMethod(Classes.nmsEntityArmorStand, "setRightArmPose", Classes.nmsVector3f);
 
     public static Method nmsWatchableObject_getIndex = getMethod(Classes.nmsWatchableObject, "a");
+
+    public static Method nmsPlayerConnection_skipRespawnWindow = getMethod(Classes.nmsPlayerConnection, "a", Classes.nmsPacketPlayInClientCommand);
+    public static Method nmsPlayerConnection_sendPacket = getMethod(Classes.nmsPlayerConnection, "sendPacket", Classes.nmsPacket);
 
     /** 引数1と引数2の絶対値を比較し、高い方の数値をDouble型で返す */
     public static Method static_nmsMathHelper_a = getMethod(Classes.nmsMathHelper, "a", double.class, double.class);
@@ -77,8 +78,23 @@ public class Methods extends ReflectionUtil {
 
     //〓 Craft 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /**
+     * @param Instance:World
+     * @return NmsWorldServer
+     */
     public static Method craftWorld_getHandle =  getMethod(Classes.craftWorld, "getHandle");
+
+    /**
+     * @param Instance:Block
+     * @return NmsBlock
+     */
     public static Method craftBlock_getNMSBlock =  getMethod(Classes.craftBlock, "getNMSBlock");
+
+    /**
+     * ItemStackからCraftItemStackを取得し返す
+     * @param Instance:ItemStack
+     * @return CraftItemStack
+     */
     public static Method static_craftItemStack_asNMSCopy =  getMethod(Classes.craftItemStack, "asNMSCopy", ItemStack.class);
 
     //〓 Craft List 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

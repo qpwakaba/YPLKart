@@ -26,6 +26,7 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
@@ -249,7 +250,7 @@ public class KartUtil extends ReflectionUtil {
 
             //周囲のプレイヤーへダメージ
             Util.createSafeExplosion(player, location, ItemEnum.KILLER.getMovingDamage()
-                    + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 4);
+                    + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 6, 0.0F, true);
         } else {
             //レースが開始されるまで動かない
             if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
@@ -447,8 +448,8 @@ public class KartUtil extends ReflectionUtil {
                                     kartPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 0.5F);
                             kartPlayer.playSound(
                                     kartPassenger.getLocation(), Sound.IRONGOLEM_HIT, soundVolume, 0.5F);
-                            Particle.sendToLocation("CRIT", location, 0, 0, 0, 1, 10);
-                            Particle.sendToLocation("CLOUD", location, 0, 0, 0, 1, 10);
+                            PacketUtil.sendParticlePacket(null, Particle.CRIT, location, 0.0F, 0.0F, 0.0F, 1, 10, new int[]{});
+                            PacketUtil.sendParticlePacket(null, Particle.CLOUD, location, 0.0F, 0.0F, 0.0F, 1, 10, new int[]{});
                         }
                     }
                 }
@@ -465,8 +466,8 @@ public class KartUtil extends ReflectionUtil {
                                     otherPassenger.getLocation(), Sound.AMBIENCE_THUNDER, soundVolume, 0.5F);
                             otherPlayer.playSound(
                                     otherPassenger.getLocation(), Sound.IRONGOLEM_HIT, soundVolume, 0.5F);
-                            Particle.sendToLocation("CRIT", location, 0, 0, 0, 1, 10);
-                            Particle.sendToLocation("CLOUD", location, 0, 0, 0, 1, 10);
+                            PacketUtil.sendParticlePacket(null, Particle.CRIT, location, 0.0F, 0.0F, 0.0F, 1, 10, new int[]{});
+                            PacketUtil.sendParticlePacket(null, Particle.CLOUD, location, 0.0F, 0.0F, 0.0F, 1, 10, new int[]{});
                         }
                     }
                 }
@@ -781,18 +782,16 @@ public class KartUtil extends ReflectionUtil {
     public static void playIdleEffect(Player player, Location kartEntityLocation, double speedStack) {
         kartEntityLocation.add(0, 0.5, 0);
 
-        //排気口付近の座標を取得
-        kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -1.5 - speedStack / 60);
+        /*
+         * 排気口付近の座標を取得
+         * 移動中は座標のズレからパーティクルの生成位置が通常より前に出てきてしまうため、速度に応じて調整する
+         */
+        kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -1.5D - speedStack / 80.0D);
 
-        //座標にランダム性を持たせ、排気口付近にパーティクルを散らす
-        double[] particleOffSet = new double[]{
-                Double.valueOf(Util.getRandom(4)) / 10
-                , 0.5
-                , Double.valueOf(Util.getRandom(4)) / 10};
-        kartEntityLocation.add(particleOffSet[0], particleOffSet[1], particleOffSet[2]);
-        Particle.sendToLocation("SPELL", kartEntityLocation, 0, 0, 0, 0, 5);
+        //パーティクルを生成する
+        PacketUtil.sendParticlePacket(null, Particle.SPELL, kartEntityLocation, 0.1F, 0.1F, 0.2F, 1, 5, new int[]{});
 
-        //音声を再生
+        //音声を再生する
         player.playSound(player.getLocation()
                 , Sound.COW_WALK, 0.2F, 0.05F + ((float) speedStack / 200));
         player.playSound(player.getLocation()
@@ -808,14 +807,17 @@ public class KartUtil extends ReflectionUtil {
             //スピードスタックが100を越える場合のみ火花のパーティクルを生成する
             if (100 < speedStack) {
 
-                //後輪付近の座標を取得
-                kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -speedStack / 60);
+                /*
+                 * 後輪付近の座標を取得
+                 * 移動中は座標のズレからパーティクルの生成位置が通常より前に出てきてしまうため、速度に応じて調整する
+                 */
+                kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -speedStack / 80.0D);
 
                 //後輪付近に火花のパーティクルを散らす
-                Particle.sendToLocation("LAVA", kartEntityLocation, 0, 0, 0, 0, 5);
+                PacketUtil.sendParticlePacket(null, Particle.LAVA, kartEntityLocation, 0.0F, 0.0F, 0.0F, 1, 5, new int[]{});
             }
 
-            //音声を再生
+            //音声を再生する
             player.playSound(player.getLocation(), Sound.FIREWORK_BLAST, 1.0F, 7.0F);
         }
     }
@@ -825,21 +827,14 @@ public class KartUtil extends ReflectionUtil {
         kartEntityLocation.add(0, 0.5, 0);
 
         //キラーの排気口付近の座標を取得
-        kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -15);
+        Location particleLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -5);
+        Location particleLocation2 = Util.getForwardLocationFromYaw(kartEntityLocation, -10);
 
-        //座標にランダム性を持たせ、排気口付近に赤いパーティクルを散らす
-        float[] particleOffSet;
-        Location cloneLocation;
-        for (int i = 0; i < 10; i++) {
-            particleOffSet = new float[]{
-                    Float.valueOf(Util.getRandom(10)) / 10
-                    , Float.valueOf(Util.getRandom(10)) / 10
-                    , Float.valueOf(Util.getRandom(10)) / 10};
-            Particle.sendToLocation("REDSTONE", kartEntityLocation
-                    , particleOffSet[0], particleOffSet[1], particleOffSet[2], 0, 10);
-        }
+        //パーティクルを生成する
+        PacketUtil.sendParticlePacket(null, Particle.REDSTONE, particleLocation, 0.5F, 0.5F, 0.5F, 1.0F, 20, new int[]{});
+        PacketUtil.sendParticlePacket(null, Particle.SMOKE_LARGE, particleLocation2, 0.5F, 0.5F, 0.5F, 0.0F, 20, new int[]{});
 
-        //音声を再生
+        //音声を再生する
         player.playSound(player.getLocation(), Sound.GHAST_FIREBALL, 0.05F, 1.5F);
         player.playSound(player.getLocation(), Sound.FIZZ, 0.05F, 1.0F);
     }

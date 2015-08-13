@@ -2,25 +2,25 @@ package com.github.erozabesu.yplkart.utils;
 
 import io.netty.channel.Channel;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.reflection.Constructors;
+import com.github.erozabesu.yplkart.reflection.Fields;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.reflection.Objects;
 
-public class PacketUtil {
+public class PacketUtil extends ReflectionUtil {
 
     /**
      * PlayerとPlayerConnectionを格納するハッシュマップ
@@ -40,7 +40,7 @@ public class PacketUtil {
      */
     private static HashMap<Player, Channel> channelMap = new HashMap<Player, Channel>();
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static HashMap<Player, Object> getPlayerConnectionMap() {
         return playerConnectionMap;
@@ -94,134 +94,112 @@ public class PacketUtil {
             return;
         }
 
-        try {
-            Object craftEntity = Util.getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
+        Object craftEntity = Util.getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
 
-            Object entitydestroypacket = getEntityDestroyPacket(disguiseEntity.getEntityId());
-            Object spawnentitypacket = getDisguiseLivingEntityPacket(disguiseEntity, nmsEntityClass
-                    , offsetX, offsetY, offsetZ);
-            Object attachentitypacket = null;
-            if (disguiseEntity.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftEntity, Util.getCraftEntity(disguiseEntity.getVehicle()));
-            }
+        Object entitydestroypacket = getEntityDestroyPacket(disguiseEntity.getEntityId());
+        Object spawnentitypacket = getDisguiseLivingEntityPacket(disguiseEntity, nmsEntityClass
+                , offsetX, offsetY, offsetZ);
+        Object attachentitypacket = null;
+        if (disguiseEntity.getVehicle() != null) {
+            attachentitypacket = getAttachEntityPacket(craftEntity, Util.getCraftEntity(disguiseEntity.getVehicle()));
+        }
 
-            Object handpacket = getEquipmentPacket(disguiseEntity, 0, new ItemStack(Material.AIR));
-            Object helmetpacket = getEquipmentPacket(disguiseEntity, 4, new ItemStack(Material.AIR));
-            Object chectpacket = getEquipmentPacket(disguiseEntity, 3, new ItemStack(Material.AIR));
-            Object leggingspacket = getEquipmentPacket(disguiseEntity, 2, new ItemStack(Material.AIR));
-            Object bootspacket = getEquipmentPacket(disguiseEntity, 1, new ItemStack(Material.AIR));
+        Object handpacket = getEquipmentPacket(disguiseEntity, 0, new ItemStack(Material.AIR));
+        Object helmetpacket = getEquipmentPacket(disguiseEntity, 4, new ItemStack(Material.AIR));
+        Object chectpacket = getEquipmentPacket(disguiseEntity, 3, new ItemStack(Material.AIR));
+        Object leggingspacket = getEquipmentPacket(disguiseEntity, 2, new ItemStack(Material.AIR));
+        Object bootspacket = getEquipmentPacket(disguiseEntity, 1, new ItemStack(Material.AIR));
 
-            if (adress == null) {
-                for (Player other : Bukkit.getOnlinePlayers()) {
-                    if (other.getUniqueId() == disguiseEntity.getUniqueId()) {
-                        continue;
-                    }
-                    if (!other.getWorld().getName().equalsIgnoreCase(disguiseEntity.getWorld().getName())) {
-                        continue;
-                    }
-
-                    sendPacket(other, entitydestroypacket);
-                    sendPacket(other, spawnentitypacket);
-                    if (attachentitypacket != null) {
-                        sendPacket(other, attachentitypacket);
-                    }
-                    sendPacket(other, handpacket);
-                    sendPacket(other, helmetpacket);
-                    sendPacket(other, chectpacket);
-                    sendPacket(other, leggingspacket);
-                    sendPacket(other, bootspacket);
+        if (adress == null) {
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                if (other.getUniqueId() == disguiseEntity.getUniqueId()) {
+                    continue;
                 }
-            } else {
-                sendPacket(adress, entitydestroypacket);
-                sendPacket(adress, spawnentitypacket);
+                if (!other.getWorld().getName().equalsIgnoreCase(disguiseEntity.getWorld().getName())) {
+                    continue;
+                }
+
+                sendPacket(other, entitydestroypacket);
+                sendPacket(other, spawnentitypacket);
                 if (attachentitypacket != null) {
-                    sendPacket(adress, attachentitypacket);
+                    sendPacket(other, attachentitypacket);
                 }
-                sendPacket(adress, handpacket);
-                sendPacket(adress, helmetpacket);
-                sendPacket(adress, chectpacket);
-                sendPacket(adress, leggingspacket);
-                sendPacket(adress, bootspacket);
+                sendPacket(other, handpacket);
+                sendPacket(other, helmetpacket);
+                sendPacket(other, chectpacket);
+                sendPacket(other, leggingspacket);
+                sendPacket(other, bootspacket);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            sendPacket(adress, entitydestroypacket);
+            sendPacket(adress, spawnentitypacket);
+            if (attachentitypacket != null) {
+                sendPacket(adress, attachentitypacket);
+            }
+            sendPacket(adress, handpacket);
+            sendPacket(adress, helmetpacket);
+            sendPacket(adress, chectpacket);
+            sendPacket(adress, leggingspacket);
+            sendPacket(adress, bootspacket);
         }
     }
 
     public static void returnOriginalPlayer(Player player) {
-        try {
-            Object craftentity = Util.getCraftEntity(player);
+        Object craftentity = Util.getCraftEntity(player);
 
-            Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
-            Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
-            Object attachentitypacket = null;
-            if (player.getVehicle() != null) {
-                attachentitypacket = getAttachEntityPacket(craftentity, Util.getCraftEntity(player.getVehicle()));
-            }
-            Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
-            Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
-                    .getEquipment().getHelmet());
-            Object chectpacket = player.getEquipment().getChestplate() == null ? null : getEquipmentPacket(player, 3, player
-                    .getEquipment().getChestplate());
-            Object leggingspacket = player.getEquipment().getLeggings() == null ? null : getEquipmentPacket(player, 2, player
-                    .getEquipment().getLeggings());
-            Object bootspacket = player.getEquipment().getBoots() == null ? null : getEquipmentPacket(player, 1, player.getEquipment()
-                    .getBoots());
+        Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
+        Object spawnnamedentitypacket = getSpawnNamedEntityPacket(craftentity);
+        Object attachentitypacket = null;
+        if (player.getVehicle() != null) {
+            attachentitypacket = getAttachEntityPacket(craftentity, Util.getCraftEntity(player.getVehicle()));
+        }
+        Object handpacket = player.getItemInHand() == null ? null : getEquipmentPacket(player, 0, player.getItemInHand());
+        Object helmetpacket = player.getEquipment().getHelmet() == null ? null : getEquipmentPacket(player, 4, player
+                .getEquipment().getHelmet());
+        Object chectpacket = player.getEquipment().getChestplate() == null ? null : getEquipmentPacket(player, 3, player
+                .getEquipment().getChestplate());
+        Object leggingspacket = player.getEquipment().getLeggings() == null ? null : getEquipmentPacket(player, 2, player
+                .getEquipment().getLeggings());
+        Object bootspacket = player.getEquipment().getBoots() == null ? null : getEquipmentPacket(player, 1, player.getEquipment()
+                .getBoots());
 
-            for (Player other : Bukkit.getOnlinePlayers()) {
-                if (other.getUniqueId() == player.getUniqueId())
-                    continue;
-                if (!other.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()))
-                    continue;
-                sendPacket(other, entitydestroypacket);
-                sendPacket(other, spawnnamedentitypacket);
-                if (attachentitypacket != null)
-                    sendPacket(other, attachentitypacket);
-                if (handpacket != null)
-                    sendPacket(other, handpacket);
-                if (helmetpacket != null)
-                    sendPacket(other, helmetpacket);
-                if (chectpacket != null)
-                    sendPacket(other, chectpacket);
-                if (leggingspacket != null)
-                    sendPacket(other, leggingspacket);
-                if (bootspacket != null)
-                    sendPacket(other, bootspacket);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (Player other : Bukkit.getOnlinePlayers()) {
+            if (other.getUniqueId() == player.getUniqueId())
+                continue;
+            if (!other.getWorld().getName().equalsIgnoreCase(player.getWorld().getName()))
+                continue;
+            sendPacket(other, entitydestroypacket);
+            sendPacket(other, spawnnamedentitypacket);
+            if (attachentitypacket != null)
+                sendPacket(other, attachentitypacket);
+            if (handpacket != null)
+                sendPacket(other, handpacket);
+            if (helmetpacket != null)
+                sendPacket(other, helmetpacket);
+            if (chectpacket != null)
+                sendPacket(other, chectpacket);
+            if (leggingspacket != null)
+                sendPacket(other, leggingspacket);
+            if (bootspacket != null)
+                sendPacket(other, bootspacket);
         }
     }
 
     public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, boolean issubtitle) {
-        try {
-            Object titlesendpacket = getTitlePacket(text, issubtitle);
-            Object titlelengthpacket = getTitleLengthPacket(fadein, length, fadeout);
+        Object titlesendpacket = getTitlePacket(text, issubtitle);
+        Object titlelengthpacket = getTitleLengthPacket(fadein, length, fadeout);
 
-            sendPacket(p, titlesendpacket);
-            sendPacket(p, titlelengthpacket);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendPacket(p, titlesendpacket);
+        sendPacket(p, titlelengthpacket);
     }
 
-    //PlayerDeathEventで呼び出すとリスポーンウィンドウをスキップできます
-    public static void skipRespawnScreen(Player p) {
-        try {
-            Object playerConnection = getPlayerConnection(p);
-            for (Method m : playerConnection.getClass().getMethods()) {
-                if (m.getName().equalsIgnoreCase("a")) {
-                    for (Class<?> c : m.getParameterTypes()) {
-                        if (c.getName().contains("PacketPlayInClientCommand")) {
-                            m.invoke(playerConnection, getClientCommandPacket());
-                            return;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /**
+     * PlayerDeathEventで呼び出すと、引数playerのリスポーンウィンドウをスキップし、強制的にリスポーンさせる
+     * @param player リスポーンウィンドウをスキップするプレイヤー
+     */
+    public static void skipRespawnScreen(Player player) {
+        Object playerConnection = getPlayerConnection(player);
+        invoke(Methods.nmsPlayerConnection_skipRespawnWindow, playerConnection);
     }
 
     /**
@@ -230,10 +208,7 @@ public class PacketUtil {
      * @param entity デスポーンさせるエンティティ
      */
     public static void sendEntityDestroyPacket(Player target, Entity entity) {
-        Object packet = null;
-
-        packet = getEntityDestroyPacket(entity.getEntityId());
-
+        Object packet = getEntityDestroyPacket(entity.getEntityId());
         if (target == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 sendPacket(player, packet);
@@ -255,12 +230,8 @@ public class PacketUtil {
         }
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
             public void run() {
-                try {
-                    Object attachentitypacket = getAttachEntityPacket(Util.getCraftEntity(player), Util.getCraftEntity(player.getVehicle()));
-                    sendPacket(player, attachentitypacket);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                Object attachentitypacket = getAttachEntityPacket(Util.getCraftEntity(player), Util.getCraftEntity(player.getVehicle()));
+                sendPacket(player, attachentitypacket);
             }
         }, 5);
     }
@@ -272,10 +243,7 @@ public class PacketUtil {
      * @param location テレポートする座標
      */
     public static void sendEntityTeleportPacket(Player target, Entity entity, Location location) {
-        Object packet = null;
-
-        packet = getEntityTeleportPacket(entity.getEntityId(), location);
-
+        Object packet = getEntityTeleportPacket(entity.getEntityId(), location);
         if (target == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 sendPacket(player, packet);
@@ -286,10 +254,7 @@ public class PacketUtil {
     }
 
     public static void sendSpawnEntityPacket(Player target, Object craftEntity, int objectID, int objectData) {
-        Object packet = null;
-
-        packet = getSpawnEntityPacket(craftEntity, objectID, objectData);
-
+        Object packet = getSpawnEntityPacket(craftEntity, objectID, objectData);
         if (target == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 sendPacket(player, packet);
@@ -309,13 +274,37 @@ public class PacketUtil {
      * @param equipItemStack 装備するアイテムのNmsItemStack
      */
     public static void sendEntityEquipmentPacket(Player target, int entityId, int itemSlot, Object equipItemStack) {
-        Object packet = null;
-
-        packet = getEntityEquipmentPacket(entityId, itemSlot, equipItemStack);
-
+        Object packet = getEntityEquipmentPacket(entityId, itemSlot, equipItemStack);
         if (target == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 sendPacket(player, packet);
+            }
+        } else {
+            sendPacket(target, packet);
+        }
+    }
+
+    /**
+     * 引数targetにパーティクル再生パケットを送信する
+     * @param target パケットを送信するプレイヤー。nullの場合同じワールドの全プレイヤーに送信する
+     * @param particle Particleクラスの要素
+     * @param isLongDistance パーティクルの描画距離を広いモードで再生するかどうか
+     * @param location 再生座標
+     * @param offsetX X方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param offsetY Y方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param offsetZ Z方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param speed パーティクルの移動速度？
+     * @param count 再生回数
+     * @param particleData 基本的にnull。ブロックのID等が影響する場合に用いる。ITEMCRACK:配列数2:ID,Data / BLOCKCRACK:配列数1:ID+(Data<<12) / BLOCKDUST:配列数1:ID+(Data<<12)
+     */
+    public static void sendParticlePacket(Player target, Particle particle, Location location, float offsetX, float offsetY, float offsetZ, float speed, int count, int[] particleData) {
+        World world = location.getWorld();
+        Object packet = getParticlePacket(particle, location, offsetX, offsetY, offsetZ, speed, count, particleData);
+        if (target == null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getLocation().getWorld().equals(world)) {
+                    sendPacket(player, packet);
+                }
             }
         } else {
             sendPacket(target, packet);
@@ -330,53 +319,43 @@ public class PacketUtil {
      * @param nmsEntityClass スポーンさせるエンティティのNmsEntityClass
      * @return 引数entityと同様の情報を持った、引数nmsEntityClassクラスのエンティティがスポーンするパケット
      */
-    public static Object getDisguiseLivingEntityPacket(
-            Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ){
-        try {
-            Object craftEntity = Util.getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
-            Location location = entity.getLocation();
+    public static Object getDisguiseLivingEntityPacket(Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ) {
+        Object craftEntity = Util.getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
+        Location location = entity.getLocation();
 
-            Methods.nmsEntity_setLocation
-            .invoke(craftEntity, location.getX() + offsetX, location.getY() + offsetY
-                    , location.getZ() + offsetZ, location.getYaw(), location.getPitch());
-            Methods.nmsEntity_setEntityID.invoke(craftEntity, entity.getEntityId());
-            Methods.nmsEntity_setCustomName.invoke(craftEntity, entity.getName());
-            Methods.nmsEntity_setCustomNameVisible.invoke(craftEntity, true);
+        invoke(Methods.nmsEntity_setLocation, craftEntity
+                , location.getX() + offsetX, location.getY() + offsetY
+                , location.getZ() + offsetZ, location.getYaw(), location.getPitch());
+        invoke(Methods.nmsEntity_setEntityID, craftEntity, entity.getEntityId());
+        invoke(Methods.nmsEntity_setCustomName, craftEntity, entity.getName());
+        invoke(Methods.nmsEntity_setCustomNameVisible, craftEntity, true);
 
-            return getSpawnEntityLivingPacket(craftEntity);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return getSpawnEntityLivingPacket(craftEntity);
     }
 
     // itemslot: 0-hand / 4-head / 3-chest / 2-leggings / 1-boots
-    private static Object getEquipmentPacket(Entity entity, int itemslot, ItemStack equipment) throws Exception {
-        return Constructors.nmsPacketPlayOutEntityEquipment.newInstance(entity.getEntityId(), itemslot,
-                Util.getCraftItemStack(equipment));
+    private static Object getEquipmentPacket(Entity entity, int itemslot, ItemStack equipment) {
+        return newInstance(Constructors.nmsPacketPlayOutEntityEquipment, entity.getEntityId(), itemslot,
+                invoke(Methods.static_craftItemStack_asNMSCopy, null, equipment));
     }
 
-    private static Object getTitlePacket(String text, boolean issubtitle) throws Exception {
+    private static Object getTitlePacket(String text, boolean issubtitle) {
         ChatColor color = Util.getChatColorFromText(text);
         text = ChatColor.stripColor(text);
-        Object title = Methods.static_nmsChatSerializer_buildTitle.invoke(
+
+        Object title = invoke(Methods.static_nmsChatSerializer_buildTitle,
                 null, "{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
 
-        return Constructors.nmsPacketPlayOutTitle.newInstance(issubtitle ?
+        return newInstance(Constructors.nmsPacketPlayOutTitle, issubtitle ?
                 Objects.nmsEnumTitleAction_PerformSubTitle : Objects.nmsEnumTitleAction_PerformTitle, title);
     }
 
-    private static Object getTitleLengthPacket(int fadein, int length, int fadeout) throws Exception {
-        return Constructors.nmsPacketPlayOutTitle_Length.newInstance(fadein, length, fadeout);
+    private static Object getTitleLengthPacket(int fadein, int length, int fadeout) {
+        return newInstance(Constructors.nmsPacketPlayOutTitle_Length, fadein, length, fadeout);
     }
 
-    private static Object getClientCommandPacket() throws Exception {
-        return Constructors.nmsPacketPlayInClientCommand.newInstance(Objects.nmsEnumClientCommand_PerformRespawn);
+    private static Object getClientCommandPacket() {
+        return newInstance(Constructors.nmsPacketPlayInClientCommand, Objects.nmsEnumClientCommand_PerformRespawn);
     }
 
     /**
@@ -384,19 +363,7 @@ public class PacketUtil {
      * @return 引数entityIdをEntityIDとして持つEntityをデスポーンさせるパケット
      */
     public static Object getEntityDestroyPacket(int entityId){
-        Object packet = null;
-        try {
-            packet = Constructors.nmsPacketPlayOutEntityDestroy.newInstance(new int[] { entityId });
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutEntityDestroy, new int[] { entityId });
     }
 
     /**
@@ -406,19 +373,7 @@ public class PacketUtil {
      * @return 引数craftPlayerをスポーンさせるパケット
      */
     private static Object getSpawnNamedEntityPacket(Object craftPlayer) {
-        Object packet = null;
-        try {
-            packet = Constructors.nmsPacketPlayOutNamedEntitySpawn.newInstance(craftPlayer);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutNamedEntitySpawn, craftPlayer);
     }
 
     /**
@@ -428,19 +383,7 @@ public class PacketUtil {
      * @return 引数craftLivingEntityをスポーンさせるパケット
      */
     private static Object getSpawnEntityLivingPacket(Object craftLivingEntity) {
-        Object packet = null;
-        try {
-            packet = Constructors.nmsPacketPlayOutSpawnEntityLiving.newInstance(craftLivingEntity);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutSpawnEntityLiving, craftLivingEntity);
     }
 
     /**
@@ -449,19 +392,7 @@ public class PacketUtil {
      * @return 引数passengerを引数vehicleに搭乗させるパケット
      */
     private static Object getAttachEntityPacket(Object passenger, Object vehicle) {
-        Object packet = null;
-        try {
-            packet = Constructors.nmsPacketPlayOutAttachEntity.newInstance(0, passenger, vehicle);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutAttachEntity, 0, passenger, vehicle);
     }
 
     /**
@@ -469,51 +400,24 @@ public class PacketUtil {
      * @param location テレポートする座標
      * @return 引数entityIdをEntityIDとして持つEntityを引数locationにテレポートするパケット
      */
-    public static Object getEntityTeleportPacket(int entityId, Location location){
-        Object packet = null;
-        try {
-            //パケットではdouble型を扱えない
-            //座標は、座標値を32倍した数値をint型に変換し利用する
-            int x = (int) (location.getX() * 32.0D);
-            int y = (int) (location.getY() * 32.0D);
-            int z = (int) (location.getZ() * 32.0D);
+    public static Object getEntityTeleportPacket(int entityId, Location location) {
+        //パケットではdouble型を扱えないため
+        //座標は、座標値を32倍した数値をint型に変換し利用する
+        int x = (int) (location.getX() * 32.0D);
+        int y = (int) (location.getY() * 32.0D);
+        int z = (int) (location.getZ() * 32.0D);
 
-            //パケットではfloat型を扱えない
-            //yaw・pitchはbyte型に変換し利用する
-            //変換は、byteの最大値256をyaw・pitchの最大値360.0Fで割り、基になったyaw・pitchに掛け合わせる
-            byte yaw = (byte) (location.getYaw() * (255.0F / 360.0F));
-            byte pitch = (byte) (location.getPitch() * (255.0F / 360.0F));
+        //パケットではfloat型を扱えないため
+        //yaw・pitchはbyte型に変換し利用する
+        //変換は、byteの最大値256をyaw・pitchの最大値360.0Fで割り、基になったyaw・pitchに掛け合わせる
+        byte yaw = (byte) (location.getYaw() * (255.0F / 360.0F));
+        byte pitch = (byte) (location.getPitch() * (255.0F / 360.0F));
 
-            packet = Constructors.nmsPacketPlayOutEntityTeleport
-                    .newInstance(entityId, x, y, z, yaw, pitch, false);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutEntityTeleport, entityId, x, y, z, yaw, pitch, false);
     }
 
     public static Object getSpawnEntityPacket(Object craftEntity, int objectID, int objectData) {
-        Object packet = null;
-
-        try {
-            packet = Constructors.nmsPacketPlayOutSpawnEntity.newInstance(craftEntity, objectID, objectData);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return packet;
+        return newInstance(Constructors.nmsPacketPlayOutSpawnEntity, craftEntity, objectID, objectData);
     }
 
     /**
@@ -524,31 +428,31 @@ public class PacketUtil {
      * @return エンティティがアイテムを装備するパケット
      */
     public static Object getEntityEquipmentPacket(int entityId, int itemSlot, Object equipItemStack) {
-        Object packet = null;
+        return newInstance(Constructors.nmsPacketPlayOutEntityEquipment, entityId, itemSlot, equipItemStack);
+    }
 
-        try {
-            packet = Constructors.nmsPacketPlayOutEntityEquipment.newInstance(entityId, itemSlot, equipItemStack);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return packet;
+    /**
+     * パーティクル再生パケットを返す
+     * @param particle Particleクラスの要素
+     * @param location 再生座標
+     * @param offsetX X方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param offsetY Y方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param offsetZ Z方向のオフセット。与えられた数値以内の乱数を生成し再生する
+     * @param speed パーティクルの移動速度？
+     * @param count 再生回数
+     * @param particleData 基本的にnull。ブロックのID等が影響する場合に用いる。ITEMCRACK:配列数2:ID,Data / BLOCKCRACK:配列数1:ID+(Data<<12) / BLOCKDUST:配列数1:ID+(Data<<12)
+     * @return パーティクル再生パケット
+     */
+    public static Object getParticlePacket(Particle particle, Location location, float offsetX, float offsetY, float offsetZ, float speed, int count, int[] particleData) {
+        return newInstance(Constructors.nmsPacketPlayOutWorldParticles
+                , particle.getNmsEnumParticle(), particle.isLongDistance(), (float) location.getX(), (float) location.getY()
+                , (float) location.getZ(), offsetX, offsetY, offsetZ, speed, count, particleData);
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     private static void sendPacket(Player p, Object packet) {
-        try {
-            Methods.nmsPlayerConnection_sendPacket.invoke(getPlayerConnection(p), packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke(Methods.nmsPlayerConnection_sendPacket, getPlayerConnection(p), packet);
     }
 
     /**
@@ -565,50 +469,37 @@ public class PacketUtil {
         return null;
     }
 
-    private static Object getPlayerConnection(Player player) throws Exception {
+    private static Object getPlayerConnection(Player player) {
         Object connection = getPlayerConnectionMap().get(player);
 
         if (connection == null) {
             Object craftPlayer = Util.getCraftEntity(player);
-            Field connectionField = ReflectionUtil.getField(craftPlayer, "playerConnection");
 
-            connection = connectionField.get(craftPlayer);
+            connection = getFieldValue(Fields.nmsEntityPlayer_playerConnection, craftPlayer);
             putPlayerConnection(player, connection);
         }
 
         return connection;
     }
 
-    private static Object getNetworkManager(Player player) throws Exception {
+    private static Object getNetworkManager(Player player) {
         Object playerconnection = getPlayerConnection(player);
         Object network = getNetworkManagerMap().get(player);
 
         if (network == null) {
-            Field networkField = ReflectionUtil.getField(playerconnection, "networkManager");
-            network = networkField.get(playerconnection);
+            network = getFieldValue(Fields.nmsPlayerConnection_networkManager, playerconnection);
             putNetworkManager(player, network);
         }
 
         return network;
     }
 
-    public static Channel getChannel(Player player) throws Exception {
+    public static Channel getChannel(Player player) {
         Object network = getNetworkManager(player);
         Channel channel = getChannelMap().get(player);
 
         if (channel == null) {
-            String version = ReflectionUtil.getBukkitVersion();
-            Field channelField = null;
-
-            if (version.equalsIgnoreCase("v1_8_R1")) {
-                channelField = ReflectionUtil.getField(network, "i");
-            } else if (version.equalsIgnoreCase("v1_8_R2")) {
-                channelField = ReflectionUtil.getField(network, "k");
-            } else if (version.equalsIgnoreCase("v1_8_R3")) {
-                channelField = ReflectionUtil.getField(network, "channel");
-            }
-
-            channel = (Channel) channelField.get(network);
+            channel = (Channel) getFieldValue(Fields.nmsNetworkManager_channel, network);
             putChannel(player, channel);
         }
 
