@@ -353,15 +353,13 @@ public class Util extends ReflectionUtil {
         return ReflectionUtil.newInstance(Constructors.nmsBlockPosition, locX, locY, locZ);
     }
 
-    //TODO: 動作確認
     /**
-     * 現在座標のブロックがよじ登ることができるブロックかどうかを判別する
-     * @param entity
+     * 引数locationのブロックがよじ登ることができるブロックかどうかを判別する
+     * @param location 座標
      * @return よじ登ることができるブロックかどうか
      */
-    public static boolean isClambableBlock(Location location) {
+    public static boolean isClimbableBlock(Location location) {
         Material blockMaterial = location.getBlock().getType();
-
         return (blockMaterial == Material.LADDER || blockMaterial == Material.VINE);
     }
 
@@ -473,14 +471,9 @@ public class Util extends ReflectionUtil {
      * @return 固形Blockかどうか
      */
     public static Boolean isSolidBlock(Location location) {
-        try {
-            return (Boolean) Methods.nmsMaterial_isSolid.invoke(
-                    Methods.nmsBlock_getMaterial.invoke(
-                            Methods.static_nmsBlock_getById.invoke(null, location.getBlock().getTypeId())));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        Object nmsBlock = invoke(Methods.static_nmsBlock_getById, null, location.getBlock().getTypeId());
+        Object nmsMaterial = invoke(Methods.nmsBlock_getMaterial, nmsBlock);
+        return (Boolean) invoke(Methods.nmsMaterial_isSolid, nmsMaterial);
     }
 
     public static Boolean isSlabBlock(Location l) {

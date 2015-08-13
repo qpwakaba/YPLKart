@@ -195,7 +195,6 @@ public class KartUtil extends ReflectionUtil {
      * @param nmsEntityKart Nmsカートエンティティ
      */
     public static void moveByKartMotion(Object nmsEntityKart) {
-
         Object passenger = getFieldValue(Fields.nmsEntity_passenger, nmsEntityKart);
 
         //EntityHumanが搭乗していない場合は何もしない
@@ -252,11 +251,7 @@ public class KartUtil extends ReflectionUtil {
             Util.createSafeExplosion(player, location, ItemEnum.KILLER.getMovingDamage()
                     + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 6, 0.0F, true);
         } else {
-            //レースが開始されるまで動かない
             if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
-                if (!RaceManager.isStarted(player.getUniqueId())) {
-                    return;
-                }
 
                 //キラーの効果が切れた場合
                 if (isKillerInitialized) {
@@ -282,18 +277,20 @@ public class KartUtil extends ReflectionUtil {
             playDriftEffect(player, location, speedStack);
 
             //スピードメーター
-            player.setLevel(((int) calcMotionSpeed(motX, motZ)) * 564);
+            player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
         }
 
         //はしご、つたのようなよじ登れるブロックに立っている場合
-        if (Util.isClambableBlock(location)) {
-            float f4 = 0.15F;
-            motX = (Double) invoke(Methods.static_nmsMathHelper_a2, null, motX, -f4, f4);
-            motZ = (Double) invoke(Methods.static_nmsMathHelper_a2, null, motZ, -f4, f4);
+        if (Util.isClimbableBlock(Util.getForwardLocationFromYaw(location, 0.5D))) {
 
-            setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
-            setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, motZ);
+            float f4 = 0.15F;
+            motX = (Double) invoke(Methods.static_nmsMathHelper_a2, null, motX, -f4, f4) * 0.2;
+            motZ = (Double) invoke(Methods.static_nmsMathHelper_a2, null, motZ, -f4, f4) * 0.2;
+
+            //setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
+            //setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, motZ);
             setFieldValue(Fields.nmsEntity_fallDistance, nmsEntityKart, 0.0F);
+
             if (motY < -0.15D) {
                 setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, motY = -0.15D);
             }
@@ -302,7 +299,7 @@ public class KartUtil extends ReflectionUtil {
         invoke(Methods.nmsEntity_move, nmsEntityKart, motX, motY, motZ);
 
         if ((Boolean) getFieldValue(Fields.nmsEntity_positionChanged, nmsEntityKart)
-                && Util.isClambableBlock(location)) {
+                && Util.isClimbableBlock(Util.getForwardLocationFromYaw(location, 0.5D))) {
             setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, motY = 0.2D + speedStack / 300);
         }
 
@@ -509,31 +506,36 @@ public class KartUtil extends ReflectionUtil {
      * キラー使用中のモーションを適用する場合はapplyKillerMotion(Racer r)を利用する
      * @param entityHuman 計算の基となるEntityHuman
      */
-    public static void setNormalMotion(Object kartEntity, Object entityHuman) {
+    public static void setNormalMotion(Object nmsEntityKart, Object entityHuman) {
+        Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, entityHuman);
+
         //キラー用変数の初期化
-        invoke(Methods.Ypl_setKillerPassedCheckPointList, kartEntity, new Object[]{null});
-        invoke(Methods.Ypl_setKillerLastPassedCheckPoint, kartEntity, new Object[]{null});
-        invoke(Methods.Ypl_setKillerX, kartEntity, 0);
-        invoke(Methods.Ypl_setKillerY, kartEntity, 0);
-        invoke(Methods.Ypl_setKillerZ, kartEntity, 0);
+        invoke(Methods.Ypl_setKillerPassedCheckPointList, nmsEntityKart, new Object[]{null});
+        invoke(Methods.Ypl_setKillerLastPassedCheckPoint, nmsEntityKart, new Object[]{null});
+        invoke(Methods.Ypl_setKillerX, nmsEntityKart, 0);
+        invoke(Methods.Ypl_setKillerY, nmsEntityKart, 0);
+        invoke(Methods.Ypl_setKillerZ, nmsEntityKart, 0);
 
-        //横方向への移動入力値
+        //クライアントの移動入力値。レースカート、かつレースが開始されていない場合は除外
         float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
-
-        //縦方向への移動入力値
         float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
+        if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+            if (!RaceManager.isStarted(player.getUniqueId())) {
+                sideInput = 0.0F;
+                forwardInput = 0.0F;
+            }
+        }
 
         //スピードスタックの算出、格納
-        double speedStack = calcSpeedStack(kartEntity, entityHuman);
-        invoke(Methods.Ypl_setSpeedStack, kartEntity, speedStack);
+        double speedStack = calcSpeedStack(nmsEntityKart, entityHuman);
+        invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, speedStack);
 
         //スピードスタックを基に縦方向への移動入力値を変換
-        forwardInput = calcForwardInput(kartEntity, forwardInput);
+        forwardInput = calcForwardInput(nmsEntityKart, forwardInput);
 
         //横方向への移動入力値を基にYawを変更
-        Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, entityHuman);
-        Kart kart = (Kart) invoke(Methods.Ypl_getKart, kartEntity);
-        float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, kartEntity);
+        Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
+        float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, nmsEntityKart);
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
             if (RaceManager.getRacer(player).isSneaking()) {
                 yaw -= sideInput * kart.getDriftCorneringPower();
@@ -543,7 +545,7 @@ public class KartUtil extends ReflectionUtil {
         } else {
             yaw -= sideInput * kart.getDefaultCorneringPower();
         }
-        invoke(Methods.nmsEntity_setYawPitch, kartEntity, yaw, 0);
+        invoke(Methods.nmsEntity_setYawPitch, nmsEntityKart, yaw, 0);
 
         //横方向の入力をモーションに適用しないため0を代入
         sideInput = 0;
@@ -563,14 +565,14 @@ public class KartUtil extends ReflectionUtil {
             float sin = (Float) invoke(Methods.static_nmsMathHelper_sin, null, yaw * 3.141593F / 180.0F);
             float cos = (Float) invoke(Methods.static_nmsMathHelper_cos, null, yaw * 3.141593F / 180.0F);
 
-            double motX = (Double) getFieldValue(Fields.nmsEntity_motX, kartEntity);
-            double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, kartEntity);
+            double motX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
+            double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
 
             motX -= forwardInput * sin + sideInput * cos;
             motZ -= sideInput * sin - forwardInput * cos;
 
-            setFieldValue(Fields.nmsEntity_motX, kartEntity, motX);
-            setFieldValue(Fields.nmsEntity_motZ, kartEntity, motZ);
+            setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
+            setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, motZ);
         }
     }
 
