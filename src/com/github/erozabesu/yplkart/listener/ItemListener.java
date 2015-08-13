@@ -73,6 +73,12 @@ public class ItemListener extends RaceManager implements Listener {
 
     @EventHandler
     public void useItem(PlayerInteractEvent e) {
+
+        // issue #112
+        if (e.isCancelled()) {
+            return;
+        }
+
         Player player = e.getPlayer();
         //プラグインが有効でない場合return
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
