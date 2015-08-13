@@ -73,12 +73,6 @@ public class ItemListener extends RaceManager implements Listener {
 
     @EventHandler
     public void useItem(PlayerInteractEvent e) {
-
-        // issue #112
-        if (e.isCancelled()) {
-            return;
-        }
-
         Player player = e.getPlayer();
         //プラグインが有効でない場合return
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
@@ -110,7 +104,16 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         UUID uuid = player.getUniqueId();
+        Racer racer = RaceManager.getRace(uuid);
         e.setCancelled(true);
+
+        //アイテムを使用して間もない状態の場合return : issue #112
+        if (racer.isItemUseCooling()) {
+            return;
+        }
+
+        //アイテムを使用したフラグをtrueにセットする : issue #112
+        racer.runItemUseCoolingTask();
 
         //チェックポイントツール
         if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {

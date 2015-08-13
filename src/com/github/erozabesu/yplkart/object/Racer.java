@@ -46,6 +46,14 @@ public class Racer extends PlayerObject{
      */
     private Location kartEntityLocation;
 
+    /**
+     * issue #112<br>
+     * アイテムを使用して間もない状態かどうか<br>
+     * アイテムを右クリック時PlayerInteractEventが2回フックされ実行してしまう場合があるため、<br>
+     * 1度のクリックで連続してアイテムを消耗してしまわないようにするため、このフラグを用いる
+     */
+    private boolean isItemUseCooling;
+
     /** マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     private boolean isStandby;
 
@@ -66,6 +74,12 @@ public class Racer extends PlayerObject{
 
     /** 最後に通過したチェックポイントエンティティ */
     private Entity lastPassedCheckPointEntity;
+
+    /**
+     * issue #112<br>
+     * アイテムを使用して間もない状態かどうかをセットするタスク
+     */
+    private BukkitTask itemUseCoolingTask;
 
     /** デスペナルティタスク */
     private BukkitTask deathPenaltyTask;
@@ -314,6 +328,18 @@ public class Racer extends PlayerObject{
                 );
     }
 
+    /** アイテムを使用して間もない状態かどうかをセットするタスクを起動する */
+    public void runItemUseCoolingTask() {
+        setItemUseCooling(true);
+        BukkitTask itemUseCoolingTask = Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+            public void run() {
+                setItemUseCooling(false);
+            }
+        }, 1L);
+
+        this.setItemUseCoolingTask(itemUseCoolingTask);
+    }
+
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** 搭乗しているカートエンティティの座標を格納する */
@@ -414,6 +440,11 @@ public class Racer extends PlayerObject{
         return kartEntityLocation;
     }
 
+    /** @return アイテムを使用して間もない状態かどうか */
+    public boolean isItemUseCooling() {
+        return isItemUseCooling;
+    }
+
     /** @return マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     public boolean isStandby() {
         return this.isStandby;
@@ -442,6 +473,11 @@ public class Racer extends PlayerObject{
     /** @return 最後に通過したチェックポイントエンティティ */
     public Entity getLastPassedCheckPointEntity() {
         return this.lastPassedCheckPointEntity;
+    }
+
+    /** @return アイテムを使用して間もない状態かどうかをセットするタスク */
+    public BukkitTask getItemUseCoolingTask() {
+        return this.itemUseCoolingTask;
     }
 
     /** @return デスペナルティタスク */
@@ -501,6 +537,11 @@ public class Racer extends PlayerObject{
         this.kartEntityLocation = kartEntityLocation;
     }
 
+    /** @param isItemUseCooling アイテムを使用して間もない状態かどうか */
+    public void setItemUseCooling(boolean isItemUseCooling) {
+        this.isItemUseCooling = isItemUseCooling;
+    }
+
     /** @param value マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     public void setStandby(boolean value) {
         this.isStandby = value;
@@ -529,6 +570,14 @@ public class Racer extends PlayerObject{
     /** @param lastPassedCheckPointEntity 最後に通過したチェックポイントエンティティ */
     public void setLastPassedCheckPointEntity(Entity lastPassedCheckPointEntity) {
         this.lastPassedCheckPointEntity = lastPassedCheckPointEntity;
+    }
+
+    /** @param itemUseCoolingTask アイテムを使用して間もない状態かどうかをセットするタスク */
+    public void setItemUseCoolingTask(BukkitTask itemUseCoolingTask) {
+        if (this.itemUseCoolingTask != null) {
+            this.itemUseCoolingTask.cancel();
+        }
+        this.itemUseCoolingTask = itemUseCoolingTask;
     }
 
     /** @param newtask デスペナルティタスク */
