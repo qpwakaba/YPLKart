@@ -107,7 +107,7 @@ public class Racer extends PlayerObject{
      */
     public Racer(UUID uuid) {
         super(uuid);
-        initializeRacer();
+        this.initializeRacer();
     }
 
     /**
@@ -116,53 +116,55 @@ public class Racer extends PlayerObject{
      * メンバ変数を初期化するメソッドが別途用意されている。
      */
     public void initializeRacer() {
-        setRacingPlayerObject(null);
+        this.setRacingPlayerObject(null);
 
-        setCircuitName("");
+        this.setCircuitName("");
 
-        setKartEntityLocation(null);
+        this.setKartEntityLocation(null);
 
-        setStandby(false);
-        setStart(false);
-        setGoal(false);
+        this.setItemUseCooling(false);
+        this.setStandby(false);
+        this.setStart(false);
+        this.setGoal(false);
 
-        setCurrentLaps(0);
+        this.setCurrentLaps(0);
 
-        setPassedCheckPointList(new ArrayList<String>());
-        setLastPassedCheckPointEntity(null);
+        this.setPassedCheckPointList(new ArrayList<String>());
+        this.setLastPassedCheckPointEntity(null);
 
-        setDeathPenaltyTask(null);
-        setDeathPenaltyTitleSendTask(null);
-        setItemPositiveSpeedTask(null);
-        setItemNegativeSpeedTask(null);
+        this.setItemUseCoolingTask(null);
+        this.setDeathPenaltyTask(null);
+        this.setDeathPenaltyTitleSendTask(null);
+        this.setItemPositiveSpeedTask(null);
+        this.setItemNegativeSpeedTask(null);
 
-        setKillerFirstPassedCheckPointEntity(null);
+        this.setKillerFirstPassedCheckPointEntity(null);
 
-        setStepDashBoard(false);
+        this.setStepDashBoard(false);
     }
 
     //〓 Race Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** レースの終了処理を行う */
     public void endRace() {
-        setGoal(true);
+        this.setGoal(true);
 
         //演出パーティクル
         Util.createSignalFireworks(getPlayer().getLocation());
         Util.createFlowerShower(getPlayer(), 20);
 
         //リザルトメッセージの送信
-        sendResult();
+        this.sendResult();
 
         //リザルトをローカルファイルへ保存
-        saveResult();
+        this.saveResult();
 
         //初期化 順序に注意
-        setStart(false);
+        this.setStart(false);
         RaceManager.clearCharacterRaceData(this.getUUID());
         RaceManager.clearKartRaceData(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
-        recoveryAll();
+        this.recoveryAll();
     }
 
     /**
@@ -171,7 +173,7 @@ public class Racer extends PlayerObject{
      * falseであればレースの参加者のみに併せて送信する。
      */
     private void sendResult() {
-        String circuitName = getCircuitName();
+        String circuitName = this.getCircuitName();
         Circuit circuit = RaceManager.getCircuit(circuitName);
         double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
         int currentRank = RaceManager.getGoalPlayer(circuitName).size();
@@ -209,7 +211,7 @@ public class Racer extends PlayerObject{
         double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
 
         //ローカルファイルへリザルトの保存
-        if (getKart() == null) {
+        if (this.getKart() == null) {
             CircuitConfig.addRaceLapTime(getPlayer(), circuitName, lapTime, false);
         } else {
             CircuitConfig.addRaceLapTime(getPlayer(), circuitName, lapTime, true);
@@ -223,17 +225,17 @@ public class Racer extends PlayerObject{
      * @param value 追加するチェックポイント
      */
     public void addPassedCheckPoint(String value) {
-        if (getPassedCheckPointList().contains(value)) {
+        if (this.getPassedCheckPointList().contains(value)) {
             return;
         }
-        getPassedCheckPointList().add(value);
+        this.getPassedCheckPointList().add(value);
         Scoreboards.setPoint(getUUID());
     }
 
     /** レース中ログアウトしたプレイヤーの情報を格納する */
     public void savePlayerDataOnQuit() {
-        if (getPlayer() != null) {
-            setRacingPlayerObject(new PlayerObject(getUUID()));
+        if (this.getPlayer() != null) {
+            this.setRacingPlayerObject(new PlayerObject(getUUID()));
         }
     }
 
@@ -249,10 +251,10 @@ public class Racer extends PlayerObject{
     public void runKillerInitializeTask(int life, Entity nearestUnpassedCheckPoint) {
         final Player player = getPlayer();
 
-        setKillerFirstPassedCheckPointEntity(nearestUnpassedCheckPoint);
+        this.setKillerFirstPassedCheckPointEntity(nearestUnpassedCheckPoint);
 
         //ランニングレース中にキラーを使用した場合、新規にキラー用カートエンティティを生成し搭乗する
-        if (getKart() == null) {
+        if (this.getKart() == null) {
             Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), KartConfig.getKillerKart());
             kartEntity.setPassenger(player);
         }
@@ -275,9 +277,9 @@ public class Racer extends PlayerObject{
      */
     public void runStepDashBoardInitializeTask() {
         int effectSecond = ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
-                + RaceManager.getRacer(getPlayer()).getCharacter().getAdjustPositiveEffectSecond()) * 20;
+                + this.getCharacter().getAdjustPositiveEffectSecond()) * 20;
 
-        setStepDashBoard(true);
+        this.setStepDashBoard(true);
 
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(),new Runnable() {
             public void run() {
@@ -330,7 +332,7 @@ public class Racer extends PlayerObject{
 
     /** アイテムを使用して間もない状態かどうかをセットするタスクを起動する */
     public void runItemUseCoolingTask() {
-        setItemUseCooling(true);
+        this.setItemUseCooling(true);
         BukkitTask itemUseCoolingTask = Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
             public void run() {
                 setItemUseCooling(false);
@@ -344,14 +346,14 @@ public class Racer extends PlayerObject{
 
     /** 搭乗しているカートエンティティの座標を格納する */
     public void saveKartEntityLocation() {
-        if (getPlayer() == null) {
+        if (this.getPlayer() == null) {
             return;
         }
-        if (getKart() == null) {
+        if (this.getKart() == null) {
             return;
         }
 
-        Entity vehicle = getPlayer().getVehicle();
+        Entity vehicle = this.getPlayer().getVehicle();
         if (vehicle == null) {
             return;
         }
@@ -359,7 +361,7 @@ public class Racer extends PlayerObject{
             return;
         }
 
-        setKartEntityLocation(vehicle.getLocation());
+        this.setKartEntityLocation(vehicle.getLocation());
     }
 
     /**
@@ -367,14 +369,14 @@ public class Racer extends PlayerObject{
      * プレイヤーを搭乗させる。
      */
     public void recoveryKart() {
-        if (getPlayer() == null) {
+        if (this.getPlayer() == null) {
             return;
         }
-        if (getKart() == null) {
+        if (this.getKart() == null) {
             return;
         }
 
-        Player player = getPlayer();
+        Player player = this.getPlayer();
         Entity vehicle = player.getVehicle();
 
         //既に何かのエンティティに搭乗している
@@ -383,7 +385,7 @@ public class Racer extends PlayerObject{
             //カートエンティティに搭乗している場合パラメータの変更のみ行いreturn
             if (RaceManager.isKartEntity(vehicle)) {
                 Object kartEntity = RaceManager.getCustomMinecartObjectByEntityMetaData(vehicle);
-                KartUtil.setParameter(kartEntity, getKart());
+                KartUtil.setParameter(kartEntity, this.getKart());
                 return;
 
             //カートエンティティ以外に搭乗している場合は降ろす
@@ -393,7 +395,7 @@ public class Racer extends PlayerObject{
         }
 
         //新規に生成したカートエンティティに搭乗させる
-        Entity kartEntity = RaceManager.createRacingKart(RaceManager.getRace(getUUID()).getKartEntityLocation(), kart);
+        Entity kartEntity = RaceManager.createRacingKart(this.getKartEntityLocation(), kart);
         kartEntity.setPassenger(player);
 
         //クライアントで搭乗が解除されている状態で描画されるのを回避するため
@@ -402,7 +404,7 @@ public class Racer extends PlayerObject{
     }
 
     public void recoveryCharacter() {
-        Player player = getPlayer();
+        Player player = this.getPlayer();
         if (player == null) {
             return;
         }
