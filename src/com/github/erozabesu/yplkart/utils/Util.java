@@ -493,6 +493,14 @@ public class Util extends ReflectionUtil {
      * @param damage ダメージ値
      */
     public static void addDamage(Entity damaged, Entity executor, int damage) {
+        /*
+         * ダメージが0以下の場合return
+         * キャラクターの妨害アイテム威力補正の影響でアイテムの威力が0以下になる場合があるため
+         */
+        if (damage <= 0) {
+            return;
+        }
+
         //非生物エンティティは除外
         if (!(damaged instanceof LivingEntity)) {
             return;
