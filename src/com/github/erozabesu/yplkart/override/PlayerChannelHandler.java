@@ -135,7 +135,7 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
             if (r.getCharacter() != null) {
                 if (!r.getCharacter().getNmsClass().getSimpleName().contains("Human")) {
                     Object packet = PacketUtil
-                            .getDisguiseLivingEntityPacket(player, r.getCharacter().getNmsClass(), 0, 0, 0);
+                            .getDisguiseLivingEntityPacket(player, r.getCharacter().getNmsClass());
                     super.write(ctx, packet, promise);
                     return;
                 }

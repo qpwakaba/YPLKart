@@ -13,8 +13,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.enumdata.Particle;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Fields;
 import com.github.erozabesu.yplkart.reflection.Methods;
@@ -81,41 +83,57 @@ public class PacketUtil extends ReflectionUtil {
      * targetプレイヤーに向けパケットを送信します
      * targetがnullの場合全プレイヤーに送信します
      */
-    public static void disguiseLivingEntity(Player adress, Entity disguiseEntity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ) {
+    /**
+     * 引数disguisePlayerの姿を引数nmsEntityClassに偽装するパケットを引数adressに送信する
+     * @param adress パケット送信対象
+     * @param disguisePlayer 外見を偽装するプレイヤー
+     * @param nmsEntityClass 偽装に利用するNmsEntityクラス
+     */
+    public static void disguiseLivingEntity(Player adress, Player disguisePlayer, Class<?> nmsEntityClass) {
         if (nmsEntityClass == null) {
             return;
         }
 
+        Racer racer = RaceManager.getRacer(disguisePlayer);
+
+        //既に他のNmsEntityに外見を偽装している場合は仮想NmsEntityをデスポーンする
+        if (racer.getDisguisedNmsEntity() != null) {
+            sendEntityDestroyPacket(null
+                    , (Entity) invoke(Methods.nmsEntity_getBukkitEntity, racer.getDisguisedNmsEntity()));
+            racer.setDisguisedNmsEntity(null);
+        }
+
+        //偽装するNmsEntityがNmsEntityHumanの場合別の処理を呼び出しreturn
         String nmsEntityClassName = nmsEntityClass.getSimpleName();
         if (nmsEntityClassName.equalsIgnoreCase("EntityHuman")) {
-            if (disguiseEntity instanceof Player) {
-                returnOriginalPlayer((Player) disguiseEntity);
-            }
+            returnOriginalPlayer(disguisePlayer);
             return;
         }
 
-        Object craftEntity = Util.getNewCraftEntityFromClass(disguiseEntity.getWorld(), nmsEntityClass);
+        Object craftEntity = Util.getNewCraftEntityFromClass(disguisePlayer.getWorld(), nmsEntityClass);
 
-        Object entitydestroypacket = getEntityDestroyPacket(disguiseEntity.getEntityId());
-        Object spawnentitypacket = getDisguiseLivingEntityPacket(disguiseEntity, nmsEntityClass
-                , offsetX, offsetY, offsetZ);
+        //スポーンさせた仮想NmsEntityを格納
+        racer.setDisguisedNmsEntity(craftEntity);
+
+        Object entitydestroypacket = getEntityDestroyPacket(disguisePlayer.getEntityId());
+        Object spawnentitypacket = getDisguiseLivingEntityPacket(disguisePlayer, nmsEntityClass);
         Object attachentitypacket = null;
-        if (disguiseEntity.getVehicle() != null) {
-            attachentitypacket = getAttachEntityPacket(craftEntity, Util.getCraftEntity(disguiseEntity.getVehicle()));
+        if (disguisePlayer.getVehicle() != null) {
+            attachentitypacket = getAttachEntityPacket(craftEntity, Util.getCraftEntity(disguisePlayer.getVehicle()));
         }
 
-        Object handpacket = getEquipmentPacket(disguiseEntity, 0, new ItemStack(Material.AIR));
-        Object helmetpacket = getEquipmentPacket(disguiseEntity, 4, new ItemStack(Material.AIR));
-        Object chectpacket = getEquipmentPacket(disguiseEntity, 3, new ItemStack(Material.AIR));
-        Object leggingspacket = getEquipmentPacket(disguiseEntity, 2, new ItemStack(Material.AIR));
-        Object bootspacket = getEquipmentPacket(disguiseEntity, 1, new ItemStack(Material.AIR));
+        Object handpacket = getEquipmentPacket(disguisePlayer, 0, new ItemStack(Material.AIR));
+        Object helmetpacket = getEquipmentPacket(disguisePlayer, 4, new ItemStack(Material.AIR));
+        Object chectpacket = getEquipmentPacket(disguisePlayer, 3, new ItemStack(Material.AIR));
+        Object leggingspacket = getEquipmentPacket(disguisePlayer, 2, new ItemStack(Material.AIR));
+        Object bootspacket = getEquipmentPacket(disguisePlayer, 1, new ItemStack(Material.AIR));
 
         if (adress == null) {
             for (Player other : Bukkit.getOnlinePlayers()) {
-                if (other.getUniqueId() == disguiseEntity.getUniqueId()) {
+                if (other.getUniqueId() == disguisePlayer.getUniqueId()) {
                     continue;
                 }
-                if (!other.getWorld().getName().equalsIgnoreCase(disguiseEntity.getWorld().getName())) {
+                if (!other.getWorld().getName().equalsIgnoreCase(disguisePlayer.getWorld().getName())) {
                     continue;
                 }
 
@@ -144,7 +162,7 @@ public class PacketUtil extends ReflectionUtil {
         }
     }
 
-    public static void returnOriginalPlayer(Player player) {
+    private static void returnOriginalPlayer(Player player) {
         Object craftentity = Util.getCraftEntity(player);
 
         Object entitydestroypacket = getEntityDestroyPacket(player.getEntityId());
@@ -319,13 +337,12 @@ public class PacketUtil extends ReflectionUtil {
      * @param nmsEntityClass スポーンさせるエンティティのNmsEntityClass
      * @return 引数entityと同様の情報を持った、引数nmsEntityClassクラスのエンティティがスポーンするパケット
      */
-    public static Object getDisguiseLivingEntityPacket(Entity entity, Class<?> nmsEntityClass, double offsetX, double offsetY, double offsetZ) {
+    public static Object getDisguiseLivingEntityPacket(Entity entity, Class<?> nmsEntityClass) {
         Object craftEntity = Util.getNewCraftEntityFromClass(entity.getWorld(), nmsEntityClass);
         Location location = entity.getLocation();
 
         invoke(Methods.nmsEntity_setLocation, craftEntity
-                , location.getX() + offsetX, location.getY() + offsetY
-                , location.getZ() + offsetZ, location.getYaw(), location.getPitch());
+                , location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         invoke(Methods.nmsEntity_setEntityID, craftEntity, entity.getEntityId());
         invoke(Methods.nmsEntity_setCustomName, craftEntity, entity.getName());
         invoke(Methods.nmsEntity_setCustomNameVisible, craftEntity, true);

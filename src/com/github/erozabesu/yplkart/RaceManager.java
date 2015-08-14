@@ -34,6 +34,7 @@ import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
@@ -249,7 +250,7 @@ public class RaceManager {
         racer.setCharacter(character);
         racer.recoveryCharacter();
 
-        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass(), 0, 0, 0);
+        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
         character.playMenuSelectSound(player);
         MessageEnum.raceCharacter.sendConvertedMessage(uuid, new Object[] { character, getCircuit(racer.getCircuitName()) });
     }
@@ -307,7 +308,7 @@ public class RaceManager {
         Player p = Bukkit.getPlayer(id);
         if (p != null) {
             getRace(id).recoveryPhysical();
-            PacketUtil.returnOriginalPlayer(p);
+            PacketUtil.disguiseLivingEntity(null, p, Classes.nmsEntityHuman);
             MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
         }
     }

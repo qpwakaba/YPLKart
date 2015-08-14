@@ -823,7 +823,7 @@ public class CMDAbstractPlayer extends CMDAbstract {
                         player.sendMessage("invalid character");
                         player.sendMessage(CharacterConfig.getCharacterListString());
                     } else {
-                        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass(), 0, 2, 0);
+                        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
                     }
                 } else if (getArgs()[1].equalsIgnoreCase("walk")) {
                     if (Util.isNumber(getArgs()[2])) {

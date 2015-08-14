@@ -35,6 +35,9 @@ public class Racer extends PlayerObject{
     /** 選択キャラクター */
     private Character character;
 
+    /** 姿を偽装するために仮想スポーンさせたNmsEntity */
+    private Object disguisedNmsEntity;
+
     /** 選択カート */
     private Kart kart;
 
@@ -432,6 +435,11 @@ public class Racer extends PlayerObject{
         return this.character;
     }
 
+    /** @return 姿を偽装するために仮想スポーンさせたNmsEntity */
+    public Object getDisguisedNmsEntity() {
+        return disguisedNmsEntity;
+    }
+
     /** @return 選択カート */
     public Kart getKart() {
         return this.kart;
@@ -527,6 +535,11 @@ public class Racer extends PlayerObject{
     /** @param character 選択キャラクター */
     public void setCharacter(Character character) {
         this.character = character;
+    }
+
+    /** @param disguisedNmsEntity 姿を偽装するために仮想スポーンさせたNmsEntity */
+    public void setDisguisedNmsEntity(Object disguisedNmsEntity) {
+        this.disguisedNmsEntity = disguisedNmsEntity;
     }
 
     /** @param kart 選択カート */
