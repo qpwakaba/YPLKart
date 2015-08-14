@@ -336,7 +336,7 @@ public class CircuitData {
             if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, -4)))
                 list.add(Util.getSideLocationFromYaw(location, -4));
 
-            location = Util.getForwardLocationFromYaw(location, 4);
+            location = Util.getForwardLocationFromYaw(location, -4);
         }
 
         return list;
