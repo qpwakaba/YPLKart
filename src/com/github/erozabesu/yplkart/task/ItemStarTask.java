@@ -45,10 +45,7 @@ public class ItemStarTask extends BukkitRunnable {
         p.removePotionEffect(PotionEffectType.SLOW);
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-        p.removePotionEffect(PotionEffectType.INVISIBILITY);
         p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, effectsecond, 1));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, effectsecond, 1));
-
         p.playSound(p.getLocation(), Sound.LEVEL_UP, 0.5F, 2.0F);
     }
 
