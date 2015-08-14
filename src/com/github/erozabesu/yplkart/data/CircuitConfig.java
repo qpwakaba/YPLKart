@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.LapTime;
 
@@ -143,7 +144,9 @@ public class CircuitConfig {
 
             MessageEnum.cmdCircuitDelete.sendConvertedMessage(adress, circuitDataName);
         } else {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         }
     }
 
@@ -160,7 +163,9 @@ public class CircuitConfig {
 
         //名称を変更するCircuitDataObjectが存在しない
         if (oldCircuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress, oldName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(oldName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
 
         //新たな名称のCircuitDataObjectが既に存在している
         } else if (newCircuitData != null) {
@@ -266,7 +271,9 @@ public class CircuitConfig {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
 
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setStartLocation(location);
             circuitData.saveConfiguration();
@@ -284,7 +291,9 @@ public class CircuitConfig {
     public static void setNumberOfLaps(Object adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setNumberOfLaps(newValue);
             circuitData.saveConfiguration();
@@ -304,7 +313,9 @@ public class CircuitConfig {
     public static void setMinPlayer(Object adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
 
         //最大プレイ人数を越える値は設定できない
         } else if (circuitData.getMaxPlayer() < newValue) {
@@ -329,7 +340,9 @@ public class CircuitConfig {
     public static void setMaxPlayer(Object adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
 
         //最小プレイ人数を下回る数値は設定できない
         } else if (newValue < circuitData.getMinPlayer()) {
@@ -354,7 +367,9 @@ public class CircuitConfig {
     public static void setMatchingTime(Object adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setMatchingTime(newValue);
             circuitData.saveConfiguration();
@@ -394,7 +409,9 @@ public class CircuitConfig {
     public static void setLimitTime(Player adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setLimitTime(newValue);
             circuitData.saveConfiguration();
@@ -414,7 +431,9 @@ public class CircuitConfig {
     public static void setBroadcastGoalMessage(Player adress, String circuitDataName, boolean newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setBroadcastGoalMessage(newValue);
             circuitData.saveConfiguration();
@@ -457,7 +476,9 @@ public class CircuitConfig {
     public static void sendRanking(Object adress, String circuitDataName) {
         CircuitData circuitData = getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
             return;
         }
 

@@ -226,11 +226,7 @@ public enum MessageEnum {
 
     //〓 public do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public String getConvertedMessage(Object object) {
-        return replaceLimitedTags(getMessage(), object);
-    }
-
-    public String getConvertedMessage(Object[] object) {
+    public String getConvertedMessage(Object... object) {
         String message = getMessage();
         for (int i = 0; i < object.length; i++) {
             message = replaceLimitedTags(message, object[i]);
@@ -242,11 +238,7 @@ public enum MessageEnum {
         sendMessage(adress, getMessage());
     }
 
-    public void sendConvertedMessage(Object adress, Object object) {
-        sendMessage(adress, getConvertedMessage(object));
-    }
-
-    public void sendConvertedMessage(Object adress, Object[] object) {
+    public void sendConvertedMessage(Object adress, Object... object) {
         sendMessage(adress, getConvertedMessage(object));
     }
 
@@ -407,10 +399,6 @@ public enum MessageEnum {
                 basemessage = basemessage.replace("<number" + tagnumber + ">", String.valueOf(num[i]));
             }
         } else if (object instanceof String) {
-            if (basemessage.contains("<circuitname>")) {
-                if (CircuitConfig.getCircuitData((String) object) != null)
-                    basemessage = basemessage.replace("<circuitname>", Util.convertInitialUpperString((String) object));
-            }
             if (basemessage.contains("<perm>")) {
                 basemessage = basemessage.replace("<perm>", ((String) object));
             }

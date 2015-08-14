@@ -86,6 +86,9 @@ public class Circuit {
 
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    public Circuit() {
+    }
+
     public Circuit(String circuitName) {
         this.setCircuitName(circuitName);
         this.initialize();

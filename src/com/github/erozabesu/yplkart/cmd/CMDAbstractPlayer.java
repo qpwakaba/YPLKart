@@ -21,6 +21,7 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
@@ -346,18 +347,23 @@ public class CMDAbstractPlayer extends CMDAbstract {
             if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_ENTRY, false, false))
                 return;
             if (CircuitConfig.getCircuitData(getArgs()[1]) == null) {
-                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(getArgs()[1]);
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), circuit);
                 return;
             }
 
             RaceManager.setEntryRaceData(this.getUUID(), getArgs()[1]);
-            //ka entry {player name} {circuit name}
-            //ka entry all {circuit name}
+
+        //ka entry {player name} {circuit name}
+        //ka entry all {circuit name}
         } else if (this.getLength() == 3) {
             if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_ENTRY, true, false))
                 return;
             if (CircuitConfig.getCircuitData(getArgs()[2]) == null) {
-                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(getArgs()[2]);
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), circuit);
                 return;
             }
             if (getArgs()[1].equalsIgnoreCase("all")) {
@@ -634,7 +640,9 @@ public class CMDAbstractPlayer extends CMDAbstract {
                 MessageEnum.cmdCircuitList.sendConvertedMessage(this.getPlayer());
             } else {
                 if (CircuitConfig.getCircuitData(getArgs()[1]) == null) {
-                    MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[1]);
+                    Circuit circuit = new Circuit();
+                    circuit.setCircuitName(getArgs()[1]);
+                    MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), circuit);
                     return;
                 }
 
@@ -646,7 +654,9 @@ public class CMDAbstractPlayer extends CMDAbstract {
             if (!Permission.hasCMDPermission(this.getPlayer(), Permission.CMD_RANKING, true, false))
                 return;
             if (CircuitConfig.getCircuitData(getArgs()[2]) == null) {
-                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), getArgs()[2]);
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(getArgs()[2]);
+                MessageEnum.invalidCircuit.sendConvertedMessage(this.getPlayer(), circuit);
                 return;
             }
             if (getArgs()[1].equalsIgnoreCase("all")) {
@@ -793,6 +803,8 @@ public class CMDAbstractPlayer extends CMDAbstract {
                     entity.setPassenger(player);
                     player.setWalkSpeed(0.6F);
                     player.sendMessage("ride random kart");
+                } else if (getArgs()[1].equalsIgnoreCase("location")) {
+                    player.sendMessage(player.getLocation().toString());
                 }
             } else if (this.getLength() == 3) {
                 if (getArgs()[1].equalsIgnoreCase("kart")) {

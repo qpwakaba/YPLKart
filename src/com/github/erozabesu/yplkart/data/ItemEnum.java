@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 
 /**
@@ -633,7 +634,9 @@ public enum ItemEnum {
     public static void addCheckPointTool(Player player, String circuitDataName) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuit);
             return;
         }
 

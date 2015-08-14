@@ -16,6 +16,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.utils.Util;
@@ -344,7 +345,9 @@ public class CMDAbstractBlock extends CMDAbstract {
 
         if (this.length == 3) {
             if (CircuitConfig.getCircuitData(args[2]) == null) {
-                MessageEnum.invalidCircuit.sendConvertedMessage(null, args[2]);
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(args[2]);
+                MessageEnum.invalidCircuit.sendConvertedMessage(null, circuit);
                 return;
             }
 
