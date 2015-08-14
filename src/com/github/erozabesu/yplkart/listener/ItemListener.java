@@ -623,12 +623,6 @@ public class ItemListener extends RaceManager implements Listener {
             user.updateInventory();
             target.updateInventory();
         }
-
-        int effectsecond = (ItemEnum.TERESA.getEffectSecond() + getRacer(user).getCharacter()
-                .getAdjustPositiveEffectSecond()) * 20;
-        user.setNoDamageTicks(effectsecond);
-        user.removePotionEffect(PotionEffectType.INVISIBILITY);
-        user.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, effectsecond, 1));
     }
 
     public void itemThunder(Player user) {
