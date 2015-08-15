@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -335,16 +334,55 @@ public enum ConfigManager {
 
     //〓 file edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** ローカルのコンフィグファイルから設定データを読み込む */
+    /**
+     * ローカルのコンフィグファイルから設定データを読み込む<br>
+     * YamlConfiguration.loadConfiguration(File file)では、<br>
+     * 2バイト文字を含む文字コードUTF-8で記述されたテキストファイルは正常に読み取れないため、<br>
+     * YamlConfiguration.loadConfiguration(Reader reader)を利用する
+     */
     public void loadLocalConfiguration() {
-        setLocalConfigFile(new File(
-                YPLKart.getInstance().getDataFolder(), getLocalConfigFileName()));
-        setLocalConfig(YamlConfiguration.loadConfiguration(getLocalConfigFile()));
+        File localFile = new File(YPLKart.getInstance().getDataFolder() + File.separator + this.getLocalConfigFileName());
+        this.setLocalConfigFile(localFile);
+        if (!localFile.exists()) {
+            return;
+        }
+
+        InputStream input = null;
+        BufferedReader reader = null;
+
+        File parent = localFile.getParentFile();
+        if (!parent.exists()) {
+            return;
+        }
+
+        try {
+            input = new FileInputStream(localFile);
+            reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+
+            this.setLocalConfig(YamlConfiguration.loadConfiguration(reader));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    // Do nothing
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    // Do nothing
+                }
+            }
+        }
     }
 
     /**
-     * .jarからローカルディレクトリにコンフィグファイルをコピーする
-     * 文字コードは各OS依存の文字コードに変換される
+     * コンフィグファイルの生成が必要な状態かどうかを判別し必要ならファイルを生成する
      * @return ファイルのコピーに成功したかどうか
      */
     public boolean CreateConfig() {
@@ -353,7 +391,10 @@ public enum ConfigManager {
             return false;
         }
 
-        //jarファイルにコピー元のファイルが存在しない
+        /*
+         * jarファイルからコンフィグファイルのコピーを試みる
+         * コピー元のファイルが存在しない場合プラグインを停止する
+         */
         if (!copyResource()) {
             MessageEnum.sendAbsolute(null, "[" + YPLKart.PLUGIN_NAME + "] v."
                     + YPLKart.PLUGIN_VERSION + " "
@@ -362,16 +403,11 @@ public enum ConfigManager {
             return false;
         }
 
-        //jarファイルからローカルにファイルをコピー
-        setLocalConfigFile(new File(getDataDirectory(), getLocalConfigFileName()));
-        setLocalConfig(YamlConfiguration.loadConfiguration(getLocalConfigFile()));
-
         return true;
     }
 
     /**
      * .jarからファイルをローカルディレクトリにコピーする
-     * 文字コードは各OS依存の文字コードに変換される
      * @return ファイルのコピーに成功したかどうか
      */
     public boolean copyResource() {
@@ -395,8 +431,8 @@ public enum ConfigManager {
             }
 
             output = new FileOutputStream(outputFile);
-            reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
-            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+            reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+            writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -440,7 +476,7 @@ public enum ConfigManager {
         }
     }
 
-    /** 各OS依存の文字コードで設定データをローカルに保存する */
+    /** 設定データをローカルに保存する */
     public void saveConfiguration() {
         File file = getLocalConfigFile();
         FileConfiguration config = getLocalConfig();
@@ -463,7 +499,7 @@ public enum ConfigManager {
 
         try {
             input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
-            reader = new BufferedReader(new InputStreamReader(input, Charset.defaultCharset()));
+            reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
             //新しいファイルに引き継ぐ行の文字列を格納
             String line;
@@ -525,7 +561,7 @@ public enum ConfigManager {
             file.createNewFile();
 
             output = new FileOutputStream(file);
-            writer = new BufferedWriter(new OutputStreamWriter(output, Charset.defaultCharset()));
+            writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
 
             for (String value : newLineList) {
                 writer.write(value);
@@ -583,7 +619,7 @@ public enum ConfigManager {
                 return null;
             }
 
-            reader = new BufferedReader(new InputStreamReader(input, "Shift_JIS"));
+            reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
             return YamlConfiguration.loadConfiguration(reader);
         } catch (Exception e) {

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -893,6 +894,13 @@ public class CMDAbstractPlayer extends CMDAbstract {
                         }
                     } else {
                         player.sendMessage("not particle");
+                    }
+                } else if (getArgs()[1].equalsIgnoreCase("sound")) {
+                    if (Util.isNumber(getArgs()[3]) && Util.isNumber(getArgs()[4])) {
+                        Sound sound = Sound.valueOf(String.valueOf(this.getArgs()[2]).toUpperCase());
+                        this.getPlayer().playSound(this.getPlayer().getLocation(), sound, Float.valueOf(getArgs()[3]), Float.valueOf(getArgs()[4]));
+                    } else {
+                        player.sendMessage("not number");
                     }
                 }
             } else if (this.getLength() == 6) {
