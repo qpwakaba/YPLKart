@@ -354,8 +354,10 @@ public class CircuitData {
                 , getLimitTime(), getMenuTime(), getMatchingTime()
                 , l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch() };
 
+        Circuit circuit = new Circuit();
+        circuit.setCircuitName(this.getCircuitDataName());
         MessageEnum.tableCircuitInformation
-            .sendConvertedMessage(adress, new Object[] { getCircuitDataName(), flag, numberdata });
+            .sendConvertedMessage(adress, circuit, flag, numberdata);
     }
 
     public void sendRanking(Object adress) {
