@@ -852,20 +852,30 @@ public class KartUtil extends ReflectionUtil {
     public static double calcSpeedStack(Object kartEntity, Object human) {
         Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, human);
         Racer race = RaceManager.getRacer(player);
+        Kart kartObject = (Kart) invoke(Methods.Ypl_getKart, kartEntity);
 
         double speedStack = (Double) invoke(Methods.Ypl_getSpeedStack, kartEntity);
 
-        //ダッシュボード、ポーションの効果をスピードスタックに上乗せしreturnする
-        //returnしなければ、後の処理で最大値・最小値を越えている場合、正常値にマージされてしまう
-        //両効果が重複してしまうと爆発的なスピードが出てしまうため、
-        //ダッシュボードに接触している場合はポーションの効果は無視する
-        Kart kartObject = (Kart) invoke(Methods.Ypl_getKart, kartEntity);
+        /*
+         * ダッシュボード、ポーションの効果をスピードスタックに上乗せしreturnする
+         * returnしなければ、後の処理で最大値・最小値を越えている場合、正常値にマージされてしまう
+         * 両効果が重複してしまうと爆発的なスピードが出てしまうため、
+         * ダッシュボードに接触している場合はポーションの効果は無視する
+         */
+
+        //ダッシュボードに接触した場合、スピードスタックを最大値+αしreturnする
         if (race.isStepDashBoard()) {
 
-            //ダッシュボードに接触した場合、スピードスタックを最大値+αしreturnする
-            return kartObject.getMaxSpeed()
+            //最高速度 + ダッシュボードのエフェクトLV + キャラクター補正
+            speedStack = kartObject.getMaxSpeed()
                     * (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
                     + race.getCharacter().getAdjustPositiveEffectLevel() * 50;
+
+            //アイテム使用中の最高速度以内の数値になるよう調整
+            speedStack = speedStack < kartObject.getBoostedMaxSpeed()
+                    ? speedStack : kartObject.getBoostedMaxSpeed();
+
+            return speedStack;
         } else {
 
             //スピードに影響するポーション効果を保持している場合、スピードスタックを操作しreturnする
@@ -873,7 +883,16 @@ public class KartUtil extends ReflectionUtil {
 
                 //スピードポーション効果を保持している場合、スピードスタックを最大値+αしreturnする
                 if (potion.getType().getName().equalsIgnoreCase("SPEED")) {
-                    return  kartObject.getMaxSpeed() + potion.getAmplifier() * 10;
+
+                    //最高速度 + ポーションエフェクトLV + キャラクター補正
+                    speedStack = kartObject.getMaxSpeed() + potion.getAmplifier() * 10
+                            + race.getCharacter().getAdjustPositiveEffectLevel() * 10;
+
+                    //アイテム使用中の最高速度以内の数値になるよう調整
+                    speedStack = speedStack < kartObject.getBoostedMaxSpeed()
+                            ? speedStack : kartObject.getBoostedMaxSpeed();
+
+                    return  speedStack;
                 }
 
                 //スロウポーション効果を保持している場合、スピードスタックを急激に減衰しreturnする

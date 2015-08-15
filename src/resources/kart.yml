@@ -11,6 +11,7 @@
 #   Standard:
 #     weight: 1.0
 #     max_speed: 250.0
+#     boosted_max_speed: 250.0
 #     acceleration: 1.0
 #     climbable_height: 0.5
 #     speed_decrease_on_dirt: 5.0
@@ -39,6 +40,9 @@
 #   max_speed :
 #     最高速度を変更します。
 #     アイテムやダッシュボードを使用せず、自力のみで出せる限界速度を指します。
+#
+#   boosted_max_speed :
+#     速度上昇アイテム使用中の最高速度を変更します。
 #
 #   acceleration :
 #     加速力を変更します。
@@ -90,6 +94,7 @@
 Standard:
   weight: 1.0
   max_speed: 250.0
+  boosted_max_speed: 400.0
   acceleration: 1.0
   climbable_height: 0.5
   speed_decrease_on_dirt: 5.0
@@ -102,6 +107,7 @@ Standard:
 Survival:
   weight: 1.5
   max_speed: 220.0
+  boosted_max_speed: 370.0
   acceleration: 1.0
   climbable_height: 0.5
   speed_decrease_on_dirt: 1.0
@@ -114,6 +120,7 @@ Survival:
 Accel:
   weight: 0.8
   max_speed: 180.0
+  boosted_max_speed: 330.0
   acceleration: 4.0
   climbable_height: 0.5
   speed_decrease_on_dirt: 5.0
@@ -126,6 +133,7 @@ Accel:
 Tricky:
   weight: 0.5
   max_speed: 300.0
+  boosted_max_speed: 450.0
   acceleration: 0.7
   climbable_height: 0.5
   speed_decrease_on_dirt: 7.0
@@ -138,6 +146,7 @@ Tricky:
 Flexible:
   weight: 1.0
   max_speed: 200.0
+  boosted_max_speed: 350.0
   acceleration: 1.5
   climbable_height: 0.5
   speed_decrease_on_dirt: 5.0
@@ -150,6 +159,7 @@ Flexible:
 Straight:
   weight: 0.5
   max_speed: 300.0
+  boosted_max_speed: 450.0
   acceleration: 2.5
   climbable_height: 0.5
   speed_decrease_on_dirt: 5.0
@@ -162,6 +172,7 @@ Straight:
 Power:
   weight: 2.0
   max_speed: 200.0
+  boosted_max_speed: 350.0
   acceleration: 0.7
   climbable_height: 1.0
   speed_decrease_on_dirt: 3.0
@@ -174,6 +185,7 @@ Power:
 Jalopy:
   weight: 1.0
   max_speed: 200.0
+  boosted_max_speed: 350.0
   acceleration: 0.8
   climbable_height: 0.5
   speed_decrease_on_dirt: 6.0

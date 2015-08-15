@@ -189,6 +189,9 @@ public enum MessageEnum {
             messageEnum.loadLocalConfig();
         }
 
+        //強制的に変更したいメッセージがある場合パッチを当てる
+        updatePatch();
+
         //ローカルへファイルの保存
         //デフォルトコンフィグから、ローカルコンフィグに未記載の項目を追記する
         ConfigManager.MESSAGE_ENUM.saveConfiguration();
@@ -289,14 +292,19 @@ public enum MessageEnum {
      * 新規の要素を追加した際は自動的に追記されるためパッチを当てる必要はない
      * 既存の要素を強制的に上書きする際に用いる(記述ミスの修正など)
      */
-    private void updatePatch() {
+    private static void updatePatch() {
         String version = messageVersion.getMessage();
         ConfigManager configManager = ConfigManager.MESSAGE_ENUM;
 
         if (version.equalsIgnoreCase("1.0")) {
             configManager.setValue(messageVersion.getConfigKey(), "1.1");
             configManager.setValue(racePlayerKill.getConfigKey()
-                    , "<circuitheader><white><player1> was killed by <player2>");
+                    , configManager.getDefaultConfig().get(racePlayerKill.getConfigKey()));
+        } else if (version.equalsIgnoreCase("1.1")) {
+            configManager.setValue(messageVersion.getConfigKey(), "1.2");
+            configManager.setValue(tableKartParameter.getConfigKey()
+                    , configManager.getDefaultConfig().get(tableKartParameter.getConfigKey()));
+
         }
     }
 

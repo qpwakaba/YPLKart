@@ -31,6 +31,9 @@ public class Kart {
     /** 最高速度 */
     private double maxSpeed;
 
+    /** 速度上昇アイテム使用中の最高速度 */
+    private double boostedMaxSpeed;
+
     /** 加速力 */
     private double acceleration;
 
@@ -68,6 +71,7 @@ public class Kart {
 
         setWeight(config.getDouble(key + ".weight"));
         setMaxSpeed(config.getDouble(key + ".max_speed"));
+        setBoostedMaxSpeed(config.getDouble(key + ".boosted_max_speed"));
         setAcceleration(config.getDouble(key + ".acceleration"));
         setClimbableHeight((float) config.getDouble(key + ".climbable_height"));
         setSpeedDecreaseOnDirt(config.getDouble(key + ".speed_decrease_on_dirt"));
@@ -93,6 +97,7 @@ public class Kart {
 
         setWeight(1.0D);
         setMaxSpeed(250.0D);
+        setBoostedMaxSpeed(400.0D);
         setAcceleration(1.5D);
         setClimbableHeight(0.5F);
         setSpeedDecreaseOnDirt(5.0D);
@@ -120,6 +125,7 @@ public class Kart {
         String[] parameter = new String[] {
                 String.valueOf(getWeight()),
                 String.valueOf(getMaxSpeed()),
+                String.valueOf(getBoostedMaxSpeed()),
                 String.valueOf(getAcceleration()),
                 String.valueOf(getDefaultCorneringPower()),
                 String.valueOf(getDriftCorneringPower()),
@@ -161,6 +167,11 @@ public class Kart {
     /** @return maxSpeed 最高速度 */
     public double getMaxSpeed() {
         return maxSpeed;
+    }
+
+    /** @return 速度上昇アイテム使用中の最高速度 */
+    public double getBoostedMaxSpeed() {
+        return boostedMaxSpeed;
     }
 
     /** @return acceleration 加速力 */
@@ -223,6 +234,11 @@ public class Kart {
     /** @param maxSpeed 最高速度 */
     private void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
+    }
+
+    /** @param boostedMaxSpeed 速度上昇アイテム使用中の最高速度 */
+    public void setBoostedMaxSpeed(double boostedMaxSpeed) {
+        this.boostedMaxSpeed = boostedMaxSpeed;
     }
 
     /** @param acceleration 加速力 */
