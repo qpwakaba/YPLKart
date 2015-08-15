@@ -404,6 +404,13 @@ public class DataListener implements Listener {
         //r.saveInventory();
         e.setKeepInventory(true);
 
+        /*
+         * リスポーン時に再生成される際に実行されるRacer.recoveryKart()ではRacer.kartEntityLocationの座標に
+         * カートが再生成されるため、予め座標を格納しておく
+         */
+        r.setKartEntityLocation(
+                r.getLastPassedCheckPointEntity().getLocation().add(0.0D, -RaceManager.checkPointHeight, 0.0D));
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 if (p.isDead())
