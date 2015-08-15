@@ -1,7 +1,122 @@
+#
+# ------------------------- 概要 -------------------------
+#
+# レース時に選択するキャラクターの設定を変更できるコンフィグファイルです。
+#
+# ------------------------- チュートリアル -------------------------
+#
+# 下記のように記述して頂くことで、オリジナルのキャラクターを追加することが可能です。
+#
+# 記述例 :
+#   Mr_Minecraft:
+#     entity_type: "Human"
+#     menu_head_item_player_name: "MHF_Steve"
+#     menu_click_sound: "burp"
+#     menu_click_sound_volume: 1.0
+#     menu_click_sound_pitch: 1.0
+#     item_adjust_max_slot: 0
+#     item_adjust_max_stack_size: 0
+#     item_adjust_positive_effect_second: 0
+#     item_adjust_positive_effect_level: 0
+#     item_adjust_negative_effect_second: 0
+#     item_adjust_negative_effect_level: 0
+#     item_adjust_attack_damage: 0
+#     max_health: 20
+#     walk_speed: 0.6
+#     death_penalty:
+#       anti_reskill_second: 3
+#       penalty_second: 6
+#       walk_speed: 0.1
+#
+# 注意点 :
+#   1.全て半角英数字で記述して下さい。
+#   2.インデントは半角スペース2文字「  」で記述して下さい。
+#   基本的に既存の設定をコピペすればニュアンスで何とかなると思います。
+#
+# 各項目の説明 :
+#   上記の記述例を参考に説明します。
+#
+#   Mr_Minecraft :
+#     キャラクターの名称を変更します。ここで記述した名称がコマンドの引数や選択メニューに利用されます。
+#
+#   entity_type :
+#     レース中はこの項目に記述したエンティティの姿にプレイヤーが偽装されます。
+#     ただし、自分から見た自分の姿は変更されません。残念ながら技術的に不可能ですのでご了承下さい。
+#     利用できるエンティティ一覧は下記の通りです。
+#     Bat, Blaze, CaveSpider, Chicken, Cow, Creeper, EnderDragon, Enderman, Endermite, Ghast, GiantZomibe, Guardian,
+#     Horse, Human, IronGolem, MagmaCube, MushroomCow, Ocelot, Pig, PigZombie, Rabbit, Sheep, Silverfish, Skeleton,
+#     Slime, Snowman, Spider, Squid, Villager, Witch, Wither, Wolf, Zombie
+#     EnderDragon, Witherの利用は、描画が不安定、ボスバーが表示されてしまう、といった不具合がございますので非推奨です。
+#     また、大文字小文字は正確に記述して下さい。
+#
+#   menu_head_item_player_name :
+#     キャラクター選択メニューに表示するスカルブロックのオーナープレイヤーネームを変更します。
+#     記述したプレイヤーの頭部のスキンがスカルブロックにプリントされ表示されます。
+#
+#   menu_click_sound :
+#     キャラクター選択メニューでキャラクターを選択した際に再生される音声を変更します。
+#     利用できる音声一覧は、お手数ですが下記のサイトをご覧下さい。
+#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+#     なお、大文字小文字は考慮しません。
+#
+#   menu_click_sound_volume :
+#     キャラクター選択メニューでキャラクターを選択した際に再生される音声のボリュームを変更します。
+#     大きすぎたり小さすぎると1.0の設定で再生されますので適度に調整して下さい。
+#
+#   menu_click_sound_pitch :
+#     キャラクター選択メニューでキャラクターを選択した際に再生される音声の再生速度を変更します。
+#     大きすぎたり小さすぎると1.0の設定で再生されますので適度に調整して下さい。
+#
+#   item_adjust_max_slot :
+#     config.ymlの「Settings: item_slot:」で設定した利用できるアイテムスロット数に補正をかけます。
+#     例えば、item_slotの設定が2の時、この数値を1に設定すれば、3スロット使用できるようになります。
+#     逆に-1を設定すれば、1スロットしか使用できなくなります。
+#
+#   item_adjust_max_stack_size :
+#     各アイテムの最大スタック数に補正をかけます。
+#
+#   item_adjust_positive_effect_second :
+#     スピードポーションを付与するタイプのアイテムを使用した際の効果時間に補正をかけます。
+#     ダッシュボードを踏んだ際の効果時間にも影響します。
+#
+#   item_adjust_positive_effect_level :
+#     スピードポーションを付与するタイプのアイテムを使用した際の効果LVに補正をかけます。
+#     ダッシュボードを踏んだ際の効果LVにも影響します。
+#
+#   item_adjust_negative_effect_second :
+#     スロウポーションを付与するタイプのアイテムを使用された際の効果時間に補正をかけます。
+#
+#   item_adjust_negative_effect_level :
+#     スロウポーションを付与するタイプのアイテムを使用された際の効果LVに補正をかけます。
+#
+#   item_adjust_attack_damage :
+#     プレイヤーにダメージを与えるアイテムを使用した際のダメージに補正をかけます。
+#
+#   max_health :
+#     最大体力を変更します。
+#
+#   walk_speed :
+#     移動速度を変更します。
+#     この移動速度は歩行時・カート搭乗時双方に影響します。
+#
+#   death_penalty :
+#     anti_reskill_second :
+#       体力が0になり死亡した際のリスキル耐性の秒数を変更します。
+#       設定された時間内は、他プレイヤーからの攻撃、妨害アイテムによるダメージを受けません。
+#
+#     penalty_second :
+#       体力が0になり死亡した際のデスペナルティの秒数を変更します。
+#
+#     walk_speed :
+#       体力が0になり死亡した際の歩行速度を変更します。
+#       上記「death_penalty: penalty_second:」で設定された秒数だけ、この歩行速度が適用されます。
+#
+# ------------------------- キャラクター設定 -------------------------
+#
 Steve:
-  entity_type: Human
-  menu_head_item_player_name: MHF_Steve
-  menu_click_sound: burp
+  entity_type: "Human"
+  menu_head_item_player_name: "MHF_Steve"
+  menu_click_sound: "burp"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -18,9 +133,9 @@ Steve:
     penalty_second: 6
     walk_speed: 0.1
 Alex:
-  entity_type: Human
-  menu_head_item_player_name: MHF_Alex
-  menu_click_sound: burp
+  entity_type: "Human"
+  menu_head_item_player_name: "MHF_Alex"
+  menu_click_sound: "burp"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -37,9 +152,9 @@ Alex:
     penalty_second: 6
     walk_speed: 0.1
 Herobrine:
-  entity_type: Human
-  menu_head_item_player_name: MHF_Herobrine
-  menu_click_sound: burp
+  entity_type: "Human"
+  menu_head_item_player_name: "MHF_Herobrine"
+  menu_click_sound: "burp"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -56,9 +171,9 @@ Herobrine:
     penalty_second: 6
     walk_speed: 0.1
 Creeper:
-  entity_type: Creeper
-  menu_head_item_player_name: MHF_Creeper
-  menu_click_sound: creeper_hiss
+  entity_type: "Creeper"
+  menu_head_item_player_name: "MHF_Creeper"
+  menu_click_sound: "creeper_hiss"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -75,9 +190,9 @@ Creeper:
     penalty_second: 6
     walk_speed: 0.1
 Zombie:
-  entity_type: Zombie
-  menu_head_item_player_name: MHF_Zombie
-  menu_click_sound: zombie_death
+  entity_type: "Zombie"
+  menu_head_item_player_name: "MHF_Zombie"
+  menu_click_sound: "zombie_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -94,9 +209,9 @@ Zombie:
     penalty_second: 10
     walk_speed: 0.1
 Skeleton:
-  entity_type: Skeleton
-  menu_head_item_player_name: MHF_Skeleton
-  menu_click_sound: skeleton_death
+  entity_type: "Skeleton"
+  menu_head_item_player_name: "MHF_Skeleton"
+  menu_click_sound: "skeleton_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -113,9 +228,9 @@ Skeleton:
     penalty_second: 7
     walk_speed: 0.1
 Spider:
-  entity_type: Spider
-  menu_head_item_player_name: MHF_Spider
-  menu_click_sound: spider_idle
+  entity_type: "Spider"
+  menu_head_item_player_name: "MHF_Spider"
+  menu_click_sound: "spider_idle"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -132,9 +247,9 @@ Spider:
     penalty_second: 7
     walk_speed: 0.1
 Enderman:
-  entity_type: Enderman
-  menu_head_item_player_name: MHF_Enderman
-  menu_click_sound: enderman_death
+  entity_type: "Enderman"
+  menu_head_item_player_name: "MHF_Enderman"
+  menu_click_sound: "enderman_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -151,9 +266,9 @@ Enderman:
     penalty_second: 5
     walk_speed: 0.1
 Witch:
-  entity_type: Witch
-  menu_head_item_player_name: MHF_Witch
-  menu_click_sound: villager_death
+  entity_type: "Witch"
+  menu_head_item_player_name: "MHF_Witch"
+  menu_click_sound: "villager_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 4.0
   item_adjust_max_slot: 0
@@ -170,9 +285,9 @@ Witch:
     penalty_second: 7
     walk_speed: 0.1
 Pig:
-  entity_type: Pig
-  menu_head_item_player_name: MHF_Pig
-  menu_click_sound: pig_death
+  entity_type: "Pig"
+  menu_head_item_player_name: "MHF_Pig"
+  menu_click_sound: "pig_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: -1
@@ -189,9 +304,9 @@ Pig:
     penalty_second: 10
     walk_speed: 0.1
 Squid:
-  entity_type: Squid
-  menu_head_item_player_name: MHF_Squid
-  menu_click_sound: slime_walk
+  entity_type: "Squid"
+  menu_head_item_player_name: "MHF_Squid"
+  menu_click_sound: "slime_walk"
   menu_click_sound_volume: 2.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -208,9 +323,9 @@ Squid:
     penalty_second: 6
     walk_speed: 0.1
 Villager:
-  entity_type: Villager
-  menu_head_item_player_name: MHF_Villager
-  menu_click_sound: villager_death
+  entity_type: "Villager"
+  menu_head_item_player_name: "MHF_Villager"
+  menu_click_sound: "villager_death"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -227,9 +342,9 @@ Villager:
     penalty_second: 0
     walk_speed: 0.1
 Golem:
-  entity_type: IronGolem
-  menu_head_item_player_name: MHF_Golem
-  menu_click_sound: burp
+  entity_type: "IronGolem"
+  menu_head_item_player_name: "MHF_Golem"
+  menu_click_sound: "burp"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0

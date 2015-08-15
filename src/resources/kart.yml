@@ -1,3 +1,92 @@
+#
+# ------------------------- 概要 -------------------------
+#
+# レース時に選択するカートの設定を変更できるコンフィグファイルです。
+#
+# ------------------------- チュートリアル -------------------------
+#
+# 下記のように記述して頂くことで、オリジナルのカートを追加することが可能です。
+#
+# 記述例 :
+#   Standard:
+#     weight: 1.0
+#     max_speed: 250.0
+#     acceleration: 1.0
+#     climbable_height: 0.5
+#     speed_decrease_on_dirt: 5.0
+#     speed_decrease_on_drift: 2.0
+#     default_cornering_power: 1.0
+#     drift_cornering_power: 5.5
+#     mount_position_offset: 0.0
+#     display_material: "bowl"
+#     display_material_data: 0
+#
+# 注意点 :
+#   1.全て半角英数字で記述して下さい。
+#   2.インデントは半角スペース2文字「  」で記述して下さい。
+#   基本的に既存の設定をコピペすればニュアンスで何とかなると思います。
+#
+# 各項目の説明 :
+#   上記の記述例を参考に説明します。
+#
+#   Standard :
+#     カートの名称を変更します。ここで記述した名称がコマンドの引数や選択メニューに利用されます。
+#
+#   weight :
+#     重量を変更します。
+#     カート同士が衝突した際の威力、反動で吹き飛ぶ距離に影響します。
+#
+#   max_speed :
+#     最高速度を変更します。
+#     アイテムやダッシュボードを使用せず、自力のみで出せる限界速度を指します。
+#
+#   acceleration :
+#     加速力を変更します。
+#     加速中の速度の上昇量を指します。
+#
+#   climbable_height :
+#     よじ登れる高さを変更します。
+#     0.5を設定すれば半ブロック、1.0を設定すれば1ブロック分の高さのブロックに衝突しても飛び越えます。
+#
+#   speed_decrease_on_dirt :
+#     ダート走行時の減速率を変更します。
+#     ダートブロック上を走行した際のスピードの減少量を指します。
+#     ダートブロックはconfig.ymlの「settings: dirt_block_id:」で変更できます。
+#
+#   speed_decrease_on_drift :
+#     ドリフト時の減速率を変更します。
+#     ドリフト中のスピードの減少量を指します。
+#
+#   default_cornering_power :
+#     コーナリング能力を変更します。
+#     左右に曲がる際の旋回量を指します。
+#
+#   drift_cornering_power :
+#     ドリフト時のコーナリング能力を変更します。
+#     ドリフト中の左右に曲がる際の旋回量を指します。
+#
+#   mount_position_offset :
+#     カートのY方向の描画位置を変更します。
+#     カートの3Dリソースを車体の高いリソースに変更した場合等に、カートが地面にめり込まないよう対処することができます。
+#
+#   display_material :
+#     カートの外見に割り当てるアイテムを変更します。
+#     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。
+#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+#     なお、大文字小文字は考慮しません。
+#
+#   display_material_data :
+#     カートの外見に割り当てるアイテムのデータ値を変更します。
+#     例えばイカ墨を利用したい場合は、
+#       display_material: INK_SACK
+#       display_material_data: 0
+#     黄色い染料を利用したい場合は、
+#       display_material: INK_SACK
+#       display_material_data: 11
+#     と記述して下さい。
+#
+# ------------------------- カート設定 -------------------------
+#
 Standard:
   weight: 1.0
   max_speed: 250.0
@@ -8,7 +97,7 @@ Standard:
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
   mount_position_offset: 0.0
-  display_material: "bowl"
+  display_material: "BOWL"
   display_material_data: 0
 Survival:
   weight: 1.5
@@ -20,7 +109,7 @@ Survival:
   default_cornering_power: 1.0
   drift_cornering_power: 6.5
   mount_position_offset: 0.0
-  display_material: "string"
+  display_material: "STRING"
   display_material_data: 0
 Accel:
   weight: 0.8
@@ -32,7 +121,7 @@ Accel:
   default_cornering_power: 1.0
   drift_cornering_power: 5.5
   mount_position_offset: 0.0
-  display_material: "feather"
+  display_material: "FEATHER"
   display_material_data: 0
 Tricky:
   weight: 0.5
@@ -44,7 +133,7 @@ Tricky:
   default_cornering_power: 1.5
   drift_cornering_power: 6.5
   mount_position_offset: 0.0
-  display_material: "sulphur"
+  display_material: "SULPHUR"
   display_material_data: 0
 Flexible:
   weight: 1.0
@@ -56,7 +145,7 @@ Flexible:
   default_cornering_power: 1.7
   drift_cornering_power: 6.5
   mount_position_offset: 0.0
-  display_material: "seeds"
+  display_material: "SEEDS"
   display_material_data: 0
 Straight:
   weight: 0.5
@@ -68,7 +157,7 @@ Straight:
   default_cornering_power: 1.0
   drift_cornering_power: 4.0
   mount_position_offset: 0.0
-  display_material: "wheat"
+  display_material: "WHEAT"
   display_material_data: 0
 Power:
   weight: 2.0
@@ -80,7 +169,7 @@ Power:
   default_cornering_power: 1.5
   drift_cornering_power: 5.5
   mount_position_offset: 0.0
-  display_material: "flint"
+  display_material: "FLINT"
   display_material_data: 0
 Jalopy:
   weight: 1.0
@@ -92,5 +181,5 @@ Jalopy:
   default_cornering_power: 1.0
   drift_cornering_power: 5.0
   mount_position_offset: 0.0
-  display_material: "leather"
+  display_material: "LEATHER"
   display_material_data: 0

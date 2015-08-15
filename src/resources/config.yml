@@ -1,46 +1,151 @@
+#
+# ------------------------- 概要 -------------------------
+#
+# プラグインの汎用的な機能の設定を変更できるコンフィグファイルです。
+#
+# ------------------------- 汎用設定 -------------------------
+#
+
+# 当プラグインの機能を有効にします。
 enable_this_plugin: true
+
+# 各権限毎のパーミッションを有効にするかどうか切り替えます。
 enable_permission:
+
+  # パーミッション : YPLKart.kart.ride を有効にします。
   kart_ride: true
+
+  # パーミッション : YPLKart.kart.drift を有効にします。
   kart_drift: true
+
+  # パーミッション : YPLKart.cmd.menu を有効にします。
   cmd_menu: true
+
+  # パーミッション : YPLKart.cmd.entry を有効にします。
   cmd_entry: true
+
+  # パーミッション : YPLKart.cmd.exit を有効にします。
   cmd_exit: true
+
+  # パーミッション : YPLKart.cmd.character を有効にします。
   cmd_character: true
+
+  # パーミッション : YPLKart.cmd.characterreset を有効にします。
   cmd_characterreset: true
+
+  # パーミッション : YPLKart.cmd.kart を有効にします。
   cmd_kart: true
+
+  # パーミッション : YPLKart.cmd.leave を有効にします。
   cmd_leave: true
+
+  # パーミッション : YPLKart.cmd.ranking を有効にします。
   cmd_ranking: true
+
+  # パーミッション : YPLKart.itemcmd.* を有効にします。
   cmd_item: true
+
+  # パーミッション : YPLKart.cmdother.menu を有効にします。
   cmd_other_menu: true
+
+  # パーミッション : YPLKart.cmdother.entry を有効にします。
   cmd_other_entry: true
+
+  # パーミッション : YPLKart.cmdother.exit を有効にします。
   cmd_other_exit: true
+
+  # パーミッション : YPLKart.cmdother.character を有効にします。
   cmd_other_character: true
+
+  # パーミッション : YPLKart.cmdother.characterreset を有効にします。
   cmd_other_characterreset: true
+
+  # パーミッション : YPLKart.cmdother.kart を有効にします。
   cmd_other_kart: true
+
+  # パーミッション : YPLKart.cmdother.leave を有効にします。
   cmd_other_leave: true
+
+  # パーミッション : YPLKart.cmdother.ranking を有効にします。
   cmd_other_ranking: true
+
+  # パーミッション : YPLKart.itemcmdother.* を有効にします。
   cmd_other_item: true
+
+  # パーミッション : YPLKart.use.* を有効にします。
   use_item: true
+
+  # パーミッション : YPLKart.interact.* を有効にします。
   interact_object: true
+
+# 管理者向けのパーミッションを有効にするかどうか切り替えます。
 enable_op_permission:
+
+  # パーミッション : YPLKart.op.kart.remove を有効にします。
   kart_remove: true
+
+  # パーミッション : YPLKart.op.cmd.circuit を有効にします。
   cmd_circuit: true
+
+  # パーミッション : YPLKart.op.cmd.display を有効にします。
   cmd_display: true
+
+  # パーミッション : YPLKart.op.cmd.reload を有効にします。
   cmd_reload: true
+
+  # パーミッション : YPLKart.op.cmd.itemboxtool を有効にします。
   cmd_itemboxtool: true
+
+# スコアボードを有効にします。
 enable_scoreboard: true
+
+# 当プラグインが動作しないワールド名を指定します。
 disabled_worlds:
 - testworld
 - testworld2
+
+# レース設定
 settings:
-  start_block_id: '41:0'
-  goal_block_id: '42:0'
-  dirt_block_id: '12:0'
+
+  # スタートブロックのIDを変更します。
+  start_block_id: "41:0"
+
+  # ゴールブロックのIDを変更します。
+  goal_block_id: "42:0"
+
+  # ダートブロックのIDを変更します。
+  dirt_block_id: "12:0"
+
+  # レース中使用できるアイテムスロットの数を変更します。
   item_slot: 2
+
+# アイテム設定
 item:
+
+  #tierは、アイテムボックスに接触した際に順位に応じたアイテムを付与するための設定です。
+  #アイテム毎にtierが設定されており、tier1～tier4の4つの階級があります。
+  #階級が高いほど効果の強いアイテムが多くなります。
+
+  #プレイヤーの上位「0％～tier1％」のプレイヤーには階級1のアイテムのみ与えられます。
+  #デフォルトでは、上位0％～30％のプレイヤーに設定されています。
   tier1: 30
+
+  #プレイヤーの上位「tier1％～tier2」％のプレイヤーには階級1～階級2のアイテムのみ与えられます。
+  #デフォルトでは、上位30％～60％のプレイヤーに設定されています。
   tier2: 60
+
+  #プレイヤーの上位「tier2％～tier3％」のプレイヤーには階級2～階級3のアイテムのみ与えられます。
+  #デフォルトでは、上位60％～80％のプレイヤーに設定されています。
   tier3: 80
+
+  #残りの、上位tier3％～100％のプレイヤーには階級3～階級4のアイテムのみ与えられます。
+  #デフォルトでは、上位80％～100％のプレイヤーに設定されています。
+
+  # ダッシュボード設定
   dash_board:
+
+    # スピードポーションエフェクトのLVを変更します。
     effect_level: 4
+
+    # スピードポーションエフェクトの秒数を変更します。
     effect_second: 2
