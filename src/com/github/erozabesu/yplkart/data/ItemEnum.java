@@ -252,8 +252,8 @@ public enum ItemEnum {
         } else {
             //外見マテリアル
             if (this.equals(KILLER)) {
-                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_block_material"));
-                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_block_material_data"));
+                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_material"));
+                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_material_data"));
             }
 
             //エフェクトレベル

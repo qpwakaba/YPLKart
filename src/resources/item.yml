@@ -211,8 +211,8 @@ killer:
   tier: 4
   material: "INK_SACK"
   material_data: 11
-  display_block_material: "INK_SACK"
-  display_block_material_data: 15
+  display_material: "INK_SACK"
+  display_material_data: 15
   max_stack_size: 1
   effect_second: 5
   moving_damage: 6
