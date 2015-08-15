@@ -915,6 +915,7 @@ public class KartUtil extends ReflectionUtil {
             } else {
                 speedStack -= kartObject.getSpeedDecreaseOnDirt();
             }
+
         //後方へキーを入力している
         } else if (forwardMotionInput < 0) {
             speedStack -= 10;
@@ -931,14 +932,19 @@ public class KartUtil extends ReflectionUtil {
             speedStack = 0;
         }
 
-        //モーション値が限りなく0に近い場合はスピードスタックを0にする
-        //壁に衝突した場合などの急激なモーションのストップに対する処理
-        double motX = (Double) getFieldValue(Fields.nmsEntity_motX, kartEntity);
-        double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, kartEntity);
-        BigDecimal bd = new BigDecimal(motX * motX + motZ * motZ);
-        double mot = bd.setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
-        if (mot == 0) {
-            speedStack = 0;
+        /*
+         * モーション値が限りなく0に近い場合はスピードスタックを0にする
+         * 壁に衝突した場合などの急激なモーションのストップに対する処理
+         * ただしデスペナルティ中は除外する
+         */
+        if (race.getDeathPenaltyTask() == null) {
+            double motX = (Double) getFieldValue(Fields.nmsEntity_motX, kartEntity);
+            double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, kartEntity);
+            BigDecimal bd = new BigDecimal(motX * motX + motZ * motZ);
+            double mot = bd.setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
+            if (mot == 0) {
+                speedStack = 0;
+            }
         }
 
         return speedStack;
