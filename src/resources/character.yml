@@ -116,7 +116,7 @@
 Steve:
   entity_type: "Human"
   menu_head_item_player_name: "MHF_Steve"
-  menu_click_sound: "burp"
+  menu_click_sound: "BURP"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -135,7 +135,7 @@ Steve:
 Alex:
   entity_type: "Human"
   menu_head_item_player_name: "MHF_Alex"
-  menu_click_sound: "burp"
+  menu_click_sound: "BURP"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -154,7 +154,7 @@ Alex:
 Herobrine:
   entity_type: "Human"
   menu_head_item_player_name: "MHF_Herobrine"
-  menu_click_sound: "burp"
+  menu_click_sound: "BURP"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -173,7 +173,7 @@ Herobrine:
 Creeper:
   entity_type: "Creeper"
   menu_head_item_player_name: "MHF_Creeper"
-  menu_click_sound: "creeper_hiss"
+  menu_click_sound: "CREEPER_HISS"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -192,7 +192,7 @@ Creeper:
 Zombie:
   entity_type: "Zombie"
   menu_head_item_player_name: "MHF_Zombie"
-  menu_click_sound: "zombie_death"
+  menu_click_sound: "ZOMBIE_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -211,7 +211,7 @@ Zombie:
 Skeleton:
   entity_type: "Skeleton"
   menu_head_item_player_name: "MHF_Skeleton"
-  menu_click_sound: "skeleton_death"
+  menu_click_sound: "SKELETON_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -230,7 +230,7 @@ Skeleton:
 Spider:
   entity_type: "Spider"
   menu_head_item_player_name: "MHF_Spider"
-  menu_click_sound: "spider_idle"
+  menu_click_sound: "SPIDER_IDLE"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -249,7 +249,7 @@ Spider:
 Enderman:
   entity_type: "Enderman"
   menu_head_item_player_name: "MHF_Enderman"
-  menu_click_sound: "enderman_death"
+  menu_click_sound: "ENDERMAN_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -258,7 +258,7 @@ Enderman:
   item_adjust_positive_effect_level: 1
   item_adjust_negative_effect_second: 0
   item_adjust_negative_effect_level: 0
-  item_adjust_attack_damage: 15
+  item_adjust_attack_damage: 5
   max_health: 25
   walk_speed: 0.5
   death_penalty:
@@ -268,7 +268,7 @@ Enderman:
 Witch:
   entity_type: "Witch"
   menu_head_item_player_name: "MHF_Witch"
-  menu_click_sound: "villager_death"
+  menu_click_sound: "VILLAGER_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 4.0
   item_adjust_max_slot: 0
@@ -287,7 +287,7 @@ Witch:
 Pig:
   entity_type: "Pig"
   menu_head_item_player_name: "MHF_Pig"
-  menu_click_sound: "pig_death"
+  menu_click_sound: "PIG_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: -1
@@ -306,7 +306,7 @@ Pig:
 Squid:
   entity_type: "Squid"
   menu_head_item_player_name: "MHF_Squid"
-  menu_click_sound: "slime_walk"
+  menu_click_sound: "SLIME_WALK"
   menu_click_sound_volume: 2.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 1
@@ -325,7 +325,7 @@ Squid:
 Villager:
   entity_type: "Villager"
   menu_head_item_player_name: "MHF_Villager"
-  menu_click_sound: "villager_death"
+  menu_click_sound: "VILLAGER_DEATH"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
@@ -336,7 +336,7 @@ Villager:
   item_adjust_negative_effect_level: 0
   item_adjust_attack_damage: -4
   max_health: 15
-  walk_speed: 0.6
+  walk_speed: 0.5
   death_penalty:
     anti_reskill_second: 1
     penalty_second: 0
@@ -344,19 +344,19 @@ Villager:
 Golem:
   entity_type: "IronGolem"
   menu_head_item_player_name: "MHF_Golem"
-  menu_click_sound: "burp"
+  menu_click_sound: "IRONGOLEM_HIT"
   menu_click_sound_volume: 1.0
   menu_click_sound_pitch: 1.0
   item_adjust_max_slot: 0
   item_adjust_max_stack_size: 0
   item_adjust_positive_effect_second: 0
   item_adjust_positive_effect_level: 0
-  item_adjust_negative_effect_second: 0
-  item_adjust_negative_effect_level: 0
-  item_adjust_attack_damage: 0
-  max_health: 20
-  walk_speed: 0.6
+  item_adjust_negative_effect_second: -2
+  item_adjust_negative_effect_level: -2
+  item_adjust_attack_damage: 10
+  max_health: 30
+  walk_speed: 0.5
   death_penalty:
     anti_reskill_second: 3
     penalty_second: 6
-    walk_speed: 0.1
+    walk_speed: 0.3

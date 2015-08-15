@@ -1,32 +1,50 @@
-#Color Tags :
-#	<black>,<white>,<gray>,<darkgray>,<red>,<darkRed>,<green>,<darkgreen>
-#	<blue>,<darkblue>,<yellow>,<gold>,<lightpurple>,<darkpurple>,<aqua>,<darkaqua>
-#Font Tags :
-#	<magic>,<bold>,<italic>,<reset>,<strikethrough>,<underline>
-#Available Tags :
-#	<br> : end a line and start a new line
-#	<plugin> : replace to this plugin name.
-#	<header> : replace to [header] value.
-#	<circuitlist> : replace to available circuit name list.
-#	<characterlist> : replace to available character name list.
-#	<kartlist> : replace to available kart name list.
-#Limited Tags : these tags only work for specific situation
-#	<circuitname> : replace to specific circuit name.
-#	<circuitheader> : replace to [circuitheader] value.
-#	<player> : replace to player name. this tag only work for command target other player.
-#	<player1> <player2> : replace to player name. this tag only work for player kill message.
-#	<character> : replace to character name. this tag only work for command character select.
-#	<kart> : replace to kart name. this tag only work for command kart select.
-#	<item> : replace to item name. this tag only work for command give items.
-#	<perm> : replace to permission node. this tag only work for permission error message.
-#	<number> : replace to specific number.
-#	<number1> <number2> ... : replace to specific number.
-#	<flag> : replace to specific flag true or false.
-#	<text1> <text2> ... : replace to specific text. this tag only work for character and kart parameter.
+#
+# ------------------------- 概要 -------------------------
+#
+# プラグインから出力されるメッセージを変更できるコンフィグファイルです。
+#
+# ------------------------- 利用可能なタグ -------------------------
+#
+# カラータグ : このタグ以降に記述されたメッセージの色を変更します。
+#   <black>,<white>,<gray>,<darkgray>,<red>,<darkRed>,<green>,<darkgreen>
+#   <blue>,<darkblue>,<yellow>,<gold>,<lightpurple>,<darkpurple>,<aqua>,<darkaqua>
+#
+# フォントタグ : このタグ以降に記述されたメッセージのフォントを変更します。
+#   <bold> : 太字。
+#   <italic> : イタリック体。
+#   <strikethrough> : 打ち消し線 。
+#   <underline> : 下線。
+#   <reset> : このタグ以前に記述されたカラータグ、フォントタグの影響のないメッセージに変更されます。
+#   <magic> : グシャってなります。
+#
+# 汎用タグ :
+#   <br> : 改行します。
+#   <plugin> : 「YPLKart」という文字列に置き換えられます。
+#   <header> : 「header」の項目に記述した内容に置き換えられます。
+#   <circuitheader> : 「circuitheader」の項目に記述した内容に置き換えられます。
+#   <circuitlist> : 登録されているサーキットの一覧に置き換えられます。
+#   <characterlist> : 登録されているキャラクターの一覧に置き換えられます。
+#   <kartlist> : 登録されているカートの一覧に置き換えられます。
+#
+# 限定タグ : 一部のメッセージのみ利用可能なタグ。
+#   <circuitname> : サーキットの名称に置き換えられます。サーキットに関連したメッセージに利用されます。
+#   <player> : プレイヤーネームに置き換えられます。他のプレイヤーをターゲットにしたコマンドを実行した場合のみ利用されます。
+#   <player1> <player2> : プレイヤーネームに置き換えられます。「racePlayerKill」の項目でのみ利用されます。
+#   <character> : キャラクターネームに置き換えられます。replace to character name. this tag only work for command character select.
+#   <kart> : replace to kart name. this tag only work for command kart select.
+#   <item> : replace to item name. this tag only work for command give items.
+#   <perm> : replace to permission node. this tag only work for permission error message.
+#   <number> : replace to specific number.
+#   <number1> <number2> ... : replace to specific number.
+#   <flag> : replace to specific flag true or false.
+#   <text1> <text2> ... : replace to specific text. this tag only work for character and kart parameter.
+#
+# ------------------------- メッセージ設定 -------------------------
+#
 messageVersion : "1.1"
-racePlayerKill : "<circuitheader><white><player1> was killed by <player2>"
 header : "<yellow>[<plugin>] "
 circuitheader : "<darkaqua>[<aqua><circuitname><darkaqua>] "
+racePlayerKill : "<circuitheader><white><player1> was killed by <player2>"
 noPermission : "<header><red>権限を所有していません - <perm>"
 invalidPlayer : "<header><red>指定したプレイヤーはログインしていません"
 invalidWorld : "<header><red>指定したワールドは存在しません"

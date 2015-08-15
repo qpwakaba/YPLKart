@@ -100,9 +100,7 @@ enable_op_permission:
 enable_scoreboard: true
 
 # 当プラグインが動作しないワールド名を指定します。
-disabled_worlds:
-- testworld
-- testworld2
+disabled_worlds: "[testworld, testworld2]"
 
 # レース設定
 settings:
