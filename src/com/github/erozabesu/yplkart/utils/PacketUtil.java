@@ -217,7 +217,10 @@ public class PacketUtil extends ReflectionUtil {
      */
     public static void skipRespawnScreen(Player player) {
         Object playerConnection = getPlayerConnection(player);
-        invoke(Methods.nmsPlayerConnection_skipRespawnWindow, playerConnection);
+        Object packetPlayInClientCommnad =
+                newInstance(Constructors.nmsPacketPlayInClientCommand, Objects.nmsEnumClientCommand_PerformRespawn);
+
+        invoke(Methods.nmsPlayerConnection_skipRespawnWindow, playerConnection, packetPlayInClientCommnad);
     }
 
     /**
