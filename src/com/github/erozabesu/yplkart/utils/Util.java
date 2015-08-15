@@ -539,8 +539,8 @@ public class Util extends ReflectionUtil {
 
                     //攻撃実行者が明確な場合、レース参加者に他殺のデスログを送信
                     if (executor != null) {
-                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerKill, new Object[] { circuit,
-                                new Player[] { (Player) damaged, (Player) executor } });
+                        Player[] messagePartsPlayers = new Player[]{(Player) damaged, (Player) executor};
+                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerKill, circuit, messagePartsPlayers);
 
                     //攻撃実行者が不明の場合、レース参加者に死亡したことのみを伝えるデスログを送信
                     } else {

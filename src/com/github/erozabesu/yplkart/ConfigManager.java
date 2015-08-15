@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -493,7 +493,7 @@ public enum ConfigManager {
         BufferedReader reader = null;
         BufferedWriter writer = null;
 
-        HashMap<Integer, String> commentTextMap = new HashMap<Integer, String>();
+        ArrayList<String> newLineList = new ArrayList<String>();
 
         try {
             input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
@@ -501,12 +501,21 @@ public enum ConfigManager {
 
             //新しいファイルに引き継ぐ行の文字列を格納
             String line;
-            int lineNumber = 0;
+            int temp = 0;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("#")) {
-                    commentTextMap.put(lineNumber, line);
-                }
-                lineNumber++;
+                    System.out.println(temp + "行目 : " + line);
+                    newLineList.add(line);
+                } else if (line.matches(".+\\#.+")) {
+                    System.out.println(temp + "行目 : " + line);
+                    newLineList.add(line);
+                } else if (line.length() == 0) {
+                    System.out.println(temp + "行目 : " + line);
+                    newLineList.add(line);
+                } else {
+                    System.out.println(temp + "行目 : remove");
+                    newLineList.add("remove");
+                }temp++;
             }
 
             //設定データの格納
@@ -546,11 +555,13 @@ public enum ConfigManager {
                     }
                 }
 
-                for (int i = 0;i < commentTextMap.keySet().size()+1; i++) {
-                    if (commentTextMap.get(i) == null) {
-                        commentTextMap.put(i, newLine);
+                int newLineListIndex = 0;
+                for (String newLines : newLineList) {
+                    if (newLines.equalsIgnoreCase("remove")) {
+                        newLineList.set(newLineListIndex, newLine);
                         break;
                     }
+                    newLineListIndex++;
                 }
             }
 
@@ -561,11 +572,9 @@ public enum ConfigManager {
             output = new FileOutputStream(file);
             writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
 
-            for (int i = 0; i < commentTextMap.keySet().size(); i++) {
-                if (commentTextMap.get(i) != null) {
-                    writer.write(commentTextMap.get(i));
-                    writer.newLine();
-                }
+            for (String newLines : newLineList) {
+                writer.write(newLines);
+                writer.newLine();
             }
 
             writer.flush();

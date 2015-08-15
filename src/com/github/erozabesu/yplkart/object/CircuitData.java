@@ -362,7 +362,9 @@ public class CircuitData {
 
         //ランキングデータがない
         if (getRunLapTimeList().size() == 0 && getKartLapTimeList().size() == 0) {
-            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(adress, getCircuitDataName());
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(this.getCircuitDataName());
+            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(adress, circuit);
             return;
         }
 

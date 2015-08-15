@@ -661,7 +661,7 @@ public class Circuit {
      * @param message MessageEnum
      * @param object タグ変換する変数
      */
-    public void sendMessageEntryPlayer(MessageEnum message, Object[] object) {
+    public void sendMessageEntryPlayer(MessageEnum message, Object... object) {
         for (Player p : getEntryPlayer()) {
             message.sendConvertedMessage(p, object);
         }

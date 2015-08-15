@@ -234,10 +234,6 @@ public enum MessageEnum {
         return message;
     }
 
-    public void sendConvertedMessage(Object adress) {
-        sendMessage(adress, getMessage());
-    }
-
     public void sendConvertedMessage(Object adress, Object... object) {
         sendMessage(adress, getConvertedMessage(object));
     }

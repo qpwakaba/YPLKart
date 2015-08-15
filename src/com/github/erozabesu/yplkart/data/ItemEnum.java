@@ -650,7 +650,9 @@ public enum ItemEnum {
         player.getInventory().addItem(itemStack);
         player.updateInventory();
 
-        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuitDataName);
+        Circuit circuit = new Circuit();
+        circuit.setCircuitName(circuitDataName);
+        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuit);
     }
 
     /**

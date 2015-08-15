@@ -112,9 +112,13 @@ public class CircuitConfig {
 
             getInstance().getCircuitDataMap().put(circuitDataName, circuitData);
 
-            MessageEnum.cmdCircuitCreate.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitCreate.sendConvertedMessage(adress, circuit);
         } else {
-            MessageEnum.cmdCircuitAlreadyExist.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitAlreadyExist.sendConvertedMessage(adress, circuit);
         }
     }
 
@@ -142,7 +146,9 @@ public class CircuitConfig {
                 }
             }
 
-            MessageEnum.cmdCircuitDelete.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitDelete.sendConvertedMessage(adress, circuit);
         } else {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(circuitDataName);
@@ -169,7 +175,9 @@ public class CircuitConfig {
 
         //新たな名称のCircuitDataObjectが既に存在している
         } else if (newCircuitData != null) {
-            MessageEnum.cmdCircuitAlreadyExist.sendConvertedMessage(adress, newName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(newName);
+            MessageEnum.cmdCircuitAlreadyExist.sendConvertedMessage(adress, circuit);
 
         } else {
 
@@ -199,7 +207,9 @@ public class CircuitConfig {
                 }
             }
 
-            MessageEnum.cmdCircuitRename.sendConvertedMessage(adress, newName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(newName);
+            MessageEnum.cmdCircuitRename.sendConvertedMessage(adress, circuit);
         }
     }
 
@@ -278,7 +288,9 @@ public class CircuitConfig {
             circuitData.setStartLocation(location);
             circuitData.saveConfiguration();
 
-            MessageEnum.cmdCircuitSetPosition.sendConvertedMessage(adress, circuitDataName);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetPosition.sendConvertedMessage(adress, circuit);
         }
     }
 
@@ -298,8 +310,9 @@ public class CircuitConfig {
             circuitData.setNumberOfLaps(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetLap.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetLap.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -319,14 +332,16 @@ public class CircuitConfig {
 
         //最大プレイ人数を越える値は設定できない
         } else if (circuitData.getMaxPlayer() < newValue) {
-            Object[] messageParts = new Object[] { circuitDataName, circuitData.getMaxPlayer() };
-            MessageEnum.cmdCircuitOutOfMaxPlayer.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitOutOfMaxPlayer.sendConvertedMessage(adress, circuit, circuitData.getMaxPlayer());
         } else {
             circuitData.setMinPlayer(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetMinPlayer.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetMinPlayer.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -346,14 +361,16 @@ public class CircuitConfig {
 
         //最小プレイ人数を下回る数値は設定できない
         } else if (newValue < circuitData.getMinPlayer()) {
-            Object[] messageParts = new Object[] { circuitDataName, circuitData.getMinPlayer() };
-            MessageEnum.cmdCircuitOutOfMinPlayer.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitOutOfMinPlayer.sendConvertedMessage(adress, circuit, circuitData.getMinPlayer());
         } else {
             circuitData.setMaxPlayer(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetMaxPlayer.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetMaxPlayer.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -374,8 +391,9 @@ public class CircuitConfig {
             circuitData.setMatchingTime(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetMatchingTime.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetMatchingTime.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -389,13 +407,16 @@ public class CircuitConfig {
     public static void setMenuTime(Object adress, String circuitDataName, int newValue) {
         CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
         if (circuitData == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(adress);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(adress, circuit);
         } else {
             circuitData.setMenuTime(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetMenuTime.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetMenuTime.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -416,8 +437,9 @@ public class CircuitConfig {
             circuitData.setLimitTime(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetLimitTime.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetLimitTime.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
@@ -438,8 +460,9 @@ public class CircuitConfig {
             circuitData.setBroadcastGoalMessage(newValue);
             circuitData.saveConfiguration();
 
-            Object[] messageParts = new Object[] {circuitDataName, newValue};
-            MessageEnum.cmdCircuitSetBroadcastGoalMessage.sendConvertedMessage(adress, messageParts);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetBroadcastGoalMessage.sendConvertedMessage(adress, circuit, newValue);
         }
     }
 
