@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Material;
@@ -494,7 +493,6 @@ public enum ConfigManager {
         BufferedReader reader = null;
         BufferedWriter writer = null;
 
-        ArrayList<String> newLineList = new ArrayList<String>();
         HashMap<Integer, String> commentTextMap = new HashMap<Integer, String>();
 
         try {
@@ -548,12 +546,12 @@ public enum ConfigManager {
                     }
                 }
 
-                newLineList.add(newLine);
-            }
-
-            //新しいファイルに引き継ぐテキストを行番号の位置に挿入したArrayListを生成
-            for (Integer commentTextIndex : commentTextMap.keySet()) {
-                newLineList.add(commentTextIndex, commentTextMap.get(commentTextIndex));
+                for (int i = 0;i < commentTextMap.keySet().size()+1; i++) {
+                    if (commentTextMap.get(i) == null) {
+                        commentTextMap.put(i, newLine);
+                        break;
+                    }
+                }
             }
 
             //ファイルを再生成しファイルの内容を初期化
@@ -563,9 +561,11 @@ public enum ConfigManager {
             output = new FileOutputStream(file);
             writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
 
-            for (String value : newLineList) {
-                writer.write(value);
-                writer.newLine();
+            for (int i = 0; i < commentTextMap.keySet().size(); i++) {
+                if (commentTextMap.get(i) != null) {
+                    writer.write(commentTextMap.get(i));
+                    writer.newLine();
+                }
             }
 
             writer.flush();
