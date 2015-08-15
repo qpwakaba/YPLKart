@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -495,27 +496,26 @@ public enum ConfigManager {
 
         ArrayList<String> newLineList = new ArrayList<String>();
 
+        //引き継がない行の値を一時的に書き換える際の文字列
+        Date tempDate = new Date();
+        String tempRemoveString = tempDate.toString() + "remove";
+
         try {
             input = new FileInputStream(new File(YPLKart.getInstance().getDataFolder(), file.getName()));
             reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
             //新しいファイルに引き継ぐ行の文字列を格納
             String line;
-            int temp = 0;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("#")) {
-                    System.out.println(temp + "行目 : " + line);
                     newLineList.add(line);
                 } else if (line.matches(".+\\#.+")) {
-                    System.out.println(temp + "行目 : " + line);
                     newLineList.add(line);
                 } else if (line.length() == 0) {
-                    System.out.println(temp + "行目 : " + line);
                     newLineList.add(line);
                 } else {
-                    System.out.println(temp + "行目 : remove");
-                    newLineList.add("remove");
-                }temp++;
+                    newLineList.add(tempRemoveString);
+                }
             }
 
             //設定データの格納
@@ -557,7 +557,7 @@ public enum ConfigManager {
 
                 int newLineListIndex = 0;
                 for (String newLines : newLineList) {
-                    if (newLines.equalsIgnoreCase("remove")) {
+                    if (newLines.equalsIgnoreCase(tempRemoveString)) {
                         newLineList.set(newLineListIndex, newLine);
                         break;
                     }
