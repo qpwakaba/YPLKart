@@ -403,7 +403,7 @@ public class Racer extends PlayerObject{
 
         //クライアントで搭乗が解除されている状態で描画されるのを回避するため
         //issue#109
-        //PacketUtil.sendOwnAttachEntityPacket(player);
+        PacketUtil.sendOwnAttachEntityPacket(player);
     }
 
     public void recoveryCharacter() {
