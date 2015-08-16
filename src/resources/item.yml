@@ -182,8 +182,8 @@ thunder:
   material_data: 8
   max_stack_size: 1
   effect_level: 2
-  effect_second: 3
-  hit_damage: 6
+  effect_second: 2
+  hit_damage: 2
   multiple:
     tier: 0
     drop_amount: 2
