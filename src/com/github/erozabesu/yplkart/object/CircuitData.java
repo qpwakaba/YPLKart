@@ -81,69 +81,69 @@ public class CircuitData {
      * @param circuitDataName サーキット名
      */
     public CircuitData(String circuitDataName) {
-        setCircuitDataName(circuitDataName);
+        this.setCircuitDataName(circuitDataName);
 
         ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
 
-        setWorldName((String) configManager.getString(circuitDataName + ".world"));
-        setLocationX((Double) configManager.getDouble(circuitDataName + ".x"));
-        setLocationY((Double) configManager.getDouble(circuitDataName + ".y"));
-        setLocationZ((Double) configManager.getDouble(circuitDataName + ".z"));
-        setLocationPitch((Float) configManager.getFloat(circuitDataName + ".pitch"));
-        setLocationYaw((Float) configManager.getFloat(circuitDataName + ".yaw"));
+        this.setWorldName(configManager.getString(circuitDataName + ".world"));
+        this.setLocationX(configManager.getDouble(circuitDataName + ".x"));
+        this.setLocationY(configManager.getDouble(circuitDataName + ".y"));
+        this.setLocationZ(configManager.getDouble(circuitDataName + ".z"));
+        this.setLocationPitch(configManager.getFloat(circuitDataName + ".pitch"));
+        this.setLocationYaw(configManager.getFloat(circuitDataName + ".yaw"));
 
-        setNumberOfLaps((Integer) configManager.getInteger(circuitDataName + ".numberoflaps"));
-        setMinPlayer((Integer) configManager.getInteger(circuitDataName + ".minplayer"));
-        setMaxPlayer((Integer) configManager.getInteger(circuitDataName + ".maxplayer"));
-        setMatchingTime((Integer) configManager.getInteger(circuitDataName + ".matchingtime"));
-        setMenuTime((Integer) configManager.getInteger(circuitDataName + ".menutime"));
-        setLimitTime((Integer) configManager.getInteger(circuitDataName + ".limittime"));
-        setBroadcastGoalMessage(configManager.getBoolean(circuitDataName + ".broadcastgoalmessage"));
-        setRunLapTimeList(getLapTimeFromConfiguration(true));
-        setKartLapTimeList(getLapTimeFromConfiguration(false));
+        this.setNumberOfLaps(configManager.getInteger(circuitDataName + ".numberoflaps"));
+        this.setMinPlayer(configManager.getInteger(circuitDataName + ".minplayer"));
+        this.setMaxPlayer(configManager.getInteger(circuitDataName + ".maxplayer"));
+        this.setMatchingTime(configManager.getInteger(circuitDataName + ".matchingtime"));
+        this.setMenuTime(configManager.getInteger(circuitDataName + ".menutime"));
+        this.setLimitTime(configManager.getInteger(circuitDataName + ".limittime"));
+        this.setBroadcastGoalMessage(configManager.getBoolean(circuitDataName + ".broadcastgoalmessage"));
+        this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
+        this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
     }
 
     /** メンバ変数がnullの場合初期値を格納する */
     public void init(Location location) {
-        if (getWorldName() == null) {
-            setWorldName(location.getWorld().getName());
+        if (this.getWorldName() == null) {
+            this.setWorldName(location.getWorld().getName());
         }
-        if (getLocationX() == 0) {
-            setLocationX(location.getX());
+        if (this.getLocationX() == 0) {
+            this.setLocationX(location.getX());
         }
-        if (getLocationY() == 0) {
-            setLocationY(location.getY());
+        if (this.getLocationY() == 0) {
+            this.setLocationY(location.getY());
         }
-        if (getLocationZ() == 0) {
-            setLocationZ(location.getZ());
+        if (this.getLocationZ() == 0) {
+            this.setLocationZ(location.getZ());
         }
-        if (getLocationPitch() == 0) {
-            setLocationPitch(location.getPitch());
+        if (this.getLocationPitch() == 0) {
+            this.setLocationPitch(location.getPitch());
         }
-        if (getLocationYaw() == 0) {
-            setLocationYaw(location.getYaw());
+        if (this.getLocationYaw() == 0) {
+            this.setLocationYaw(location.getYaw());
         }
 
-        if (getNumberOfLaps() == 0) {
-            setNumberOfLaps(3);
+        if (this.getNumberOfLaps() == 0) {
+            this.setNumberOfLaps(3);
         }
-        if (getMinPlayer() == 0) {
-            setMinPlayer(3);
+        if (this.getMinPlayer() == 0) {
+            this.setMinPlayer(3);
         }
-        if (getMaxPlayer() == 0) {
-            setMaxPlayer(10);
+        if (this.getMaxPlayer() == 0) {
+            this.setMaxPlayer(10);
         }
-        if (getMatchingTime() == 0) {
-            setMatchingTime(30);
+        if (this.getMatchingTime() == 0) {
+            this.setMatchingTime(30);
         }
-        if (getMenuTime() == 0) {
-            setMenuTime(30);
+        if (this.getMenuTime() == 0) {
+            this.setMenuTime(30);
         }
-        if (getLimitTime() == 0) {
-            setLimitTime(300);
+        if (this.getLimitTime() == 0) {
+            this.setLimitTime(300);
         }
-        if (getBroadcastGoalMessage() == false) {
-            setBroadcastGoalMessage(false);
+        if (this.getBroadcastGoalMessage() == false) {
+            this.setBroadcastGoalMessage(false);
         }
     }
 
@@ -156,7 +156,7 @@ public class CircuitData {
      */
     public LapTime getRunLapTime(UUID uuid) {
         LapTime lapTimeObject = null;
-        for (LapTime lapTime : getRunLapTimeList()) {
+        for (LapTime lapTime : this.getRunLapTimeList()) {
             if (lapTime.getUuid().equals(uuid)) {
                 lapTimeObject = lapTime;
             }
@@ -171,7 +171,7 @@ public class CircuitData {
      */
     public LapTime getKartLapTime(UUID uuid) {
         LapTime lapTimeObject = null;
-        for (LapTime lapTime : getKartLapTimeList()) {
+        for (LapTime lapTime : this.getKartLapTimeList()) {
             if (lapTime.getUuid().equals(uuid)) {
                 lapTimeObject = lapTime;
             }
@@ -181,12 +181,12 @@ public class CircuitData {
 
     /** @param runLapTime 追加する参加者のランニングレースラップ記録 */
     public void addRunLapTimeList(LapTime runLapTime) {
-        getRunLapTimeList().add(runLapTime);
+        this.getRunLapTimeList().add(runLapTime);
     }
 
     /** @param kartLapTime 追加する参加者のカートレースラップ記録 */
     public void addKartLapTimeList(LapTime kartLapTime) {
-        getKartLapTimeList().add(kartLapTime);
+        this.getKartLapTimeList().add(kartLapTime);
     }
 
     /**
@@ -194,7 +194,7 @@ public class CircuitData {
      * @param uuid 記録を削除するプレイヤーのUUID
      */
     public void removeRunLapTime(UUID uuid) {
-        Iterator<LapTime> iterator = getRunLapTimeList().iterator();
+        Iterator<LapTime> iterator = this.getRunLapTimeList().iterator();
         LapTime lapTimeObject = null;
         while (iterator.hasNext()) {
             lapTimeObject = iterator.next();
@@ -210,7 +210,7 @@ public class CircuitData {
      * @param uuid 記録を削除するプレイヤーのUUID
      */
     public void removeKartLapTime(UUID uuid) {
-        Iterator<LapTime> iterator = getKartLapTimeList().iterator();
+        Iterator<LapTime> iterator = this.getKartLapTimeList().iterator();
         LapTime lapTimeObject = null;
         while (iterator.hasNext()) {
             lapTimeObject = iterator.next();
@@ -250,7 +250,7 @@ public class CircuitData {
         config.setValue(configKey + ".broadcastgoalmessage", getBroadcastGoalMessage());
 
         //ランニングレースラップタイムを設定データに上書き
-        for(LapTime lapTimeObject : getRunLapTimeList()) {
+        for (LapTime lapTimeObject : getRunLapTimeList()) {
             int numberOfLaps = lapTimeObject.getNumberOfLaps();
             String uuid = lapTimeObject.getUuid().toString();
             double lapTime = lapTimeObject.getLapTime();
@@ -259,7 +259,7 @@ public class CircuitData {
         }
 
         //カートレースラップタイムを設定データに上書き
-        for(LapTime lapTimeObject : getKartLapTimeList()) {
+        for (LapTime lapTimeObject : this.getKartLapTimeList()) {
             int numberOfLaps = lapTimeObject.getNumberOfLaps();
             String uuid = lapTimeObject.getUuid().toString();
             double lapTime = lapTimeObject.getLapTime();
@@ -282,27 +282,27 @@ public class CircuitData {
     }
 
     /** 全く同様のメンバ変数を持つオブジェクトを新規に生成し返す */
-    public CircuitData clone() {
+    public CircuitData cloneCircuitData() {
 
         //ローカルファイルへ未保存のメンバ変数がある可能性があるため保存しておく
-        saveConfiguration();
+        this.saveConfiguration();
 
         //新たに生成したオブジェクトを返す
         //コンストラクタから、サーキット名がキーのローカル設定データを読み込むため
         //メンバ変数の代入等は不要
-        return new CircuitData(getCircuitDataName());
+        return new CircuitData(this.getCircuitDataName());
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param location セットするレースの開始座標 */
     public void setStartLocation(Location location) {
-        setWorldName(location.getWorld().getName());
-        setLocationX(location.getX());
-        setLocationY(location.getY());
-        setLocationZ(location.getZ());
-        setLocationPitch(location.getPitch());
-        setLocationYaw(location.getYaw());
+        this.setWorldName(location.getWorld().getName());
+        this.setLocationX(location.getX());
+        this.setLocationY(location.getY());
+        this.setLocationZ(location.getZ());
+        this.setLocationPitch(location.getPitch());
+        this.setLocationYaw(location.getYaw());
     }
 
     /** @return レースの開始座標 */
@@ -314,8 +314,8 @@ public class CircuitData {
         }
 
         return new Location(world
-                , getLocationX(), getLocationY(), getLocationZ()
-                , getLocationYaw(), getLocationPitch());
+                , this.getLocationX(), this.getLocationY(), this.getLocationZ()
+                , this.getLocationYaw(), this.getLocationPitch());
     }
 
     /**
@@ -323,18 +323,22 @@ public class CircuitData {
      * @return レース開始座標List
      */
     public List<Location> getStartLocationList() {
-        Location location = getStartLocation();
-        if (location == null)
+        Location location = this.getStartLocation();
+        if (location == null) {
             return null;
+        }
 
         List<Location> list = new ArrayList<Location>();
         while (list.size() < getMaxPlayer()) {
-            if (!Util.isSolidBlock(location))
+            if (!Util.isSolidBlock(location)) {
                 list.add(location);
-            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, 4)))
+            }
+            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, 4))) {
                 list.add(Util.getSideLocationFromYaw(location, 4));
-            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, -4)))
+            }
+            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, -4))) {
                 list.add(Util.getSideLocationFromYaw(location, -4));
+            }
 
             location = Util.getForwardLocationFromYaw(location, -4);
         }
@@ -347,23 +351,23 @@ public class CircuitData {
      * @param adress ログの送信先
      */
     public void sendInformation(Object adress) {
-        Location l = getStartLocation();
-        boolean flag = getBroadcastGoalMessage();
+        Location l = this.getStartLocation();
+        boolean flag = this.getBroadcastGoalMessage();
         Number[] numberdata = {
-                getNumberOfLaps(), getMinPlayer(), getMaxPlayer()
-                , getLimitTime(), getMenuTime(), getMatchingTime()
+                this.getNumberOfLaps(), this.getMinPlayer(), this.getMaxPlayer()
+                , this.getLimitTime(), this.getMenuTime(), this.getMatchingTime()
                 , l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch() };
 
         Circuit circuit = new Circuit();
         circuit.setCircuitName(this.getCircuitDataName());
         MessageEnum.tableCircuitInformation
-            .sendConvertedMessage(adress, circuit, flag, numberdata);
+                .sendConvertedMessage(adress, circuit, flag, numberdata);
     }
 
     public void sendRanking(Object adress) {
 
         //ランキングデータがない
-        if (getRunLapTimeList().size() == 0 && getKartLapTimeList().size() == 0) {
+        if (this.getRunLapTimeList().size() == 0 && this.getKartLapTimeList().size() == 0) {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(this.getCircuitDataName());
             MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(adress, circuit);
@@ -372,12 +376,14 @@ public class CircuitData {
 
         //ランニングレース
         if (getRunLapTimeList().size() == 0) {
+
             // Do nothing
+
         } else {
             //LapTimeオブジェクトを周回数毎にハッシュマップに格納
             HashMap<Integer, List<LapTime>> lapTimeKeySet = new HashMap<Integer, List<LapTime>>();
 
-            for (LapTime lapTimeObject : getRunLapTimeList()) {
+            for (LapTime lapTimeObject : this.getRunLapTimeList()) {
                 int numberOfLaps = lapTimeObject.getNumberOfLaps();
 
                 if (lapTimeKeySet.get(numberOfLaps) == null) {
@@ -389,7 +395,7 @@ public class CircuitData {
 
             //LapTimeオブジェクトの配列をラップタイムに関して昇順ソート
             for (int numberOfLaps : lapTimeKeySet.keySet()) {
-                Collections.sort(lapTimeKeySet.get(numberOfLaps), new Comparator<LapTime>(){
+                Collections.sort(lapTimeKeySet.get(numberOfLaps), new Comparator<LapTime>() {
                     @Override
                     public int compare(LapTime lapTime1, LapTime lapTime2) {
                         return lapTime1.compareTo(lapTime2);
@@ -413,7 +419,7 @@ public class CircuitData {
                         + " <darkaqua>Laps" + " <darkaqua>======<br>";
 
                 for (int rank = 1; rank <= lapTimeObjectList.size(); rank++) {
-                    LapTime lapTimeObject = lapTimeObjectList.get(rank-1);
+                    LapTime lapTimeObject = lapTimeObjectList.get(rank - 1);
                     String playerName = Bukkit.getOfflinePlayer(lapTimeObject.getUuid()).getName();
 
                     //配列上位10位以内
@@ -439,8 +445,8 @@ public class CircuitData {
                 //ランキング参照者のデータを別枠で書き出す
                 if (adress instanceof Player || adress instanceof UUID) {
                     String playerName = adress instanceof Player
-                            ? ((Player)adress).getName()
-                                    : Bukkit.getOfflinePlayer((UUID) adress).getName();
+                            ? ((Player) adress).getName()
+                            : Bukkit.getOfflinePlayer((UUID) adress).getName();
 
                     if (ownRank != 0 && ownLapSecond != 0) {
                         ranking += "<white>" + playerName + "<green>さんの順位は<yellow>" + ownRank
@@ -456,12 +462,14 @@ public class CircuitData {
 
         //カートレース
         if (getKartLapTimeList().size() == 0) {
+
             // Do nothing
+
         } else {
             //LapTimeオブジェクトを周回数毎にハッシュマップに格納
             HashMap<Integer, List<LapTime>> lapTimeKeySet = new HashMap<Integer, List<LapTime>>();
 
-            for (LapTime lapTimeObject : getKartLapTimeList()) {
+            for (LapTime lapTimeObject : this.getKartLapTimeList()) {
                 int numberOfLaps = lapTimeObject.getNumberOfLaps();
 
                 if (lapTimeKeySet.get(numberOfLaps) == null) {
@@ -473,7 +481,7 @@ public class CircuitData {
 
             //LapTimeオブジェクトの配列をラップタイムに関して昇順ソート
             for (int numberOfLaps : lapTimeKeySet.keySet()) {
-                Collections.sort(lapTimeKeySet.get(numberOfLaps), new Comparator<LapTime>(){
+                Collections.sort(lapTimeKeySet.get(numberOfLaps), new Comparator<LapTime>() {
                     @Override
                     public int compare(LapTime lapTime1, LapTime lapTime2) {
                         return lapTime1.compareTo(lapTime2);
@@ -497,7 +505,7 @@ public class CircuitData {
                         + " <darkaqua>Laps" + " <darkaqua>======<br>";
 
                 for (int rank = 1; rank <= lapTimeObjectList.size(); rank++) {
-                    LapTime lapTimeObject = lapTimeObjectList.get(rank-1);
+                    LapTime lapTimeObject = lapTimeObjectList.get(rank - 1);
                     String playerName = Bukkit.getOfflinePlayer(lapTimeObject.getUuid()).getName();
 
                     //配列上位10位以内
@@ -522,8 +530,8 @@ public class CircuitData {
                 //ランキング参照者のデータを別枠で書き出す
                 if (adress instanceof Player || adress instanceof UUID) {
                     String playerName = adress instanceof Player
-                            ? ((Player)adress).getName()
-                                    : Bukkit.getOfflinePlayer((UUID) adress).getName();
+                            ? ((Player) adress).getName()
+                            : Bukkit.getOfflinePlayer((UUID) adress).getName();
 
                     if (ownRank != 0 && ownLapSecond != 0) {
                         ranking += "<white>" + playerName + "<green>さんの順位は<yellow>" + ownRank
@@ -560,7 +568,7 @@ public class CircuitData {
      * @param isRunningRace ランニングレースかどうか
      * @return LapTimeオブジェクトList
      */
-    private List<LapTime> getLapTimeFromConfiguration (boolean isRunningRace) {
+    private List<LapTime> getLapTimeFromConfiguration(boolean isRunningRace) {
         List<LapTime> lapTimeMap = new ArrayList<LapTime>();
 
         //レースタイプ
@@ -571,7 +579,7 @@ public class CircuitData {
         FileConfiguration config = manager.getLocalConfig();
 
         //<Circuit name>.<Race Type>.<Number of Laps>のセクションを取得
-        String lapKey = getCircuitDataName() + "." + raceTypeKey;
+        String lapKey = this.getCircuitDataName() + "." + raceTypeKey;
         ConfigurationSection lapSection = config.getConfigurationSection(lapKey);
 
         //存在しないセクションであれば空のListを返す
@@ -600,82 +608,82 @@ public class CircuitData {
 
     /** @return configKey サーキット名 */
     public String getCircuitDataName() {
-        return circuitDataName;
+        return this.circuitDataName;
     }
 
     /** @return ワールド名 */
     public String getWorldName() {
-        return worldName;
+        return this.worldName;
     }
 
     /** @return locationX x座標 */
     public double getLocationX() {
-        return locationX;
+        return this.locationX;
     }
 
     /** @return locationY y座標 */
     public double getLocationY() {
-        return locationY;
+        return this.locationY;
     }
 
     /** @return locationZ z座標 */
     public double getLocationZ() {
-        return locationZ;
+        return this.locationZ;
     }
 
     /** @return locationYaw Yaw */
     public float getLocationYaw() {
-        return locationYaw;
+        return this.locationYaw;
     }
 
     /** @return locationPitch Pitch */
     public float getLocationPitch() {
-        return locationPitch;
+        return this.locationPitch;
     }
 
     /** @return numberOfLaps 周回数 */
     public int getNumberOfLaps() {
-        return numberOfLaps;
+        return this.numberOfLaps;
     }
 
     /** @return minPlayer 最小プレイ人数 */
     public int getMinPlayer() {
-        return minPlayer;
+        return this.minPlayer;
     }
 
     /** @return maxPlayer 最大プレイ人数 */
     public int getMaxPlayer() {
-        return maxPlayer;
+        return this.maxPlayer;
     }
 
     /** @return matchingTime マッチング猶予時間 */
     public int getMatchingTime() {
-        return matchingTime;
+        return this.matchingTime;
     }
 
     /** @return menuTime メニュー選択猶予時間 */
     public int getMenuTime() {
-        return menuTime;
+        return this.menuTime;
     }
 
     /** @return limitTime レース終了までのタイムリミット */
     public int getLimitTime() {
-        return limitTime;
+        return this.limitTime;
     }
 
     /** @return broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
     public boolean getBroadcastGoalMessage() {
-        return broadcastGoalMessage;
+        return this.broadcastGoalMessage;
     }
 
     /** @return runLapTime 参加者のランニングレースラップ記録 */
     public List<LapTime> getRunLapTimeList() {
-        return runLapTime;
+        return this.runLapTime;
     }
 
     /** @return kartLapTime 参加者のカートレースラップ記録 */
     public List<LapTime> getKartLapTimeList() {
-        return kartLapTime;
+        return this.kartLapTime;
     }
 
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

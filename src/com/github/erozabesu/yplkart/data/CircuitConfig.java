@@ -182,7 +182,7 @@ public class CircuitConfig {
         } else {
 
             //既存のオブジェクトのメンバ変数を引き継いだ新たなオブジェクトを生成
-            newCircuitData = oldCircuitData.clone();
+            newCircuitData = oldCircuitData.cloneCircuitData();
 
             //新たなキーに名称を変更
             newCircuitData.setCircuitDataName(newName);
@@ -233,7 +233,7 @@ public class CircuitConfig {
         UUID uuid = player.getUniqueId();
         LapTime newLapTimeObject = new LapTime(circuitData.getNumberOfLaps(), uuid, lapTime);
         LapTime oldLapTimeObject = isKartRace
-                ? circuitData.getKartLapTime(uuid) : circuitData.getRunLapTime(uuid);;
+                ? circuitData.getKartLapTime(uuid) : circuitData.getRunLapTime(uuid);
 
         //プレイヤーの記録が既に存在している
         if (oldLapTimeObject != null) {
