@@ -98,11 +98,11 @@ public class KartUtil extends ReflectionUtil {
         BukkitTask livingCheckTask =
             Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
                 public void run() {
-                    int lastTicksLived = (Integer) invoke(Methods.Ypl_getLastTicksLived, nmsEntityKart);
-                    invoke(Methods.Ypl_setLastTicksLived, nmsEntityKart, lastTicksLived + 1);
+                    int entityId = (Integer) ReflectionUtil.invoke(Methods.nmsEntity_getId, nmsEntityKart);
+                    Object nmsWorld = ReflectionUtil.invoke(Methods.nmsEntity_getWorld, nmsEntityKart);
 
-                    if (lastTicksLived == (Integer) getFieldValue(Fields.nmsEntity_ticksLived, nmsEntityKart)) {
-                        RaceManager.removeKartEntityIdMap((Integer) invoke(Methods.nmsEntity_getId, nmsEntityKart));
+                    if (isDead(entityId, nmsWorld)) {
+                        RaceManager.removeKartEntityIdMap(entityId);
                         ((BukkitTask) invoke(Methods.Ypl_getLivingCheckTask, nmsEntityKart)).cancel();
                     }
                 }
@@ -1003,6 +1003,17 @@ public class KartUtil extends ReflectionUtil {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
         return Util.getGroundBlockID(location).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+    }
+
+    /**
+     * 引数nmsEntityKartがデスポーンしているかどうかを返す
+     * @param nmsEntityKart 判別するNmsEntity
+     * @return 引数nmsEntityKartがデスポーンしているかどうか
+     */
+    public static boolean isDead(int entityId, Object nmsWorld) {
+        Object nmsEntityKart = ReflectionUtil.invoke(Methods.nmsWorld_getNmsEntityById, nmsWorld, entityId);
+
+        return nmsEntityKart == null;
     }
 
     /**

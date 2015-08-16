@@ -83,18 +83,6 @@ public class CustomArmorStand extends EntityArmorStand {
      */
     private BukkitTask livingCheckTask;
 
-    /**
-     * 1チック前のticksLivedの値を格納する
-     * livingCheckTaskで利用する<br>
-     * エンティティが自然消滅した場合、メンバ変数の値は変更されないまま消滅する<br>
-     * そのため、deadフラグやisAlive()メソッドは生前の値のまま放置され、<br>
-     * 消滅後でもdeadフラグはfalseであり、isAlive()メソッドはtrueを返す<br>
-     * 同様に何チック生存したかを示すticksLivedも消滅後は値が変更されなくなるため、<br>
-     * ticksLivedが1チック前と同じ値を示した場合、エンティティの消滅を確認することができる<br>
-     * この変数はその確認を行うために宣言している
-     */
-    private int lastTicksLived = -2;
-
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public CustomArmorStand(World world, Kart kart, KartType kartType, Location location) {
@@ -254,11 +242,6 @@ public class CustomArmorStand extends EntityArmorStand {
         return livingCheckTask;
     }
 
-    /** @return lastTicksLived 1チック前のticksLived */
-    public int getLastTicksLived() {
-        return lastTicksLived;
-    }
-
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param groundFrictionX Xモーションの地面での摩擦係数 */
@@ -344,10 +327,5 @@ public class CustomArmorStand extends EntityArmorStand {
     /** @param livingCheckTask 生存チェックタスク */
     public void setLivingCheckTask(BukkitTask livingCheckTask) {
         this.livingCheckTask = livingCheckTask;
-    }
-
-    /** @param lastTicksLived 1チック前のticksLived */
-    public void setLastTicksLived(int lastTicksLived) {
-        this.lastTicksLived = lastTicksLived;
     }
 }

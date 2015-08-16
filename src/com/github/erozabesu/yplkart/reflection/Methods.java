@@ -34,6 +34,13 @@ public class Methods extends ReflectionUtil {
     public static Method nmsWorld_getEntities = getMethod(Classes.nmsWorld, "getEntities", Classes.nmsEntity, Classes.nmsAxisAlignedBB);
 
     /**
+     * 引数IntegerのIDを持つNmsEntityを返す
+     * @param EntityId
+     * @return NmsEntity
+     */
+    public static Method nmsWorld_getNmsEntityById = getMethod(Classes.nmsWorld, "a", int.class);
+
+    /**
      * 引数NmsEntityをスポーンさせる
      * @param Instance NmsEntityをスポーンさせるNmsWorld
      * @param NmsEntity スポーンさせるNmsEntity
@@ -340,7 +347,6 @@ public class Methods extends ReflectionUtil {
     public static Method Ypl_getKillerPassedCheckPointList = getMethod(Classes.yplCustomKart, "getKillerPassedCheckPointList");
     public static Method Ypl_getKillerLastPassedCheckPoint = getMethod(Classes.yplCustomKart, "getKillerLastPassedCheckPoint");
     public static Method Ypl_getLivingCheckTask = getMethod(Classes.yplCustomKart, "getLivingCheckTask");
-    public static Method Ypl_getLastTicksLived = getMethod(Classes.yplCustomKart, "getLastTicksLived");
 
     public static Method Ypl_setGroundFrictionX = getMethod(Classes.yplCustomKart, "setGroundFrictionX", double.class);
     public static Method Ypl_setGroundFrictionY = getMethod(Classes.yplCustomKart, "setGroundFrictionY", double.class);
@@ -359,5 +365,4 @@ public class Methods extends ReflectionUtil {
     public static Method Ypl_setKillerPassedCheckPointList = getMethod(Classes.yplCustomKart, "setKillerPassedCheckPointList", List.class);
     public static Method Ypl_setKillerLastPassedCheckPoint = getMethod(Classes.yplCustomKart, "setKillerLastPassedCheckPoint", Entity.class);
     public static Method Ypl_setLivingCheckTask = getMethod(Classes.yplCustomKart, "setLivingCheckTask", BukkitTask.class);
-    public static Method Ypl_setLastTicksLived = getMethod(Classes.yplCustomKart, "setLastTicksLived", int.class);
 }

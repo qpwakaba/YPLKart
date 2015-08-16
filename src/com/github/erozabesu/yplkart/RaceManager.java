@@ -100,6 +100,7 @@ public class RaceManager {
      * @return 引数entityIdをEntityIDとして持つエンティティがカートエンティティかどうか
      */
     public static boolean isKartEntityByEntityId(int entityId) {
+
         return kartEntityIdMap.keySet().contains(entityId);
     }
 
