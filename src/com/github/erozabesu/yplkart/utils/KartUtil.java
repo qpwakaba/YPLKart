@@ -328,7 +328,7 @@ public class KartUtil extends ReflectionUtil {
          * 現在座標のテレポートパケットを送信する
          * 描画位置の細かい計算は、パケットの送信をPlayerChannelHandlerがフックし行うためここでは送信するのみ
          */
-        PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
+        //PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
     }
 
     /**
@@ -1041,7 +1041,7 @@ public class KartUtil extends ReflectionUtil {
         }
 
         //Y座標のオフセット
-        double offsetY = -0.5D + kartObject.getMountPositionOffset();
+        double offsetY = -0.25D + kartObject.getMountPositionOffset();
 
         //オフセットを適用したY座標
         double newLocationY = location.getY() + offsetY;
