@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
@@ -318,6 +319,13 @@ public class KartUtil extends ReflectionUtil {
         setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, motY *= 0.9800000190734863D);
         //setMotionX(getMotionX() * groundFriction);
         //setMotionZ(getMotionZ() * groundFriction);
+
+        /*
+         * カートエンティティの描画位置をkart.ymlのmount_position_offsetの位置に強制描画させるため、
+         * 現在座標のテレポートパケットを送信する
+         * 描画位置の細かい計算は、パケットの送信をPlayerChannelHandlerがフックし行うためここでは送信するのみ
+         */
+        PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
     }
 
     /**
@@ -992,5 +1000,47 @@ public class KartUtil extends ReflectionUtil {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
         return Util.getGroundBlockID(location).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+    }
+
+    /**
+     * カートエンティティのY方向の描画位置をkart.ymlのmount_position_offsetの値に応じて調整した座標を返す
+     * @return 調整後の座標
+     */
+    public static Location getMountPositionAdjustedLocation(Entity kartEntity) {
+        Kart kartObject = RaceManager.getKartObjectByEntityMetaData(kartEntity);
+        Location location = kartEntity.getLocation();
+
+        /*
+         * カートエンティティ直下の直近のソリッドブロック、及びその座標
+         * カートと接触するBoundingBoxの面の正確な座標が必要なため、NmsBlockから取得したブロックの高さを
+         * 座標から減算する
+         */
+        Block groundBlock = Util.getGroundBlock(location);
+        Location groundBlockLocation;
+        if (groundBlock == null) {
+            groundBlockLocation = location;
+        } else {
+            Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
+            groundBlockLocation = groundBlock.getLocation();
+            groundBlockLocation.add(
+                    0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+        }
+
+        //Y座標のオフセット
+        double offsetY = -0.5D + kartObject.getMountPositionOffset();
+
+        //オフセットを適用したY座標
+        double newLocationY = location.getY() + offsetY;
+
+        /*
+         * この時点でカートエンティティのY座標と地面との距離は必ずoffsetYの値になるはずだが、
+         * 半ブロック等を通過時にズレが生じるため、距離が必ずoffsetYの値になるように調整する
+         */
+        offsetY -= newLocationY - groundBlockLocation.getY();
+        newLocationY += offsetY;
+
+        location.setY(newLocationY);
+
+        return location;
     }
 }
