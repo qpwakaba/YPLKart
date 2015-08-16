@@ -18,10 +18,12 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class Racer extends PlayerObject{
@@ -156,6 +158,13 @@ public class Racer extends PlayerObject{
         Util.createSignalFireworks(getPlayer().getLocation());
         Util.createFlowerShower(getPlayer(), 20);
 
+        //偽装するために仮想スポーンさせているNmsEntityをデスポーンさせる
+        if (this.getDisguisedNmsEntity() != null) {
+            Entity disguisedEntity =
+                    (Entity) ReflectionUtil.invoke(Methods.nmsEntity_getBukkitEntity, this.getDisguisedNmsEntity());
+            PacketUtil.sendEntityDestroyPacket(null, disguisedEntity);
+        }
+
         //リザルトメッセージの送信
         this.sendResult();
 
@@ -164,10 +173,10 @@ public class Racer extends PlayerObject{
 
         //初期化 順序に注意
         this.setStart(false);
-        RaceManager.clearCharacterRaceData(this.getUUID());
         RaceManager.clearKartRaceData(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
         this.recoveryAll();
+        RaceManager.clearCharacterRaceData(this.getUUID());
     }
 
     /**
