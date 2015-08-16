@@ -249,8 +249,9 @@ public class CircuitConfig {
 
                 //テキストメッセージの送信
                 Number[] messagePartsLapTime = new Number[] { oldLapTimeObject.getLapTime(), lapTime };
-                MessageEnum.raceHighScore.sendConvertedMessage(player
-                        , new Object[] { circuitDataName, messagePartsLapTime });
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(circuitDataName);
+                MessageEnum.raceHighScore.sendConvertedMessage(player, circuit, messagePartsLapTime);
             } else {
                 //記録の更新がない場合は何もしない
                 return;
