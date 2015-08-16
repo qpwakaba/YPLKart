@@ -219,6 +219,9 @@ public class Circuit {
                 RaceManager.showSelectMenu(player, true);
                 ItemEnum.addItem(player, ItemEnum.MENU.getItem());
 
+                //ToggleSneakMOD対策 : issue #150
+                player.setSneaking(false);
+
                 count++;
                 continue;
             }
