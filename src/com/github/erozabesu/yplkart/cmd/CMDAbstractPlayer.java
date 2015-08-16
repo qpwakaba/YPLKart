@@ -378,7 +378,9 @@ public class CMDAbstractPlayer extends CMDAbstract {
                     return;
                 }
                 Player other = Bukkit.getPlayer(getArgs()[1]);
-                MessageEnum.cmdEntryOther.sendConvertedMessage(this.getPlayer(), new Object[] { other, getArgs()[2] });
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(getArgs()[2]);
+                MessageEnum.cmdEntryOther.sendConvertedMessage(this.getPlayer(), circuit, other);
                 RaceManager.setEntryRaceData(other.getUniqueId(), getArgs()[2]);
             }
         } else {

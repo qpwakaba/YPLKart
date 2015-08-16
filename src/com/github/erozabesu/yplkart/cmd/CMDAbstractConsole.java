@@ -225,7 +225,9 @@ public class CMDAbstractConsole extends CMDAbstract {
                     return;
                 }
 
-                MessageEnum.cmdEntryOther.sendConvertedMessage(null, new Object[] { other, args[2] });
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(args[2]);
+                MessageEnum.cmdEntryOther.sendConvertedMessage(null, other, circuit);
                 RaceManager.setEntryRaceData(other.getUniqueId(), args[2]);
             }
         } else {
