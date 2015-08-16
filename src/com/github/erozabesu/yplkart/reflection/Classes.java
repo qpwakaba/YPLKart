@@ -32,6 +32,7 @@ public class Classes extends ReflectionUtil{
     public static Class<?> nmsPacketPlayInSteerVehicle = getNMSClass("PacketPlayInSteerVehicle");
     public static Class<?> nmsPacketPlayInUseEntity = getNMSClass("PacketPlayInUseEntity");
     public static Class<?> nmsPacketPlayOutAttachEntity = getNMSClass("PacketPlayOutAttachEntity");
+    public static Class<?> nmsPacketPlayOutChat = getNMSClass("PacketPlayOutChat");
     public static Class<?> nmsPacketPlayOutEntityDestroy = getNMSClass("PacketPlayOutEntityDestroy");
     public static Class<?> nmsPacketPlayOutEntityEquipment = getNMSClass("PacketPlayOutEntityEquipment");
     public static Class<?> nmsPacketPlayOutEntityLook = null;

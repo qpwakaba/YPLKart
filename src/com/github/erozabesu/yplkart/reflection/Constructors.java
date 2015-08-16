@@ -28,6 +28,12 @@ public class Constructors extends ReflectionUtil{
     public static Constructor<?> nmsVector3f = getConstructor(Classes.nmsVector3f, float.class, float.class, float.class);
 
     /**
+     * @param NmsIChatBaseComponent
+     * @param Byte
+     */
+    public static Constructor<?> nmsPacketPlayOutChat = getConstructor(Classes.nmsPacketPlayOutChat, Classes.nmsIChatBaseComponent, byte.class);
+
+    /**
      * @param Integer
      * @param NmsEntity
      * @param NmsEntity

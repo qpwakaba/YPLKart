@@ -271,7 +271,7 @@ public class Methods extends ReflectionUtil {
      * @param String 変換する文字列
      * @return 取得したIChatBaseComponent
      */
-    public static Method static_nmsChatSerializer_buildTitle = getMethod(Classes.nmsChatSerializer, "a", String.class);
+    public static Method static_nmsChatSerializer_buildNmsIChatBaseComponent = getMethod(Classes.nmsChatSerializer, "a", String.class);
 
     /**
      * 引数IntegerをIDにもつNmsBlockを返す

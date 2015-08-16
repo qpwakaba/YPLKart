@@ -78,11 +78,6 @@ public class PacketUtil extends ReflectionUtil {
 
     //〓 Send Packet 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /*
-     * job.getCraftClassName()で得られるエンティティの姿にpを変身させます
-     * targetプレイヤーに向けパケットを送信します
-     * targetがnullの場合全プレイヤーに送信します
-     */
     /**
      * 引数disguisePlayerの姿を引数nmsEntityClassに偽装するパケットを引数adressに送信する
      * @param adress パケット送信対象
@@ -201,6 +196,17 @@ public class PacketUtil extends ReflectionUtil {
             if (bootspacket != null)
                 sendPacket(other, bootspacket);
         }
+    }
+
+    /**
+     * 引数adressに引数textの文字列をアクションバーに表示するパケットを送信する
+     * @param adress 送信対象
+     * @param text 送信するメッセージ
+     */
+    public static void sendActionBar(Player adress, String text) {
+        Object actionBarPacket = getActionBarPacket(text);
+
+        sendPacket(adress, actionBarPacket);
     }
 
     public static void sendTitle(Player p, String text, int fadein, int length, int fadeout, boolean issubtitle) {
@@ -359,11 +365,23 @@ public class PacketUtil extends ReflectionUtil {
                 invoke(Methods.static_craftItemStack_asNMSCopy, null, equipment));
     }
 
+    /**
+     * 引数textの文字列をアクションバーに表示するパケットを返す
+     * @param text 表示するメッセージ
+     * @return 引数textの文字列をアクションバーに表示するパケット
+     */
+    private static Object getActionBarPacket(String text) {
+        Object actionBar = invoke(Methods.static_nmsChatSerializer_buildNmsIChatBaseComponent,
+                null, "{\"text\": \"" + text + "\"}");
+
+        return newInstance(Constructors.nmsPacketPlayOutChat, actionBar, (byte) 2);
+    }
+
     private static Object getTitlePacket(String text, boolean issubtitle) {
         ChatColor color = Util.getChatColorFromText(text);
         text = ChatColor.stripColor(text);
 
-        Object title = invoke(Methods.static_nmsChatSerializer_buildTitle,
+        Object title = invoke(Methods.static_nmsChatSerializer_buildNmsIChatBaseComponent,
                 null, "{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
 
         return newInstance(Constructors.nmsPacketPlayOutTitle, issubtitle ?

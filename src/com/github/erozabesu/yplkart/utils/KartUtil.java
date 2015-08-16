@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -278,7 +279,9 @@ public class KartUtil extends ReflectionUtil {
             playDriftEffect(player, location, speedStack);
 
             //スピードメーター
-            player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
+            int motionSpeed = (int) (calcMotionSpeed(motX, motZ) * 564.0D);
+            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED : " + ChatColor.BOLD.toString() + motionSpeed);
+            //player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
         }
 
         //はしご、つたのようなよじ登れるブロックに立っている場合
