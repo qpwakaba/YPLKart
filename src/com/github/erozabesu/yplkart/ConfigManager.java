@@ -575,6 +575,14 @@ public enum ConfigManager {
                 }
             }
 
+            /*
+             * コンフィグからデータの削除が行われていた場合、リプレイス用テキストは置き換えられず、
+             * この時点でも残っているため削除
+             */
+            while (newLineList.contains(tempRemoveString)) {
+                newLineList.remove(tempRemoveString);
+            }
+
             //ファイルを再生成しファイルの内容を初期化
             file.delete();
             file.createNewFile();
