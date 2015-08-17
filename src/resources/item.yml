@@ -66,13 +66,13 @@
 #       drop_amount :
 #         ドロップする数量を指定して下さい。
 #
-#   display_block_material :
+#   display_material :
 #     設置タイプのアイテムの外見に割り当てるアイテムを変更します。
 #     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。
 #     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 #     なお、大文字小文字は考慮しません。
 #
-#   display_block_material_data :
+#   display_material_data :
 #     設置タイプのアイテムの外見に割り当てるアイテムのデータ値を変更します。
 #     例えばイカ墨を利用したい場合は、
 #       display_material: INK_SACK
