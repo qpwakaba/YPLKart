@@ -320,18 +320,18 @@ public enum MessageEnum {
         message = message.replace("<header>", header.getMessage());
         message = message.replace("<circuitheader>", circuitheader.getMessage());
         message = message.replace("<plugin>", YPLKart.PLUGIN_NAME);
-        if (ItemEnum.getItemListString() != null) {
-            message = message.replace("<itemlist>", ItemEnum.getItemListString().toLowerCase());
-        }
-        if (CircuitConfig.getCircuitListString() != null) {
-            message = message.replace("<circuitlist>", CircuitConfig.getCircuitListString());
-        }
-        if (CharacterConfig.getCharacterListString() != null) {
-            message = message.replace("<characterlist>", CharacterConfig.getCharacterListString());
-        }
-        if (KartConfig.getKartListString() != null) {
-            message = message.replace("<kartlist>", KartConfig.getKartListString());
-        }
+
+        String itemList = ItemEnum.getItemListString();
+        message = message.replace("<itemlist>", itemList == null ? "" : itemList);
+
+        String circuitList = CircuitConfig.getCircuitListString();
+        message = message.replace("<circuitlist>", circuitList == null ? "" : circuitList);
+
+        String characterList = CharacterConfig.getCharacterListString();
+        message = message.replace("<characterlist>", characterList == null ? "" : characterList);
+
+        String kartList = KartConfig.getKartListString();
+        message = message.replace("<kartlist>", kartList == null ? "" : kartList);
 
         return message;
     }
