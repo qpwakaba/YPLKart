@@ -515,7 +515,7 @@ public class CircuitConfig {
      * @return 削除に成功したかどうか
      */
     public static boolean removeCircuitData(String circuitDataName) {
-        if (!getCircuitDataMap().containsKey(circuitDataName)) {
+        if (getCircuitDataMap().containsKey(circuitDataName)) {
             getCircuitDataMap().remove(circuitDataName);
             return true;
         }
