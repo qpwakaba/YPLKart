@@ -137,6 +137,11 @@ public class CustomArmorStand extends EntityArmorStand {
         KartUtil.livingUpdate(this);
     }
 
+    /**
+     * 水流に接触しているかどうかを判別し、フラグ、及びモーションの適用<br>
+     * ディスプレイカートの場合、水流で動いてしまうため何もせずreturn falseする
+     * @return 水に接触しているかどうか
+     */
     @Override
     public boolean W() {
         if (this.getKartType().equals(KartType.DisplayKart)) {
