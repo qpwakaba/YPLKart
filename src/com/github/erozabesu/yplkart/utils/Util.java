@@ -432,6 +432,7 @@ public class Util extends ReflectionUtil {
         return Bukkit.getPlayer(id) != null;
     }
 
+    @Deprecated
     public static boolean isNumber(String number) {
         try {
             Integer.parseInt(number);
@@ -448,6 +449,48 @@ public class Util extends ReflectionUtil {
                     return false;
                 }
             }
+        }
+    }
+
+    /**
+     * 引数numberがIntegerに変換できるかどうかを返す
+     * @param number 調べるString
+     * @return 引数numberがIntegerに変換できるかどうか
+     */
+    public static boolean isInteger(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 引数numberがFloatに変換できるかどうかを返す
+     * @param number 調べるString
+     * @return 引数numberがFloatに変換できるかどうか
+     */
+    public static boolean isFloat(String number) {
+        try {
+            Float.parseFloat(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 引数numberがDoubleに変換できるかどうかを返す
+     * @param number 調べるString
+     * @return 引数numberがDoubleに変換できるかどうか
+     */
+    public static boolean isDouble(String number) {
+        try {
+            Double.parseDouble(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
