@@ -280,7 +280,7 @@ public class KartUtil extends ReflectionUtil {
 
             //スピードメーター
             int motionSpeed = (int) (calcMotionSpeed(motX, motZ) * 564.0D);
-            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED : " + ChatColor.BOLD.toString() + motionSpeed);
+            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + motionSpeed);
             //player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
         }
 
