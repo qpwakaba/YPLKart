@@ -71,6 +71,9 @@ public class CircuitConfig {
 
             putCircuitData(circuitDataName, circuitData);
 
+            //MessageEnumのメンバ変数を更新 : issue #154
+            MessageEnum.reload();
+
             Circuit circuit = new Circuit();
             circuit.setCircuitName(circuitDataName);
             MessageEnum.cmdCircuitCreate.sendConvertedMessage(adress, circuit);
