@@ -59,9 +59,11 @@ public class KartUtil extends ReflectionUtil {
             }
         }
 
-        //ディスプレイカートの場合何もしない
+        //ディスプレイカートの場合モーションを0に固定
         if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.DisplayKart)) {
-            // Do nothing
+            setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, 0.0D);
+            setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, 0.0D);
+            setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, 0.0D);
 
         //ディスプレイカート以外
         } else {

@@ -137,6 +137,15 @@ public class CustomArmorStand extends EntityArmorStand {
         KartUtil.livingUpdate(this);
     }
 
+    @Override
+    public boolean W() {
+        if (this.getKartType().equals(KartType.DisplayKart)) {
+            return false;
+        } else {
+            return super.W();
+        }
+    }
+
     /** エンティティ同士の衝突 */
     @Override
     public void collide(Entity entity) {
