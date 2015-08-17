@@ -108,6 +108,9 @@ public class CircuitConfig {
                 }
             }
 
+            //MessageEnumのメンバ変数を更新 : issue #154
+            MessageEnum.reload();
+
             Circuit circuit = new Circuit();
             circuit.setCircuitName(circuitDataName);
             MessageEnum.cmdCircuitDelete.sendConvertedMessage(adress, circuit);
@@ -168,6 +171,9 @@ public class CircuitConfig {
                         entity.setCustomName(entity.getCustomName().replace(oldName, newName));
                 }
             }
+
+            //MessageEnumのメンバ変数を更新 : issue #154
+            MessageEnum.reload();
 
             Circuit circuit = new Circuit();
             circuit.setCircuitName(newName);
