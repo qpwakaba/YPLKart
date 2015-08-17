@@ -105,7 +105,7 @@ public class CircuitData {
 
     /** メンバ変数がnullの場合初期値を格納する */
     public void init(Location location) {
-        if (this.getWorldName() == null) {
+        if (this.getWorldName() == "") {
             this.setWorldName(location.getWorld().getName());
         }
         if (this.getLocationX() == 0) {

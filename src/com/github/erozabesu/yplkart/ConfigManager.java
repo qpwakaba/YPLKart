@@ -329,7 +329,7 @@ public enum ConfigManager {
      * @param newValue 新しい値
      */
     public void setValue(String configKey, Object newValue) {
-        getLocalConfig().set(configKey, newValue);
+        this.getLocalConfig().set(configKey, newValue);
     }
 
     //〓 file edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -479,7 +479,7 @@ public enum ConfigManager {
     /** 設定データをローカルに保存する */
     public void saveConfiguration() {
         File file = getLocalConfigFile();
-        FileConfiguration config = getLocalConfig();
+        FileConfiguration config = this.getLocalConfig();
 
         //コンフィグファイルが無い場合新規作成する
         if (!file.exists()) {

@@ -1,8 +1,9 @@
 package com.github.erozabesu.yplkart.data;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -27,60 +28,19 @@ import com.github.erozabesu.yplkart.object.LapTime;
 public class CircuitConfig {
 
     /** RaceDataオブジェクトを格納しているハッシュマップ */
-    private HashMap<String, CircuitData> circuitDataMap = new HashMap<String, CircuitData>();
+    private static HashMap<String, CircuitData> circuitDataMap = new HashMap<String, CircuitData>();
 
     //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** このクラスのインスタンス */
-    private static CircuitConfig instance;
-
-    /**
-     * このクラスのインスタンスを返す
-     * @return CircuitConfig.classインスタンス
-     */
-    private static CircuitConfig getInstance() {
-        return instance;
-    }
-
-    /**
-     * コンストラクタ
+    /*
+     * コンストラクタは使用禁止
      * コンフィグの読み込みはstatic.reload()メソッドで明示的に行う
      * static.reload()はConfigManager.reload()から実行される
-     * ややこしくなるため他のConfigクラスと同様の手順を踏む
      */
-    public CircuitConfig() {
-        instance = this;
-    }
+    /*public CircuitConfig() {
+    }*/
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @return CircuitDataオブジェクトを格納しているハッシュマップ */
-    public HashMap<String, CircuitData> getCircuitDataMap() {
-        return this.circuitDataMap;
-    }
-
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param circuitDataMap CircuitDataオブジェクトを格納しているハッシュマップ */
-    public void setCircuitDataMap(HashMap<String, CircuitData> circuitDataMap) {
-        this.circuitDataMap = circuitDataMap;
-    }
-
-    //〓 static data edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * 引数circuitDataNameに対応するCircuitDataオブジェクトを返す
-     * @param circuitDataName サーキット名
-     * @return CircuitDataオブジェクト
-     */
-    public static CircuitData getCircuitData(String circuitDataName) {
-        for (String mapKey : getInstance().getCircuitDataMap().keySet()) {
-            if (mapKey.equalsIgnoreCase(circuitDataName)) {
-                return getInstance().getCircuitDataMap().get(mapKey);
-            }
-        }
-        return null;
-    }
+    //〓 Data Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 設定データを再読み込みする
@@ -88,11 +48,10 @@ public class CircuitConfig {
      * 新規にオブジェクトを生成しハッシュマップに格納する
      */
     public static void reload() {
-        CircuitConfig instance = getInstance();
-        instance.circuitDataMap.clear();
+        clearCircuitData();
 
         for(String configKey : ConfigManager.RACEDATA_CONFIG.getLocalConfig().getKeys(false)) {
-            instance.circuitDataMap.put(configKey, new CircuitData(configKey));
+            putCircuitData(configKey, new CircuitData(configKey));
         }
     }
 
@@ -110,7 +69,7 @@ public class CircuitConfig {
             circuitData.init(location);
             circuitData.saveConfiguration();
 
-            getInstance().getCircuitDataMap().put(circuitDataName, circuitData);
+            putCircuitData(circuitDataName, circuitData);
 
             Circuit circuit = new Circuit();
             circuit.setCircuitName(circuitDataName);
@@ -133,7 +92,7 @@ public class CircuitConfig {
         if (circuitData != null) {
 
             //ハッシュマップから削除
-            getInstance().getCircuitDataMap().remove(circuitDataName);
+            removeCircuitData(circuitDataName);
 
             //ローカルファイルから削除
             circuitData.deleteConfiguration();
@@ -191,10 +150,10 @@ public class CircuitConfig {
             newCircuitData.saveConfiguration();
 
             //ハッシュマップに追加
-            getInstance().getCircuitDataMap().put(newName, newCircuitData);
+            putCircuitData(newName, newCircuitData);
 
             //古いCircuitDataオブジェクトをハッシュマップから削除
-            getInstance().getCircuitDataMap().remove(oldName);
+            removeCircuitData(oldName);
 
             //古いCircuitDataオブジェクトをローカルファイルから削除
             oldCircuitData.deleteConfiguration();
@@ -469,28 +428,6 @@ public class CircuitConfig {
 
     //〓 static util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** @return CircuitDataオブジェクトキーのList */
-    public static List<String> getCircuitList() {
-        List<String> list = new ArrayList<String>();
-        for (String key : getInstance().getCircuitDataMap().keySet()) {
-            list.add(key);
-        }
-        return list;
-    }
-
-    /** @return CircuitDataオブジェクトキーのListString */
-    public static String getCircuitListString() {
-        String list = null;
-        for (String key : getInstance().getCircuitDataMap().keySet()) {
-            if (list == null) {
-                list = key;
-            } else {
-                list += ", " + key;
-            }
-        }
-        return list;
-    }
-
     /**
      * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
      * 走行記録をランキング形式で引数adressへ送信する
@@ -507,5 +444,84 @@ public class CircuitConfig {
         }
 
         circuitData.sendRanking(adress);
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return CircuitDataオブジェクトを格納しているハッシュマップ */
+    public static HashMap<String, CircuitData> getCircuitDataMap() {
+        return circuitDataMap;
+    }
+
+    /**
+     * 引数circuitDataNameに対応するCircuitDataオブジェクトを返す
+     * @param circuitDataName 取得するCircuitDataオブジェクト名
+     * @return CircuitDataオブジェクト
+     */
+    public static CircuitData getCircuitData(String circuitDataName) {
+        return getCircuitDataMap().get(circuitDataName);
+    }
+
+    /** @return CircuitDataオブジェクトを格納しているハッシュマップのKeySet */
+    public static Set<String> getCircuitDataMapKeySet() {
+        return getCircuitDataMap().keySet();
+    }
+
+    /** @return CircuitDataオブジェクトキーのList */
+    public static List<String> getCircuitList() {
+        System.out.println(getCircuitDataMap().keySet().size());
+        return Arrays.asList(getCircuitDataMap().keySet().toArray(new String[0]));
+    }
+
+    /** @return CircuitDataオブジェクトキーのListString */
+    public static String getCircuitListString() {
+        String list = null;
+        for (String key : getCircuitList()) {
+            if (list == null) {
+                list = key;
+            } else {
+                list += ", " + key;
+            }
+        }
+        return list;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param circuitDataMap CircuitDataオブジェクトを格納しているハッシュマップ */
+    public static void setCircuitDataMap(HashMap<String, CircuitData> circuitDataMap) {
+        CircuitConfig.circuitDataMap = circuitDataMap;
+    }
+
+    /**
+     * CircuitDataオブジェクトを格納しているハッシュマップに新たなCircuitDataオブジェクトを格納する
+     * @param 格納するCircuitDataのサーキット名
+     * @param 格納するCircuitDataオブジェクト
+     * @return 格納に成功したかどうか
+     */
+    public static boolean putCircuitData(String circuitDataName, CircuitData circuitData) {
+        if (!getCircuitDataMap().containsKey(circuitDataName)) {
+            getCircuitDataMap().put(circuitDataName, circuitData);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * CircuitDataオブジェクトを格納しているハッシュマップから引数circuitDataNameをキーに持つCircuitDataオブジェクトを削除する
+     * @param circuitDataName 削除するCircuitDataオブジェクトキー
+     * @return 削除に成功したかどうか
+     */
+    public static boolean removeCircuitData(String circuitDataName) {
+        if (!getCircuitDataMap().containsKey(circuitDataName)) {
+            getCircuitDataMap().remove(circuitDataName);
+            return true;
+        }
+        return false;
+    }
+
+    /** CircuitDataオブジェクトを格納しているハッシュマップを初期化する */
+    public static void clearCircuitData() {
+        getCircuitDataMap().clear();
     }
 }
