@@ -555,13 +555,23 @@ public enum ConfigManager {
                     }
                 }
 
+                /*
+                 * リプレイス用テキストが残っている場合はリプレイスし、フラグをtrueにして次の要素に進む
+                 * 残っていない場合はArrayListにテキストを追加し次の要素に進む
+                 */
+                boolean replacedTempText = false;
                 int newLineListIndex = 0;
                 for (String newLines : newLineList) {
                     if (newLines.equalsIgnoreCase(tempRemoveString)) {
                         newLineList.set(newLineListIndex, newLine);
+                        replacedTempText = true;
                         break;
                     }
                     newLineListIndex++;
+                }
+
+                if (!replacedTempText) {
+                    newLineList.add(newLine);
                 }
             }
 

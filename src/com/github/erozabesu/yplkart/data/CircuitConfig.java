@@ -469,7 +469,6 @@ public class CircuitConfig {
 
     /** @return CircuitDataオブジェクトキーのList */
     public static List<String> getCircuitList() {
-        System.out.println(getCircuitDataMap().keySet().size());
         return Arrays.asList(getCircuitDataMap().keySet().toArray(new String[0]));
     }
 
