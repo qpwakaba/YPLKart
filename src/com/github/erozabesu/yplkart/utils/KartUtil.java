@@ -136,7 +136,7 @@ public class KartUtil extends ReflectionUtil {
         if (passenger != null && passenger != nmsEntityHuman) {
 
             //搭乗者がプレイヤーエンティティ
-            if (!instanceOf(passenger, Classes.nmsEntityPlayer)) {
+            if (!instanceOf(passenger, Classes.nmsEntityHuman)) {
                 //何もせずリターン
                 return false;
 
