@@ -122,6 +122,13 @@ public class KartUtil extends ReflectionUtil {
      */
     public static boolean onRightClicked(Object nmsEntityKart, Object nmsEntityHuman) {
 
+        Player clickedPlayer = (Player) ReflectionUtil.invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityHuman);
+
+        //クリックしたプレイヤーがレース中、かつゴールしていない場合return
+        if (RaceManager.isStandBy(clickedPlayer.getUniqueId()) && !RaceManager.getRacer(clickedPlayer).isGoal()) {
+            return false;
+        }
+
         Object passenger = getFieldValue(Fields.nmsEntity_passenger, nmsEntityKart);
 
         //既に搭乗者が居た場合

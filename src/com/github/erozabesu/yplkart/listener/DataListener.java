@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -50,6 +51,14 @@ public class DataListener implements Listener {
     public DataListener(YPLKart plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         pl = plugin;
+    }
+
+    @EventHandler
+    public void onInteractEntity(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        if (RaceManager.isStandBy(player.getUniqueId())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
