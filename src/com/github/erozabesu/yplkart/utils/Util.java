@@ -113,11 +113,12 @@ public class Util extends ReflectionUtil {
      * @return Block
      */
     public static Block getGroundBlock(Location location) {
+        Location cloneLocation = location.clone();
         for (int i = 0; i <= 5; i++) {
-            if (isSolidBlock(location)) {
-                return location.getBlock();
+            if (isSolidBlock(cloneLocation)) {
+                return cloneLocation.getBlock();
             }
-            location.add(0, -1, 0);
+            cloneLocation.add(0, -1, 0);
         }
         return null;
     }
@@ -640,10 +641,11 @@ public class Util extends ReflectionUtil {
     }
 
     public static Location adjustBlockLocation(Location location) {
-        double x = location.getBlockX() + 0.5D;
-        double z = location.getBlockZ() + 0.5D;
+        Location cloneLocation = location.clone();
+        double x = cloneLocation.getBlockX() + 0.5D;
+        double z = cloneLocation.getBlockZ() + 0.5D;
 
-        return new Location(location.getWorld(), x, location.getY(), z, location.getYaw(), location.getPitch());
+        return new Location(cloneLocation.getWorld(), x, cloneLocation.getY(), z, cloneLocation.getYaw(), cloneLocation.getPitch());
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
