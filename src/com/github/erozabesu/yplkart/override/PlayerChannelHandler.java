@@ -56,15 +56,18 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
             if (player != null) {
                 //レース中であれば値をfalseに変更する
                 if (unmount) {
-                    if (RaceManager.isStandBy(player.getUniqueId())) {
-                        ReflectionUtil.setFieldValue(
-                                Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg, false);
+                    //ゴールしている場合は除外
+                    if (!RaceManager.getRacer(player).isGoal()) {
+                        if (RaceManager.isStandBy(player.getUniqueId())) {
+                            ReflectionUtil.setFieldValue(
+                                    Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg, false);
 
-                        //擬似スニークフラグをtrueにする
-                        RaceManager.getRacer(player).setSneaking(true);
+                            //擬似スニークフラグをtrueにする
+                            RaceManager.getRacer(player).setSneaking(true);
 
-                        super.channelRead(ctx, msg);
-                        return;
+                            super.channelRead(ctx, msg);
+                            return;
+                        }
                     }
                 }
 
