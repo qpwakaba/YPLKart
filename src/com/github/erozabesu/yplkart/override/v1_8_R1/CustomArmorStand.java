@@ -153,15 +153,11 @@ public class CustomArmorStand extends EntityArmorStand {
 
     /**
      * 引数fireTicsのチック数だけNmsEntityを延焼させる<br>
-     * ディスプレイカートの場合、延焼してしまうのを防ぐため何もせずreturnする
+     * 延焼してしまうのを防ぐため何もせずreturnする
      * @param fireTics
      */
     public void setOnFire(int fireTics) {
-        if (this.getKartType().equals(KartType.DisplayKart)) {
-            return;
-        } else {
-            super.setOnFire(fireTics);
-        }
+        super.setOnFire(0);
     }
 
     /** エンティティ同士の衝突 */
