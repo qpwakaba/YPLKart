@@ -43,6 +43,9 @@ public class Racer extends PlayerObject{
     /** 選択カート */
     private Kart kart;
 
+    /** レース開始時にテレポートする座標 */
+    private Location raceStartLocation;
+
     /**
      * 搭乗しているカートエンティティの座標
      * カートエンティティを再生成した際のYawを固定するため、
@@ -454,6 +457,11 @@ public class Racer extends PlayerObject{
         return this.kart;
     }
 
+    /** @return レース開始時にテレポートする座標 */
+    public Location getRaceStartLocation() {
+        return raceStartLocation;
+    }
+
     /** @return 搭乗しているカートエンティティの座標 */
     public Location getKartEntityLocation() {
         return kartEntityLocation;
@@ -554,6 +562,11 @@ public class Racer extends PlayerObject{
     /** @param kart 選択カート */
     public void setKart(Kart kart) {
         this.kart = kart;
+    }
+
+    /** @param raceStartLocation レース開始時にテレポートする座標 */
+    public void setRaceStartLocation(Location raceStartLocation) {
+        this.raceStartLocation = raceStartLocation;
     }
 
     /** @param kartEntityLocation 搭乗しているカートエンティティの座標 */

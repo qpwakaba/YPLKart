@@ -216,6 +216,7 @@ public class Circuit {
                 //開始地点にテレポート、メニュー表示
                 player.leaveVehicle();
                 player.teleport(position.get(count));
+                racer.setRaceStartLocation(position.get(count));
                 RaceManager.showSelectMenu(player, true);
                 ItemEnum.addItem(player, ItemEnum.MENU.getItem());
 

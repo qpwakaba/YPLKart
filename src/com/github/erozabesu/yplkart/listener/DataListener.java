@@ -346,6 +346,12 @@ public class DataListener implements Listener {
             event.setRespawnLocation(
                     new Location(respawn.getWorld()
                             , respawn.getX(), respawn.getY(), respawn.getZ(), racer.getLastYaw(), 0));
+        //チェックポイントを通過していない場合はレース開始地点にリスポーンする
+        } else {
+            Location respawn = racer.getRaceStartLocation();
+            event.setRespawnLocation(
+                    new Location(respawn.getWorld()
+                            , respawn.getX(), respawn.getY(), respawn.getZ(), racer.getLastYaw(), 0));
         }
     }
 
@@ -415,10 +421,15 @@ public class DataListener implements Listener {
 
         /*
          * リスポーン時に再生成される際に実行されるRacer.recoveryKart()ではRacer.kartEntityLocationの座標に
-         * カートが再生成されるため、予め座標を格納しておく
+         * カートが再生成されるため、予め最後に通過したチェックポイントの座標を格納しておく
+         * 通過済みのチェックポイントがない場合はレース開始地点の座標を格納する
          */
-        r.setKartEntityLocation(
-                r.getLastPassedCheckPointEntity().getLocation().add(0.0D, -RaceManager.checkPointHeight, 0.0D));
+        if (r.getLastPassedCheckPointEntity() == null) {
+            r.setKartEntityLocation(r.getRaceStartLocation());
+        } else {
+            r.setKartEntityLocation(
+                    r.getLastPassedCheckPointEntity().getLocation().add(0.0D, -RaceManager.checkPointHeight, 0.0D));
+        }
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(YPLKart.getInstance(), new Runnable() {
             public void run() {
