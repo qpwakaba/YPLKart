@@ -25,62 +25,6 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
-        String packetName = msg.getClass().getSimpleName();
-        /*
-         * プレイヤーがエンティティから降りるパケットを受信した場合、レース中であれば値を変更する
-         *
-         * カートエンティティとして利用しているアーマースタンドは、Vehicleクラスを継承していないため、
-         * プレイヤーの操作をVehicleEventではフックできない。
-         * また、PlayerToggleSneakEventは搭乗中のプレイヤーからはスローされない。
-         * そのため、プレイヤーのShiftキー押下をキャンセルできず、レース中であってもカートから降りてしまう。
-         * また、エンティティから降りるメソッドは、EntityHumanクラス内で定義されているため、
-         * EntityArmorStand内のどのメソッドをOverrideしてもこの操作をキャンセルすることはできない。
-         * そこで、クライアントから受信したShiftキー押下のパケットを変更し、
-         * レース中はカートから降りられないよう常にfalseに設定している。
-         * ただし、この影響でPlayer.isSneaking()が常にfalseを返し、ドリフト機能が動作しないため、
-         * Racerオブジェクトの擬似スニークフラグを利用する。
-         */
-        if(packetName.equalsIgnoreCase("PacketPlayInSteerVehicle")){
-
-            //エンティティから降りるかどうか
-            boolean unmount = (Boolean) ReflectionUtil.getFieldValue(
-                    Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg);
-
-            //NetworkManagerからプレイヤーを取得
-            Object networkManager = ctx.pipeline().toMap().get("packet_handler");
-            Player player = PacketUtil.getPlayerByNetworkManager(networkManager);
-
-            if (player != null) {
-                //レース中であれば値をfalseに変更する
-                if (unmount) {
-                    //ゴールしている場合は除外
-                    if (!RaceManager.getRacer(player).isGoal()) {
-                        if (RaceManager.isStandBy(player.getUniqueId())) {
-                            ReflectionUtil.setFieldValue(
-                                    Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg, false);
-
-                            //擬似スニークフラグをtrueにする
-                            RaceManager.getRacer(player).setSneaking(true);
-
-                            super.channelRead(ctx, msg);
-                            return;
-                        }
-                    }
-                }
-
-                //擬似スニークフラグをfalseにする
-                RaceManager.getRacer(player).setSneaking(false);
-            }
-
-            super.channelRead(ctx, msg);
-        } else {
-            super.channelRead(ctx, msg);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {

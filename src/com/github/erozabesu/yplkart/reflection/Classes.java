@@ -73,4 +73,5 @@ public class Classes extends ReflectionUtil{
     //〓 Ypl 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static Class<?> yplCustomKart = getYPLKartClass("CustomArmorStand");
+    public static Class<?> yplCustomCraftArmorStand = getYPLKartClass("CustomCraftArmorStand");
 }

@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +43,9 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class DataListener implements Listener {
@@ -51,6 +54,31 @@ public class DataListener implements Listener {
     public DataListener(YPLKart plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         pl = plugin;
+    }
+
+    /**
+     * スタンバイ状態のレースに参加しており、かつゴールしていないプレイヤーの搭乗解除をキャンセルする
+     * @param event
+     */
+    @EventHandler
+    public void onVehicleExit(VehicleExitEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getExited().getWorld())) {
+            return;
+        }
+        if (!(event.getExited() instanceof Player)) {
+            return;
+        }
+        if (!ReflectionUtil.instanceOf(event.getVehicle(), Classes.yplCustomCraftArmorStand)) {
+            return;
+        }
+
+        Player player = (Player) event.getExited();
+
+        if (!RaceManager.getRacer(player).isGoal()) {
+            if (RaceManager.isStandBy(player.getUniqueId())) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler

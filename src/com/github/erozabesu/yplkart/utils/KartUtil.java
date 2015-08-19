@@ -557,7 +557,7 @@ public class KartUtil extends ReflectionUtil {
         Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
         float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, nmsEntityKart);
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
-            if (RaceManager.getRacer(player).isSneaking()) {
+            if (player.isSneaking()) {
                 yaw -= sideInput * kart.getDriftCorneringPower();
             } else {
                 yaw -= sideInput * kart.getDefaultCorneringPower();
@@ -824,7 +824,7 @@ public class KartUtil extends ReflectionUtil {
 
     /** ドリフト中の火花パーティクルを生成する */
     public static void playDriftEffect(Player player, Location kartEntityLocation, double speedStack) {
-        if (RaceManager.getRacer(player).isSneaking()) {
+        if (player.isSneaking()) {
 
             //スピードスタックが100を越える場合のみ火花のパーティクルを生成する
             if (100 < speedStack) {

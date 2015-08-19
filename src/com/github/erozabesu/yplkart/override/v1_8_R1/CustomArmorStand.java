@@ -10,6 +10,7 @@ import net.minecraft.server.v1_8_R1.Vec3D;
 import net.minecraft.server.v1_8_R1.World;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.erozabesu.yplkart.object.Kart;
@@ -129,6 +130,20 @@ public class CustomArmorStand extends EntityArmorStand {
     }
 
     //〓 Override 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * このクラスのBukkitEntityを返す<br>
+     * イベントリスナのVehicle系イベントをフックできるようVehicleクラスを継承した、<br>
+     * カスタムCraftEntityクラスのインスタンスを返す
+     * @return Vehicleクラスを継承したカスタムCraftEntityクラスのインスタンス
+     */
+    @Override
+    public CraftEntity getBukkitEntity() {
+        if (this.bukkitEntity == null ) {
+            this.bukkitEntity = new CustomCraftArmorStand(this.world.getServer(), this);
+        }
+        return this.bukkitEntity;
+    }
 
     /** Entityの状態を毎チック更新する */
     @Override
