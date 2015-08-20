@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -12,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 /**
  * プレイヤーの基本情報を格納するクラス
@@ -45,6 +47,9 @@ public class PlayerObject {
 
     /** 経験値 */
     private float exp;
+
+    /** 現在付与されているポーションエフェクト */
+    private Collection<PotionEffect> potionEffect;
 
     /** インベントリ */
     private ArrayList<ItemStack> inventory;
@@ -90,6 +95,7 @@ public class PlayerObject {
         setWalkSpeed(player.getWalkSpeed());
         setLevel(player.getLevel());
         setExp(player.getExp());
+        setPotionEffect(player.getActivePotionEffects());
         setInventory(new ArrayList<ItemStack>(Arrays.asList(player.getInventory().getContents())));
         setArmorContents(new ArrayList<ItemStack>(Arrays.asList(player.getInventory().getArmorContents())));
     }
@@ -130,6 +136,11 @@ public class PlayerObject {
         player.setHealth(getHealth());
         player.setFoodLevel(getHunger());
         player.setWalkSpeed(getWalkSpeed());
+
+        for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(activePotionEffect.getType());
+        }
+        player.addPotionEffects(this.getPotionEffect());
     }
 
     /** 経験値を復元する */
@@ -207,6 +218,9 @@ public class PlayerObject {
         player.setLevel(0);
         player.setExp(0);
         player.setFoodLevel(20);
+        for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(activePotionEffect.getType());
+        }
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -254,6 +268,11 @@ public class PlayerObject {
     /** @return 経験値 */
     public float getExp() {
         return this.exp;
+    }
+
+    /** @return 現在付与されているポーションエフェクト */
+    public Collection<PotionEffect> getPotionEffect() {
+        return potionEffect;
     }
 
     /** @return インベントリ */
@@ -321,6 +340,11 @@ public class PlayerObject {
     /** @param exp 経験値 */
     public void setExp(float exp) {
         this.exp = exp;
+    }
+
+    /** @param potionEffect 現在付与されているポーションエフェクト */
+    public void setPotionEffect(Collection<PotionEffect> potionEffect) {
+        this.potionEffect = potionEffect;
     }
 
     /** @param inventory インベントリ */
