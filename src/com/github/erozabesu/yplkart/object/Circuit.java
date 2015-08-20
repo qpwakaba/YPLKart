@@ -164,7 +164,7 @@ public class Circuit {
 
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
         //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
-        if (!YPLKart.getInstance().isEnabled()) {
+        if (YPLKart.getInstance().isEnabled()) {
             final List<UUID> nextentry = new ArrayList<UUID>(getReserveEntryPlayerList());
             if (0 < nextentry.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
