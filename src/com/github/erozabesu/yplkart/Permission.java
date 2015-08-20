@@ -212,6 +212,10 @@ public enum Permission {
             return true;
         }
 
+        if (player.isOp()) {
+            return true;
+        }
+
         if (noMessage) {
             return false;
         }
@@ -232,6 +236,9 @@ public enum Permission {
      * @return playerがパーミッションを所有しているかどうか
      */
     public static Boolean hasCMDPermission(Player player, Permission permission, boolean targetOther, boolean noMessage) {
+        if (player.isOp()) {
+            return true;
+        }
         if (!targetOther) {
             if (!permission.getSettingNodeValue())
                 return true;
