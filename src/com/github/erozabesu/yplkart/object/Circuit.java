@@ -262,16 +262,23 @@ public class Circuit {
 
     /**
      * プレイヤーをエントリーリストから削除する
+     * エントリーを削除した影響でプレイしている人数が0人になった場合はレースを終了する
      * @param uuid 追加するプレイヤーのUUID
      */
     public void exitPlayer(UUID uuid) {
-        if (this.getEntryPlayerList().contains(uuid))
+        if (this.getEntryPlayerList().contains(uuid)) {
             this.getEntryPlayerList().remove(uuid);
+        }
 
-        if (this.getReserveEntryPlayerList().contains(uuid))
+        if (this.getReserveEntryPlayerList().contains(uuid)) {
             this.getReserveEntryPlayerList().remove(uuid);
+        }
 
         denyMatching(uuid);
+
+        if (this.isRaceEnd()) {
+            this.endRace();
+        }
     }
 
     /**
@@ -448,7 +455,10 @@ public class Circuit {
                     //初期化
                     getMatchingAcceptPlayerList().clear();
                     setMatchingCountDownTime(0);
-                    getMatchingTask().cancel();
+
+                    if (getMatchingTask() != null) {
+                        getMatchingTask().cancel();
+                    }
                     setMatchingTask(null);
                 }
             }
