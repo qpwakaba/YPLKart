@@ -56,6 +56,7 @@ public class ItemStarTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        p.setNoDamageTicks(10);
         if (RaceManager.getRacer(p).isGoal()) {
             p.setWalkSpeed(0.2F);
             die();
