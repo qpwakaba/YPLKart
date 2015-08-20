@@ -57,7 +57,9 @@ public class DataListener implements Listener {
     }
 
     /**
-     * スタンバイ状態のレースに参加しており、かつゴールしていないプレイヤーの搭乗解除をキャンセルする
+     * 水中で搭乗した場合マインクラフトの仕様で強制的に搭乗解除されてしまうため、<br>
+     * 仮想スニークフラグがtrueでない場合はキャンセルする<br>
+     * また、スタンバイ状態のレースに参加しており、かつゴールしていないプレイヤーの搭乗解除をキャンセルする
      * @param event
      */
     @EventHandler
@@ -74,10 +76,18 @@ public class DataListener implements Listener {
 
         Player player = (Player) event.getExited();
 
-        if (!RaceManager.getRacer(player).isGoal()) {
-            if (RaceManager.isStandBy(player.getUniqueId())) {
-                event.setCancelled(true);
-            }
+        //レース中はキャンセル
+        if (RaceManager.isStillRacing(player.getUniqueId())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Racer racer = RaceManager.getRacer(player);
+
+        //仮想スニークフラグがtrueではない場合はキャンセル
+        if (!racer.isSneaking()) {
+            event.setCancelled(true);
+            return;
         }
     }
 

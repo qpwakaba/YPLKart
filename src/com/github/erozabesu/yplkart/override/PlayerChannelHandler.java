@@ -25,6 +25,35 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
 
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+        String packetName = msg.getClass().getSimpleName();
+        /*
+         * プレイヤーがエンティティから降りるパケットを受信した場合、仮想スニークフラグをtrueに変更する
+         *
+         * 水中でカートエンティティに搭乗した場合、強制的に搭乗を解除されてしまうため、
+         * VehicleExitEventを常にsetCancelled(true)する必要がある。
+         * その影響で、自発的にプレイヤーが搭乗を解除したい場合もキャンセルされてしまうため、
+         * 仮想スニークフラグを利用し、フラグがtrueの場合、イベントのキャンセルを行わないようにする。
+         */
+        if(packetName.equalsIgnoreCase("PacketPlayInSteerVehicle")){
+
+            //エンティティから降りるかどうか
+            boolean unmount = (Boolean) ReflectionUtil.getFieldValue(
+                    Fields.nmsPacketPlayInSteerVehicle_isUnmount, msg);
+
+            //NetworkManagerからプレイヤーを取得
+            Object networkManager = ctx.pipeline().toMap().get("packet_handler");
+            Player player = PacketUtil.getPlayerByNetworkManager(networkManager);
+
+            //擬似スニークフラグをfalseにする
+            RaceManager.getRacer(player).setSneaking(unmount);
+        }
+
+        super.channelRead(ctx, msg);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {

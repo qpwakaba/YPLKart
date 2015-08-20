@@ -1,5 +1,7 @@
 package com.github.erozabesu.yplkart.object;
 
+import io.netty.channel.ChannelHandlerContext;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -51,6 +53,12 @@ public class PlayerObject {
     private ArrayList<ItemStack> armorContents;
 
     /**
+     * プレイヤーがスニークしているかどうか
+     * @see com.github.erozabesu.yplkart.override.PlayerChannelHandler#channelRead(ChannelHandlerContext , Object)
+     */
+    private boolean isSneaking;
+
+    /**
      *  リスポーン時のプレイヤーの向き<br>
      *  issue #88 の変更で削除予定
      */
@@ -63,6 +71,7 @@ public class PlayerObject {
 
         initializePlayerObject();
 
+        setSneaking(false);
         setLastYaw(0);
     }
 
@@ -257,6 +266,11 @@ public class PlayerObject {
         return this.armorContents;
     }
 
+    /** @return スニークしているかどうか */
+    public boolean isSneaking() {
+        return this.isSneaking;
+    }
+
     /** @return リスポーン時のプレイヤーの向き */
     public float getLastYaw() {
         return this.lastYaw;
@@ -317,6 +331,11 @@ public class PlayerObject {
     /** @param armorContents アーマーインベントリ */
     public void setArmorContents(ArrayList<ItemStack> armorContents) {
         this.armorContents = armorContents;
+    }
+
+    /** @param スニークしているかどうか */
+    public void setSneaking(boolean isSneaking) {
+        this.isSneaking = isSneaking;
     }
 
     /** @param value リスポーン時のプレイヤーの向き */
