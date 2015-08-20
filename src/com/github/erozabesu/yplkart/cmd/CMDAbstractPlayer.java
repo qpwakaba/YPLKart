@@ -371,7 +371,9 @@ public class CMDAbstractPlayer extends CMDAbstract {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.setEntryRaceData(other.getUniqueId(), getArgs()[2]);
                 }
-                MessageEnum.cmdEntryAll.sendConvertedMessage(this.getPlayer(), getArgs()[2]);
+                Circuit circuit = new Circuit();
+                circuit.setCircuitName(getArgs()[2]);
+                MessageEnum.cmdEntryAll.sendConvertedMessage(this.getPlayer(), circuit);
             } else {
                 if (!Util.isOnline(getArgs()[1])) {
                     MessageEnum.invalidPlayer.sendConvertedMessage(this.getPlayer());
