@@ -105,24 +105,12 @@ public class CircuitData {
 
     /** メンバ変数がnullの場合初期値を格納する */
     public void init(Location location) {
-        if (this.getWorldName() == "") {
-            this.setWorldName(location.getWorld().getName());
-        }
-        if (this.getLocationX() == 0) {
-            this.setLocationX(location.getX());
-        }
-        if (this.getLocationY() == 0) {
-            this.setLocationY(location.getY());
-        }
-        if (this.getLocationZ() == 0) {
-            this.setLocationZ(location.getZ());
-        }
-        if (this.getLocationPitch() == 0) {
-            this.setLocationPitch(location.getPitch());
-        }
-        if (this.getLocationYaw() == 0) {
-            this.setLocationYaw(location.getYaw());
-        }
+        this.setWorldName(location.getWorld().getName());
+        this.setLocationX(location.getX());
+        this.setLocationY(location.getY());
+        this.setLocationZ(location.getZ());
+        this.setLocationPitch(location.getPitch());
+        this.setLocationYaw(location.getYaw());
 
         if (this.getNumberOfLaps() == 0) {
             this.setNumberOfLaps(3);
