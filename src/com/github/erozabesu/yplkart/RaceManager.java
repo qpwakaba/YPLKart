@@ -302,25 +302,35 @@ public class RaceManager {
     }
 
     public static void clearCharacterRaceData(UUID id) {
-        if (getRace(id).getCharacter() == null)
-            return;
+        Racer racer = getRace(id);
 
-        getRace(id).setCharacter(null);
-        Player p = Bukkit.getPlayer(id);
-        if (p != null) {
-            getRace(id).recoveryPhysical();
-            PacketUtil.disguiseLivingEntity(null, p, Classes.nmsEntityHuman);
-            MessageEnum.raceCharacterReset.sendConvertedMessage(id, getCircuit(id));
+        if (racer.getCharacter() == null) {
+            return;
+        }
+
+        racer.setCharacter(null);
+        Player player = Bukkit.getPlayer(id);
+        if (player != null) {
+            racer.recoveryPhysical();
+            PacketUtil.disguiseLivingEntity(null, player, Classes.nmsEntityHuman);
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(racer.getCircuitName());
+            MessageEnum.raceCharacterReset.sendConvertedMessage(id, circuit);
         }
     }
 
     public static void clearKartRaceData(UUID id) {
-        if (getRace(id).getKart() == null)
+        Racer racer = getRace(id);
+        if (racer.getKart() == null) {
             return;
+        }
 
-        if (Bukkit.getPlayer(id) != null)
-            MessageEnum.raceLeave.sendConvertedMessage(id, getCircuit(id));
-        getRace(id).setKart(null);
+        racer.setKart(null);
+        if (Bukkit.getPlayer(id) != null) {
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(racer.getCircuitName());
+            MessageEnum.raceLeave.sendConvertedMessage(id, circuit);
+        }
     }
 
     public static void leaveRacingKart(Player player) {
@@ -549,8 +559,11 @@ public class RaceManager {
     public static Boolean isStarted(UUID uuid) {
         if (isEntry(uuid)) {
             if (isStandBy(uuid)) {
-                if (getCircuit(uuid).isStarted()) {
-                    return true;
+                Circuit circuit = getCircuit(uuid);
+                if (circuit != null) {
+                    if (circuit.isStarted()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -564,9 +577,12 @@ public class RaceManager {
     public static Boolean isStillRacing(UUID uuid) {
         if (isEntry(uuid)) {
             if (isStandBy(uuid)) {
-                if (getCircuit(uuid).isStarted()) {
-                    if (!getRace(uuid).isGoal()) {
-                        return true;
+                Circuit circuit = getCircuit(uuid);
+                if (circuit != null) {
+                    if (circuit.isStarted()) {
+                        if (!getRace(uuid).isGoal()) {
+                            return true;
+                        }
                     }
                 }
             }
