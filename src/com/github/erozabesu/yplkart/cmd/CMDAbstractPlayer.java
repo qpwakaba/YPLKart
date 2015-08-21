@@ -25,6 +25,7 @@ import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -165,6 +166,14 @@ public class CMDAbstractPlayer extends CMDAbstract {
         } else if (this.getLength() == 4) {
             if (getArgs()[1].equalsIgnoreCase("rename")) {
                 CircuitConfig.renameCircuit(this.getPlayer(), getArgs()[2], getArgs()[3]);
+                return;
+            } else if (getArgs()[1].equalsIgnoreCase("setracetype")) {
+                RaceType raceType = RaceType.getRaceTypeByString(getArgs()[3]);
+                if (raceType == null) {
+                    MessageEnum.invalidRaceType.sendConvertedMessage(this.getPlayer());
+                    return;
+                }
+                CircuitConfig.setRaceType(this.getPlayer(), getArgs()[2], raceType);
                 return;
             } else if (getArgs()[1].equalsIgnoreCase("setminplayer")) {
                 if (!Util.isNumber(getArgs()[3])) {

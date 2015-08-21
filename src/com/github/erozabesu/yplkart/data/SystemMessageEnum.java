@@ -26,6 +26,7 @@ public enum SystemMessageEnum {
             + "<green>/ka circuit create {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :<br>"
             + "<green>/ka circuit delete {circuit name} :<br>"
             + "<green>/ka circuit edit {circuit name} :<br>"
+            + "<green>/ka circuit setracetype {circuit name} {race type} :<br>"
             + "<green>/ka circuit setlap {circuit name} {number of laps} :<br>"
             + "<green>/ka circuit setminplayer {circuit name} {number of player} :<br>"
             + "<green>/ka circuit setmaxplayer {circuit name} {number of player} :<br>"
@@ -40,6 +41,7 @@ public enum SystemMessageEnum {
             + "<gold>Circuit List :<br><white><circuitlist>"),
     referenceCircuitOutgame("<green>/ka circuit create {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :<br>"
             + "<green>/ka circuit delete {circuit name} :<br>"
+            + "<green>/ka circuit setracetype {circuit name} {race type} :<br>"
             + "<green>/ka circuit setposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :<br>"
             + "<green>/ka circuit setgoalposition {circuit name} {worldname} {x} {y} {z} {yaw} {pitch} :<br>"
             + "<green>/ka circuit rename {circuit name} {new circuitname} :<br>"
