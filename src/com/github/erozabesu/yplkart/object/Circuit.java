@@ -13,7 +13,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
@@ -475,10 +474,14 @@ public class Circuit {
      * カウントダウン終了と同時にstartフラグをtrueに切り替える
      */
     public void runStandbyTask() {
-        if (this.getStandbyTask() != null)
+        if (this.getStandbyTask() != null) {
             this.getStandbyTask().cancel();
+        }
 
-        this.setStandbyCountDownTime(CircuitConfig.getCircuitData(this.getCircuitName()).getMenuTime() + 12);
+        //ローカルファイルのサーキット設定データ
+        final CircuitData circuitData = CircuitConfig.getCircuitData(this.getCircuitName());
+
+        this.setStandbyCountDownTime(circuitData.getMenuTime() + 12);
 
         this.setStandbyTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
@@ -500,9 +503,8 @@ public class Circuit {
                             RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
 
-                        //TODO: issue #79
                         if (RaceManager.getRacer(p).getKart() == null
-                                && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
+                                && circuitData.getRaceType().equals(RaceType.KART)) {
                             RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
                         }
                         p.closeInventory();

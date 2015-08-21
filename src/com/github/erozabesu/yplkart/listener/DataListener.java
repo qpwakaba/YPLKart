@@ -29,7 +29,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.Scoreboards;
 import com.github.erozabesu.yplkart.YPLKart;
@@ -41,7 +40,9 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
@@ -490,6 +491,8 @@ public class DataListener implements Listener {
         final Player p = (Player) e.getPlayer();
         Racer r = RaceManager.getRacer(p);
         if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
+
+            //まだキャラクターを選択していない場合は別の画面に遷移させない
             if (r.getCharacter() == null) {
                 MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
                         p, RaceManager.getCircuit(r.getCircuitName()));
@@ -500,27 +503,45 @@ public class DataListener implements Listener {
                 });
                 return;
             }
-            if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
-                MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getCircuitName()));
-                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        RaceManager.showSelectMenu(p, false);
-                    }
-                });
-                return;
+
+            /*
+             * まだカートを選択しておらず、かつ参加しているサーキットのレースタイプがKARTの場合、
+             * 強制的にカート選択画面に遷移する
+             */
+            CircuitData circuitData = CircuitConfig.getCircuitData(r.getCircuitName());
+            if (circuitData != null) {
+                if (r.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
+                    MessageEnum.raceMustSelectKart.sendConvertedMessage(
+                            p, RaceManager.getCircuit(r.getCircuitName()));
+                    Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                        public void run() {
+                            RaceManager.showSelectMenu(p, false);
+                        }
+                    });
+                    return;
+                }
             }
         } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
-            if (r.getKart() == null && Permission.hasPermission(p, Permission.KART_RIDE, true)) {
-                MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getCircuitName()));
-                Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        RaceManager.showSelectMenu(p, false);
-                    }
-                });
-                return;
+
+            /*
+             * まだカートを選択しておらず、かつ参加しているサーキットのレースタイプがKARTの場合、
+             * 別の画面に遷移させない
+             */
+            CircuitData circuitData = CircuitConfig.getCircuitData(r.getCircuitName());
+            if (circuitData != null) {
+                if (r.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
+                    MessageEnum.raceMustSelectKart.sendConvertedMessage(
+                            p, RaceManager.getCircuit(r.getCircuitName()));
+                    Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
+                        public void run() {
+                            RaceManager.showSelectMenu(p, false);
+                        }
+                    });
+                    return;
+                }
             }
+
+            //まだキャラクターを選択していない場合、強制的にキャラクター選択画面に遷移する
             if (r.getCharacter() == null) {
                 MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
                         p, RaceManager.getCircuit(r.getCircuitName()));
