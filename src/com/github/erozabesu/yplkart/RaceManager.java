@@ -25,14 +25,17 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.reflection.Constructors;
@@ -784,16 +787,16 @@ public class RaceManager {
     // 〓 Edit Player 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * 選択メニュー（仮想インベントリ）を引数playerに表示する
-     * 選択メニューのアイテムは下記のように配置される
-     * □ = 空白
-     * ■ = オブジェクトアイテム
-     * ▲ = メニュー操作用アイテム
-     * レイアウト：
-     * □□□□□□□□□
-     * □■■■■■■■□
-     * □■■■■■■■□
-     * ...
+     * 選択メニュー（仮想インベントリ）を引数playerに表示する<br>
+     * 選択メニューのアイテムは下記のように配置される<br>
+     * □ = 空白<br>
+     * ■ = オブジェクトアイテム<br>
+     * ▲ = メニュー操作用アイテム<br>
+     * レイアウト：<br>
+     * □□□□□□□□□<br>
+     * □■■■■■■■□<br>
+     * □■■■■■■■□<br>
+     * ...<br>
      * □□□▲▲▲□□□
      * @param player 選択メニューを表示するプレイヤー
      * @param isCharacterMenu キャラクター選択メニューか、カート選択メニューかどうか
@@ -851,9 +854,15 @@ public class RaceManager {
         //キャラクター選択メニューとカート選択メニューで処理が異なる
         if (isCharacterMenu) {
             inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
-            if (Permission.hasPermission(player, Permission.KART_RIDE, true)) {
-                inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
-                inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
+            Racer racer = getRacer(player);
+            if (!racer.getCircuitName().equalsIgnoreCase("")) {
+                CircuitData circuitData = CircuitConfig.getCircuitData(racer.getCircuitName());
+                if (circuitData != null) {
+                    if (circuitData.getRaceType().equals(RaceType.KART)) {
+                        inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
+                        inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
+                    }
+                }
             }
         } else {
             inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.KART_RANDOM.getMenuItem());

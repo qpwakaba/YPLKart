@@ -17,6 +17,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.LapTime;
+import com.github.erozabesu.yplkart.object.RaceType;
 
 /**
  * レース設定を管理するクラス
@@ -432,6 +433,28 @@ public class CircuitConfig {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(circuitDataName);
             MessageEnum.cmdCircuitSetBroadcastGoalMessage.sendConvertedMessage(adress, circuit, newValue);
+        }
+    }
+
+    /**
+     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトのレースタイプを設定する
+     * @param address ログの送信先
+     * @param circuitDataName CircuitDataオブジェクトキー
+     * @param raceType レースタイプ
+     */
+    public static void setRaceType(Player address, String circuitDataName, RaceType raceType) {
+        CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
+        if (circuitData == null) {
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.invalidCircuit.sendConvertedMessage(address, circuit);
+        } else {
+            circuitData.setRaceType(raceType);
+            circuitData.saveConfiguration();
+
+            Circuit circuit = new Circuit();
+            circuit.setCircuitName(circuitDataName);
+            MessageEnum.cmdCircuitSetRaceType.sendConvertedMessage(address, circuit, raceType);
         }
     }
 

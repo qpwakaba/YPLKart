@@ -67,6 +67,9 @@ public class CircuitData {
     /** ゴールメッセージをサーバー全体に送信するかどうか */
     private boolean broadcastGoalMessage;
 
+    /** 開催するレースタイプ */
+    private RaceType raceType;
+
     /** 参加者のランニングレースラップ記録 */
     private List<LapTime> runLapTime = new ArrayList<LapTime>();
 
@@ -99,6 +102,7 @@ public class CircuitData {
         this.setMenuTime(configManager.getInteger(circuitDataName + ".menutime"));
         this.setLimitTime(configManager.getInteger(circuitDataName + ".limittime"));
         this.setBroadcastGoalMessage(configManager.getBoolean(circuitDataName + ".broadcastgoalmessage"));
+        this.setRaceType(RaceType.getRaceTypeByString(configManager.getString(circuitDataName + ".race_type")));
         this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
         this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
     }
@@ -132,6 +136,9 @@ public class CircuitData {
         }
         if (this.getBroadcastGoalMessage() == false) {
             this.setBroadcastGoalMessage(false);
+        }
+        if (this.getRaceType() == null) {
+            this.setRaceType(RaceType.KART);
         }
     }
 
@@ -236,6 +243,7 @@ public class CircuitData {
         config.setValue(configKey + ".menutime", getMenuTime());
         config.setValue(configKey + ".limittime", getLimitTime());
         config.setValue(configKey + ".broadcastgoalmessage", getBroadcastGoalMessage());
+        config.setValue(configKey + ".race_type", this.getRaceType().name());
 
         //ランニングレースラップタイムを設定データに上書き
         for (LapTime lapTimeObject : getRunLapTimeList()) {
@@ -340,7 +348,6 @@ public class CircuitData {
      */
     public void sendInformation(Object adress) {
         Location l = this.getStartLocation();
-        boolean flag = this.getBroadcastGoalMessage();
         Number[] numberdata = {
                 this.getNumberOfLaps(), this.getMinPlayer(), this.getMaxPlayer()
                 , this.getLimitTime(), this.getMenuTime(), this.getMatchingTime()
@@ -349,7 +356,7 @@ public class CircuitData {
         Circuit circuit = new Circuit();
         circuit.setCircuitName(this.getCircuitDataName());
         MessageEnum.tableCircuitInformation
-                .sendConvertedMessage(adress, circuit, flag, numberdata);
+                .sendConvertedMessage(adress, circuit, this.getRaceType(), numberdata, this.getBroadcastGoalMessage());
     }
 
     public void sendRanking(Object adress) {
@@ -664,6 +671,11 @@ public class CircuitData {
         return this.broadcastGoalMessage;
     }
 
+    /** @return 開催するレースタイプ */
+    public RaceType getRaceType() {
+        return raceType;
+    }
+
     /** @return runLapTime 参加者のランニングレースラップ記録 */
     public List<LapTime> getRunLapTimeList() {
         return this.runLapTime;
@@ -744,6 +756,11 @@ public class CircuitData {
     /** @param broadcastGoalMessage ゴールメッセージをサーバー全体に送信するかどうか */
     public void setBroadcastGoalMessage(boolean broadcastGoalMessage) {
         this.broadcastGoalMessage = broadcastGoalMessage;
+    }
+
+    /** @param raceType 開催するレースタイプ */
+    public void setRaceType(RaceType raceType) {
+        this.raceType = raceType;
     }
 
     /** @param runLapTimeList 参加者のランニングレースラップ記録 */
