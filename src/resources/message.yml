@@ -23,11 +23,13 @@
 #   <header> : 「header」の項目に記述した内容に置き換えられます。
 #   <circuitheader> : 「circuitheader」の項目に記述した内容に置き換えられます。
 #   <circuitlist> : 登録されているサーキットの一覧に置き換えられます。
+#   <racetypelist> : レースタイプ一覧に置き換えられます。
 #   <characterlist> : 登録されているキャラクターの一覧に置き換えられます。
 #   <kartlist> : 登録されているカートの一覧に置き換えられます。
 #
 # 限定タグ : 一部のメッセージのみ利用可能なタグ。
 #   <circuitname> : サーキットの名称に置き換えられます。
+#   <racetype> : レースタイプに置き換えられます。
 #   <player> : プレイヤーネームに置き換えられます。
 #   <player1> <player2> : プレイヤーネームに置き換えられます。
 #   <character> : キャラクターネームに置き換えられます。
@@ -41,7 +43,7 @@
 #
 # ------------------------- メッセージ設定 -------------------------
 #
-messageVersion : "1.2"
+messageVersion : "1.3"
 header : "<yellow>[<plugin>] "
 circuitheader : "<darkaqua>[<aqua><circuitname><darkaqua>] "
 racePlayerKill : "<circuitheader><white><player1> was killed by <player2>"
@@ -51,6 +53,7 @@ invalidWorld : "<header><red>指定したワールドは存在しません"
 invalidNumber : "<header><red>数値を入力して下さい"
 invalidBoolean : "<header><white>true<red>、もしくは<white>false<red>と入力して下さい"
 invalidCircuit : "<header><red>サーキット：<gold><circuitname><red>は存在しません"
+invalidRaceType : "<header><red>存在しないレースタイプです<br><gold>Race Type List : <br> <white><racetypelist>"
 invalidCharacter : "<header><red>キャラクター名が正しくありません<br><white><characterlist>"
 invalidKart : "<header><red>カート名が正しくありません<br><white><kartlist>"
 cmdCircuitCreate : "<circuitheader><green>サーキットを作成しました"
@@ -60,6 +63,7 @@ cmdCircuitList : "<header><gold>Circuit List：<br><circuitlist>"
 cmdCircuitEdit : "<circuitheader>チェックポイントツールを配布しました"
 cmdCircuitRename : "<circuitheader>サーキット名を変更しました"
 cmdCircuitRankingNoScoreData : "<circuitheader><red>レースの記録がありません"
+cmdCircuitSetRaceType : "<circuitheader><green>レースタイプを<white><racetype><green>に設定しました"
 cmdCircuitSetPosition : "<circuitheader><green>現在位置を開始座標として設定しました"
 cmdCircuitSetLap : "<circuitheader><green>周回数を<white><number>周<green>に設定しました"
 cmdCircuitSetMinPlayer : "<circuitheader><green>最小プレイ人数を<white><number>人<green>に設定しました"
@@ -149,6 +153,6 @@ titleRaceStartCountDown : "<red><number>"
 titleRaceStartCountDownSub : ""
 titleCountDown : "<yellow>残り時間 : <number>秒"
 titleGoalRank : "<green><number1>位  <number2>秒"
-tableCircuitInformation : "<aqua>==========-[ <gold>Circuit Information <aqua>]-==========<br>    <green>サーキット名 ： <white><circuitname><br>    <green>周回数 ： <white><number1><br>    <green>最小プレイ人数 ： <white><number2><br>    <green>最大プレイ人数 ： <white><number3><br>    <green>レースが自動終了するまでの時間 ： <white><number4><green> (秒)<br>    <green>キャラクター・カートを選択できる猶予時間 ： <white><number5><green> (秒)<br>    <green>レースへの参加・辞退を決定できる猶予時間 ： <white><number6><green> (秒)<br>    <green>順位・ラップタイムのサーバー全体通知 ： <white><flag><br>    <green>レース開始座標 ： <br>            <green>x <white><number7><green> / y <white><number8><green> / z <white><number9><br>            <green>yaw <white><number10><green> / pitch <white><number11><br>"
+tableCircuitInformation : "<aqua>==========-[ <gold>Circuit Information <aqua>]-==========<br>    <green>サーキット名 ： <white><circuitname><br>    <green>レースタイプ ： <white><racetype><br>    <green>周回数 ： <white><number1><br>    <green>最小プレイ人数 ： <white><number2><br>    <green>最大プレイ人数 ： <white><number3><br>    <green>レースが自動終了するまでの時間 ： <white><number4><green> (秒)<br>    <green>キャラクター・カートを選択できる猶予時間 ： <white><number5><green> (秒)<br>    <green>レースへの参加・辞退を決定できる猶予時間 ： <white><number6><green> (秒)<br>    <green>順位・ラップタイムのサーバー全体通知 ： <white><flag><br>    <green>レース開始座標 ： <br>            <green>x <white><number7><green> / y <white><number8><green> / z <white><number9><br>            <green>yaw <white><number10><green> / pitch <white><number11><br>"
 tableCharacterParameter : "<darkaqua><green> 体力 : <yellow><text1><br><darkaqua><green> 速さ : <yellow><text2><br><darkaqua><green> アイテムスロット : <yellow><text3><br><darkaqua><green> 最大スタック数 : <yellow><text4><br><darkaqua><green> 妨害アイテム威力補正 : <yellow><text5><br><darkaqua><green> リスキル耐性 : <yellow><text6><br><darkaqua><green> デスペナルティの長さ : <blue><text7><br><darkaqua><green> デスペナルティ時の速さ : <blue><text8><br><darkaqua><green> 速度強化アイテム補正(LV) : <yellow><text9><br><darkaqua><green> 速度強化アイテム補正(秒) : <yellow><text10><br><darkaqua><green> 速度低下アイテム補正(LV) : <yellow><text11><br><darkaqua><green> 速度低下アイテム補正(秒) : <yellow><text12>"
 tableKartParameter : "<darkaqua><green> 重量 : <yellow><text1><br><darkaqua><green> 最高速度 : <yellow><text2><br><darkaqua><green> アイテム使用中の最高速度 : <yellow><text3><br><darkaqua><green> 加速 : <yellow><text4><br><darkaqua><green> カーブ性能 : <yellow><text5><br><darkaqua><green> ドリフト時のカーブ性能 : <yellow><text6><br><darkaqua><green> ドリフト時の減速率 : <yellow><text7><br><darkaqua><green> ダート走行時の減速率 : <yellow><text8><br><darkaqua><green> 乗り越えられるブロックの高さ : <yellow><text9><br>"

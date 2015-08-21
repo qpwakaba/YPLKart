@@ -17,6 +17,7 @@ import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.PermissionObject;
+import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.utils.Util;
 
 /**
@@ -41,6 +42,7 @@ public enum MessageEnum {
     invalidNumber(),
     invalidBoolean(),
     invalidCircuit(),
+    invalidRaceType(),
     invalidCharacter(),
     invalidKart(),
 
@@ -51,6 +53,7 @@ public enum MessageEnum {
     cmdCircuitEdit(),
     cmdCircuitRename(),
     cmdCircuitRankingNoScoreData(),
+    cmdCircuitSetRaceType(),
     cmdCircuitSetPosition(),
     cmdCircuitSetLap(),
     cmdCircuitSetMinPlayer(),
@@ -219,6 +222,10 @@ public enum MessageEnum {
             configManager.setValue(messageVersion.getConfigKey(), "1.2");
             configManager.setValue(tableKartParameter.getConfigKey()
                     , configManager.getDefaultConfig().get(tableKartParameter.getConfigKey()));
+        } else if (version.equalsIgnoreCase("1.2")) {
+            configManager.setValue(messageVersion.getConfigKey(), "1.3");
+            configManager.setValue(tableCircuitInformation.getConfigKey()
+                    , configManager.getDefaultConfig().get(tableCircuitInformation.getConfigKey()));
 
         }
     }
@@ -300,6 +307,9 @@ public enum MessageEnum {
 
         String circuitList = CircuitConfig.getCircuitListString();
         message = message.replace("<circuitlist>", circuitList == null ? "" : circuitList);
+
+        String raceTypeList = RaceType.getRaceTypeListString();
+        message = message.replace("<racetypelist>", raceTypeList);
 
         String characterList = CharacterConfig.getCharacterListString();
         message = message.replace("<characterlist>", characterList == null ? "" : characterList);
@@ -400,6 +410,8 @@ public enum MessageEnum {
         } else if (object instanceof Circuit) {
             basemessage = basemessage.replace("<circuitname>",
                     Util.convertInitialUpperString(((Circuit) object).getCircuitName()));
+        } else if (object instanceof RaceType) {
+            basemessage = basemessage.replace("<racetype>", ((RaceType) object).name());
         } else if (object instanceof Character) {
             basemessage = basemessage.replace("<character>", ((Character) object).getCharacterName());
         } else if (object instanceof Kart) {
