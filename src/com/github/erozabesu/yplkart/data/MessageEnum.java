@@ -1,6 +1,5 @@
 package com.github.erozabesu.yplkart.data;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +16,7 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.PermissionObject;
 import com.github.erozabesu.yplkart.utils.Util;
 
 /**
@@ -162,7 +162,7 @@ public enum MessageEnum {
     /** テキストメッセージ */
     private String message;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
@@ -203,31 +203,27 @@ public enum MessageEnum {
         }
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    /**
+     * 新規の要素を追加した際は自動的に追記されるためパッチを当てる必要はない
+     * 既存の要素を強制的に上書きする際に用いる(項目の追加、記述ミスの修正など)
+     */
+    private static void updatePatch() {
+        String version = messageVersion.getMessage();
+        ConfigManager configManager = ConfigManager.MESSAGE_ENUM;
 
-    /** @return configKey コンフィグキー */
-    public String getConfigKey() {
-        return this.configKey;
+        if (version.equalsIgnoreCase("1.0")) {
+            configManager.setValue(messageVersion.getConfigKey(), "1.1");
+            configManager.setValue(racePlayerKill.getConfigKey()
+                    , configManager.getDefaultConfig().get(racePlayerKill.getConfigKey()));
+        } else if (version.equalsIgnoreCase("1.1")) {
+            configManager.setValue(messageVersion.getConfigKey(), "1.2");
+            configManager.setValue(tableKartParameter.getConfigKey()
+                    , configManager.getDefaultConfig().get(tableKartParameter.getConfigKey()));
+
+        }
     }
 
-    /** @return message テキストメッセージ */
-    public String getMessage() {
-        return this.message;
-    }
-
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param configKey セットするコンフィグキー */
-    public void setConfigKey(String configKey) {
-        this.configKey = configKey;
-    }
-
-    /** @param message セットするテキストメッセージ */
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    //〓 public do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Message 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public String getConvertedMessage(Object... object) {
         String message = getMessage();
@@ -258,8 +254,6 @@ public enum MessageEnum {
         }
     }
 
-    //〓 util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     /**
      * 引数adressに対し引数messageのテキストメッセージを送信する
      * adressがnullの場合はログにプレーンメッセージを出力する
@@ -288,27 +282,7 @@ public enum MessageEnum {
         }
     }
 
-    /**
-     * 新規の要素を追加した際は自動的に追記されるためパッチを当てる必要はない
-     * 既存の要素を強制的に上書きする際に用いる(記述ミスの修正など)
-     */
-    private static void updatePatch() {
-        String version = messageVersion.getMessage();
-        ConfigManager configManager = ConfigManager.MESSAGE_ENUM;
-
-        if (version.equalsIgnoreCase("1.0")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.1");
-            configManager.setValue(racePlayerKill.getConfigKey()
-                    , configManager.getDefaultConfig().get(racePlayerKill.getConfigKey()));
-        } else if (version.equalsIgnoreCase("1.1")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.2");
-            configManager.setValue(tableKartParameter.getConfigKey()
-                    , configManager.getDefaultConfig().get(tableKartParameter.getConfigKey()));
-
-        }
-    }
-
-    //〓 static 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Tags 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 引数messageの汎用タグを置換する
@@ -391,8 +365,9 @@ public enum MessageEnum {
      * @return
      */
     private static String replaceLimitedTags(String basemessage, Object object) {
-        if (object == null)
+        if (object == null) {
             return basemessage;
+        }
 
         if (object instanceof Number) {
             basemessage = basemessage.replace("<number>", String.valueOf((Number) object));
@@ -401,10 +376,6 @@ public enum MessageEnum {
             for (int i = 0; i < num.length; i++) {
                 int tagnumber = i + 1;
                 basemessage = basemessage.replace("<number" + tagnumber + ">", String.valueOf(num[i]));
-            }
-        } else if (object instanceof String) {
-            if (basemessage.contains("<perm>")) {
-                basemessage = basemessage.replace("<perm>", ((String) object));
             }
         } else if (object instanceof String[]) {
             String[] text = (String[]) object;
@@ -422,6 +393,10 @@ public enum MessageEnum {
                 basemessage = basemessage.replace("<player" + tagnumber + ">",
                         String.valueOf(((Player[]) object)[i].getName()));
             }
+        } else if (object instanceof PermissionObject) {
+            if (basemessage.contains("<perm>")) {
+                basemessage = basemessage.replace("<perm>", ((PermissionObject) object).getPermissionNode());
+            }
         } else if (object instanceof Circuit) {
             basemessage = basemessage.replace("<circuitname>",
                     Util.convertInitialUpperString(((Circuit) object).getCircuitName()));
@@ -432,10 +407,32 @@ public enum MessageEnum {
         } else if (object instanceof ItemStack) {
             basemessage = basemessage.replace("<item>",
                     ChatColor.stripColor(((ItemStack) object).getItemMeta().getDisplayName()));
-        } else if (object instanceof File) {
-            basemessage = basemessage.replace("<file>", ((File) object).getName());
         }
 
         return basemessage;
+    }
+
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @return configKey コンフィグキー */
+    public String getConfigKey() {
+        return this.configKey;
+    }
+
+    /** @return message テキストメッセージ */
+    public String getMessage() {
+        return this.message;
+    }
+
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /** @param configKey セットするコンフィグキー */
+    public void setConfigKey(String configKey) {
+        this.configKey = configKey;
+    }
+
+    /** @param message セットするテキストメッセージ */
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
