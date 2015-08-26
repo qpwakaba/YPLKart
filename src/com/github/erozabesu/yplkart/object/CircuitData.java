@@ -102,7 +102,8 @@ public class CircuitData {
         this.setMenuTime(configManager.getInteger(circuitDataName + ".menutime"));
         this.setLimitTime(configManager.getInteger(circuitDataName + ".limittime"));
         this.setBroadcastGoalMessage(configManager.getBoolean(circuitDataName + ".broadcastgoalmessage"));
-        this.setRaceType(RaceType.getRaceTypeByString(configManager.getString(circuitDataName + ".race_type")));
+        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(circuitDataName + ".race_type"));
+        this.setRaceType(raceType == null ? RaceType.KART : raceType);
         this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
         this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
     }
