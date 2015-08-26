@@ -536,13 +536,20 @@ public class KartUtil extends ReflectionUtil {
         invoke(Methods.Ypl_setKillerY, nmsEntityKart, 0);
         invoke(Methods.Ypl_setKillerZ, nmsEntityKart, 0);
 
-        //クライアントの移動入力値。レースカート、かつレースが開始されていない場合は除外
+        //クライアントの移動入力値
         float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
         float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
+
         if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+
+            //レースカート、かつレースが開始されていない場合は入力値を0に
             if (!RaceManager.isStarted(player.getUniqueId())) {
                 sideInput = 0.0F;
                 forwardInput = 0.0F;
+
+            //地面に接していない場合は横方向への入力値を0に
+            } else if (!(Boolean) getFieldValue(Fields.nmsEntity_onGround, nmsEntityKart)) {
+                sideInput = 0.0F;
             }
         }
 
