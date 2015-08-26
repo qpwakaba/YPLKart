@@ -1011,7 +1011,7 @@ public class KartUtil extends ReflectionUtil {
     public static boolean isDirtBlock(Object kartEntity) {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
-        return Util.getGroundBlockID(location).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+        return Util.getGroundBlockID(location, 1).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
     }
 
     /**
@@ -1038,7 +1038,7 @@ public class KartUtil extends ReflectionUtil {
          * カートと接触するBoundingBoxの面の正確な座標が必要なため、NmsBlockから取得したブロックの高さを
          * 座標から減算する
          */
-        Block groundBlock = Util.getGroundBlock(location);
+        Block groundBlock = Util.getGroundBlock(location, 1);
         Location groundBlockLocation;
         if (groundBlock == null) {
             groundBlockLocation = location;

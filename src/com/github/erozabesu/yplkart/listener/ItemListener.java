@@ -377,8 +377,8 @@ public class ItemListener extends RaceManager implements Listener {
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
 
-        if (Util.getGroundBlockMaterial(player.getLocation()) == Material.PISTON_BASE
-                || Util.getGroundBlockMaterial(player.getLocation()) == Material.PISTON_STICKY_BASE) {
+        if (Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_BASE
+                || Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_STICKY_BASE) {
             if (Permission.hasPermission(player, Permission.INTERACT_DASHBOARD, false)) {
                 if (boostRailCool.get(player) != null)
                     if (boostRailCool.get(player))

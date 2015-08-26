@@ -108,13 +108,14 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * locationを基点に直下の最も近い固形Blockを返す
+     * 引数locationを基点に、引数heightの数値だけ下方の最も近い固形Blockを返す。
      * @param location 基点となる座標
-     * @return Block
+     * @param height 高さ
+     * @return 直下の固形ブロック。固形ブロックが存在しない場合は{@code null}を返す。
      */
-    public static Block getGroundBlock(Location location) {
+    public static Block getGroundBlock(Location location, int height) {
         Location cloneLocation = location.clone();
-        for (int i = 0; i <= 5; i++) {
+        for (int i = 0; i <= height; i++) {
             if (isSolidBlock(cloneLocation)) {
                 return cloneLocation.getBlock();
             }
@@ -124,12 +125,13 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * locationを基点に直下の最も近い固形BlockのIDを返す
+     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのIDを返す。
      * @param location 基点となる座標
+     * @param height 高さ
      * @return BlockのID、データのString
      */
-    public static String getGroundBlockID(Location location) {
-        Block block = getGroundBlock(location);
+    public static String getGroundBlockID(Location location, int height) {
+        Block block = getGroundBlock(location, height);
         if (block == null) {
             return "0:0";
         }
@@ -138,12 +140,13 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * locationを基点に直下の最も近い固形BlockのMaterialを返す
+     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのMaterialを返す
      * @param location 基点となる座標
+     * @param height 高さ
      * @return BlockのMaterial
      */
-    public static Material getGroundBlockMaterial(Location location) {
-        Block block = getGroundBlock(location);
+    public static Material getGroundBlockMaterial(Location location, int height) {
+        Block block = getGroundBlock(location, height);
         if (block == null) {
             return Material.AIR;
         }
