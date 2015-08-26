@@ -76,14 +76,15 @@ public class DataListener implements Listener {
         }
 
         Player player = (Player) event.getExited();
+        Racer racer = RaceManager.getRacer(player);
 
         //レース中はキャンセル
-        if (RaceManager.isStillRacing(player.getUniqueId())) {
-            event.setCancelled(true);
-            return;
+        if (RaceManager.isStandBy(player.getUniqueId())) {
+            if (!racer.isGoal()) {
+                event.setCancelled(true);
+                return;
+            }
         }
-
-        Racer racer = RaceManager.getRacer(player);
 
         //仮想スニークフラグがtrueではない場合はキャンセル
         if (!racer.isSneaking()) {
