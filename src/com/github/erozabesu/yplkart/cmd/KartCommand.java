@@ -13,9 +13,9 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.utils.Util;
 
-public class RideCommand extends Command {
-    public RideCommand() {
-        super("ride");
+public class KartCommand extends Command {
+    public KartCommand() {
+        super("kart");
     }
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
