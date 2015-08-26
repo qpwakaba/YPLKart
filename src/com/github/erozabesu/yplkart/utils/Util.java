@@ -454,13 +454,22 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * 引数numberがIntegerに変換できるかどうかを返す
-     * @param number 調べるString
-     * @return 引数numberがIntegerに変換できるかどうか
+     * 引数valueが数値、booleanに一致しない文字列かどうかを返す。
+     * @param value チェックする文字列
+     * @return 引数valueが数値、booleanに一致しない文字列かどうかを返す。
      */
-    public static boolean isInteger(String number) {
+    public static boolean isString(String value) {
+        return !isInteger(value) && !isFloat(value) && !isBoolean(value);
+    }
+
+    /**
+     * 引数valueがIntegerに変換できるかどうかを返す
+     * @param value 調べるString
+     * @return 引数valueがIntegerに変換できるかどうか
+     */
+    public static boolean isInteger(String value) {
         try {
-            Integer.parseInt(number);
+            Integer.parseInt(value);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -468,13 +477,13 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * 引数numberがFloatに変換できるかどうかを返す
-     * @param number 調べるString
-     * @return 引数numberがFloatに変換できるかどうか
+     * 引数valueがFloatに変換できるかどうかを返す。
+     * @param value チェックする文字列
+     * @return 引数valueがFloatに変換できるかどうか
      */
-    public static boolean isFloat(String number) {
+    public static boolean isFloat(String value) {
         try {
-            Float.parseFloat(number);
+            Float.parseFloat(value);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -482,23 +491,15 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * 引数numberがDoubleに変換できるかどうかを返す
-     * @param number 調べるString
-     * @return 引数numberがDoubleに変換できるかどうか
+     * 引数valueがBooleanに変換できるかどうかを返す。
+     * @return 引数valueがBooleanに変換できるかどうか
      */
-    public static boolean isDouble(String number) {
-        try {
-            Double.parseDouble(number);
+    public static boolean isBoolean(String value) {
+        if (value.equals("true") || value.equals("false")) {
             return true;
-        } catch (NumberFormatException e) {
+        } else {
             return false;
         }
-    }
-
-    public static boolean isBoolean(String flag) {
-        if (flag.equalsIgnoreCase("true") || flag.equalsIgnoreCase("false"))
-            return true;
-        return false;
     }
 
     public static boolean isLoadedChunk(Location l) {
