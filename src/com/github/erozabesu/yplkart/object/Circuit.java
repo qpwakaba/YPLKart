@@ -213,6 +213,7 @@ public class Circuit {
                 RaceManager.leaveRacingKart(player);
 
                 //開始地点にテレポート、メニュー表示
+                racer.setSneaking(true);
                 player.leaveVehicle();
                 player.teleport(position.get(count));
                 racer.setRaceStartLocation(position.get(count));
