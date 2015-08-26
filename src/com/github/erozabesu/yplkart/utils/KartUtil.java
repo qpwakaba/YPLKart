@@ -334,7 +334,9 @@ public class KartUtil extends ReflectionUtil {
          * 現在座標のテレポートパケットを送信する
          * 描画位置の細かい計算は、パケットの送信をPlayerChannelHandlerがフックし行うためここでは送信するのみ
          */
-        PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
+        if((Integer) getFieldValue(Fields.nmsEntity_ticksLived, nmsEntityKart) % 20 == 0) {
+            PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
+        }
     }
 
     /**
@@ -1066,10 +1068,12 @@ public class KartUtil extends ReflectionUtil {
         if (groundBlock == null) {
             groundBlockLocation = location;
         } else {
-            Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
+            //Object nmsGroundBlock = ReflectionUtil.invoke(Methods.craftBlock_getNMSBlock, groundBlock);
             groundBlockLocation = groundBlock.getLocation();
-            groundBlockLocation.add(
-                    0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);
+            /*groundBlockLocation.add(
+                    0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);*/
+            double blockHeight = Util.isBottomSlabBlock(groundBlock) ? 0.5D : 1.0D;
+            groundBlockLocation.add(0.0D, -1.0D + blockHeight, 0.0D);
         }
 
         //Y座標のオフセット

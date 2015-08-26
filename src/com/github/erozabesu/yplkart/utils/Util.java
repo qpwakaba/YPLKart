@@ -531,6 +531,24 @@ public class Util extends ReflectionUtil {
         return false;
     }
 
+    /**
+     * 引数blockが下半分に設置された半ブロックかどうかを返す。<br>
+     * 上半分に設置された半ブロックの場合、もしくは半ブロックではない場合はfalseを返す。
+     * @param block チェックするブロック
+     * @return 引数blockが下半分に設置された半ブロックかどうか
+     */
+    public static Boolean isBottomSlabBlock(Block block) {
+        if (!isSlabBlock(block.getLocation())) {
+            return false;
+        }
+
+        if (8 <= block.getData()) {
+            return false;
+        }
+
+        return true;
+    }
+
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
