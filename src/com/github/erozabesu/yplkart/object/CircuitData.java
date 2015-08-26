@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -344,9 +345,9 @@ public class CircuitData {
 
     /**
      * メンバ変数の設定データ一覧をログ出力する
-     * @param adress ログの送信先
+     * @param address ログの送信先
      */
-    public void sendInformation(Object adress) {
+    public void sendInformation(CommandSender address) {
         Location l = this.getStartLocation();
         Number[] numberdata = {
                 this.getNumberOfLaps(), this.getMinPlayer(), this.getMaxPlayer()
@@ -356,16 +357,16 @@ public class CircuitData {
         Circuit circuit = new Circuit();
         circuit.setCircuitName(this.getCircuitDataName());
         MessageEnum.tableCircuitInformation
-                .sendConvertedMessage(adress, circuit, this.getRaceType(), numberdata, this.getBroadcastGoalMessage());
+                .sendConvertedMessage(address, circuit, this.getRaceType(), numberdata, this.getBroadcastGoalMessage());
     }
 
-    public void sendRanking(Object adress) {
+    public void sendRanking(CommandSender address) {
 
         //ランキングデータがない
         if (this.getRunLapTimeList().size() == 0 && this.getKartLapTimeList().size() == 0) {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(this.getCircuitDataName());
-            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(adress, circuit);
+            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(address, circuit);
             return;
         }
 
@@ -424,13 +425,8 @@ public class CircuitData {
                     }
 
                     //ランキング参照者がプレイヤーの場合、参照者自身のデータを格納する
-                    if (adress instanceof Player) {
-                        if (lapTimeObject.getUuid().equals(((Player) adress).getUniqueId())) {
-                            ownRank = rank;
-                            ownLapSecond = lapTimeObject.getLapTime();
-                        }
-                    } else if (adress instanceof UUID) {
-                        if (lapTimeObject.getUuid().equals(((UUID) adress))) {
+                    if (address instanceof Player) {
+                        if (lapTimeObject.getUuid().equals(((Player) address).getUniqueId())) {
                             ownRank = rank;
                             ownLapSecond = lapTimeObject.getLapTime();
                         }
@@ -438,10 +434,8 @@ public class CircuitData {
                 }
 
                 //ランキング参照者のデータを別枠で書き出す
-                if (adress instanceof Player || adress instanceof UUID) {
-                    String playerName = adress instanceof Player
-                            ? ((Player) adress).getName()
-                            : Bukkit.getOfflinePlayer((UUID) adress).getName();
+                if (address instanceof Player) {
+                    String playerName = ((Player) address).getName();
 
                     if (ownRank != 0 && ownLapSecond != 0) {
                         ranking += "<white>" + playerName + "<green>さんの順位は<yellow>" + ownRank
@@ -451,7 +445,7 @@ public class CircuitData {
                     }
                 }
 
-                MessageEnum.sendAbsolute(adress, MessageEnum.replaceChatColor(ranking));
+                MessageEnum.sendAbsolute(address, MessageEnum.replaceChatColor(ranking));
             }
         }
 
@@ -510,23 +504,16 @@ public class CircuitData {
                     }
 
                     //ランキング参照者がプレイヤーの場合、参照者自身のデータを格納する
-                    if (adress instanceof Player) {
-                        if (lapTimeObject.getUuid().equals(((Player) adress).getUniqueId())) {
-                            ownRank = rank;
-                            ownLapSecond = lapTimeObject.getLapTime();
-                        }
-                    } else if (adress instanceof UUID) {
-                        if (lapTimeObject.getUuid().equals(((UUID) adress))) {
+                    if (address instanceof Player) {
+                        if (lapTimeObject.getUuid().equals(((Player) address).getUniqueId())) {
                             ownRank = rank;
                             ownLapSecond = lapTimeObject.getLapTime();
                         }
                     }
                 }
                 //ランキング参照者のデータを別枠で書き出す
-                if (adress instanceof Player || adress instanceof UUID) {
-                    String playerName = adress instanceof Player
-                            ? ((Player) adress).getName()
-                            : Bukkit.getOfflinePlayer((UUID) adress).getName();
+                if (address instanceof Player) {
+                    String playerName = ((Player) address).getName();
 
                     if (ownRank != 0 && ownLapSecond != 0) {
                         ranking += "<white>" + playerName + "<green>さんの順位は<yellow>" + ownRank
@@ -536,7 +523,7 @@ public class CircuitData {
                     }
                 }
 
-                MessageEnum.sendAbsolute(adress, MessageEnum.replaceChatColor(ranking));
+                MessageEnum.sendAbsolute(address, MessageEnum.replaceChatColor(ranking));
             }
         }
     }
@@ -690,7 +677,7 @@ public class CircuitData {
 
     /** @param configKey サーキット名 */
     public void setCircuitDataName(String circuitDataName) {
-        this.circuitDataName = (String) circuitDataName;
+        this.circuitDataName = circuitDataName;
     }
 
     /** @param worldName ワールド名 */

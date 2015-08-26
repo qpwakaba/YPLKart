@@ -501,6 +501,10 @@ public class Util extends ReflectionUtil {
         return false;
     }
 
+    public static boolean isPlayer(Object object) {
+        return (object instanceof Player);
+    }
+
     public static boolean isLoadedChunk(Location l) {
         Player player = getNearestPlayer(getNearbyPlayers(l, 100), l);
         if (player == null)
