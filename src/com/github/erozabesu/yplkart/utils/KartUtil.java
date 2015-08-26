@@ -227,10 +227,6 @@ public class KartUtil extends ReflectionUtil {
         double motY = (Double) getFieldValue(Fields.nmsEntity_motY, nmsEntityKart);
         double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
 
-        //モーション値を変換する前に現在のモーション値を残しておく
-        //collide()で使用する
-        invoke(Methods.Ypl_setLastMotionSpeed, nmsEntityKart, calcMotionSpeed(motX, motZ) * kart.getWeight());
-
         //キラー使用中
         boolean isKillerInitialized = (Boolean) invoke(Methods.Ypl_isKillerInitialized, nmsEntityKart);
         if (racer.getUsingKiller() != null) {
@@ -288,9 +284,10 @@ public class KartUtil extends ReflectionUtil {
             playDriftEffect(player, location, speedStack);
 
             //スピードメーター
-            int motionSpeed = (int) (calcMotionSpeed(motX, motZ) * 564.0D);
-            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + motionSpeed);
-            //player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
+
+            double motionSpeed = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
+            BigDecimal bd = new BigDecimal(motionSpeed);
+            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + bd.intValue());
         }
 
         //はしご、つたのようなよじ登れるブロックに立っている場合
@@ -337,7 +334,7 @@ public class KartUtil extends ReflectionUtil {
          * 現在座標のテレポートパケットを送信する
          * 描画位置の細かい計算は、パケットの送信をPlayerChannelHandlerがフックし行うためここでは送信するのみ
          */
-        //PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
+        PacketUtil.sendEntityTeleportPacket(null, entityKart, location);
     }
 
     /**
@@ -528,6 +525,7 @@ public class KartUtil extends ReflectionUtil {
      */
     public static void setNormalMotion(Object nmsEntityKart, Object entityHuman) {
         Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, entityHuman);
+        boolean onGround = (Boolean) getFieldValue(Fields.nmsEntity_onGround, nmsEntityKart);
 
         //キラー用変数の初期化
         invoke(Methods.Ypl_setKillerPassedCheckPointList, nmsEntityKart, new Object[]{null});
@@ -536,13 +534,20 @@ public class KartUtil extends ReflectionUtil {
         invoke(Methods.Ypl_setKillerY, nmsEntityKart, 0);
         invoke(Methods.Ypl_setKillerZ, nmsEntityKart, 0);
 
-        //クライアントの移動入力値。レースカート、かつレースが開始されていない場合は除外
+        //クライアントの移動入力値
         float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
         float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
+
         if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+
+            //レースカート、かつレースが開始されていない場合は入力値を0に
             if (!RaceManager.isStarted(player.getUniqueId())) {
                 sideInput = 0.0F;
                 forwardInput = 0.0F;
+
+            //地面に接していない場合は横方向への入力値を0に
+            } else if (!(Boolean) getFieldValue(Fields.nmsEntity_onGround, nmsEntityKart)) {
+                sideInput = 0.0F;
             }
         }
 
@@ -550,8 +555,22 @@ public class KartUtil extends ReflectionUtil {
         double speedStack = calcSpeedStack(nmsEntityKart, entityHuman);
         invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, speedStack);
 
-        //スピードスタックを基に縦方向への移動入力値を変換
-        forwardInput = calcForwardInput(nmsEntityKart, forwardInput);
+        /*
+         * 地面に接している場合はクライアントの縦方向の入力係数を、スピードスタックを加味した値に変換
+         * 空気中にいる場合は現在のモーション値を、スピードスタックを加味した値に変換
+         */
+        double motX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
+        double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
+
+        if (onGround) {
+            forwardInput = calcForwardInput(nmsEntityKart, forwardInput);
+        } else {
+            float motionSpeed = (float) calcMotionSpeed(motX, motZ);
+            if (1.0F < motionSpeed) {
+                motionSpeed = 1.0F;
+            }
+            forwardInput = calcForwardInput(nmsEntityKart, motionSpeed);
+        }
 
         //横方向への移動入力値を基にYawを変更
         Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
@@ -585,11 +604,15 @@ public class KartUtil extends ReflectionUtil {
             float sin = (Float) invoke(Methods.static_nmsMathHelper_sin, null, yaw * 3.141593F / 180.0F);
             float cos = (Float) invoke(Methods.static_nmsMathHelper_cos, null, yaw * 3.141593F / 180.0F);
 
-            double motX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
-            double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
-
             motX -= forwardInput * sin + sideInput * cos;
             motZ -= sideInput * sin - forwardInput * cos;
+
+            if (2.5D < motX) {
+                motX = 2.5D;
+            }
+            if (2.5D < motZ) {
+                motZ = 2.5D;
+            }
 
             setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
             setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, motZ);
@@ -1011,7 +1034,7 @@ public class KartUtil extends ReflectionUtil {
     public static boolean isDirtBlock(Object kartEntity) {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
-        return Util.getGroundBlockID(location).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+        return Util.getGroundBlockID(location, 1).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
     }
 
     /**
@@ -1038,7 +1061,7 @@ public class KartUtil extends ReflectionUtil {
          * カートと接触するBoundingBoxの面の正確な座標が必要なため、NmsBlockから取得したブロックの高さを
          * 座標から減算する
          */
-        Block groundBlock = Util.getGroundBlock(location);
+        Block groundBlock = Util.getGroundBlock(location, 1);
         Location groundBlockLocation;
         if (groundBlock == null) {
             groundBlockLocation = location;

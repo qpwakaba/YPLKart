@@ -49,7 +49,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         this.shooter = shooter;
         this.adjustdamage = RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
         this.lap = RaceManager.getRacer(shooter).getCurrentLaps();
-        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
+        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation(), 5);
 
         shooterpassedcheckpoint = RaceManager.getRacer(shooter).getPassedCheckPointList();
 
@@ -97,12 +97,12 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         //周回数の更新
         if (lastStepBlock.equalsIgnoreCase(
                 (String) ConfigEnum.START_BLOCK_ID.getValue())) {
-            if (Util.getGroundBlockID(this.projectile.getLocation()).equalsIgnoreCase(
+            if (Util.getGroundBlockID(this.projectile.getLocation(), 5).equalsIgnoreCase(
                     (String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
                 lap++;
             }
         }
-        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation());
+        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation(), 5);
 
         //targetを発見したら突撃return
         ArrayList<LivingEntity> livingentity = Util.getNearbyLivingEntities(this.projectile.getLocation(), 20);

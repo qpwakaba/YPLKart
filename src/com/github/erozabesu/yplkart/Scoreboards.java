@@ -12,7 +12,6 @@ import org.bukkit.scoreboard.Team;
 
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
@@ -118,12 +117,7 @@ public class Scoreboards {
         if (sb == null)
             return;
 
-        //XXX: Unstable issue#103
-        if (ReflectionUtil.getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
-            sb.getTeam(YPLKart.PLUGIN_NAME).removePlayer(Bukkit.getOfflinePlayer(id));
-        } else {
-            sb.getTeam(YPLKart.PLUGIN_NAME).removeEntry(getPlayerRegisterName(id));
-        }
+        sb.getTeam(YPLKart.PLUGIN_NAME).removePlayer(Bukkit.getOfflinePlayer(id));
 
         sb.resetScores(getPlayerRegisterName(id));
         hideBoard(id);

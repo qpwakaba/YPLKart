@@ -76,14 +76,15 @@ public class DataListener implements Listener {
         }
 
         Player player = (Player) event.getExited();
+        Racer racer = RaceManager.getRacer(player);
 
         //レース中はキャンセル
-        if (RaceManager.isStillRacing(player.getUniqueId())) {
-            event.setCancelled(true);
-            return;
+        if (RaceManager.isStandBy(player.getUniqueId())) {
+            if (!racer.isGoal()) {
+                event.setCancelled(true);
+                return;
+            }
         }
-
-        Racer racer = RaceManager.getRacer(player);
 
         //仮想スニークフラグがtrueではない場合はキャンセル
         if (!racer.isSneaking()) {
@@ -183,8 +184,8 @@ public class DataListener implements Listener {
             return;
         }
 
-        String fromBlockId = Util.getGroundBlockID(event.getFrom());
-        String toBlockId = Util.getGroundBlockID(event.getTo());
+        String fromBlockId = Util.getGroundBlockID(event.getFrom(), 5);
+        String toBlockId = Util.getGroundBlockID(event.getTo(), 5);
 
         //現在の週回数
         int currentLaps = racer.getCurrentLaps();
