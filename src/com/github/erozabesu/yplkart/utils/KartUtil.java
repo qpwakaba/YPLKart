@@ -288,9 +288,10 @@ public class KartUtil extends ReflectionUtil {
             playDriftEffect(player, location, speedStack);
 
             //スピードメーター
-            int motionSpeed = (int) (calcMotionSpeed(motX, motZ) * 564.0D);
-            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + motionSpeed);
-            //player.setLevel((int) (calcMotionSpeed(motX, motZ) * 564.0D));
+
+            double motionSpeed = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
+            BigDecimal bd = new BigDecimal(motionSpeed);
+            PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + bd.intValue());
         }
 
         //はしご、つたのようなよじ登れるブロックに立っている場合
