@@ -227,10 +227,6 @@ public class KartUtil extends ReflectionUtil {
         double motY = (Double) getFieldValue(Fields.nmsEntity_motY, nmsEntityKart);
         double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
 
-        //モーション値を変換する前に現在のモーション値を残しておく
-        //collide()で使用する
-        invoke(Methods.Ypl_setLastMotionSpeed, nmsEntityKart, calcMotionSpeed(motX, motZ) * kart.getWeight());
-
         //キラー使用中
         boolean isKillerInitialized = (Boolean) invoke(Methods.Ypl_isKillerInitialized, nmsEntityKart);
         if (racer.getUsingKiller() != null) {
@@ -529,6 +525,7 @@ public class KartUtil extends ReflectionUtil {
      */
     public static void setNormalMotion(Object nmsEntityKart, Object entityHuman) {
         Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, entityHuman);
+        boolean onGround = (Boolean) getFieldValue(Fields.nmsEntity_onGround, nmsEntityKart);
 
         //キラー用変数の初期化
         invoke(Methods.Ypl_setKillerPassedCheckPointList, nmsEntityKart, new Object[]{null});
@@ -558,8 +555,22 @@ public class KartUtil extends ReflectionUtil {
         double speedStack = calcSpeedStack(nmsEntityKart, entityHuman);
         invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, speedStack);
 
-        //スピードスタックを基に縦方向への移動入力値を変換
-        forwardInput = calcForwardInput(nmsEntityKart, forwardInput);
+        /*
+         * 地面に接している場合はクライアントの縦方向の入力係数を、スピードスタックを加味した値に変換
+         * 空気中にいる場合は現在のモーション値を、スピードスタックを加味した値に変換
+         */
+        double motX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
+        double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
+
+        if (onGround) {
+            forwardInput = calcForwardInput(nmsEntityKart, forwardInput);
+        } else {
+            float motionSpeed = (float) calcMotionSpeed(motX, motZ);
+            if (1.0F < motionSpeed) {
+                motionSpeed = 1.0F;
+            }
+            forwardInput = calcForwardInput(nmsEntityKart, motionSpeed);
+        }
 
         //横方向への移動入力値を基にYawを変更
         Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
@@ -593,11 +604,15 @@ public class KartUtil extends ReflectionUtil {
             float sin = (Float) invoke(Methods.static_nmsMathHelper_sin, null, yaw * 3.141593F / 180.0F);
             float cos = (Float) invoke(Methods.static_nmsMathHelper_cos, null, yaw * 3.141593F / 180.0F);
 
-            double motX = (Double) getFieldValue(Fields.nmsEntity_motX, nmsEntityKart);
-            double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
-
             motX -= forwardInput * sin + sideInput * cos;
             motZ -= sideInput * sin - forwardInput * cos;
+
+            if (2.5D < motX) {
+                motX = 2.5D;
+            }
+            if (2.5D < motZ) {
+                motZ = 2.5D;
+            }
 
             setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
             setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, motZ);
