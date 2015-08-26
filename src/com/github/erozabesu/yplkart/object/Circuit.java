@@ -203,6 +203,10 @@ public class Circuit {
                 //レース用スコアボードを表示
                 Scoreboards.entryCircuit(uuid);
 
+                //VehicleExitEventがフックされるため、スタンバイフラグをtrueに変更する前に搭乗を解除する
+                racer.setSneaking(true);
+                player.leaveVehicle();
+
                 //Racerオブジェクトの諸々
                 racer.applyRaceParameter();
                 racer.setCircuitName(getCircuitName());
@@ -213,8 +217,6 @@ public class Circuit {
                 RaceManager.leaveRacingKart(player);
 
                 //開始地点にテレポート、メニュー表示
-                racer.setSneaking(true);
-                player.leaveVehicle();
                 player.teleport(position.get(count));
                 racer.setRaceStartLocation(position.get(count));
                 RaceManager.showSelectMenu(player, true);
