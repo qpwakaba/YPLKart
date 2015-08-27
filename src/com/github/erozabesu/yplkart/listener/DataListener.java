@@ -297,24 +297,30 @@ public class DataListener implements Listener {
         }
 
         if (RaceManager.isStandBy(p.getUniqueId()) && !racer.isGoal()) {
-            //レース中のパラメータを復元する
-            racer.getRacingPlayerObject().recoveryAll();
 
-            //カートエンティティを再生成し搭乗する
-            racer.recoveryKart();
+            // issue #197
+            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    //レース中のパラメータを復元する
+                    racer.getRacingPlayerObject().recoveryAll();
 
-            //カート、もしくはキャラクターが未選択の場合強制的にランダム選択する : issue #121
-            if (racer.getCharacter() == null) {
-                RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
-                ItemEnum.removeAllKeyItems(p);
-            }
+                    //カートエンティティを再生成し搭乗する
+                    racer.recoveryKart();
 
-            if (circuitData.getRaceType().equals(RaceType.KART)) {
-                RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
-                ItemEnum.removeAllKeyItems(p);
-            }
+                    //カート、もしくはキャラクターが未選択の場合強制的にランダム選択する : issue #121
+                    if (racer.getCharacter() == null) {
+                        RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
+                        ItemEnum.removeAllKeyItems(p);
+                    }
 
-            Scoreboards.showBoard(p.getUniqueId());
+                    if (circuitData.getRaceType().equals(RaceType.KART)) {
+                        RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
+                        ItemEnum.removeAllKeyItems(p);
+                    }
+
+                    Scoreboards.showBoard(p.getUniqueId());
+                }
+            }, 10);
         }
     }
 
