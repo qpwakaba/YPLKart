@@ -223,6 +223,13 @@ public class PlayerObject {
         }
     }
 
+    /** 仮想スニークフラグを強制的にtrueに変更し搭乗中のエンティティからプレイヤーを降ろす。 */
+    public void leaveVehicle() {
+        this.setSneaking(true);
+        this.getPlayer().leaveVehicle();
+        this.setSneaking(false);
+    }
+
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return UUID */

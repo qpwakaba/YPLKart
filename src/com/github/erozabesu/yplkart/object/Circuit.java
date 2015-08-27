@@ -204,8 +204,7 @@ public class Circuit {
                 Scoreboards.entryCircuit(uuid);
 
                 //VehicleExitEventがフックされるため、スタンバイフラグをtrueに変更する前に搭乗を解除する
-                racer.setSneaking(true);
-                player.leaveVehicle();
+                racer.leaveVehicle();
 
                 //Racerオブジェクトの諸々
                 racer.applyRaceParameter();

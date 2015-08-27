@@ -337,7 +337,7 @@ public class DataListener implements Listener {
         //ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
         if (player.getVehicle() != null) {
             if (RaceManager.isSpecificKartType(player.getVehicle(), KartType.DisplayKart)) {
-                player.leaveVehicle();
+                racer.leaveVehicle();
             }
         }
 
