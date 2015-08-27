@@ -953,6 +953,12 @@ public class KartUtil extends ReflectionUtil {
 
         float forwardMotionInput =
                 (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, human);
+
+        //ドリフトしている場合はスピードを減衰
+        if (player.isSneaking()) {
+            speedStack -= kartObject.getSpeedDecreaseOnDrift() * 0.7;
+        }
+
         //前方へキーを入力している
         if (0 < forwardMotionInput) {
             if (!isDirtBlock(kartEntity)) {
