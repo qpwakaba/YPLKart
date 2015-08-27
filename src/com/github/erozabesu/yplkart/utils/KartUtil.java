@@ -967,7 +967,7 @@ public class KartUtil extends ReflectionUtil {
 
         //入力していない
         } else if (0 == forwardMotionInput) {
-            speedStack -= 4;
+            speedStack -= 6;
         }
 
         //最大値・最小値を越えている場合、正常値にマージする
