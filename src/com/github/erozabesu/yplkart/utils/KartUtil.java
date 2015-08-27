@@ -579,7 +579,7 @@ public class KartUtil extends ReflectionUtil {
         float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, nmsEntityKart);
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
             if (player.isSneaking()) {
-                yaw -= sideInput * kart.getDriftCorneringPower();
+                yaw -= (sideInput * kart.getDriftCorneringPower()) * 1.2;
             } else {
                 yaw -= sideInput * kart.getDefaultCorneringPower();
             }
