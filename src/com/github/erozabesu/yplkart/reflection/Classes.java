@@ -21,7 +21,7 @@ public class Classes extends ReflectionUtil{
     public static Class<?> nmsEntityArmorStand = getNMSClass("EntityArmorStand");
     public static Class<?> nmsItemStack = getNMSClass("ItemStack");
     public static Class<?> nmsPacket = getNMSClass("Packet");
-    public static Class<?> nmsWatchableObject = getNMSClass("DataWatcher$WatchableObject");
+    public static Class<?> nmsWatchableObject;
     public static Class<?> nmsPlayerConnection = getNMSClass("PlayerConnection");
     public static Class<?> nmsNetworkManager = getNMSClass("NetworkManager");
     public static Class<?> nmsIChatBaseComponent = getNMSClass("IChatBaseComponent");
@@ -49,17 +49,19 @@ public class Classes extends ReflectionUtil{
     //XXX: CraftBukkit Unstable
     static {
         if (getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
-            Classes.nmsChatSerializer = getNMSClass("ChatSerializer");
-            Classes.nmsEnumTitleAction = getNMSClass("EnumTitleAction");
-            Classes.nmsEnumClientCommand = getNMSClass("EnumClientCommand");
-            Classes.nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntityLook");
-            Classes.nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutRelEntityMoveLook");
+            nmsWatchableObject = getNMSClass("WatchableObject");
+            nmsChatSerializer = getNMSClass("ChatSerializer");
+            nmsEnumTitleAction = getNMSClass("EnumTitleAction");
+            nmsEnumClientCommand = getNMSClass("EnumClientCommand");
+            nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntityLook");
+            nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutRelEntityMoveLook");
         } else {
-            Classes.nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
-            Classes.nmsEnumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
-            Classes.nmsEnumClientCommand = getNMSClass("PacketPlayInClientCommand$EnumClientCommand");
-            Classes.nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutEntityLook");
-            Classes.nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook");
+            nmsWatchableObject = getNMSClass("DataWatcher$WatchableObject");
+            nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
+            nmsEnumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
+            nmsEnumClientCommand = getNMSClass("PacketPlayInClientCommand$EnumClientCommand");
+            nmsPacketPlayOutEntityLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutEntityLook");
+            nmsPacketPlayOutRelEntityMoveLook = getNMSClass("PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook");
         }
     }
 
