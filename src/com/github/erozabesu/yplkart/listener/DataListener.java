@@ -290,9 +290,13 @@ public class DataListener implements Listener {
         }
 
         final Player p = e.getPlayer();
-        if (RaceManager.isStandBy(p.getUniqueId())) {
-            Racer racer = RaceManager.getRacer(p);
+        final Racer racer = RaceManager.getRacer(p);
+        final CircuitData circuitData = CircuitConfig.getCircuitData(racer.getCircuitName());
+        if (circuitData == null) {
+            return;
+        }
 
+        if (RaceManager.isStandBy(p.getUniqueId()) && !racer.isGoal()) {
             //レース中のパラメータを復元する
             racer.getRacingPlayerObject().recoveryAll();
 
@@ -304,8 +308,8 @@ public class DataListener implements Listener {
                 RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                 ItemEnum.removeAllKeyItems(p);
             }
-            //TODO: issue #79
-            if (racer.getKart() == null) {
+
+            if (circuitData.getRaceType().equals(RaceType.KART)) {
                 RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
                 ItemEnum.removeAllKeyItems(p);
             }
