@@ -131,7 +131,8 @@ public enum ConfigManager {
     //〓 do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * ローカルコンフィグの設定データからpathキーの値を返す
+     * ローカルコンフィグの設定データから引数configKeyをパスに持つ値を返す。<br>
+     * config.yml以外には利用しないこと。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグの値
      */
@@ -148,33 +149,33 @@ public enum ConfigManager {
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのString値を返す
+     * ローカルコンフィグの設定データから引数configKeyをパスに持つString値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのString値
      */
-    public String getString(String configKey) {
-        //ローカルコンフィグにキーが含まれていない場合書き込む
-        if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
+    public String getString(String configKey, String defaultValue) {
+        //ローカルコンフィグにキーが含まれていない場合引数defaultValueを書き込む
+        if (!this.getLocalConfig().contains(configKey)) {
             if (defaultValue != null) {
-                getLocalConfig().set(configKey, defaultValue);
+                this.getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, "");
+                this.getLocalConfig().set(configKey, "");
             }
         }
 
-        return String.valueOf(getLocalConfig().get(configKey));
+        return String.valueOf(this.getLocalConfig().get(configKey));
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのint値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つint値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのint値
      */
-    public int getInteger(String configKey) {
+    public int getInteger(String configKey, Integer defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
@@ -184,89 +185,93 @@ public enum ConfigManager {
 
         try {
             return Integer.valueOf(String.valueOf(getLocalConfig().get(configKey)));
-        } catch (ClassCastException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのfloat値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つfloat値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのfloat値
      */
-    public float getFloat(String configKey) {
+    public float getFloat(String configKey, Float defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, 0.6F);
+                getLocalConfig().set(configKey, 0.0F);
             }
         }
 
         try {
             return Float.valueOf(String.valueOf(getLocalConfig().get(configKey)));
-        } catch (ClassCastException e) {
-            return 0.6F;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0.0F;
         }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのdouble値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つdouble値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのdouble値
      */
-    public double getDouble(String configKey) {
+    public double getDouble(String configKey, Double defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, 1.0D);
+                getLocalConfig().set(configKey, 0.0D);
             }
         }
 
         try {
             return Double.valueOf(String.valueOf(getLocalConfig().get(configKey)));
-        } catch (ClassCastException e) {
-            return 1.0D;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0.0D;
         }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのbyte値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つbyte値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのbyte値
      */
-    public byte getByte(String configKey) {
+    public byte getByte(String configKey, Byte defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, 0);
+                getLocalConfig().set(configKey, (byte) 0);
             }
         }
 
         try {
             return Byte.valueOf(String.valueOf(getLocalConfig().get(configKey)));
-        } catch (NumberFormatException e) {
-            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return (byte) 0;
         }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのboolean値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つboolean値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのboolean値
      */
-    public boolean getBoolean(String configKey) {
+    public boolean getBoolean(String configKey, Boolean defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
@@ -274,51 +279,57 @@ public enum ConfigManager {
             }
         }
 
-        return Boolean.valueOf(String.valueOf(getLocalConfig().get(configKey)));
+        try {
+            return Boolean.valueOf(String.valueOf(getLocalConfig().get(configKey)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのMaterial値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つMaterial値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのMaterial値
      */
-    public Material getMaterial(String configKey) {
+    public Material getMaterial(String configKey, Material defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, "stone");
+                getLocalConfig().set(configKey, "STONE");
             }
         }
 
         try {
             return Material.getMaterial(String.valueOf(getLocalConfig().get(configKey)).toUpperCase());
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return Material.STONE;
         }
     }
 
     /**
-     * ローカルコンフィグの設定データからpathキーのSound値を返す
+     * ローカルコンフィグの設定データから引数configKeyキーをパスに持つSound値を返す。<br>
+     * 一致する値が存在しない場合は引数defaultValueを保存し返す。
      * @param configKey ローカルコンフィグ値のパス
      * @return 取得したローカルコンフィグのSound値
      */
-    public Sound getSound(String configKey) {
+    public Sound getSound(String configKey, Sound defaultValue) {
         //ローカルコンフィグにキーが含まれていない場合書き込む
         if (!getLocalConfig().contains(configKey)) {
-            Object defaultValue = getDefaultConfig().get(configKey);
             if (defaultValue != null) {
                 getLocalConfig().set(configKey, defaultValue);
             } else {
-                getLocalConfig().set(configKey, "click");
+                getLocalConfig().set(configKey, "CLICK");
             }
         }
 
         try {
             return Sound.valueOf(String.valueOf(getLocalConfig().get(configKey)).toUpperCase());
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             return Sound.CLICK;
         }
     }

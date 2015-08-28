@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
@@ -80,68 +81,69 @@ public class CircuitData {
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * コンストラクタ
-     * 設定をメンバ変数へ格納する
+     * コンストラクタ。<br>
+     * 設定をメンバ変数へ格納する。<br>
+     * ユーザ側で新規に追加するデータを扱うため、ConfigManager.getDefaultConfig()には何も記述されていない。<br>
+     * そのため、ConfigManager.getXxxx(String configKey, Object defaultValue)メソッドのdefaultValueには手動で固定値を渡す。
      * @param circuitDataName サーキット名
      */
     public CircuitData(String circuitDataName) {
         this.setCircuitDataName(circuitDataName);
 
-        ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
-
-        this.setWorldName(configManager.getString(circuitDataName + ".world"));
-        this.setLocationX(configManager.getDouble(circuitDataName + ".x"));
-        this.setLocationY(configManager.getDouble(circuitDataName + ".y"));
-        this.setLocationZ(configManager.getDouble(circuitDataName + ".z"));
-        this.setLocationPitch(configManager.getFloat(circuitDataName + ".pitch"));
-        this.setLocationYaw(configManager.getFloat(circuitDataName + ".yaw"));
-
-        this.setNumberOfLaps(configManager.getInteger(circuitDataName + ".numberoflaps"));
-        this.setMinPlayer(configManager.getInteger(circuitDataName + ".minplayer"));
-        this.setMaxPlayer(configManager.getInteger(circuitDataName + ".maxplayer"));
-        this.setMatchingTime(configManager.getInteger(circuitDataName + ".matchingtime"));
-        this.setMenuTime(configManager.getInteger(circuitDataName + ".menutime"));
-        this.setLimitTime(configManager.getInteger(circuitDataName + ".limittime"));
-        this.setBroadcastGoalMessage(configManager.getBoolean(circuitDataName + ".broadcastgoalmessage"));
-        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(circuitDataName + ".race_type"));
-        this.setRaceType(raceType == null ? RaceType.KART : raceType);
-        this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
-        this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
+        init();
     }
 
-    /** メンバ変数がnullの場合初期値を格納する */
-    public void init(Location location) {
-        this.setWorldName(location.getWorld().getName());
-        this.setLocationX(location.getX());
-        this.setLocationY(location.getY());
-        this.setLocationZ(location.getZ());
-        this.setLocationPitch(location.getPitch());
-        this.setLocationYaw(location.getYaw());
+    public CircuitData(String circuitDataName, Location location) {
+        this.setCircuitDataName(circuitDataName);
 
-        if (this.getNumberOfLaps() == 0) {
-            this.setNumberOfLaps(3);
-        }
-        if (this.getMinPlayer() == 0) {
-            this.setMinPlayer(3);
-        }
-        if (this.getMaxPlayer() == 0) {
-            this.setMaxPlayer(10);
-        }
-        if (this.getMatchingTime() == 0) {
-            this.setMatchingTime(30);
-        }
-        if (this.getMenuTime() == 0) {
-            this.setMenuTime(30);
-        }
-        if (this.getLimitTime() == 0) {
-            this.setLimitTime(300);
-        }
-        if (this.getBroadcastGoalMessage() == false) {
-            this.setBroadcastGoalMessage(false);
-        }
-        if (this.getRaceType() == null) {
-            this.setRaceType(RaceType.KART);
-        }
+        init();
+
+        ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
+
+        this.setWorldName(location.getWorld().getName());
+        configManager.setValue(this.getCircuitDataName() + ".world", location.getWorld().getName());
+
+        this.setLocationX(location.getX());
+        configManager.setValue(this.getCircuitDataName() + ".x", location.getX());
+
+        this.setLocationY(location.getY());
+        configManager.setValue(this.getCircuitDataName() + ".y", location.getY());
+
+        this.setLocationZ(location.getZ());
+        configManager.setValue(this.getCircuitDataName() + ".z", location.getZ());
+
+        this.setLocationPitch(location.getPitch());
+        configManager.setValue(this.getCircuitDataName() + ".pitch", location.getPitch());
+
+        this.setLocationYaw(location.getYaw());
+        configManager.setValue(this.getCircuitDataName() + ".yaw", location.getYaw());
+    }
+
+    /** メンバ変数をコンフィグの値を基に初期値する */
+    public void init() {
+        ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
+        YamlConfiguration defaultConfig = configManager.getDefaultConfig();
+
+        this.setWorldName(configManager.getString(this.getCircuitDataName() + ".world", "world"));
+
+        this.setLocationX(configManager.getDouble(this.getCircuitDataName() + ".x", 0.0D));
+        this.setLocationY(configManager.getDouble(this.getCircuitDataName() + ".y", 0.0D));
+        this.setLocationZ(configManager.getDouble(this.getCircuitDataName() + ".z", 0.0D));
+        this.setLocationPitch(configManager.getFloat(this.getCircuitDataName() + ".pitch", 0.0F));
+        this.setLocationYaw(configManager.getFloat(this.getCircuitDataName() + ".yaw", 0.0F));
+
+        this.setNumberOfLaps(configManager.getInteger(this.getCircuitDataName() + ".numberoflaps", 3));
+        this.setMinPlayer(configManager.getInteger(this.getCircuitDataName() + ".minplayer", 3));
+        this.setMaxPlayer(configManager.getInteger(this.getCircuitDataName() + ".maxplayer", 10));
+        this.setMatchingTime(configManager.getInteger(this.getCircuitDataName() + ".matchingtime", 30));
+        this.setMenuTime(configManager.getInteger(this.getCircuitDataName() + ".menutime", 30));
+        this.setLimitTime(configManager.getInteger(this.getCircuitDataName() + ".limittime", 300));
+        this.setBroadcastGoalMessage(configManager.getBoolean(this.getCircuitDataName() + ".broadcastgoalmessage", false));
+
+        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(this.getCircuitDataName() + ".race_type", "KART"));
+        this.setRaceType(raceType);
+        this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
+        this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
     }
 
     //〓 List/Map 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -577,7 +579,7 @@ public class CircuitData {
             ConfigurationSection uuidSection = config.getConfigurationSection(uuidKey);
             for (String uuidValue : uuidSection.getKeys(false)) {
 
-                double lapTime = manager.getDouble(uuidKey + "." + uuidValue);
+                double lapTime = manager.getDouble(uuidKey + "." + uuidValue, 1000000.0D);
                 LapTime lapTimeObject =
                         new LapTime(Integer.valueOf(lapValue), UUID.fromString(uuidValue), lapTime);
                 lapTimeMap.add(lapTimeObject);

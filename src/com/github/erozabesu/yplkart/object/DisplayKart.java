@@ -34,18 +34,25 @@ public class DisplayKart {
 
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /**
+     * コンストラクタ。<br>
+     * 設定をメンバ変数へ格納する。<br>
+     * ユーザ側で新規に追加するデータを扱うため、ConfigManager.getDefaultConfig()には何も記述されていない。<br>
+     * そのため、ConfigManager.getXxxx(String configKey, Object defaultValue)メソッドのdefaultValueには手動で固定値を渡す。
+     * @param configKey コンフィグキー
+     */
     public DisplayKart(String configKey) {
         setConfigKey(configKey);
 
         ConfigManager configManager = ConfigManager.DISPLAY_KART_CONFIG;
 
-        setKartObjectKey(configManager.getString(configKey + ".kart_type"));
-        setWorldName(configManager.getString(configKey + ".world"));
-        setLocationX(configManager.getDouble(configKey + ".x"));
-        setLocationY(configManager.getDouble(configKey + ".y"));
-        setLocationZ(configManager.getDouble(configKey + ".z"));
-        setLocationPitch(configManager.getFloat(configKey + ".pitch"));
-        setLocationYaw(configManager.getFloat(configKey + ".yaw"));
+        setKartObjectKey(configManager.getString(configKey + ".kart_type", "Standard"));
+        setWorldName(configManager.getString(configKey + ".world", "world"));
+        setLocationX(configManager.getDouble(configKey + ".x", 0.0D));
+        setLocationY(configManager.getDouble(configKey + ".y", 0.0D));
+        setLocationZ(configManager.getDouble(configKey + ".z", 0.0D));
+        setLocationPitch(configManager.getFloat(configKey + ".pitch", 0.0F));
+        setLocationYaw(configManager.getFloat(configKey + ".yaw", 0.0F));
     }
 
     public void createDisplayKart(String configKey, Kart kart, Location location) {

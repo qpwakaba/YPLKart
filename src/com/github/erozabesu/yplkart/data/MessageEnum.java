@@ -180,7 +180,10 @@ public enum MessageEnum {
 
     /** ローカルコンフィグファイルの設定データを格納する */
     private void loadLocalConfig() {
-        setMessage((String) ConfigManager.MESSAGE_ENUM.getString(getConfigKey()));
+        ConfigManager config = ConfigManager.MESSAGE_ENUM;
+
+        String defaultValue = config.getDefaultConfig().getString(this.getConfigKey());
+        this.setMessage(ConfigManager.MESSAGE_ENUM.getString(this.getConfigKey(), defaultValue));
     }
 
     /**

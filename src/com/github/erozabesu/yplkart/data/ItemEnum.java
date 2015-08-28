@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -233,13 +234,21 @@ public enum ItemEnum {
     /** ローカルコンフィグファイルの設定データを格納する */
     public void loadLocalConfig() {
         ConfigManager config = ConfigManager.ITEM_ENUM;
+        YamlConfiguration defaultConfig = config.getDefaultConfig();
         String nodePrefix = getConfigKey() + ".";
 
         //全アイテム共通項目
-        setTier(config.getInteger(nodePrefix + "tier"));
-        setMaterial(config.getMaterial(nodePrefix + "material"));
-        setMaterialData(config.getByte(nodePrefix + "material_data"));
-        setMaxstack(config.getInteger(nodePrefix + "max_stack_size"));
+        int defaultTier = defaultConfig.getInt(nodePrefix + "tier");
+        this.setTier(config.getInteger(nodePrefix + "tier", defaultTier));
+
+        Material defaultMaterial = Material.getMaterial(defaultConfig.getString(nodePrefix + "material"));
+        this.setMaterial(config.getMaterial(nodePrefix + "material", defaultMaterial));
+
+        byte defaultMaterialData = (byte) defaultConfig.getInt(nodePrefix + "material_data");
+        this.setMaterialData(config.getByte(nodePrefix + "material_data", defaultMaterialData));
+
+        int defaultMaxStackSize = defaultConfig.getInt(nodePrefix + "max_stack_size");
+        this.setMaxstack(config.getInteger(nodePrefix + "max_stack_size", defaultMaxStackSize));
 
         //OP用アイテム
         if (this.equals(CHECKPOINT_TOOL)
@@ -252,8 +261,11 @@ public enum ItemEnum {
         } else {
             //外見マテリアル
             if (this.equals(KILLER)) {
-                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_material"));
-                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_material_data"));
+                Material defaultDisplayMaterial = Material.getMaterial(defaultConfig.getString(nodePrefix + "display_material"));
+                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_material", defaultDisplayMaterial));
+
+                byte defaultDisplayMaterialData = (byte) defaultConfig.getInt(nodePrefix + "display_material_data");
+                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_material_data", defaultDisplayMaterialData));
             }
 
             //エフェクトレベル
@@ -262,7 +274,8 @@ public enum ItemEnum {
                     || this.equals(BANANA)
                     || this.equals(GESSO)
                     || this.equals(THUNDER)) {
-                setEffectLevel(config.getInteger(nodePrefix + "effect_level"));
+                int defaultEffectLevel = defaultConfig.getInt(nodePrefix + "effect_level");
+                setEffectLevel(config.getInteger(nodePrefix + "effect_level", defaultEffectLevel));
             }
 
             //エフェクト秒数
@@ -274,12 +287,14 @@ public enum ItemEnum {
                     || this.equals(STAR)
                     || this.equals(TERESA)
                     || this.equals(KILLER)) {
-                setEffectSecond(config.getInteger(nodePrefix + "effect_second"));
+                int defaultEffectSecond = defaultConfig.getInt(nodePrefix + "effect_second");
+                setEffectSecond(config.getInteger(nodePrefix + "effect_second", defaultEffectSecond));
             }
 
             //歩行速度
             if (this.equals(STAR)) {
-                setWalkSpeed(config.getFloat(nodePrefix + "walk_speed"));
+                float defaultWalkSpeed = (float) defaultConfig.getDouble(nodePrefix + "walk_speed");
+                setWalkSpeed(config.getFloat(nodePrefix + "walk_speed", defaultWalkSpeed));
             }
 
             //ヒットダメージ
@@ -289,18 +304,23 @@ public enum ItemEnum {
                     || this.equals(THORNED_TURTLE)
                     || this.equals(THUNDER)
                     || this.equals(STAR)) {
-                setHitDamage(config.getInteger(nodePrefix + "hit_damage"));
+                int defaultHidDamage = defaultConfig.getInt(nodePrefix + "hit_damage");
+                setHitDamage(config.getInteger(nodePrefix + "hit_damage", defaultHidDamage));
             }
 
             //ムービングダメージ
             if (this.equals(KILLER)
                     || this.equals(THORNED_TURTLE)) {
-                setMovingDamage(config.getInteger(nodePrefix + "moving_damage"));
+                int defaultMovingDamage = defaultConfig.getInt(nodePrefix + "moving_damage");
+                setMovingDamage(config.getInteger(nodePrefix + "moving_damage", defaultMovingDamage));
             }
 
             //全レース用アイテム共通
-            setTierMultiple(config.getInteger(nodePrefix + "multiple.tier"));
-            setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount"));
+            int defaultMultipleTier = defaultConfig.getInt(nodePrefix + "multiple.tier");
+            setTierMultiple(config.getInteger(nodePrefix + "multiple.tier", defaultMultipleTier));
+
+            int defaultMultipleDropAmount = defaultConfig.getInt(nodePrefix + "multiple.drop_amount");
+            setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount", defaultMultipleDropAmount));
         }
     }
 

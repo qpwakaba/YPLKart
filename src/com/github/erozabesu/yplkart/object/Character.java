@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -77,41 +78,68 @@ public class Character {
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * コンストラクタ
-     * 設定をメンバ変数へ格納する
+     * コンストラクタ。<br>
+     * 設定をメンバ変数へ格納する。<br>
+     * デフォルト値はConfigManager.getDefaultConfig()からコンフィグキー「Steve.xxxxxx」の値を取得する。
      * @param key コンフィグキー
      */
     public Character(String key) {
         setCharacterName(key);
 
         ConfigManager config = ConfigManager.CHARACTER_CONFIG;
+        String defaultKey = "Steve";
+        YamlConfiguration defaultConfig = config.getDefaultConfig();
 
-        Class<?> nmsClass = ReflectionUtil.getNMSClass("Entity" + config.getString(key + ".entity_type"));
-        if (nmsClass == null) {
-            setNmsClass(ReflectionUtil.getNMSClass("EntityHuman"));
-        } else {
-            setNmsClass(nmsClass);
-        }
+        String defaultEntityType = defaultConfig.getString(defaultKey + ".entity_type");
+        Class<?> nmsClass = ReflectionUtil.getNMSClass("Entity" + config.getString(key + ".entity_type", defaultEntityType));
 
-        setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name"));
+        String defaultMenuHeadItemPlayerName = defaultConfig.getString(defaultKey + ".menu_head_item_player_name");
+        setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name", defaultMenuHeadItemPlayerName));
 
-        setMenuClickSound(config.getSound(key + ".menu_click_sound"));
-        setMenuClickSoundVolume(config.getFloat(key + ".menu_click_sound_volume"));
-        setMenuClickSoundPitch(config.getFloat(key + ".menu_click_sound_pitch"));
+        Sound defaultMenuClickSound = Sound.valueOf(defaultConfig.getString(defaultKey + ".menu_click_sound"));
+        setMenuClickSound(config.getSound(key + ".menu_click_sound", defaultMenuClickSound));
 
-        setAdjustMaxSlotSize(config.getInteger(key + ".item_adjust_max_slot"));
-        setAdjustMaxStackSize(config.getInteger(key + ".item_adjust_max_stack_size"));
-        setAdjustPositiveEffectSecond(config.getInteger(key + ".item_adjust_positive_effect_second"));
-        setAdjustPositiveEffectLevel(config.getInteger(key + ".item_adjust_positive_effect_level"));
-        setAdjustNegativeEffectSecond(config.getInteger(key + ".item_adjust_negative_effect_second"));
-        setAdjustNegativeEffectLevel(config.getInteger(key + ".item_adjust_negative_effect_level"));
-        setAdjustAttackDamage(config.getInteger(key + ".item_adjust_attack_damage"));
+        float defaultMenuClickSoundVolume = (float) defaultConfig.getDouble(defaultKey + ".menu_click_sound_volume");
+        setMenuClickSoundVolume(config.getFloat(key + ".menu_click_sound_volume", defaultMenuClickSoundVolume));
 
-        setMaxHealth(config.getDouble(key + ".max_health"));
-        setWalkSpeed(config.getFloat(key + ".walk_speed"));
-        setPenaltyAntiReskillSecond(config.getInteger(key + ".death_penalty.anti_reskill_second"));
-        setPenaltySecond(config.getInteger(key + ".death_penalty.penalty_second"));
-        setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed"));
+        float defaultMenuClickSoundPitch = (float) defaultConfig.getDouble(defaultKey + ".menu_click_sound_pitch");
+        setMenuClickSoundPitch(config.getFloat(key + ".menu_click_sound_pitch", defaultMenuClickSoundPitch));
+
+        int defaultItemAdjustMaxSlot = defaultConfig.getInt(defaultKey + ".item_adjust_max_slot");
+        setAdjustMaxSlotSize(config.getInteger(key + ".item_adjust_max_slot", defaultItemAdjustMaxSlot));
+
+        int defaultItemAdjustMaxStackSize = defaultConfig.getInt(defaultKey + ".item_adjust_max_stack_size");
+        setAdjustMaxStackSize(config.getInteger(key + ".item_adjust_max_stack_size", defaultItemAdjustMaxStackSize));
+
+        int defaultItemAdjustPositiveEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_second");
+        setAdjustPositiveEffectSecond(config.getInteger(key + ".item_adjust_positive_effect_second", defaultItemAdjustPositiveEffectSecond));
+
+        int defaultItemAdjustPositiveEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_level");
+        setAdjustPositiveEffectLevel(config.getInteger(key + ".item_adjust_positive_effect_level", defaultItemAdjustPositiveEffectLevel));
+
+        int defaultItemAdjustNegativeEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_second");
+        setAdjustNegativeEffectSecond(config.getInteger(key + ".item_adjust_negative_effect_second", defaultItemAdjustNegativeEffectSecond));
+
+        int defaultItemAdjustNegativeEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_level");
+        setAdjustNegativeEffectLevel(config.getInteger(key + ".item_adjust_negative_effect_level", defaultItemAdjustNegativeEffectLevel));
+
+        int defaultItemAdjustAttackDamage = defaultConfig.getInt(defaultKey + ".item_adjust_attack_damage");
+        setAdjustAttackDamage(config.getInteger(key + ".item_adjust_attack_damage", defaultItemAdjustAttackDamage));
+
+        double defaultMaxHealth = defaultConfig.getDouble(defaultKey + ".max_health");
+        setMaxHealth(config.getDouble(key + ".max_health", defaultMaxHealth));
+
+        float defaultWalkSpeed = (float) defaultConfig.getDouble(defaultKey + ".walk_speed");
+        setWalkSpeed(config.getFloat(key + ".walk_speed", defaultWalkSpeed));
+
+        int defaultDeathPenaltyAntiReskillSecond = defaultConfig.getInt(defaultKey + ".death_penalty.anti_reskill_second");
+        setPenaltyAntiReskillSecond(config.getInteger(key + ".death_penalty.anti_reskill_second", defaultDeathPenaltyAntiReskillSecond));
+
+        int defaultDeathPenaltyPenaltySecond = defaultConfig.getInt(defaultKey + ".death_penalty.penalty_second");
+        setPenaltySecond(config.getInteger(key + ".death_penalty.penalty_second", defaultDeathPenaltyPenaltySecond));
+
+        float defaultDeathPenaltyWalkSpeed = (float) defaultConfig.getDouble(defaultKey + ".death_penalty.walk_speed");
+        setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed", defaultDeathPenaltyWalkSpeed));
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

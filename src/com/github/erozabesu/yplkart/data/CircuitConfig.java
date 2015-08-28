@@ -67,8 +67,7 @@ public class CircuitConfig {
     public static void createCircuit(CommandSender address, String circuitDataName, Location location) {
         CircuitData circuitData = getCircuitData(circuitDataName);
         if (circuitData == null) {
-            circuitData = new CircuitData(circuitDataName);
-            circuitData.init(location);
+            circuitData = new CircuitData(circuitDataName, location);
             circuitData.saveConfiguration();
 
             putCircuitData(circuitDataName, circuitData);
