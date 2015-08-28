@@ -27,9 +27,8 @@ public class KaCommand implements CommandExecutor {
                 SystemMessageEnum.reference.sendConvertedMessage(sender);
                 return true;
             } else {
-                if (!CommandEnum.execute(sender, label, args)) {
+                if (!CommandEnum.execute(sender, label, args))
                     SystemMessageEnum.reference.sendConvertedMessage(sender);
-                }
                 return true;
             }
         }
