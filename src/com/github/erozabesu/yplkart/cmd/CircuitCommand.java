@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import com.github.erozabesu.yplkart.cmd.circuit.CircuitCommandEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.utils.Util;
 
 public class CircuitCommand extends Command {
     public CircuitCommand() {
@@ -12,13 +13,19 @@ public class CircuitCommand extends Command {
     }
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length <= 1) {
+        if (args.length < 1) {
             // TODO: ここでコマンドの使い方を表示させられる。
             return false;
         }
-        if(!CircuitCommandEnum.execute(sender, label, args)) {
-            SystemMessageEnum.referenceCircuitOutgame.sendConvertedMessage(sender);
+
+        if(args.length == 1 || !CircuitCommandEnum.execute(sender, label, args)) {
+            if (Util.isPlayer(sender)) {
+                SystemMessageEnum.referenceCircuitIngame.sendConvertedMessage(sender);
+            } else {
+                SystemMessageEnum.referenceCircuitOutgame.sendConvertedMessage(sender);
+            }
         }
+
         return true;
     }
 }
