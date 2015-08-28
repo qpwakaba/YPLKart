@@ -681,12 +681,12 @@ public class KartUtil extends ReflectionUtil {
             invoke(Methods.Ypl_setKillerZ, entityKart, vector.getZ());
         }
 
-        //最寄の未通過のチェックポイントとの平面距離が5ブロック以内になるまでreturnする
+        //最寄の未通過のチェックポイントとの平面距離が10ブロック以内になるまでreturnする
         Entity lastPassedCP = (Entity) invoke(Methods.Ypl_getKillerLastPassedCheckPoint, entityKart);
         if (lastPassedCP != null) {
             double distance = lastPassedCP.getLocation()
                     .distance(kartLocation.clone().add(0, cPHeihgt, 0));
-            if ( 5 < distance) {
+            if ( 10 < distance) {
                 return;
             }
         }
