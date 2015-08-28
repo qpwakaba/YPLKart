@@ -686,13 +686,13 @@ public class KartUtil extends ReflectionUtil {
         if (lastPassedCP != null) {
             double distance = lastPassedCP.getLocation()
                     .distance(kartLocation.clone().add(0, cPHeihgt, 0));
-            if ( 5 < distance) {
+            if ( 10 < distance) {
                 return;
             }
         }
 
         //周囲のチェックポイントを取得し、検出できなかった場合return
-        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(kartLocation, 40, racer.getCircuitName());
+        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(kartLocation, 80, racer.getCircuitName());
         if (nearbyCPList == null) {
             return;
         }

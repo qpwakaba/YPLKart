@@ -82,8 +82,8 @@ public enum CommandEnum {
         private final static Map<String, Command> commands;
 
         static {
-            commands = new HashMap<>();
-            aliases = new HashMap<>();
+            commands = new HashMap<String, Command>();
+            aliases = new HashMap<String, Command>();
         }
 
     }
