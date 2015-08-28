@@ -208,25 +208,26 @@ public class RaceManager {
     // 〓 Racer Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void setEntryRaceData(UUID id, String circuitname) {
+        Player player = Bukkit.getPlayer(id);
         if (isEntry(id)) {
             String oldcircuitname = Util.convertInitialUpperString(getRace(id).getCircuitName());
-            MessageEnum.raceEntryAlready.sendConvertedMessage(id, oldcircuitname);
+            MessageEnum.raceEntryAlready.sendConvertedMessage(player, oldcircuitname);
         } else {
             Circuit c = setupCircuit(circuitname);
             if (c.isFillPlayer()) {
                 c.entryReservePlayer(id);
-                MessageEnum.raceEntryFull.sendConvertedMessage(id, c);
+                MessageEnum.raceEntryFull.sendConvertedMessage(player, c);
             } else {
                 getRace(id).setCircuitName(circuitname);
 
                 if (c.isStarted()) {
                     c.entryReservePlayer(id);
-                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(id, c);
+                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, c);
                 } else {
                     c.entryPlayer(id);
                     Scoreboards.entryCircuit(id);
 
-                    MessageEnum.raceEntry.sendConvertedMessage(id, c);
+                    MessageEnum.raceEntry.sendConvertedMessage(player, c);
 
                     if (c.isMatching())
                         setMatchingCircuitData(id);
@@ -237,15 +238,14 @@ public class RaceManager {
 
     public static void setCharacterRaceData(UUID uuid, Character character) {
         //レース開始前はなにもしない
-        if (!isStandBy(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(uuid, getCircuit(uuid));
+        Player player = Bukkit.getPlayer(uuid);
+        //プレイヤーがオフライン
+        if (player == null) {
             return;
         }
 
-        Player player = Bukkit.getPlayer(uuid);
-
-        //プレイヤーがオフライン
-        if (player == null) {
+        if (!isStandBy(uuid)) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
             return;
         }
 
@@ -256,17 +256,18 @@ public class RaceManager {
 
         PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
         character.playMenuSelectSound(player);
-        MessageEnum.raceCharacter.sendConvertedMessage(uuid, new Object[] { character, getCircuit(racer.getCircuitName()) });
+        MessageEnum.raceCharacter.sendConvertedMessage(player, new Object[] { character, getCircuit(racer.getCircuitName()) });
     }
 
     public static void setKartRaceData(UUID uuid, Kart kart) {
-        if (!isStandBy(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(uuid, getCircuit(uuid));
+        Player player = Bukkit.getPlayer(uuid);
+        //プレイヤーがオフライン
+        if (player == null) {
             return;
         }
 
-        //プレイヤーがオフライン
-        if (Bukkit.getPlayer(uuid) == null) {
+        if (!isStandBy(uuid)) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
             return;
         }
 
@@ -275,7 +276,7 @@ public class RaceManager {
         racer.setKart(kart);
         racer.recoveryKart();
 
-        MessageEnum.raceKart.sendConvertedMessage(uuid, new Object[] { kart, getCircuit(racer.getCircuitName()) });
+        MessageEnum.raceKart.sendConvertedMessage(player, new Object[] { kart, getCircuit(racer.getCircuitName()) });
     }
 
     public static void clearEntryRaceData(UUID uuid) {
@@ -297,7 +298,7 @@ public class RaceManager {
                         racer.recoveryAll();
                     }
                 }
-                MessageEnum.raceExit.sendConvertedMessage(uuid, circuit);
+                MessageEnum.raceExit.sendConvertedMessage(player, circuit);
             }
 
             racer.initializeRacer();
@@ -318,7 +319,7 @@ public class RaceManager {
             PacketUtil.disguiseLivingEntity(null, player, Classes.nmsEntityHuman);
             Circuit circuit = new Circuit();
             circuit.setCircuitName(racer.getCircuitName());
-            MessageEnum.raceCharacterReset.sendConvertedMessage(id, circuit);
+            MessageEnum.raceCharacterReset.sendConvertedMessage(player, circuit);
         }
     }
 
@@ -329,10 +330,11 @@ public class RaceManager {
         }
 
         racer.setKart(null);
-        if (Bukkit.getPlayer(id) != null) {
+        Player player = Bukkit.getPlayer(id);
+        if (player != null) {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(racer.getCircuitName());
-            MessageEnum.raceLeave.sendConvertedMessage(id, circuit);
+            MessageEnum.raceLeave.sendConvertedMessage(player, circuit);
         }
     }
 

@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import com.github.erozabesu.yplkart.ConfigManager;
@@ -116,7 +117,7 @@ public class DisplayKartConfig {
      * @param adress ログの送信先
      * @param uuid 削除するDisplayKartオブジェクト名
      */
-    public static void deleteDisplayKart(Object adress, String uuid) {
+    public static void deleteDisplayKart(CommandSender address, String uuid) {
         DisplayKart displayKart = getDisplayKart(uuid);
         if (displayKart != null) {
 
@@ -126,7 +127,7 @@ public class DisplayKartConfig {
             //ローカルファイルから削除
             displayKart.deleteConfiguration();
 
-            MessageEnum.cmdDisplayDelete.sendConvertedMessage(adress, uuid);
+            MessageEnum.cmdDisplayDelete.sendConvertedMessage(address, uuid);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.github.erozabesu.yplkart;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
@@ -131,17 +131,17 @@ public enum Permission {
 
     /**
      * playerがパーミッションを所有しているかどうかを確認する
-     * @param player パーミッションを確認するプレイヤー
+     * @param target パーミッションを確認する対象
      * @param permission 確認するパーミッション
      * @param noMessage playerにパーミッションエラーメッセージを送信するかどうか
-     * @return playerがパーミッションを所有しているかどうか
+     * @return 対象がパーミッションを所有しているかどうか
      */
-    public static Boolean hasPermission(Player player, Permission permission, boolean noMessage) {
+    public static Boolean hasPermission(CommandSender target, Permission permission, boolean noMessage) {
         if (permission == null) {
             return true;
         }
 
-        if (player.isOp()) {
+        if (target.isOp()) {
             return true;
         }
 
@@ -149,7 +149,7 @@ public enum Permission {
             return true;
         }
 
-        if (player.hasPermission(permission.getPermissionNode())) {
+        if (target.hasPermission(permission.getPermissionNode())) {
             return true;
         }
 
@@ -157,7 +157,7 @@ public enum Permission {
             return false;
         }
 
-        MessageEnum.noPermission.sendConvertedMessage(player, permission.getPermission());
+        MessageEnum.noPermission.sendConvertedMessage(target, permission.getPermission());
         return false;
     }
 

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -240,8 +241,8 @@ public enum MessageEnum {
         return message;
     }
 
-    public void sendConvertedMessage(Object adress, Object... object) {
-        sendMessage(adress, getConvertedMessage(object));
+    public void sendConvertedMessage(CommandSender address, Object... object) {
+        sendMessage(address, getConvertedMessage(object));
     }
 
     //サーキットのランキング表のような、タグ置換ではどうしようもないStringを送信する際に用います
@@ -262,31 +263,35 @@ public enum MessageEnum {
     }
 
     /**
-     * 引数adressに対し引数messageのテキストメッセージを送信する
-     * adressがnullの場合はログにプレーンメッセージを出力する
-     * @param adress 送信対象(Player, UUID, null)
+     * 引数addressに対し引数messageのテキストメッセージを送信する
+     * addressがnullの場合はログにプレーンメッセージを出力する
+     * @param address 送信対象(CommandSender, null)
      * @param message テキストメッセージ
-     * @see org.bukkit.entity.Player
-     * @see java.util.UUID
+     * @see org.bukkit.command.CommandSender
      */
-    private void sendMessage(Object adress, String message) {
+    private void sendMessage(CommandSender address, String message) {
         if (message == null)
             return;
-        if (message.length() == 0)
+        if (message.isEmpty())
             return;
 
-        Player p = null;
-        if (adress instanceof Player)
-            p = (Player) adress;
-        else if (adress instanceof UUID)
-            p = Bukkit.getPlayer((UUID) adress);
-
         for (String line : replaceLine(message)) {
-            if (p != null)
-                p.sendMessage(line);
+            if (address != null)
+                address.sendMessage(line);
             else
                 log.log(Level.INFO, ChatColor.stripColor(line));
         }
+    }
+
+    /**
+     * 引数addressに対し引数messageのテキストメッセージを送信する
+     * addressがnullの場合はログにプレーンメッセージを出力する
+     * @param address 送信対象(Player, UUID, null)
+     * @param message テキストメッセージ
+     * @see java.util.UUID
+     */
+    private void sendMessage(UUID address, String message) {
+        this.sendMessage(Bukkit.getPlayer((UUID) address), message);
     }
 
     //〓 Tags 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
