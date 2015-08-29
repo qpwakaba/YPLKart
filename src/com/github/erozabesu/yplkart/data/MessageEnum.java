@@ -230,7 +230,10 @@ public enum MessageEnum {
             configManager.setValue(messageVersion.getConfigKey(), "1.3");
             configManager.setValue(tableCircuitInformation.getConfigKey()
                     , configManager.getDefaultConfig().get(tableCircuitInformation.getConfigKey()));
-
+        } else if (version.equalsIgnoreCase("1.3")) {
+            configManager.setValue(messageVersion.getConfigKey(), "1.4");
+            configManager.setValue(tableCircuitInformation.getConfigKey()
+                    , configManager.getDefaultConfig().get(tableCircuitInformation.getConfigKey()));
         }
     }
 

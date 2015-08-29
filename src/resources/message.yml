@@ -6,7 +6,7 @@
 # ------------------------- 利用可能なタグ -------------------------
 #
 # カラータグ : このタグ以降に記述されたメッセージの色を変更します。
-#   <black>,<white>,<gray>,<darkgray>,<red>,<darkRed>,<green>,<darkgreen>
+#   <black>,<white>,<gray>,<darkgray>,<red>,<darkred>,<green>,<darkgreen>
 #   <blue>,<darkblue>,<yellow>,<gold>,<lightpurple>,<darkpurple>,<aqua>,<darkaqua>
 #
 # フォントタグ : このタグ以降に記述されたメッセージのフォントを変更します。
@@ -43,7 +43,7 @@
 #
 # ------------------------- メッセージ設定 -------------------------
 #
-messageVersion : "1.3"
+messageVersion : "1.4"
 header : "<yellow>[<plugin>] "
 circuitheader : "<darkaqua>[<aqua><circuitname><darkaqua>] "
 racePlayerKill : "<circuitheader><white><player1> was killed by <player2>"
@@ -153,6 +153,6 @@ titleRaceStartCountDown : "<red><number>"
 titleRaceStartCountDownSub : ""
 titleCountDown : "<yellow>残り時間 : <number>秒"
 titleGoalRank : "<green><number1>位  <number2>秒"
-tableCircuitInformation : "<aqua>==========-[ <gold>Circuit Information <aqua>]-==========<br>    <green>サーキット名 ： <white><circuitname><br>    <green>レースタイプ ： <white><racetype><br>    <green>周回数 ： <white><number1><br>    <green>最小プレイ人数 ： <white><number2><br>    <green>最大プレイ人数 ： <white><number3><br>    <green>レースが自動終了するまでの時間 ： <white><number4><green> (秒)<br>    <green>キャラクター・カートを選択できる猶予時間 ： <white><number5><green> (秒)<br>    <green>レースへの参加・辞退を決定できる猶予時間 ： <white><number6><green> (秒)<br>    <green>順位・ラップタイムのサーバー全体通知 ： <white><flag><br>    <green>レース開始座標 ： <br>            <green>x <white><number7><green> / y <white><number8><green> / z <white><number9><br>            <green>yaw <white><number10><green> / pitch <white><number11><br>"
+tableCircuitInformation : "<aqua>==========-[ <gold>Circuit Information <aqua>]-==========<br>    <green>サーキット名 ： <white><circuitname><br>    <green>レースタイプ ： <white><racetype><br>    <green>周回数 ： <white><number1><br>    <green>最小プレイ人数 ： <white><number2><br>    <green>最大プレイ人数 ： <white><number3><br>    <green>レースが自動終了するまでの時間 ： <white><number4><green> (秒)<br>    <green>キャラクター・カートを選択できる猶予時間 ： <white><number5><green> (秒)<br>    <green>レースへの参加・辞退を決定できる猶予時間 ： <white><number6><green> (秒)<br>    <green>順位・ラップタイムのサーバー全体通知 ： <white><flag><br>    <green>レース開始座標 ： <br>            <green>world name : <white><text1><br>            <green>x <white><number7><green> / y <white><number8><green> / z <white><number9><br>            <green>yaw <white><number10><green> / pitch <white><number11><br><aqua>========================================"
 tableCharacterParameter : "<darkaqua><green> 体力 : <yellow><text1><br><darkaqua><green> 速さ : <yellow><text2><br><darkaqua><green> アイテムスロット : <yellow><text3><br><darkaqua><green> 最大スタック数 : <yellow><text4><br><darkaqua><green> 妨害アイテム威力補正 : <yellow><text5><br><darkaqua><green> リスキル耐性 : <yellow><text6><br><darkaqua><green> デスペナルティの長さ : <blue><text7><br><darkaqua><green> デスペナルティ時の速さ : <blue><text8><br><darkaqua><green> 速度強化アイテム補正(LV) : <yellow><text9><br><darkaqua><green> 速度強化アイテム補正(秒) : <yellow><text10><br><darkaqua><green> 速度低下アイテム補正(LV) : <yellow><text11><br><darkaqua><green> 速度低下アイテム補正(秒) : <yellow><text12>"
 tableKartParameter : "<darkaqua><green> 重量 : <yellow><text1><br><darkaqua><green> 最高速度 : <yellow><text2><br><darkaqua><green> アイテム使用中の最高速度 : <yellow><text3><br><darkaqua><green> 加速 : <yellow><text4><br><darkaqua><green> カーブ性能 : <yellow><text5><br><darkaqua><green> ドリフト時のカーブ性能 : <yellow><text6><br><darkaqua><green> ドリフト時の減速率 : <yellow><text7><br><darkaqua><green> ダート走行時の減速率 : <yellow><text8><br><darkaqua><green> 乗り越えられるブロックの高さ : <yellow><text9><br>"
