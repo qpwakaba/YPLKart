@@ -404,6 +404,8 @@ public enum MessageEnum {
                 int tagnumber = i + 1;
                 basemessage = basemessage.replace("<text" + tagnumber + ">", text[i]);
             }
+        } else if (object instanceof String) {
+            basemessage = basemessage.replace("<text1>", (String) object);
         } else if (object instanceof Boolean) {
             basemessage = basemessage.replace("<flag>", String.valueOf(object));
         } else if (object instanceof Player) {

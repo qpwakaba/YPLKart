@@ -360,7 +360,7 @@ public class CircuitData {
         Circuit circuit = new Circuit();
         circuit.setCircuitName(this.getCircuitDataName());
         MessageEnum.tableCircuitInformation
-                .sendConvertedMessage(address, circuit, this.getRaceType(), numberdata, this.getBroadcastGoalMessage());
+                .sendConvertedMessage(address, circuit, this.getRaceType(), l.getWorld().getName(), numberdata, this.getBroadcastGoalMessage());
     }
 
     public void sendRanking(CommandSender address) {
