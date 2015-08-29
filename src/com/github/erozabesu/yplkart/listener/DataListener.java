@@ -274,8 +274,9 @@ public class DataListener implements Listener {
         Location location = player.getLocation();
         ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(circuitName, location, 100.0D);
 
-        //TODO: 周囲にチェックポイントが無い場合コースアウト
+        //周囲にチェックポイントが無い場合コースアウト
         if (checkPointEntityList == null) {
+            racer.applyCourseOut();
             return;
         }
 
