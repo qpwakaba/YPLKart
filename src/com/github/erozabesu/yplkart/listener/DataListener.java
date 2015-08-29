@@ -121,7 +121,9 @@ public class DataListener implements Listener {
         if (!YPLKart.isPluginEnabled(e.getFrom().getWorld()))
             return;
         Player p = e.getPlayer();
-        if (!ItemEnum.CHECKPOINT_TOOL.isSimilar(p.getItemInHand()))
+        if (!ItemEnum.CHECKPOINT_TOOL.isSimilar(p.getItemInHand())
+                && !ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(p.getItemInHand())
+                && !ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(p.getItemInHand()))
             return;
 
         List<Entity> list = p.getNearbyEntities(1, 1, 1);
