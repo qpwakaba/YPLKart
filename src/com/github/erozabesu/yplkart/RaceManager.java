@@ -674,7 +674,7 @@ public class RaceManager {
         if (entity.getCustomName() == null) {
             return false;
         }
-        if (!ChatColor.stripColor(entity.getCustomName()).equalsIgnoreCase(circuitName)) {
+        if (!ChatColor.stripColor(entity.getCustomName()).equalsIgnoreCase(ChatColor.stripColor(circuitName))) {
             return false;
         }
         return true;
@@ -781,7 +781,7 @@ public class RaceManager {
 
         armorStand.getLocation().setYaw(l.getYaw());
         armorStand.getLocation().setPitch(l.getPitch());
-        armorStand.setCustomName(ChatColor.GREEN + circuitname);
+        armorStand.setCustomName(circuitname);
         armorStand.setCustomNameVisible(true);
         armorStand.setVisible(false);
         armorStand.setGravity(false);

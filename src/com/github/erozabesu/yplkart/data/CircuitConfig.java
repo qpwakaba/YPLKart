@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -493,7 +494,7 @@ public class CircuitConfig {
      * @return CircuitDataオブジェクト
      */
     public static CircuitData getCircuitData(String circuitDataName) {
-        return getCircuitDataMap().get(circuitDataName);
+        return getCircuitDataMap().get(ChatColor.stripColor(circuitDataName));
     }
 
     /** @return CircuitDataオブジェクトを格納しているハッシュマップのKeySet */
