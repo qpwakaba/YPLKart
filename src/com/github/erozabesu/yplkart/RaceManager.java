@@ -22,7 +22,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
@@ -417,7 +416,7 @@ public class RaceManager {
         for (Entity e : entityList) {
             //プレイヤーとの高低差が一定以上のチェックポイントはスルー
             if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCustomWitherSkull(e, circuitname))
+                if (isCheckPointEntity(e, circuitname))
                     if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
                         nearbycheckpoint.add(e);
         }
@@ -435,7 +434,7 @@ public class RaceManager {
         for (Entity e : entityList) {
             //プレイヤーとの高低差が一定以上のチェックポイントはスルー
             if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCustomWitherSkull(e, r.getCircuitName()))
+                if (isCheckPointEntity(e, r.getCircuitName()))
                     if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(r.getCircuitName()))
                         if (!r.getPassedCheckPointList().contains(lap + e.getUniqueId().toString()))
                             nearbycheckpoint.add(e);
@@ -461,7 +460,7 @@ public class RaceManager {
         for (Entity e : entityList) {
             //プレイヤーとの高低差が一定以上のチェックポイントはスルー
             if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCustomWitherSkull(e, circuitname))
+                if (isCheckPointEntity(e, circuitname))
                     if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
                         nearbycheckpoint.add(e.getUniqueId().toString());
         }
@@ -668,13 +667,16 @@ public class RaceManager {
         return false;
     }
 
-    public static boolean isCustomWitherSkull(Entity e, String circuitname) {
-        if (!(e instanceof WitherSkull))
+    public static boolean isCheckPointEntity(Entity entity, String circuitName) {
+        if (!(entity instanceof WitherSkull) && !(entity instanceof ArmorStand)) {
             return false;
-        if (e.getCustomName() == null)
+        }
+        if (entity.getCustomName() == null) {
             return false;
-        if (!ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
+        }
+        if (!ChatColor.stripColor(entity.getCustomName()).equalsIgnoreCase(circuitName)) {
             return false;
+        }
         return true;
     }
 
@@ -774,16 +776,18 @@ public class RaceManager {
         return entity;
     }
 
-    public static Entity createCustomWitherSkull(Location l, String circuitname) throws Exception {
-        WitherSkull skull = l.getWorld().spawn(l.add(0, checkPointHeight, 0), WitherSkull.class);
-        skull.setDirection(new Vector(0, 0, 0));
-        skull.setVelocity(new Vector(0, 0, 0));
-        skull.getLocation().setYaw(0);
-        skull.getLocation().setPitch(0);
-        skull.setCustomName(ChatColor.GREEN + circuitname);
-        skull.setCustomNameVisible(true);
+    public static Entity createCheckPointEntity(Location l, String circuitname) {
+        ArmorStand armorStand = l.getWorld().spawn(l.add(0, checkPointHeight, 0), ArmorStand.class);
 
-        return skull;
+        armorStand.getLocation().setYaw(l.getYaw());
+        armorStand.getLocation().setPitch(l.getPitch());
+        armorStand.setCustomName(ChatColor.GREEN + circuitname);
+        armorStand.setCustomNameVisible(true);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        armorStand.setBasePlate(false);
+
+        return armorStand;
     }
 
     // 〓 Edit Player 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

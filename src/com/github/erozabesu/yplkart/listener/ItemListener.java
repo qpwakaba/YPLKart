@@ -117,11 +117,8 @@ public class ItemListener extends RaceManager implements Listener {
 
         //チェックポイントツール
         if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {
-            try {
-                createCustomWitherSkull(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
         //アイテムボックスツール
         } else if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {

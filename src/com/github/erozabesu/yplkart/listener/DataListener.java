@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -125,7 +126,7 @@ public class DataListener implements Listener {
 
         List<Entity> list = p.getNearbyEntities(1, 1, 1);
         for (Entity entity : list) {
-            if (RaceManager.isCustomWitherSkull(
+            if (RaceManager.isCheckPointEntity(
                     entity, p.getItemInHand().getItemMeta().getLore().get(0)))
                 if (entity.getLocation().distance(p.getLocation()) < 1.5) {
                     p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
@@ -133,6 +134,21 @@ public class DataListener implements Listener {
                     MessageEnum.itemRemoveCheckPoint.sendConvertedMessage(p);
                     break;
                 }
+        }
+    }
+
+    @EventHandler
+    public void cancelArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
+            return;
+        }
+
+        Entity armorStand = event.getRightClicked();
+        for (String circuitName : CircuitConfig.getCircuitList()) {
+            if (RaceManager.isCheckPointEntity(armorStand, circuitName)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -255,6 +271,8 @@ public class DataListener implements Listener {
 
         ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(
                 event.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, racer.getCircuitName());
+
+        //TODO: 周囲にチェックポイントが無い場合コースアウト
         if (checkPointEntityList == null) {
             return;
         }
@@ -353,12 +371,6 @@ public class DataListener implements Listener {
 
             //レース前のパラメータを復元する
             racer.recoveryAll();
-
-            //ゴール直後にログアウトした場合、r.setGoalでスケジュールされたテレポートタスクが不発するため対策
-            if (racer.isGoal()) {
-                racer.recoveryLocation();
-                racer.initializeRacer();
-            }
         } else if (RaceManager.isEntry(player.getUniqueId())
                 && !RaceManager.isStandBy(player.getUniqueId())) {
             RaceManager.clearEntryRaceData(player.getUniqueId());

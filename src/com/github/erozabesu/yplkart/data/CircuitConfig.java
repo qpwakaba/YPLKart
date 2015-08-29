@@ -104,8 +104,9 @@ public class CircuitConfig {
             //設置済みのチェックポイントEntityを削除
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {
-                    if (RaceManager.isCustomWitherSkull(entity, circuitDataName))
+                    if (RaceManager.isCheckPointEntity(entity, circuitDataName)) {
                         entity.remove();
+                    }
                 }
             }
 
@@ -168,8 +169,9 @@ public class CircuitConfig {
             //設置済みのチェックポイントの固有名をnewNameに変更する
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {
-                    if (RaceManager.isCustomWitherSkull(entity, oldName))
+                    if (RaceManager.isCheckPointEntity(entity, oldName)) {
                         entity.setCustomName(entity.getCustomName().replace(oldName, newName));
+                    }
                 }
             }
 
