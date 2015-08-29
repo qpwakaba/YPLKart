@@ -120,6 +120,16 @@ public class ItemListener extends RaceManager implements Listener {
             createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
+        //チェックポイントツールTier2
+        } else if (ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())) {
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+
+        //チェックポイントツールTier3
+        } else if (ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand())) {
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+
         //アイテムボックスツール
         } else if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
             //ブロックを右クリックした場合のみ動作
