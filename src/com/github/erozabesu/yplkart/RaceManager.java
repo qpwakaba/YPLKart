@@ -25,6 +25,7 @@ import org.bukkit.metadata.MetadataValue;
 
 import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
+import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
@@ -409,66 +410,66 @@ public class RaceManager {
         return 0;
     }
 
-    public static ArrayList<Entity> getNearbyCheckpoint(Location l, double radius, String circuitname) {
-        List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
+    public static ArrayList<Entity> getNearbyCheckpoint(String circuitName, Location location, double radius) {
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
 
-        ArrayList<Entity> nearbycheckpoint = new ArrayList<Entity>();
-        for (Entity e : entityList) {
-            //プレイヤーとの高低差が一定以上のチェックポイントはスルー
-            if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCheckPointEntity(e, circuitname))
-                    if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
-                        nearbycheckpoint.add(e);
+        ArrayList<Entity> nearbyCheckPoint = new ArrayList<Entity>();
+        for (Entity entity : entityList) {
+            if (isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+                nearbyCheckPoint.add(entity);
+            }
         }
 
-        if (nearbycheckpoint.isEmpty())
+        if (nearbyCheckPoint.isEmpty()) {
             return null;
-        return nearbycheckpoint;
+        }
+
+        return nearbyCheckPoint;
     }
 
-    public static List<Entity> getNearbyUnpassedCheckpoint(Location l, double radius, Racer r) {
-        String lap = r.getCurrentLaps() <= 0 ? "" : String.valueOf(r.getCurrentLaps());
-        List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
+    public static List<Entity> getNearbyUnpassedCheckpoint(Racer racer, Location location, double radius) {
+        String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
 
-        List<Entity> nearbycheckpoint = new ArrayList<Entity>();
-        for (Entity e : entityList) {
-            //プレイヤーとの高低差が一定以上のチェックポイントはスルー
-            if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCheckPointEntity(e, r.getCircuitName()))
-                    if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(r.getCircuitName()))
-                        if (!r.getPassedCheckPointList().contains(lap + e.getUniqueId().toString()))
-                            nearbycheckpoint.add(e);
+        List<Entity> nearbyCheckPoint = new ArrayList<Entity>();
+        for (Entity entity : entityList) {
+            if (isSpecificCircuitCheckPointEntity(entity, racer.getCircuitName())) {
+                if (!racer.getPassedCheckPointList().contains(currentLaps + entity.getUniqueId().toString())) {
+                    nearbyCheckPoint.add(entity);
+                }
+            }
         }
 
-        if (nearbycheckpoint.isEmpty())
+        if (nearbyCheckPoint.isEmpty()) {
             return null;
-        return nearbycheckpoint;
+        }
+
+        return nearbyCheckPoint;
     }
 
     public static Entity getNearestUnpassedCheckpoint(Location l, double radius, Racer r) {
-        List<Entity> checkpoint = getNearbyUnpassedCheckpoint(l, radius, r);
+        List<Entity> checkpoint = getNearbyUnpassedCheckpoint(r, l, radius);
         if (checkpoint == null)
             return null;
 
         return Util.getNearestEntity(checkpoint, l);
     }
 
-    public static ArrayList<String> getNearbyCheckpointID(Location l, double radius, String circuitname) {
-        List<Entity> entityList = Util.getNearbyEntities(l.clone().add(0, checkPointHeight, 0), radius);
+    public static ArrayList<String> getNearbyCheckpointID(String circuitName, Location location, double radius) {
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
 
-        ArrayList<String> nearbycheckpoint = new ArrayList<String>();
-        for (Entity e : entityList) {
-            //プレイヤーとの高低差が一定以上のチェックポイントはスルー
-            if (Math.abs(e.getLocation().getY() - l.getY()) < checkPointHeight + 5)
-                if (isCheckPointEntity(e, circuitname))
-                    if (ChatColor.stripColor(e.getCustomName()).equalsIgnoreCase(circuitname))
-                        nearbycheckpoint.add(e.getUniqueId().toString());
+        ArrayList<String> nearbyCheckPoint = new ArrayList<String>();
+        for (Entity entity : entityList) {
+            if (isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+                nearbyCheckPoint.add(entity.getUniqueId().toString());
+            }
         }
 
-        if (nearbycheckpoint.isEmpty())
+        if (nearbyCheckPoint.isEmpty()) {
             return null;
+        }
 
-        return nearbycheckpoint;
+        return nearbyCheckPoint;
     }
 
     /**
@@ -527,6 +528,57 @@ public class RaceManager {
             }
         }
         return null;
+    }
+
+    /**
+     * 引数entityのカスタムネームのChatColorから、対応するチェックポイントTierを返す。<br>
+     * 対応するTierが存在しない場合は{@code null}を返す。
+     * @param entity 取得するエンティティ
+     * @return チェックポイントのTier数。対応するTierが存在しない場合は{@code null}を返す。
+     */
+    public static Integer getCheckPointEntityTier(Entity entity) {
+        String nameColor = ChatColor.getLastColors(entity.getCustomName());
+
+        if (nameColor.contains("a")) {
+            return 1;
+        } else if (nameColor.contains("9")) {
+            return 2;
+        } else if (nameColor.contains("c")) {
+            return 3;
+        }
+
+        return null;
+    }
+
+    /**
+     * 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティの場合、対応する階級からチェックポイントの検出距離を返す。<br>
+     * チェックポイントエンティティでない場合は{@code null}を返す。
+     * @param entity 取得するエンティティ
+     * @return チェックポイントの検出距離
+     */
+    public static Double getDetectCheckPointRadiusByCheckPointEntity(Entity entity, String circuitName) {
+        if (!isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+            return null;
+        }
+
+        Integer tier = getCheckPointEntityTier(entity);
+        if (tier == null) {
+            return null;
+        }
+
+        switch(tier) {
+            case 1:
+                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
+
+            case 2:
+                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue();
+
+            case 3:
+                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+
+            default:
+                return null;
+        }
     }
 
     // 〓 Util Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -667,7 +719,38 @@ public class RaceManager {
         return false;
     }
 
-    public static boolean isCheckPointEntity(Entity entity, String circuitName) {
+    /**
+     * 引数entityがチェックポイントエンティティかどうかを返す。<br>
+     * ウィザースカル、もしくはアーマースタンドエンティティであり、かつ存在するサーキットと同名のカスタムネームを所有しているエンティティの場合trueを返す。
+     * @param entity チェックするエンティティ
+     * @return 引数entityがチェックポイントエンティティかどうか
+     */
+    public static boolean isCheckPointEntity(Entity entity) {
+        if (!(entity instanceof WitherSkull) && !(entity instanceof ArmorStand)) {
+            return false;
+        }
+        if (entity.getCustomName() == null) {
+            return false;
+        }
+
+        String entityName = ChatColor.stripColor(entity.getCustomName());
+        for (String circuitName : CircuitConfig.getCircuitList()) {
+            if (entityName.equalsIgnoreCase(circuitName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティかどうかを返す。<br>
+     * ウィザースカル、もしくはアーマースタンドエンティティであり、かつ引数circuitNameと同名のカスタムネームを所有しているエンティティの場合trueを返す。
+     * @param entity チェックするエンティティ
+     * @param circuitName サーキットの名称
+     * @return 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティかどうか
+     */
+    public static boolean isSpecificCircuitCheckPointEntity(Entity entity, String circuitName) {
         if (!(entity instanceof WitherSkull) && !(entity instanceof ArmorStand)) {
             return false;
         }
@@ -677,6 +760,36 @@ public class RaceManager {
         if (!ChatColor.stripColor(entity.getCustomName()).equalsIgnoreCase(ChatColor.stripColor(circuitName))) {
             return false;
         }
+        return true;
+    }
+
+    /**
+     * 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティであり、かつTierが引数tierに一致しているかどうかを返す。<br>
+     * ウィザースカル、もしくはアーマースタンドエンティティであり、かつ引数circuitNameと同名のカスタムネームを所有しているエンティティであり、<br>
+     * かつTierが引数tierに一致している場合trueを返す。
+     * @param entity チェックするエンティティ
+     * @param circuitName サーキットの名称
+     * @param tier チェックポイントエンティティの階級
+     * @return 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティであり、かつTierが引数tierに一致しているかどうか
+     */
+    public static boolean isCheckPointEntity(Entity entity, String circuitName, int tier) {
+        if (!isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+            return false;
+        }
+        if (tier < 1 && 3 < tier) {
+            return false;
+        }
+
+        String nameColor = ChatColor.getLastColors(entity.getCustomName());
+        Integer entityTier = getCheckPointEntityTier(entity);
+        if (entityTier == null) {
+            return false;
+        }
+
+        if (entityTier != tier) {
+            return false;
+        }
+
         return true;
     }
 

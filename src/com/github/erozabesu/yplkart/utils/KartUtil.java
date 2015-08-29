@@ -692,7 +692,7 @@ public class KartUtil extends ReflectionUtil {
         }
 
         //周囲のチェックポイントを取得し、検出できなかった場合return
-        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(kartLocation, 40, racer.getCircuitName());
+        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(racer.getCircuitName(), kartLocation, 40);
         if (nearbyCPList == null) {
             return;
         }

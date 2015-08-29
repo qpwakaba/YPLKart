@@ -90,7 +90,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
             this.projectile.setVelocity(new Vector(this.motX, this.motY, this.motZ));
 
             if (!Util.isLoadedChunk(this.projectile.getLocation())) {
-                this.projectile.teleport(this.projectile.getLocation().add(this.motX, this.motY, this.motZ));
+                this.projectile.teleport(this.projectile.getLocation().clone().add(this.motX, this.motY, this.motZ));
             }
         }
 
@@ -130,7 +130,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         //アカこうらを1位から2位に向け発射した場合
         if (this.targetreverse) {
             ArrayList<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    this.projectile.getLocation().add(-this.motX * 3, 0, -this.motZ * 3), 30, r.getCircuitName());
+                    r.getCircuitName(), this.projectile.getLocation().clone().add(-this.motX * 3, 0, -this.motZ * 3), 30);
             if (templist == null)
                 return;
 
@@ -145,7 +145,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
             //その他
         } else {
             ArrayList<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    this.projectile.getLocation().add(this.motX * 3, 0, this.motZ * 3), 30, r.getCircuitName());
+                    r.getCircuitName(), this.projectile.getLocation().clone().add(this.motX * 3, 0, this.motZ * 3), 30);
             if (templist == null)
                 return;
 
@@ -170,7 +170,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         Entity checkpoint = Util.getNearestEntity(checkpointlist, this.projectile.getLocation());
         this.turtlepassedcheckpoint.add(lap + checkpoint.getUniqueId().toString());
         Vector v = Util.getVectorToLocation(this.projectile.getLocation(),
-                checkpoint.getLocation().add(0, -RaceManager.checkPointHeight, 0)).multiply(3);
+                checkpoint.getLocation().clone().add(0, -RaceManager.checkPointHeight, 0)).multiply(3);
         this.motX = v.getX();
         this.motY = v.getY();
         this.motZ = v.getZ();
