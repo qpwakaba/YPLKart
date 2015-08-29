@@ -274,44 +274,19 @@ public class DataListener implements Listener {
         Location location = player.getLocation();
         ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(circuitName, location, 100.0D);
 
-        //最終的に通過判定をクリアしたチェックポイントのリスト
-        List<Entity> newPassedCheckPoint = new ArrayList<Entity>();
+        //周囲にチェックポイントが無い場合コースアウト
+        if (checkPointEntityList == null) {
+            racer.applyCourseOut();
+            return;
+        }
 
         Iterator<Entity> i = checkPointEntityList.iterator();
         Entity checkPointEntity;
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         while (i.hasNext()) {
             checkPointEntity = i.next();
-
-            Integer detectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(checkPointEntity, circuitName);
-            if (detectRadius == null) {
-                continue;
-            }
-
-            if (detectRadius < checkPointEntity.getLocation().distance(location)) {
-                continue;
-            }
-
-            if (!racer.getPassedCheckPointList().contains(currentLaps + checkPointEntity.getUniqueId().toString())) {
-                newPassedCheckPoint.add(checkPointEntity);
-            }
-        }
-
-        // 新しく通過したチェックポイントの内最も近いチェックポイントを通過したチェックポイントとして格納
-        if (!newPassedCheckPoint.isEmpty()) {
-            Entity newLastPassedCheckPoint = Util.getNearestEntity(newPassedCheckPoint, location);
-            racer.setLastPassedCheckPointEntity(newLastPassedCheckPoint);
-            racer.addPassedCheckPoint(currentLaps + newLastPassedCheckPoint.getUniqueId().toString());
-        }
-
-        // 最後に通過したチェックポイントとの距離が検出範囲を超えている場合コースアウトと判定する
-        Entity lastPassedCheckPoint = racer.getLastPassedCheckPointEntity();
-        Integer lastPassedCheckPointDetectRadius =
-                RaceManager.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
-        if (lastPassedCheckPoint != null && lastPassedCheckPointDetectRadius != null) {
-            if (lastPassedCheckPointDetectRadius + 10 < location.distance(lastPassedCheckPoint.getLocation())) {
-                racer.applyCourseOut();
-            }
+            racer.addPassedCheckPoint(currentLaps + checkPointEntity.getUniqueId().toString());
+            racer.setLastPassedCheckPointEntity(checkPointEntity);
         }
     }
 
