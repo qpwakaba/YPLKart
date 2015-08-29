@@ -345,33 +345,6 @@ public class Racer extends PlayerObject{
                 );
     }
 
-    /**
-     * 最後に通過したチェックポイントに強制的にテレポートし、デスペナルティを付与する。<br>
-     * 最後に通過したチェックポイントが格納されていない場合は除外される。
-     */
-    public void applyCourseOut() {
-        Entity lastPassedCheckPoint = this.getLastPassedCheckPointEntity();
-        if (lastPassedCheckPoint != null) {
-            final Location teleportLocation = lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight, 0);
-            Entity kartEntity = this.getPlayer().getVehicle();
-            if (kartEntity != null) {
-                this.getPlayer().leaveVehicle();
-                kartEntity.remove();
-            }
-            this.getPlayer().teleport(teleportLocation);
-
-            //遅延させないとカートが生成されない
-            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                public void run() {
-                    setKartEntityLocation(teleportLocation);
-                    recoveryKart();
-                }
-            }, 2);
-
-            this.applyDeathPenalty();
-        }
-    }
-
     /** アイテムを使用して間もない状態かどうかをセットするタスクを起動する */
     public void runItemUseCoolingTask() {
         this.setItemUseCooling(true);
