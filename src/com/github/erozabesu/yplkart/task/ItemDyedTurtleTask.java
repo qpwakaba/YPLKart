@@ -1,6 +1,7 @@
 package com.github.erozabesu.yplkart.task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -89,7 +90,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         if (this.motX != 0 && this.motY != 0 && this.motZ != 0) {
             this.projectile.setVelocity(new Vector(this.motX, this.motY, this.motZ));
 
-            if (!Util.isLoadedChunk(this.projectile.getLocation())) {
+            if (!this.projectile.getLocation().getChunk().isLoaded()) {
                 this.projectile.teleport(this.projectile.getLocation().clone().add(this.motX, this.motY, this.motZ));
             }
         }
@@ -105,7 +106,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation(), 5);
 
         //targetを発見したら突撃return
-        ArrayList<LivingEntity> livingentity = Util.getNearbyLivingEntities(this.projectile.getLocation(), 20);
+        List<LivingEntity> livingentity = Util.getNearbyLivingEntities(this.projectile.getLocation(), 20);
         for (LivingEntity target : livingentity) {
             if (this.target.getUniqueId().toString().equalsIgnoreCase(target.getUniqueId().toString())) {
                 Vector v = Util.getVectorToLocation(this.projectile.getLocation(), target.getLocation())

@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.EntityEffect;
 import org.bukkit.FireworkEffect;
@@ -195,74 +196,107 @@ public class Util extends ReflectionUtil {
                 yaw, adjustlocation.getPitch());
     }
 
-    //TODO 負荷の原因になっている可能性あり
-    public static ArrayList<Entity> getNearbyEntities(Location l, double radius) {
-        ArrayList<Entity> entities = new ArrayList<Entity>();
-        for (Entity entity : l.getWorld().getEntities()) {
-            if (l.distanceSquared(entity.getLocation()) <= radius * radius) {
+    /**
+     * 引数locationから半径radiusブロック以内のチャンクを返す。
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return 引数locationから半径radiusブロック以内のチャンク
+     */
+    public static List<Chunk> getNearbyChunks(Location location, double radius) {
+        List<Chunk> nearbyChunks = new ArrayList<Chunk>();
+
+        location.add(radius, 0, radius);
+
+        double round = (radius / 16) + 1;
+        for (int x = 0; x < round; x++) {
+            for (int z = 0; z < round; z++) {
+                Chunk chunk = location.getWorld().getChunkAt(location.clone().add(-16 * x, 0, -16 * z));
+                nearbyChunks.add(chunk);
+            }
+        }
+
+        return nearbyChunks;
+    }
+
+    /**
+     * 引数locationから半径radiusブロック以内のチャンクに存在するエンティティを返す。
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return 引数locationから半径radiusブロック以内のチャンクに存在するエンティティ
+     */
+    public static List<Entity> getNearbyEntities(Location location, double radius) {
+        List<Entity> entities = new ArrayList<Entity>();
+
+        List<Chunk> nearbyChunks = getNearbyChunks(location, radius);
+        if (nearbyChunks.isEmpty()) {
+            return entities;
+        }
+
+        for (Chunk chunk : nearbyChunks) {
+            for (Entity entity : chunk.getEntities()) {
                 entities.add(entity);
             }
         }
+
         return entities;
     }
 
-    //TODO 負荷の原因になっている可能性あり
-    public static ArrayList<LivingEntity> getNearbyLivingEntities(Location l, double radius) {
-        ArrayList<Entity> entity = getNearbyEntities(l, radius);
-        ArrayList<LivingEntity> livingentity = new ArrayList<LivingEntity>();
-        for (Entity e : entity) {
-            if (e instanceof LivingEntity)
-                livingentity.add((LivingEntity) e);
+    /**
+     * 引数locationから半径radiusブロック以内のチャンクに存在する生物エンティティを返す。
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return 引数locationから半径radiusブロック以内のチャンクに存在する生物エンティティ
+     */
+    public static List<LivingEntity> getNearbyLivingEntities(Location location, double radius) {
+        List<Entity> entities = getNearbyEntities(location, radius);
+        List<LivingEntity> livingEntities = new ArrayList<LivingEntity>();
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity)
+                livingEntities.add((LivingEntity) entity);
         }
-        return livingentity;
+        return livingEntities;
     }
 
-    //TODO 負荷の原因になっている可能性あり
-    public static ArrayList<Player> getNearbyPlayers(Location l, double radius) {
-        ArrayList<Entity> entity = getNearbyEntities(l, radius);
-        ArrayList<Player> livingentity = new ArrayList<Player>();
-        for (Entity e : entity) {
-            if (e instanceof Player)
-                livingentity.add((Player) e);
+    /**
+     * 引数locationから半径radiusブロック以内のチャンクに存在するプレイヤーを返す。
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return 引数locationから半径radiusブロック以内のチャンクに存在するプレイヤー
+     */
+    public static List<Player> getNearbyPlayers(Location location, double radius) {
+        List<Entity> entities = getNearbyEntities(location, radius);
+        List<Player> humanEntities = new ArrayList<Player>();
+        for (Entity entity : entities) {
+            if (entity instanceof Player) {
+                humanEntities.add((Player) entity);
+            }
         }
-        return livingentity;
+        return humanEntities;
     }
 
-    //TODO 負荷の原因になっている可能性あり
-    public static Entity getNearestEntity(List<Entity> entities, Location l) {
-        Iterator<Entity> i = entities.iterator();
-        Entity e = null;
-        Entity temp;
-        while (i.hasNext()) {
-            temp = i.next();
-            if (e != null)
-                if (e.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
-                    if (e.getLocation().distance(l) < temp.getLocation().distance(l))
+    /**
+     * 引数entitiesの配列中のエンティティの内、最も引数locationとの直線距離が近いエンティティを返す。
+     * @param entities エンティティリスト
+     * @param location 基点となる座標
+     * @return 引数entitiesの配列中のエンティティの内、最も引数locationとの直線距離が近いエンティティ
+     */
+    public static Entity getNearestEntity(List<Entity> entities, Location location) {
+        Iterator<Entity> iterator = entities.iterator();
+        Entity entity = null;
+        Entity tempEntity;
+        while (iterator.hasNext()) {
+            tempEntity = iterator.next();
+            if (entity != null) {
+                if (entity.getWorld().getName().equalsIgnoreCase(tempEntity.getWorld().getName())) {
+                    if (entity.getLocation().distance(location) < tempEntity.getLocation().distance(location)) {
                         continue;
-            e = temp;
+                    }
+                }
+            }
+            entity = tempEntity;
         }
 
-        return e;
-    }
-
-    //TODO 負荷の原因になっている可能性あり
-    public static Player getNearestPlayer(ArrayList<Player> players, Location l) {
-        if (players == null)
-            return null;
-
-        Iterator<Player> i = players.iterator();
-        Player p = null;
-        Player temp;
-        while (i.hasNext()) {
-            temp = i.next();
-            if (p != null)
-                if (p.getWorld().getName().equalsIgnoreCase(temp.getWorld().getName()))
-                    if (p.getLocation().distance(l) < temp.getLocation().distance(l))
-                        continue;
-            p = temp;
-        }
-
-        return p;
+        return entity;
     }
 
     /**
@@ -509,14 +543,6 @@ public class Util extends ReflectionUtil {
         return (object instanceof Player);
     }
 
-    public static boolean isLoadedChunk(Location l) {
-        Player player = getNearestPlayer(getNearbyPlayers(l, 100), l);
-        if (player == null)
-            return false;
-
-        return true;
-    }
-
     /**
      * 引数locationのBlockが固形Blockか判別する
      * @param location 判別するBlockの座標
@@ -741,7 +767,8 @@ public class Util extends ReflectionUtil {
         if (!noSound) {
             l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
         }
-        ArrayList<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
+
+        List<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
         for (LivingEntity damaged : entities) {
             if (executor != null) {
                 if (damaged.getUniqueId() == executor.getUniqueId()) {
