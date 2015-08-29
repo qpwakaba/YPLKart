@@ -13,6 +13,7 @@ public enum CircuitCommandEnum {
     INFO(new InfoCommand()),
     DELETE(new DeleteCommand()),
     RENAME(new RenameCommand()),
+    SET_RACE_TYPE(new SetRaceTypeCommand()),
     SET_MIN_PLAYER(new SetMinPlayerCommand()),
     SET_MAX_PLAYER(new SetMaxPlayerCommand()),
     SET_MATCHING_TIME(new SetMatchingTimeCommand()),
