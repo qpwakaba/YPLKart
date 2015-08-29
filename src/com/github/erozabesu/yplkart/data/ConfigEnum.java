@@ -24,6 +24,7 @@ public enum ConfigEnum {
     PERMISSION_CMD_ITEM("enable_permission.cmd_item"),
     PERMISSION_CMD_OTHER_MENU("enable_permission.cmd_other_menu"),
     PERMISSION_CMD_OTHER_ENTRY("enable_permission.cmd_other_entry"),
+    PERMISSION_CMD_OTHER_FORCEENTRY("enable_permission.cmd_other_forceentry"),
     PERMISSION_CMD_OTHER_EXIT("enable_permission.cmd_other_exit"),
     PERMISSION_CMD_OTHER_CHARACTER("enable_permission.cmd_other_character"),
     PERMISSION_CMD_OTHER_CHARACTERRESET("enable_permission.cmd_other_characterreset"),

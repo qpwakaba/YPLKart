@@ -54,6 +54,9 @@ enable_permission:
   # パーミッション : YPLKart.cmdother.entry を有効にします。
   cmd_other_entry: true
 
+  # パーミッション : YPLKart.cmdother.forceentry を有効にします。
+  cmd_other_forceentry: true
+
   # パーミッション : YPLKart.cmdother.exit を有効にします。
   cmd_other_exit: true
 
