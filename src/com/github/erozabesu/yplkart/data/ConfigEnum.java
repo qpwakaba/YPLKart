@@ -14,6 +14,7 @@ public enum ConfigEnum {
     PERMISSION_KART_DRIFT("enable_permission.kart_drift"),
     PERMISSION_CMD_MENU("enable_permission.cmd_menu"),
     PERMISSION_CMD_ENTRY("enable_permission.cmd_entry"),
+    PERMISSION_CMD_FORCEENTRY("enable_permission.cmd_forceentry"),
     PERMISSION_CMD_EXIT("enable_permission.cmd_exit"),
     PERMISSION_CMD_CHARACTER("enable_permission.cmd_character"),
     PERMISSION_CMD_CHARACTERRESET("enable_permission.cmd_characterreset"),
