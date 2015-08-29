@@ -92,8 +92,8 @@ public class ItemTurtleTask extends BukkitRunnable {
         boolean onair = false;
         //真下とその更に後ろが非ソリッドブロックなら下へ
         //1ブロックだけ非ソリッドの場合に下に降ろしてしまうと、直前のソリッドブロックの先端に接触してしまう
-        if (!Util.isSolidBlock(this.projectile.getLocation().add(0, -1, 0))) {
-            if (!Util.isSolidBlock(this.projectile.getLocation().add(-this.x, -1, -this.z))) {
+        if (!Util.isSolidBlock(this.projectile.getLocation().clone().add(0, -1, 0))) {
+            if (!Util.isSolidBlock(this.projectile.getLocation().clone().add(-this.x, -1, -this.z))) {
                 this.y = -0.8;
                 onair = true;
             }
