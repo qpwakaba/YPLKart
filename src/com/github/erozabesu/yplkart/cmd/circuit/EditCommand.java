@@ -11,13 +11,17 @@ public class EditCommand extends Command {
     public EditCommand() {
         super("edit");
     }
+
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!Permission.hasPermission(sender, Permission.OP_CMD_CIRCUIT, false))
+        if (!Permission.hasPermission(sender, Permission.OP_CMD_CIRCUIT, false)) {
             return true;
-        if(args.length != 2 || !(sender instanceof Player))
+        }
+        if(args.length != 3 || !(sender instanceof Player)) {
             //TODO: ここでコマンドの使い方を表示させられる。
             return false;
+        }
+
         Player player = (Player)sender;
         String circuitName = args[2];
         ItemEnum.addCheckPointTool(player, circuitName);

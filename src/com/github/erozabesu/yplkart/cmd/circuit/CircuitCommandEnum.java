@@ -24,7 +24,8 @@ public enum CircuitCommandEnum {
     CREATE(new CreateCommand()),
     SET_POSITION(new SetPositionCommand()),
     ACCEPT(new AcceptCommand()),
-    DENY(new DenyCommand()), ;
+    DENY(new DenyCommand()),
+    EDIT(new EditCommand());
 
     private final Command command;
 
