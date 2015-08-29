@@ -681,6 +681,10 @@ public class KartUtil extends ReflectionUtil {
             invoke(Methods.Ypl_setKillerZ, entityKart, vector.getZ());
         }
 
+        if (passedCPList == null) {
+            return;
+        }
+
         //最寄の未通過のチェックポイントとの平面距離が10ブロック以内になるまでreturnする
         Entity lastPassedCP = (Entity) invoke(Methods.Ypl_getKillerLastPassedCheckPoint, entityKart);
         if (lastPassedCP != null) {
@@ -692,8 +696,8 @@ public class KartUtil extends ReflectionUtil {
         }
 
         //周囲のチェックポイントを取得し、検出できなかった場合return
-        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(racer.getCircuitName(), kartLocation, 40);
-        if (nearbyCPList == null) {
+        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(racer.getCircuitName(), kartLocation, 100);
+        if (nearbyCPList == null || nearbyCPList.isEmpty()) {
             return;
         }
 
