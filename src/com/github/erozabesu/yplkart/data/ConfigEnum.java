@@ -51,7 +51,11 @@ public enum ConfigEnum {
     ITEM_TIER2("item.tier2"),
     ITEM_TIER3("item.tier3"),
     ITEM_DASH_BOARD_EFFECT_LEVEL("item.dash_board.effect_level"),
-    ITEM_DASH_BOARD_EFFECT_SECOND("item.dash_board.effect_second");
+    ITEM_DASH_BOARD_EFFECT_SECOND("item.dash_board.effect_second"),
+
+    ITEM_DETECT_CHECKPOINT_RADIUS_TIER1("item.detect_checkpoint_radius.tier1"),
+    ITEM_DETECT_CHECKPOINT_RADIUS_TIER2("item.detect_checkpoint_radius.tier2"),
+    ITEM_DETECT_CHECKPOINT_RADIUS_TIER3("item.detect_checkpoint_radius.tier3");
 
     /** コンフィグキー */
     private String configKey;
