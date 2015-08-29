@@ -579,9 +579,9 @@ public class KartUtil extends ReflectionUtil {
         float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, nmsEntityKart);
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
             if (player.isSneaking()) {
-                yaw -= (sideInput * kart.getDriftCorneringPower()) * 1.2;
+                yaw -= (sideInput * kart.getDriftCorneringPower()) * 1.6;
             } else {
-                yaw -= sideInput * kart.getDefaultCorneringPower();
+                yaw -= (sideInput * kart.getDefaultCorneringPower()) * 2.0;
             }
         } else {
             yaw -= sideInput * kart.getDefaultCorneringPower();
@@ -960,7 +960,7 @@ public class KartUtil extends ReflectionUtil {
 
         //ドリフトしている場合はスピードを減衰
         if (player.isSneaking()) {
-            speedStack -= kartObject.getSpeedDecreaseOnDrift() * 0.7;
+            speedStack -= kartObject.getSpeedDecreaseOnDrift() * 1.3;
         }
 
         //前方へキーを入力している
