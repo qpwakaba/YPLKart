@@ -3,9 +3,12 @@ package com.github.erozabesu.yplkart.cmd.circuit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.object.Circuit;
 
 public class EditCommand extends Command {
     public EditCommand() {
@@ -24,7 +27,18 @@ public class EditCommand extends Command {
 
         Player player = (Player)sender;
         String circuitName = args[2];
-        ItemEnum.addCheckPointTool(player, circuitName);
+        Circuit circuit = new Circuit();
+        circuit.setCircuitName(circuitName);
+
+        ItemStack[] checkPointTools = ItemEnum.getCheckPointTools(circuitName);
+        if (checkPointTools == null) {
+            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuit);
+            return true;
+        }
+
+        player.getInventory().addItem(checkPointTools);
+        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuit);
+
         return true;
     }
 }
