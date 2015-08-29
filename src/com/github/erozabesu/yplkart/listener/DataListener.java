@@ -286,16 +286,14 @@ public class DataListener implements Listener {
         //config.ymlからチェックポイントの検出範囲を取得
         Integer detectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(nearestCheckPoint, circuitName);
 
-        //チェックポイントとの距離が検出範囲外の場合はreturn
-        if (detectRadius < nearestCheckPoint.getLocation().distance(location)) {
-            return;
-        }
-
-        //未通過のチェックポイントだった場合は通過済みリストに格納
-        String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
-        if (!racer.getPassedCheckPointList().contains(currentLaps + nearestCheckPoint.getUniqueId().toString())) {
-            racer.setLastPassedCheckPointEntity(nearestCheckPoint);
-            racer.addPassedCheckPoint(currentLaps + nearestCheckPoint.getUniqueId().toString());
+        //チェックポイントとの距離が検出範囲内
+        if (nearestCheckPoint.getLocation().distance(location) < detectRadius) {
+            //未通過のチェックポイントだった場合は通過済みリストに格納
+            String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
+            if (!racer.getPassedCheckPointList().contains(currentLaps + nearestCheckPoint.getUniqueId().toString())) {
+                racer.setLastPassedCheckPointEntity(nearestCheckPoint);
+                racer.addPassedCheckPoint(currentLaps + nearestCheckPoint.getUniqueId().toString());
+            }
         }
 
         // 最後に通過したチェックポイントとの距離が検出範囲を超えている場合コースアウトと判定する
