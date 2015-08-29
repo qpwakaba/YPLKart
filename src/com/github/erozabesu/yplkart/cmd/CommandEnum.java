@@ -8,6 +8,8 @@ import java.util.Map;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import com.github.erozabesu.yplkart.data.ItemEnum;
+
 public enum CommandEnum {
     CIRCUIT(new CircuitCommand()),
     DISPLAY(new DisplayCommand()),
@@ -49,6 +51,9 @@ public enum CommandEnum {
         String commandName = args[0];
         Command command = getCommand(commandName);
         if (command != null) {
+            return command.execute(sender, label, args);
+        } else if (ItemEnum.getItemByCommandKey(args[0]) != null) {
+            command = new ItemCommand();
             return command.execute(sender, label, args);
         }
         return false;
