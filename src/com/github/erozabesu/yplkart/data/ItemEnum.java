@@ -20,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
-import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 
 /**
@@ -34,8 +33,20 @@ public enum ItemEnum {
             "check_point_tool",
             Permission.OP_CMD_CIRCUIT,
             Permission.OP_CMD_CIRCUIT,
-            "チェックポイントツール",
-            ""),
+            ChatColor.GREEN + "チェックポイントツール",
+            ChatColor.GREEN + ""),
+    CHECKPOINT_TOOL_TIER2(
+            "check_point_tool",
+            Permission.OP_CMD_CIRCUIT,
+            Permission.OP_CMD_CIRCUIT,
+            ChatColor.BLUE + "チェックポイントツールTier2",
+            ChatColor.BLUE + ""),
+    CHECKPOINT_TOOL_TIER3(
+            "check_point_tool",
+            Permission.OP_CMD_CIRCUIT,
+            Permission.OP_CMD_CIRCUIT,
+            ChatColor.RED + "チェックポイントツールTier3",
+            ChatColor.RED + ""),
     ITEMBOX_TOOL(
             "itembox_tool",
             Permission.OP_CMD_ITEMBOXTOOL,
@@ -550,16 +561,17 @@ public enum ItemEnum {
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 ItemMeta targetMeta = getItem().getItemMeta();
                 if (itemMeta.hasDisplayName() && targetMeta.hasDisplayName()) {
-                    String itemName = ChatColor.stripColor(itemMeta.getDisplayName());
-                    String targetName = ChatColor.stripColor(getDisplayName());
+                    String itemName = itemMeta.getDisplayName();
+                    String targetName = getDisplayName();
 
                     if (itemMeta.hasLore() && targetMeta.hasLore()) {
-                        String itemLore = ChatColor.stripColor(itemMeta.getLore().get(0));
-                        String targetLore = ChatColor.stripColor(getLore());
+                        String itemLore = itemMeta.getLore().get(0);
+                        String targetLore = getLore();
 
                         //チェックポイントツールかどうか
-                        if (itemName.equalsIgnoreCase(
-                                ChatColor.stripColor(CHECKPOINT_TOOL.getDisplayName()))) {
+                        if (itemName.equalsIgnoreCase(CHECKPOINT_TOOL.getDisplayName())
+                                || itemName.equalsIgnoreCase(CHECKPOINT_TOOL_TIER2.getDisplayName())
+                                || itemName.equalsIgnoreCase(CHECKPOINT_TOOL_TIER3.getDisplayName())) {
                             if (CircuitConfig.getCircuitData(itemLore) != null) {
                                 return true;
                             }
@@ -647,32 +659,31 @@ public enum ItemEnum {
     }
 
     /**
-     * 引数circuitnameのサーキットを編集できるチェックポイントツールを返す
-     * @param player アイテムを付与するプレイヤー
-     * @param circuitDataName チェックポイントを編集するサーキット名
+     * 引数circuitNameのサーキットを編集できるチェックポイントツールを返す。
+     * @param circuitName チェックポイントを編集するサーキット名
      */
-    public static void addCheckPointTool(Player player, String circuitDataName) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitDataName);
+    public static ItemStack[] getCheckPointTools(String circuitName) {
+        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
         if (circuitData == null) {
-            Circuit circuit = new Circuit();
-            circuit.setCircuitName(circuitDataName);
-            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuit);
-            return;
+            return null;
         }
 
-        ItemEnum itemType = ItemEnum.CHECKPOINT_TOOL;
-        ItemStack itemStack = new ItemStack(itemType.getMaterial(), 1, (short) 0, itemType.getMaterialData());
-        ItemMeta meta = itemStack.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + itemType.getDisplayName());
-        meta.setLore(Arrays.asList(circuitDataName));
-        itemStack.setItemMeta(meta);
+        ItemStack[] checkPointTools = new ItemStack[3];
+        ItemEnum[] checkPointItemEnum = {ItemEnum.CHECKPOINT_TOOL, ItemEnum.CHECKPOINT_TOOL_TIER2, ItemEnum.CHECKPOINT_TOOL_TIER3};
 
-        player.getInventory().addItem(itemStack);
-        player.updateInventory();
+        for (int i = 0; i < checkPointItemEnum.length; i++) {
+            ItemEnum itemEnum = checkPointItemEnum[i];
 
-        Circuit circuit = new Circuit();
-        circuit.setCircuitName(circuitDataName);
-        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuit);
+            ItemStack itemStack = new ItemStack(itemEnum.getMaterial(), 1, (short) 0, itemEnum.getMaterialData());
+            ItemMeta meta = itemStack.getItemMeta();
+            meta.setDisplayName(itemEnum.getDisplayName());
+            meta.setLore(Arrays.asList(itemEnum.getLore() + circuitName));
+            itemStack.setItemMeta(meta);
+
+            checkPointTools[i] = itemStack;
+        }
+
+        return checkPointTools;
     }
 
     /**
