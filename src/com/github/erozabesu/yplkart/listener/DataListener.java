@@ -128,14 +128,15 @@ public class DataListener implements Listener {
 
         List<Entity> list = p.getNearbyEntities(1, 1, 1);
         for (Entity entity : list) {
-            if (RaceManager.isCheckPointEntity(
-                    entity, p.getItemInHand().getItemMeta().getLore().get(0)))
+            String circuitName = p.getItemInHand().getItemMeta().getLore().get(0);
+            if (RaceManager.isSpecificCircuitCheckPointEntity(entity, circuitName)) {
                 if (entity.getLocation().distance(p.getLocation()) < 1.5) {
                     p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
                     entity.remove();
                     MessageEnum.itemRemoveCheckPoint.sendConvertedMessage(p);
                     break;
                 }
+            }
         }
     }
 
@@ -146,11 +147,9 @@ public class DataListener implements Listener {
         }
 
         Entity armorStand = event.getRightClicked();
-        for (String circuitName : CircuitConfig.getCircuitList()) {
-            if (RaceManager.isCheckPointEntity(armorStand, circuitName)) {
-                event.setCancelled(true);
-                return;
-            }
+        if (RaceManager.isCheckPointEntity(armorStand)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -266,13 +265,14 @@ public class DataListener implements Listener {
             return;
         }
 
-        Racer racer = RaceManager.getRacer(player);
+        final Racer racer = RaceManager.getRacer(player);
         if (racer.getCurrentLaps() < 1) {
             return;
         }
 
-        ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(
-                event.getPlayer().getLocation(), RaceManager.checkPointDetectRadius, racer.getCircuitName());
+        String circuitName = racer.getCircuitName();
+        Location location = player.getLocation();
+        ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(circuitName, location, 100.0D);
 
         //TODO: 周囲にチェックポイントが無い場合コースアウト
         if (checkPointEntityList == null) {
