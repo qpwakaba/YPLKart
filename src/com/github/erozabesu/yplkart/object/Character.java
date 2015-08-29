@@ -84,7 +84,7 @@ public class Character {
      * @param key コンフィグキー
      */
     public Character(String key) {
-        setCharacterName(key);
+        this.setCharacterName(key);
 
         ConfigManager config = ConfigManager.CHARACTER_CONFIG;
         String defaultKey = "Steve";
@@ -92,55 +92,55 @@ public class Character {
 
         String defaultEntityType = defaultConfig.getString(defaultKey + ".entity_type");
         Class<?> nmsClass = ReflectionUtil.getNMSClass("Entity" + config.getString(key + ".entity_type", defaultEntityType));
-        setNmsClass(nmsClass);
+        this.setNmsClass(nmsClass);
 
         String defaultMenuHeadItemPlayerName = defaultConfig.getString(defaultKey + ".menu_head_item_player_name");
-        setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name", defaultMenuHeadItemPlayerName));
+        this.setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name", defaultMenuHeadItemPlayerName));
 
         Sound defaultMenuClickSound = Sound.valueOf(defaultConfig.getString(defaultKey + ".menu_click_sound"));
-        setMenuClickSound(config.getSound(key + ".menu_click_sound", defaultMenuClickSound));
+        this.setMenuClickSound(config.getSound(key + ".menu_click_sound", defaultMenuClickSound));
 
         float defaultMenuClickSoundVolume = (float) defaultConfig.getDouble(defaultKey + ".menu_click_sound_volume");
-        setMenuClickSoundVolume(config.getFloat(key + ".menu_click_sound_volume", defaultMenuClickSoundVolume));
+        this.setMenuClickSoundVolume(config.getFloat(key + ".menu_click_sound_volume", defaultMenuClickSoundVolume));
 
         float defaultMenuClickSoundPitch = (float) defaultConfig.getDouble(defaultKey + ".menu_click_sound_pitch");
-        setMenuClickSoundPitch(config.getFloat(key + ".menu_click_sound_pitch", defaultMenuClickSoundPitch));
+        this.setMenuClickSoundPitch(config.getFloat(key + ".menu_click_sound_pitch", defaultMenuClickSoundPitch));
 
         int defaultItemAdjustMaxSlot = defaultConfig.getInt(defaultKey + ".item_adjust_max_slot");
-        setAdjustMaxSlotSize(config.getInteger(key + ".item_adjust_max_slot", defaultItemAdjustMaxSlot));
+        this.setAdjustMaxSlotSize(config.getInteger(key + ".item_adjust_max_slot", defaultItemAdjustMaxSlot));
 
         int defaultItemAdjustMaxStackSize = defaultConfig.getInt(defaultKey + ".item_adjust_max_stack_size");
-        setAdjustMaxStackSize(config.getInteger(key + ".item_adjust_max_stack_size", defaultItemAdjustMaxStackSize));
+        this.setAdjustMaxStackSize(config.getInteger(key + ".item_adjust_max_stack_size", defaultItemAdjustMaxStackSize));
 
         int defaultItemAdjustPositiveEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_second");
-        setAdjustPositiveEffectSecond(config.getInteger(key + ".item_adjust_positive_effect_second", defaultItemAdjustPositiveEffectSecond));
+        this.setAdjustPositiveEffectSecond(config.getInteger(key + ".item_adjust_positive_effect_second", defaultItemAdjustPositiveEffectSecond));
 
         int defaultItemAdjustPositiveEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_level");
-        setAdjustPositiveEffectLevel(config.getInteger(key + ".item_adjust_positive_effect_level", defaultItemAdjustPositiveEffectLevel));
+        this.setAdjustPositiveEffectLevel(config.getInteger(key + ".item_adjust_positive_effect_level", defaultItemAdjustPositiveEffectLevel));
 
         int defaultItemAdjustNegativeEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_second");
-        setAdjustNegativeEffectSecond(config.getInteger(key + ".item_adjust_negative_effect_second", defaultItemAdjustNegativeEffectSecond));
+        this.setAdjustNegativeEffectSecond(config.getInteger(key + ".item_adjust_negative_effect_second", defaultItemAdjustNegativeEffectSecond));
 
         int defaultItemAdjustNegativeEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_level");
-        setAdjustNegativeEffectLevel(config.getInteger(key + ".item_adjust_negative_effect_level", defaultItemAdjustNegativeEffectLevel));
+        this.setAdjustNegativeEffectLevel(config.getInteger(key + ".item_adjust_negative_effect_level", defaultItemAdjustNegativeEffectLevel));
 
         int defaultItemAdjustAttackDamage = defaultConfig.getInt(defaultKey + ".item_adjust_attack_damage");
-        setAdjustAttackDamage(config.getInteger(key + ".item_adjust_attack_damage", defaultItemAdjustAttackDamage));
+        this.setAdjustAttackDamage(config.getInteger(key + ".item_adjust_attack_damage", defaultItemAdjustAttackDamage));
 
         double defaultMaxHealth = defaultConfig.getDouble(defaultKey + ".max_health");
-        setMaxHealth(config.getDouble(key + ".max_health", defaultMaxHealth));
+        this.setMaxHealth(config.getDouble(key + ".max_health", defaultMaxHealth));
 
         float defaultWalkSpeed = (float) defaultConfig.getDouble(defaultKey + ".walk_speed");
-        setWalkSpeed(config.getFloat(key + ".walk_speed", defaultWalkSpeed));
+        this.setWalkSpeed(config.getFloat(key + ".walk_speed", defaultWalkSpeed));
 
         int defaultDeathPenaltyAntiReskillSecond = defaultConfig.getInt(defaultKey + ".death_penalty.anti_reskill_second");
-        setPenaltyAntiReskillSecond(config.getInteger(key + ".death_penalty.anti_reskill_second", defaultDeathPenaltyAntiReskillSecond));
+        this.setPenaltyAntiReskillSecond(config.getInteger(key + ".death_penalty.anti_reskill_second", defaultDeathPenaltyAntiReskillSecond));
 
         int defaultDeathPenaltyPenaltySecond = defaultConfig.getInt(defaultKey + ".death_penalty.penalty_second");
-        setPenaltySecond(config.getInteger(key + ".death_penalty.penalty_second", defaultDeathPenaltyPenaltySecond));
+        this.setPenaltySecond(config.getInteger(key + ".death_penalty.penalty_second", defaultDeathPenaltyPenaltySecond));
 
         float defaultDeathPenaltyWalkSpeed = (float) defaultConfig.getDouble(defaultKey + ".death_penalty.walk_speed");
-        setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed", defaultDeathPenaltyWalkSpeed));
+        this.setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed", defaultDeathPenaltyWalkSpeed));
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -164,19 +164,19 @@ public class Character {
     /** @return キャラクターのパラメーター一覧 */
     public String getParameter() {
         String[] parameter = new String[] {
-                String.valueOf(getMaxHealth()),
-                String.valueOf(getWalkSpeed()),
-                String.valueOf(getAdjustMaxSlotSize()
+                String.valueOf(this.getMaxHealth()),
+                String.valueOf(this.getWalkSpeed()),
+                String.valueOf(this.getAdjustMaxSlotSize()
                         + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
-                Util.convertSignNumber(getAdjustMaxStackSize()),
-                Util.convertSignNumber(getAdjustAttackDamage()),
-                String.valueOf(getPenaltyAntiReskillSecond()),
-                String.valueOf(getPenaltySecond()),
-                String.valueOf(getPenaltyWalkSpeed()),
-                Util.convertSignNumber(getAdjustPositiveEffectLevel()),
-                Util.convertSignNumber(getAdjustPositiveEffectSecond()),
-                Util.convertSignNumberR(getAdjustNegativeEffectLevel()),
-                Util.convertSignNumberR(getAdjustNegativeEffectSecond())
+                Util.convertSignNumber(this.getAdjustMaxStackSize()),
+                Util.convertSignNumber(this.getAdjustAttackDamage()),
+                String.valueOf(this.getPenaltyAntiReskillSecond()),
+                String.valueOf(this.getPenaltySecond()),
+                String.valueOf(this.getPenaltyWalkSpeed()),
+                Util.convertSignNumber(this.getAdjustPositiveEffectLevel()),
+                Util.convertSignNumber(this.getAdjustPositiveEffectSecond()),
+                Util.convertSignNumberR(this.getAdjustNegativeEffectLevel()),
+                Util.convertSignNumberR(this.getAdjustNegativeEffectSecond())
         };
 
         return MessageEnum.tableCharacterParameter.getConvertedMessage(new Object[] {parameter});
@@ -201,7 +201,7 @@ public class Character {
 
     /** @return menuHeadBlockPlayerName ヘッドブロックのプレイヤー名 */
     public String getMenuHeadBlockPlayerName() {
-        return menuHeadBlockPlayerName;
+        return this.menuHeadBlockPlayerName;
     }
 
     /**  @return メニュークリック時の効果音 */
