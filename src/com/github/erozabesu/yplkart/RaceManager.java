@@ -556,7 +556,7 @@ public class RaceManager {
      * @param entity 取得するエンティティ
      * @return チェックポイントの検出距離
      */
-    public static Double getDetectCheckPointRadiusByCheckPointEntity(Entity entity, String circuitName) {
+    public static Integer getDetectCheckPointRadiusByCheckPointEntity(Entity entity, String circuitName) {
         if (!isSpecificCircuitCheckPointEntity(entity, circuitName)) {
             return null;
         }
@@ -568,13 +568,13 @@ public class RaceManager {
 
         switch(tier) {
             case 1:
-                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
+                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
 
             case 2:
-                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue();
+                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue();
 
             case 3:
-                return (Double) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
 
             default:
                 return null;
