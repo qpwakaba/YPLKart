@@ -92,6 +92,7 @@ public class Character {
 
         String defaultEntityType = defaultConfig.getString(defaultKey + ".entity_type");
         Class<?> nmsClass = ReflectionUtil.getNMSClass("Entity" + config.getString(key + ".entity_type", defaultEntityType));
+        setNmsClass(nmsClass);
 
         String defaultMenuHeadItemPlayerName = defaultConfig.getString(defaultKey + ".menu_head_item_player_name");
         setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name", defaultMenuHeadItemPlayerName));
