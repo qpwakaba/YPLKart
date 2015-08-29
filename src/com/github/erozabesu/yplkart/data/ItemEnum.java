@@ -640,11 +640,12 @@ public enum ItemEnum {
     }
 
     /**
-     * commandKeyと一致するenum要素名のenumを返す
-     * 大文字小文字は考慮しない
-     * Tierが-1以下のアイテムは含まれない
-     * @param commandKey enum要素名
-     * @return ItemType
+     * 引数commandKeyと一致する要素名のItemEnumを返す。<br>
+     * 大文字小文字は考慮しない。<br>
+     * Tierが-1以下のアイテムは含まれない。<br>
+     * 一致するItemEnumが存在しない場合は{@code null}を返す。
+     * @param commandKey ItemEnum要素名
+     * @return 引数commandKeyと一致する要素名のItemEnum
       */
     public static ItemEnum getItemByCommandKey(String commandKey) {
         for (ItemEnum item : values()) {
