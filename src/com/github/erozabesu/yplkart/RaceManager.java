@@ -28,6 +28,7 @@ import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
+import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
@@ -221,23 +222,54 @@ public class RaceManager {
             MessageEnum.raceEntryAlready.sendConvertedMessage(player, oldcircuitname);
         } else {
             Circuit circuit = setupCircuit(circuitName);
-            if (circuit.isFillPlayer()) {
-                circuit.entryReservePlayer(uuid);
-                MessageEnum.raceEntryFull.sendConvertedMessage(player, circuit);
-            } else {
+
+            // プレイヤーの意思決定に関わらず強制的にエントリー
+            if (forceEntry) {
                 racer.setCircuitName(circuitName);
+                circuit.entryPlayer(uuid);
+                Scoreboards.entryCircuit(uuid);
+                MessageEnum.raceEntryForce.sendConvertedMessage(player, circuit);
+                circuit.acceptMatching(uuid);
 
+                // 既にレースがスタートしている場合はレースに割り込ませる
                 if (circuit.isStandby() || circuit.isStarted()) {
+
+                    // スタート位置を取得
+                    int startLocationListSize = circuit.getEntryPlayerList().size();
+                    List<Location> startLocationList =
+                            CircuitConfig.getCircuitData(circuit.getCircuitName()).getStartLocationList(startLocationListSize);
+
+                    // スタート位置にテレポート、プレイヤーの状態をレース用に初期化
+                    circuit.setupRacer(uuid, startLocationList.get(startLocationListSize));
+
+                    // メニューアイテムを削除
+                    ItemEnum.removeAllKeyItems(player);
+
+                    // TODO:
+                    // 割り込みメッセージの送信
+                }
+
+            // 通常のエントリー
+            } else {
+                if (circuit.isFillPlayer()) {
                     circuit.entryReservePlayer(uuid);
-                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, circuit);
+                    MessageEnum.raceEntryFull.sendConvertedMessage(player, circuit);
                 } else {
-                    circuit.entryPlayer(uuid);
-                    Scoreboards.entryCircuit(uuid);
+                    racer.setCircuitName(circuitName);
 
-                    MessageEnum.raceEntry.sendConvertedMessage(player, circuit);
+                    if (circuit.isStandby() || circuit.isStarted()) {
+                        circuit.entryReservePlayer(uuid);
+                        MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, circuit);
+                    } else {
+                        circuit.entryPlayer(uuid);
+                        Scoreboards.entryCircuit(uuid);
+                        MessageEnum.raceEntry.sendConvertedMessage(player, circuit);
 
-                    if (circuit.isMatching())
-                        circuitSetter_AcceptMatching(uuid);
+                        // サーキットが既にマッチングフェーズの場合は自動的に参加に同意する
+                        if (circuit.isMatching()) {
+                            circuitSetter_AcceptMatching(uuid);
+                        }
+                    }
                 }
             }
         }
