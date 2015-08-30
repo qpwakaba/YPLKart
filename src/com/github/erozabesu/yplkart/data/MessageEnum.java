@@ -71,6 +71,8 @@ public enum MessageEnum {
     cmdMenuOther(),
     cmdEntryOther(),
     cmdEntryAll(),
+    cmdEntryForceOther(),
+    cmdEntryForceAll(),
     cmdExitAll(),
     cmdExitOther(),
     cmdCharacterAll(),
@@ -108,6 +110,7 @@ public enum MessageEnum {
     racePlayerKill(),
 
     raceEntry(),
+    raceEntryForce(),
     raceEntryAlready(),
     raceEntryAlreadyStart(),
     raceEntryFull(),
