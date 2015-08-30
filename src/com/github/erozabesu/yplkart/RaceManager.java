@@ -207,7 +207,7 @@ public class RaceManager {
 
     // 〓 Racer Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void setEntryRaceData(UUID id, String circuitname) {
+    public static void setEntryRaceData(UUID id, String circuitname, boolean forceEntry) {
         Player player = Bukkit.getPlayer(id);
         if (isEntry(id)) {
             String oldcircuitname = Util.convertInitialUpperString(getRace(id).getCircuitName());
