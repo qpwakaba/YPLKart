@@ -186,8 +186,9 @@ public class RaceManager {
             return;
         } else if (isStandby(uuid)) {
             return;
-        } else {
-            circuit.acceptMatching(uuid);
+        }
+
+        if (circuit.acceptMatching(uuid)) {
             MessageEnum.raceAccept.sendConvertedMessage(player, circuit);
         }
     }
