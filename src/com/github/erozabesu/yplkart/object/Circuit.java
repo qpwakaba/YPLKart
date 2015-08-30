@@ -409,6 +409,13 @@ public class Circuit {
 
                 //制限時間が残っている場合、参加者にカウントダウンタイトルメッセージを送信
                 if (0 < getMatchingCountDownTime()) {
+
+                    // エントリー者が全員意思決定を終えている場合は制限時間をタイムアップさせる
+                    if (getEntryPlayerList().size() == getMatchingAcceptPlayerList().size()) {
+                        setMatchingCountDownTime(0);
+                        return;
+                    }
+
                     Player entryPlayer = null;
                     for (UUID id : getEntryPlayerList()) {
                         if ((entryPlayer = Bukkit.getPlayer(id)) != null) {
