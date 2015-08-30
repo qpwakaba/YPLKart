@@ -134,13 +134,13 @@ public class Circuit {
      * 各タスクを起動し、演出を再生する
      */
     public void startRace() {
-        setStarted(true);
-        runLimitTimeCountDownTask();
-        runDetectEndTask();
-        for (Player p : getEntryPlayer()) {
-            Util.createSignalFireworks(p.getLocation());
-            Util.createFlowerShower(p, 5);
-            new SendExpandedTitleTask(p, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(
+        this.setStarted(true);
+        this.runLimitTimeCountDownTask();
+        this.runDetectEndTask();
+        for (Player player : getOnlineEntryPlayerList()) {
+            Util.createSignalFireworks(player.getLocation());
+            Util.createFlowerShower(player, 5);
+            new SendExpandedTitleTask(player, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(
                     YPLKart.getInstance(), 0, 1);
         }
     }
@@ -152,27 +152,27 @@ public class Circuit {
      * 新たにマッチングを開始する
      */
     public void endRace() {
-        sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { getInstance() });
-        Iterator<UUID> i = getEntryPlayerList().iterator();
-        UUID id;
-        while (i.hasNext()) {
-            id = i.next();
-            i.remove();
-            RaceManager.racerSetter_UnEntry(id);
+        this.sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { getInstance() });
+        Iterator<UUID> currentEntryListIterator = getEntryPlayerList().iterator();
+        UUID currentUuid;
+        while (currentEntryListIterator.hasNext()) {
+            currentUuid = currentEntryListIterator.next();
+            currentEntryListIterator.remove();
+            RaceManager.racerSetter_UnEntry(currentUuid);
         }
 
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
         //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
         if (YPLKart.getInstance().isEnabled()) {
-            final List<UUID> nextentry = new ArrayList<UUID>(getReserveEntryPlayerList());
-            if (0 < nextentry.size()) {
+            final List<UUID> nextEntryList = new ArrayList<UUID>(getReserveEntryPlayerList());
+            if (0 < nextEntryList.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        Circuit c = RaceManager.setupCircuit(getCircuitName());
-                        for (UUID id : nextentry) {
-                            if (Bukkit.getPlayer(id) != null) {
-                                RaceManager.racerSetter_Entry(id, getCircuitName(), false);
-                                c.entryPlayer(id);
+                        Circuit circuit = RaceManager.setupCircuit(getCircuitName());
+                        for (UUID nextUuid : nextEntryList) {
+                            if (Bukkit.getPlayer(nextUuid) != null) {
+                                RaceManager.racerSetter_Entry(nextUuid, getCircuitName(), false);
+                                circuit.entryPlayer(nextUuid);
                             }
                         }
                     }
@@ -181,55 +181,69 @@ public class Circuit {
         }
 
         //初期化
-        removeAllJammerEntity();
-        initialize();
+        this.removeAllJammerEntity();
+        this.initialize();
         RaceManager.clearCircuitData(getCircuitName());
         Scoreboards.endCircuit(getCircuitName());
     }
 
-    /** エントリープレイヤーのパラメータをレース用に初期化し、レース開始地点にテレポートする */
-    private void setupRacer() {
+    /**
+     * エントリーしている全プレイヤーパラメータをレース用に初期化し、レース開始地点にテレポートする。<br>
+     * プレイヤーがオフラインの場合はエントリーを取り消す。
+     */
+    private void setupAllRacer() {
         List<Location> position = CircuitConfig.getCircuitData(getCircuitName()).getStartLocationList();
         int count = 0;
 
         for (UUID uuid : getEntryPlayerList()) {
-            if (Bukkit.getPlayer(uuid) != null) {
-                Player player = Bukkit.getPlayer(uuid);
-                Racer racer = RaceManager.getRacer(player);
+            this.setupRacer(uuid, position.get(count));
+            count++;
+        }
+    }
 
-                //メッセージ送信
-                MessageEnum.raceStart.sendConvertedMessage(player, new Object[] {getInstance()});
+    /**
+     * 引数uuidのプレイヤーパラメータをレース用に初期化し、引数locationテレポートする。<br>
+     * プレイヤーがオフラインの場合はエントリーを取り消す。
+     * @param uuid プレイヤーUUID
+     * @param location レース開始地点の座標
+     */
+    private void setupRacer(UUID uuid, Location location) {
 
-                //レース用スコアボードを表示
-                Scoreboards.entryCircuit(uuid);
+        Player player = Bukkit.getPlayer(uuid);
 
-                //VehicleExitEventがフックされるため、スタンバイフラグをtrueに変更する前に搭乗を解除する
-                racer.leaveVehicle();
+        //オンラインではないプレイヤーは辞退
+        if (player == null) {
+            this.exitPlayer(uuid);
 
-                //Racerオブジェクトの諸々
-                racer.applyRaceParameter();
-                racer.setCircuitName(getCircuitName());
-                racer.setStandby(true);
-                racer.setKartEntityLocation(Util.adjustBlockLocation(position.get(count)));
-                RaceManager.racerSetter_DeselectCharacter(uuid);
-                RaceManager.racerSetter_DeselectKart(uuid);
-                RaceManager.leaveRacingKart(player);
+        } else {
+            Racer racer = RaceManager.getRacer(player);
 
-                //開始地点にテレポート、メニュー表示
-                player.teleport(position.get(count));
-                racer.setRaceStartLocation(position.get(count));
-                RaceManager.showSelectMenu(player, true);
-                ItemEnum.addItem(player, ItemEnum.MENU.getItem());
+            //メッセージ送信
+            MessageEnum.raceStart.sendConvertedMessage(player, new Object[] {getInstance()});
 
-                //ToggleSneakMOD対策 : issue #150
-                player.setSneaking(false);
+            //レース用スコアボードを表示
+            Scoreboards.entryCircuit(uuid);
 
-                count++;
-                continue;
-            }
+            //VehicleExitEventがフックされるため、スタンバイフラグをtrueに変更する前に搭乗を解除する
+            racer.leaveVehicle();
 
-            //オンラインではないプレイヤーは辞退
-            exitPlayer(uuid);
+            //Racerオブジェクトの諸々
+            racer.applyRaceParameter();
+            racer.setCircuitName(getCircuitName());
+            racer.setStandby(true);
+            racer.setKartEntityLocation(Util.adjustBlockLocation(location));
+            RaceManager.racerSetter_DeselectCharacter(uuid);
+            RaceManager.racerSetter_DeselectKart(uuid);
+            RaceManager.leaveRacingKart(player);
+
+            //開始地点にテレポート、メニュー表示
+            player.teleport(location);
+            racer.setRaceStartLocation(location);
+            RaceManager.showSelectMenu(player, true);
+            ItemEnum.addItem(player, ItemEnum.MENU.getItem());
+
+            //ToggleSneakMOD対策 : issue #150
+            player.setSneaking(false);
         }
     }
 
@@ -359,7 +373,7 @@ public class Circuit {
                     return;
                 }
                 //オンラインのプレイヤー人数が規定人数以上
-                if (getEntryPlayer().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
+                if (getOnlineEntryPlayerList().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
                     return;
                 }
                 runMatchingTask();
@@ -428,7 +442,7 @@ public class Circuit {
                     if (circuitData.getMinPlayer() <= getMatchingAcceptPlayerList().size()) {
 
                         //プレイヤーの状態をレース用に初期化
-                        setupRacer();
+                        setupAllRacer();
 
                         //スコアボードのタイトルを 参加申請中→ランキング に書き換え
                         Scoreboards.startCircuit(getCircuitName());
@@ -502,7 +516,7 @@ public class Circuit {
 
                 //選択猶予時間がまだ残っている
                 if (12 < getStandbyCountDownTime()) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         int count = getStandbyCountDownTime() - 12;
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceMenu.getMessage(), 0, 25, 0, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(count), 0, 25, 0, true);
@@ -511,7 +525,7 @@ public class Circuit {
 
                 //選択猶予時間がタイムアップ
                 } else if (getStandbyCountDownTime() == 12) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         if (RaceManager.getRacer(p).getCharacter() == null) {
                             RaceManager.racerSetter_Character(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
@@ -526,7 +540,7 @@ public class Circuit {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStandbySub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (getStandbyCountDownTime() == 10) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         PacketUtil.sendTitle(
                                 p, MessageEnum.titleRaceLaps.getConvertedMessage(
                                         CircuitConfig.getCircuitData(getCircuitName()).getNumberOfLaps())
@@ -534,19 +548,19 @@ public class Circuit {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (getStandbyCountDownTime() == 8) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(
                                 CircuitConfig.getCircuitData(getCircuitName()).getLimitTime()), 10,
                                 40, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (getStandbyCountDownTime() == 6) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceReady.getMessage(), 10, 20, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceReadySub.getMessage(), 10, 20, 10, true);
                     }
                 } else if (0 < getStandbyCountDownTime() && getStandbyCountDownTime() < 4) {
-                    for (Player p : getEntryPlayer()) {
+                    for (Player p : getOnlineEntryPlayerList()) {
                         p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(getStandbyCountDownTime()), 0, 20,
                                 0, false);
@@ -579,27 +593,27 @@ public class Circuit {
                 if (getCurrentTime() % 20 == 0) {
                     int remainTime = limitTime - getCurrentTime() / 20;
                     if (remainTime == 60) {
-                        for (Player p : getEntryPlayer()) {
+                        for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
                             MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 60 });
                         }
                     } else if (remainTime == 30) {
-                        for (Player p : getEntryPlayer()) {
+                        for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
                             MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 30 });
                         }
                     } else if (remainTime == 10) {
-                        for (Player p : getEntryPlayer()) {
+                        for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
                             MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 10 });
                         }
                     } else if (0 < remainTime && remainTime < 10) {
-                        for (Player p : getEntryPlayer()) {
+                        for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
                             MessageEnum.raceTimeLimitCountDown.sendConvertedMessage(p, new Object[] { getInstance(), remainTime });
                         }
                     } else if (remainTime == 0) {
-                        for (Player p : getEntryPlayer()) {
+                        for (Player p : getOnlineEntryPlayerList()) {
                             p.playSound(p.getLocation(), Sound.ITEM_BREAK, 2.0F, 1.0F);
                             MessageEnum.raceTimeUp.sendConvertedMessage(p, new Object[] { getInstance() });
                         }
@@ -630,25 +644,37 @@ public class Circuit {
 
     /** @return レーススタートからの経過時間を、チック→ミリ秒に変換し返す */
     public int getLapMilliSecond() {
-        return getCurrentTime() * 50;
+        return this.getCurrentTime() * 50;
     }
 
-    public List<Player> getEntryPlayer() {
-        List<Player> entry = new ArrayList<Player>();
-        for (UUID id : this.getEntryPlayerList()) {
-            if (Bukkit.getPlayer(id) != null)
-                entry.add(Bukkit.getPlayer(id));
+    /**
+     * エントリーしているプレイヤーのうち、オンラインの全プレイヤーを配列で返す。
+     * @return オンラインのエントリプレイヤーリスト
+     */
+    public List<Player> getOnlineEntryPlayerList() {
+        List<Player> entryList = new ArrayList<Player>();
+
+        for (UUID uuid : this.getEntryPlayerList()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                entryList.add(player);
+            }
         }
-        return entry;
+        return entryList;
     }
 
-    public List<UUID> getEntryPlayerID() {
-        List<UUID> entry = new ArrayList<UUID>();
-        for (UUID id : this.getEntryPlayerList()) {
-            if (Bukkit.getPlayer(id) != null)
-                entry.add(id);
+    /**
+     * エントリーしているプレイヤーのうち、オンラインの全プレイヤーのUUIDを配列で返す。
+     * @return オンラインのエントリプレイヤーUUIDリスト
+     */
+    public List<UUID> getOnlineEntryPlayerUuidList() {
+        List<UUID> entryList = new ArrayList<UUID>();
+        for (UUID uuid : this.getEntryPlayerList()) {
+            if (Bukkit.getPlayer(uuid) != null) {
+                entryList.add(uuid);
+            }
         }
-        return entry;
+        return entryList;
     }
 
     public boolean isFillPlayer() {
@@ -658,21 +684,30 @@ public class Circuit {
         return false;
     }
 
-    /** @return 開催されているレースがあるかどうか */
+    /**
+     * 現在進行形で開催されているレースがなく、レースが終了状態かどうかを返す。<br>
+     * レースがスタートしており、かつ走行中のプレイヤーが残っている場合はfalseを返す。<br>
+     * また、レースがまだスタートしていない状態、かつスタンバイ状態のプレイヤーがいる場合もfalseを返す。<br>
+     * 上記の状態以外の場合はtrueを返す。
+     * @return 開催されているレースがあるかどうか
+     */
     public boolean isRaceEnd() {
-        Iterator<UUID> i = getEntryPlayerID().iterator();
-        UUID id;
+        Iterator<UUID> iterator = this.getOnlineEntryPlayerUuidList().iterator();
+        UUID uuid;
+
         if (isStarted()) {
-            while (i.hasNext()) {
-                id = i.next();
-                if (RaceManager.isEntry(id) && !RaceManager.getRace(id).isGoal())
+            while (iterator.hasNext()) {
+                uuid = iterator.next();
+                if (RaceManager.isStillRacing(uuid)) {
                     return false;
+                }
             }
         } else {
-            while (i.hasNext()) {
-                id = i.next();
-                if (RaceManager.isEntry(id))
+            while (iterator.hasNext()) {
+                uuid = iterator.next();
+                if (RaceManager.isStandby(uuid)) {
                     return false;
+                }
             }
         }
 
@@ -680,7 +715,7 @@ public class Circuit {
     }
 
     public boolean isJammerEntity(Entity entity) {
-        return getJammerEntityList().contains(entity);
+        return this.getJammerEntityList().contains(entity);
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -691,7 +726,7 @@ public class Circuit {
      * @param object タグ変換する変数
      */
     public void sendMessageEntryPlayer(MessageEnum message, Object... object) {
-        for (Player p : getEntryPlayer()) {
+        for (Player p : getOnlineEntryPlayerList()) {
             message.sendConvertedMessage(p, object);
         }
     }

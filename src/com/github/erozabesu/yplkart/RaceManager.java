@@ -365,7 +365,7 @@ public class RaceManager {
     public static List<Player> getEntryPlayer(String circuitname) {
         if (circuit.get(circuitname) == null)
             return null;
-        return circuit.get(circuitname).getEntryPlayer();
+        return circuit.get(circuitname).getOnlineEntryPlayerList();
     }
 
     public static List<Player> getGoalPlayer(String circuitname) {
