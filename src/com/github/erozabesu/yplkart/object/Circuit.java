@@ -175,7 +175,6 @@ public class Circuit {
                         Circuit circuit = RaceManager.setupCircuit(getCircuitName());
                         for (UUID nextUuid : nextEntryList) {
                             if (Bukkit.getPlayer(nextUuid) != null) {
-                                RaceManager.racerSetter_Entry(nextUuid, getCircuitName(), false);
                                 circuit.entryPlayer(nextUuid);
                             }
                         }
