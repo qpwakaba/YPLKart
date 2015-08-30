@@ -18,12 +18,19 @@ public class EntryCommand extends Command {
         super("entry");
     }
 
+    /*
+     * ka entry [サーキット]
+     * ka entry [プレイヤー] [サーキット]
+     * ka entry all/@a [サーキット]
+     */
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        // ka entry {circuit name}
+        // ka entry [サーキット]
         if (args.length == 2) {
-            if (!Permission.hasPermission(sender, Permission.CMD_ENTRY, false))
+            if (!Permission.hasPermission(sender, Permission.CMD_ENTRY, false)) {
                 return true;
+            }
+
             if (Util.isPlayer(sender)) {
                 Player player = (Player) sender;
                 String circuitName = args[1];
@@ -37,11 +44,14 @@ public class EntryCommand extends Command {
                 RaceManager.racerSetter_Entry(player.getUniqueId(), circuitName, false);
                 return true;
             }
-            // ka entry {player name} {circuit name}
-            // ka entry all {circuit name}
+
+        // ka entry [プレイヤー] [サーキット]
+        // ka entry all/@a [サーキット]
         } else if (args.length == 3) {
-            if (!Permission.hasPermission(sender, Permission.CMD_ENTRY.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMD_ENTRY.getTargetOtherPermission(), false)) {
                 return true;
+            }
+
             String circuitName = args[2];
             if (CircuitConfig.getCircuitData(circuitName) == null) {
                 Circuit circuit = new Circuit();
@@ -49,7 +59,8 @@ public class EntryCommand extends Command {
                 MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuit);
                 return true;
             }
-            if (args[1].equalsIgnoreCase("all")) {
+
+            if (args[1].equalsIgnoreCase("all") || args[1].equalsIgnoreCase("@a")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], false);
                 }
@@ -70,8 +81,10 @@ public class EntryCommand extends Command {
                 return true;
             }
         }
+
         SystemMessageEnum.referenceEntry.sendConvertedMessage(sender);
         SystemMessageEnum.referenceEntryOther.sendConvertedMessage(sender);
+
         return true;
     }
 }
