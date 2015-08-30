@@ -283,23 +283,34 @@ public class Circuit {
     }
 
     /**
-     * レースへの招待TellRawメッセージを承認したプレイヤーリストに追加する
+     * レースへの招待TellRawメッセージを承認したプレイヤーリストに追加する。<br>
+     * 追加に成功した場合はtrueを返す。<br>
+     * 既にリストに追加されているプレイヤーの場合はfalseを返す。
      * @param uuid 追加するプレイヤーのUUID
+     * @return リストへの追加に成功したかどうか
      */
-    public void acceptMatching(UUID uuid) {
+    public boolean acceptMatching(UUID uuid) {
         if (!this.getMatchingAcceptPlayerList().contains(uuid)) {
             this.getMatchingAcceptPlayerList().add(uuid);
+            return true;
         }
+
+        return false;
     }
 
     /**
-     * レースへの招待TellRawメッセージを承認したプレイヤーリストから削除する
+     * レースへの招待TellRawメッセージを承認したプレイヤーリストから削除する。<br>
+     * 削除に成功した場合はtrueを返す。<br>
+     * リスト含まれていないプレイヤーの場合はfalseを返す。
      * @param uuid 追加するプレイヤーのUUID
      */
-    public void denyMatching(UUID uuid) {
+    public boolean denyMatching(UUID uuid) {
         if (this.getMatchingAcceptPlayerList().contains(uuid)) {
             this.getMatchingAcceptPlayerList().remove(uuid);
+            return true;
         }
+
+        return false;
     }
 
     /**
