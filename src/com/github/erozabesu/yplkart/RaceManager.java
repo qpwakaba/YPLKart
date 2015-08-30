@@ -540,6 +540,23 @@ public class RaceManager {
     }
 
     /**
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄のチェックポイントを返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param racer 参加中のプレイヤーのRacerインスタンス
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントエンティティ
+     */
+    public static Entity getNearestCheckpoint(Racer racer, Location location, double radius) {
+        List<Entity> checkPointList = getNearbyCheckpoint(racer.getCircuitName(), location, radius);
+        if (checkPointList == null || checkPointList.isEmpty()) {
+            return null;
+        }
+
+        return Util.getNearestEntity(checkPointList, location);
+    }
+
+    /**
      * 引数entityのMetadataからCustomMinecartObjectを取得し返す
      * @param entity CustomMinecartObjectを取得するEntity
      * @return 取得したCustomMinecartObject

@@ -272,7 +272,7 @@ public class DataListener implements Listener {
         Location location = player.getLocation();
 
         //半径100ブロック以内の最寄のチェックポイントを取得
-        Entity nearestCheckPoint = RaceManager.getNearestUnpassedCheckpoint(racer, location, 100.0D);
+        Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, 100.0D);
 
         //取得できなかった場合return
         if (nearestCheckPoint == null) {
