@@ -211,7 +211,7 @@ public class Circuit {
      * @param uuid プレイヤーUUID
      * @param location レース開始地点の座標
      */
-    private void setupRacer(UUID uuid, Location location) {
+    public void setupRacer(UUID uuid, Location location) {
 
         Player player = Bukkit.getPlayer(uuid);
 
@@ -746,10 +746,12 @@ public class Circuit {
         String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
 
         for (UUID uuid : getEntryPlayerList()) {
-            Player player = Bukkit.getPlayer(uuid);
-            player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-            MessageEnum.raceReady.sendConvertedMessage(player, getInstance());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + tellraw);
+            if (!this.getMatchingAcceptPlayerList().contains(uuid)) {
+                Player player = Bukkit.getPlayer(uuid);
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
+                MessageEnum.raceReady.sendConvertedMessage(player, getInstance());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + tellraw);
+            }
         }
     }
 
