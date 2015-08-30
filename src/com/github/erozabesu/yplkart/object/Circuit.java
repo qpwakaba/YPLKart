@@ -156,7 +156,7 @@ public class Circuit {
      * 新たにマッチングを開始する
      */
     public void endRace() {
-        this.sendMessageEntryPlayer(MessageEnum.raceEnd, new Object[] { getInstance() });
+        this.sendMessageEntryPlayer(MessageEnum.raceEnd, this);
         Iterator<UUID> currentEntryListIterator = getEntryPlayerList().iterator();
         UUID currentUuid;
         while (currentEntryListIterator.hasNext()) {
@@ -282,7 +282,6 @@ public class Circuit {
 
     /**
      * プレイヤーをエントリーリストから削除する
-     * エントリーを削除した影響でプレイしている人数が0人になった場合はレースを終了する
      * @param uuid 追加するプレイヤーのUUID
      */
     public void exitPlayer(UUID uuid) {
@@ -294,11 +293,7 @@ public class Circuit {
             this.getReserveEntryPlayerList().remove(uuid);
         }
 
-        denyMatching(uuid);
-
-        if (this.isRaceEnd()) {
-            this.endRace();
-        }
+        this.denyMatching(uuid);
     }
 
     /**
@@ -735,8 +730,8 @@ public class Circuit {
      * @param object タグ変換する変数
      */
     public void sendMessageEntryPlayer(MessageEnum message, Object... object) {
-        for (Player p : getOnlineEntryPlayerList()) {
-            message.sendConvertedMessage(p, object);
+        for (Player player : getOnlineEntryPlayerList()) {
+            message.sendConvertedMessage(player, object);
         }
     }
 
