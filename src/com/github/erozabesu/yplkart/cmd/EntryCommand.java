@@ -94,7 +94,9 @@ public class EntryCommand extends Command {
                     for (Player other : Bukkit.getOnlinePlayers()) {
                         RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], false);
                     }
-                    MessageEnum.cmdEntryAll.sendConvertedMessage(sender, args[2]);
+                    Circuit circuit = new Circuit();
+                    circuit.setCircuitName(args[2]);
+                    MessageEnum.cmdEntryAll.sendConvertedMessage(sender, circuit);
 
                     return true;
 
