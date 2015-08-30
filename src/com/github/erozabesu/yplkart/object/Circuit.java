@@ -192,7 +192,8 @@ public class Circuit {
      * プレイヤーがオフラインの場合はエントリーを取り消す。
      */
     private void setupAllRacer() {
-        List<Location> position = CircuitConfig.getCircuitData(getCircuitName()).getStartLocationList();
+        int listSize = this.getOnlineEntryPlayerUuidList().size();
+        List<Location> position = CircuitConfig.getCircuitData(getCircuitName()).getStartLocationList(listSize);
         int count = 0;
 
         for (UUID uuid : getEntryPlayerList()) {

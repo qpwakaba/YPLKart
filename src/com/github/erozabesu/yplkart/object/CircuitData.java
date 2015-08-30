@@ -319,10 +319,11 @@ public class CircuitData {
     }
 
     /**
-     * レース開始座標を基準に、参加者を整列させる座標Listを返す
-     * @return レース開始座標List
+     * レース開始座標を基準に、参加者を整列させる座標を引数listSizeの数だけ生成し配列で返す。
+     * @param listSize 生成する座標の数
+     * @return レース開始座標の配列
      */
-    public List<Location> getStartLocationList() {
+    public List<Location> getStartLocationList(int listSize) {
         Location location = this.getStartLocation();
         if (location == null) {
             return null;
