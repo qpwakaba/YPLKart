@@ -21,7 +21,7 @@ public class CharacterResetCommand extends Command {
             if (!Permission.hasPermission(sender, Permission.CMD_CHARACTERRESET, false))
                 return true;
             Player player = (Player) sender;
-            RaceManager.clearCharacterRaceData(player.getUniqueId());
+            RaceManager.racerSetter_DeselectCharacter(player.getUniqueId());
             return true;
         } else if (args.length == 2) {
             if (!Permission.hasPermission(sender, Permission.CMD_CHARACTERRESET.getTargetOtherPermission(), false))
@@ -29,7 +29,7 @@ public class CharacterResetCommand extends Command {
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.clearCharacterRaceData(other.getUniqueId());
+                    RaceManager.racerSetter_DeselectCharacter(other.getUniqueId());
                 }
                 MessageEnum.cmdCharacterResetAll.sendConvertedMessage(sender);
                 return true;
@@ -42,7 +42,7 @@ public class CharacterResetCommand extends Command {
 
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
-                RaceManager.clearCharacterRaceData(other.getUniqueId());
+                RaceManager.racerSetter_DeselectCharacter(other.getUniqueId());
                 MessageEnum.cmdCharacterResetOther.sendConvertedMessage(sender, other);
                 return true;
             }

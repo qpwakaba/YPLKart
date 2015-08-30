@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -172,71 +173,76 @@ public class RaceManager {
 
     // 〓 Circuit Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void setMatchingCircuitData(UUID id) {
-        Circuit c = getCircuit(id);
-        Player p = Bukkit.getPlayer(id);
-        if (p != null)
-            p.playSound(p.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-        if (c == null) {
+    public static void circuitSetter_AcceptMatching(UUID uuid) {
+        Circuit circuit = getCircuit(uuid);
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+        }
+
+        if (circuit == null) {
             return;
-        } else if (!c.isMatching()) {
+        } else if (!circuit.isMatching()) {
             return;
-        } else if (isStandBy(id)) {
+        } else if (isStandby(uuid)) {
             return;
         } else {
-            c.acceptMatching(id);
-            MessageEnum.raceAccept.sendConvertedMessage(p, c);
+            circuit.acceptMatching(uuid);
+            MessageEnum.raceAccept.sendConvertedMessage(player, circuit);
         }
     }
 
-    public static void clearMatchingCircuitData(UUID id) {
-        Circuit c = getCircuit(id);
-        Player p = Bukkit.getPlayer(id);
-        if (p != null)
-            p.playSound(p.getLocation(), Sound.CLICK, 1.0F, 0.9F);
-        if (c == null) {
+    public static void circuitSetter_DenyMatching(UUID uuid) {
+        Circuit circuit = getCircuit(uuid);
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 0.9F);
+        }
+
+        if (circuit == null) {
             return;
-        } else if (!c.isMatching()) {
+        } else if (!circuit.isMatching()) {
             return;
-        } else if (isStandBy(id)) {
+        } else if (isStandby(uuid)) {
             return;
         } else {
-            clearEntryRaceData(id);
+            racerSetter_UnEntry(uuid);
         }
     }
 
     // 〓 Racer Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void setEntryRaceData(UUID id, String circuitname, boolean forceEntry) {
-        Player player = Bukkit.getPlayer(id);
-        if (isEntry(id)) {
-            String oldcircuitname = Util.convertInitialUpperString(getRace(id).getCircuitName());
+    public static void racerSetter_Entry(UUID uuid, String circuitName, boolean forceEntry) {
+        Player player = Bukkit.getPlayer(uuid);
+        Racer racer = getRace(uuid);
+        if (isEntry(uuid)) {
+            String oldcircuitname = Util.convertInitialUpperString(racer.getCircuitName());
             MessageEnum.raceEntryAlready.sendConvertedMessage(player, oldcircuitname);
         } else {
-            Circuit c = setupCircuit(circuitname);
-            if (c.isFillPlayer()) {
-                c.entryReservePlayer(id);
-                MessageEnum.raceEntryFull.sendConvertedMessage(player, c);
+            Circuit circuit = setupCircuit(circuitName);
+            if (circuit.isFillPlayer()) {
+                circuit.entryReservePlayer(uuid);
+                MessageEnum.raceEntryFull.sendConvertedMessage(player, circuit);
             } else {
-                getRace(id).setCircuitName(circuitname);
+                racer.setCircuitName(circuitName);
 
-                if (c.isStarted()) {
-                    c.entryReservePlayer(id);
-                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, c);
+                if (circuit.isStarted()) {
+                    circuit.entryReservePlayer(uuid);
+                    MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, circuit);
                 } else {
-                    c.entryPlayer(id);
-                    Scoreboards.entryCircuit(id);
+                    circuit.entryPlayer(uuid);
+                    Scoreboards.entryCircuit(uuid);
 
-                    MessageEnum.raceEntry.sendConvertedMessage(player, c);
+                    MessageEnum.raceEntry.sendConvertedMessage(player, circuit);
 
-                    if (c.isMatching())
-                        setMatchingCircuitData(id);
+                    if (circuit.isMatching())
+                        circuitSetter_AcceptMatching(uuid);
                 }
             }
         }
     }
 
-    public static void setCharacterRaceData(UUID uuid, Character character) {
+    public static void racerSetter_Character(UUID uuid, Character character) {
         //レース開始前はなにもしない
         Player player = Bukkit.getPlayer(uuid);
         //プレイヤーがオフライン
@@ -244,7 +250,7 @@ public class RaceManager {
             return;
         }
 
-        if (!isStandBy(uuid)) {
+        if (!isStandby(uuid)) {
             MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
             return;
         }
@@ -259,14 +265,14 @@ public class RaceManager {
         MessageEnum.raceCharacter.sendConvertedMessage(player, new Object[] { character, getCircuit(racer.getCircuitName()) });
     }
 
-    public static void setKartRaceData(UUID uuid, Kart kart) {
+    public static void racerSetter_Kart(UUID uuid, Kart kart) {
         Player player = Bukkit.getPlayer(uuid);
         //プレイヤーがオフライン
         if (player == null) {
             return;
         }
 
-        if (!isStandBy(uuid)) {
+        if (!isStandby(uuid)) {
             MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
             return;
         }
@@ -279,7 +285,7 @@ public class RaceManager {
         MessageEnum.raceKart.sendConvertedMessage(player, new Object[] { kart, getCircuit(racer.getCircuitName()) });
     }
 
-    public static void clearEntryRaceData(UUID uuid) {
+    public static void racerSetter_UnEntry(UUID uuid) {
         if (isEntry(uuid)) {
             Scoreboards.exitCircuit(uuid);
 
@@ -290,10 +296,10 @@ public class RaceManager {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!racer.isGoal()) {
-                    clearCharacterRaceData(uuid);
-                    clearKartRaceData(uuid);
+                    racerSetter_DeselectCharacter(uuid);
+                    racerSetter_DeselectKart(uuid);
                     leaveRacingKart(player);
-                    if (isStandBy(uuid)) {
+                    if (isStandby(uuid)) {
                         //全パラメータを復元する
                         racer.recoveryAll();
                     }
@@ -305,7 +311,7 @@ public class RaceManager {
         }
     }
 
-    public static void clearCharacterRaceData(UUID id) {
+    public static void racerSetter_DeselectCharacter(UUID id) {
         Racer racer = getRace(id);
 
         if (racer.getCharacter() == null) {
@@ -323,14 +329,14 @@ public class RaceManager {
         }
     }
 
-    public static void clearKartRaceData(UUID id) {
-        Racer racer = getRace(id);
+    public static void racerSetter_DeselectKart(UUID uuid) {
+        Racer racer = getRace(uuid);
         if (racer.getKart() == null) {
             return;
         }
 
         racer.setKart(null);
-        Player player = Bukkit.getPlayer(id);
+        Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             Circuit circuit = new Circuit();
             circuit.setCircuitName(racer.getCircuitName());
@@ -338,6 +344,10 @@ public class RaceManager {
         }
     }
 
+    /**
+     * 引数playerが搭乗中のエンティティがレーシングカートエンティティだった場合、搭乗を解除し、カートエンティティをデスポーンさせる。
+     * @param player
+     */
     public static void leaveRacingKart(Player player) {
         Entity vehicle = player.getVehicle();
         if (vehicle != null) {
@@ -410,66 +420,90 @@ public class RaceManager {
         return 0;
     }
 
-    public static ArrayList<Entity> getNearbyCheckpoint(String circuitName, Location location, double radius) {
+    /**
+     * 引数circuitNameが名称のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置されたチェックポイント全てを配列で返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param circuitName サーキット名
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントの配列
+     */
+    public static List<Entity> getNearbyCheckpoint(String circuitName, Location location, double radius) {
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
 
-        ArrayList<Entity> nearbyCheckPoint = new ArrayList<Entity>();
-        for (Entity entity : entityList) {
-            if (isSpecificCircuitCheckPointEntity(entity, circuitName)) {
-                nearbyCheckPoint.add(entity);
+        Iterator<Entity> iterator = entityList.iterator();
+        Entity tempEntity;
+        while (iterator.hasNext()) {
+            tempEntity = iterator.next();
+
+            //引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
+            if (!isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
+                iterator.remove();
             }
         }
 
-        if (nearbyCheckPoint.isEmpty()) {
+        if (entityList == null || entityList.isEmpty()) {
             return null;
         }
 
-        return nearbyCheckPoint;
+        return entityList;
     }
 
+    /**
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された未通過のチェックポイント全てを配列で返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param racer 参加中のプレイヤーのRacerインスタンス
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントの配列
+     */
     public static List<Entity> getNearbyUnpassedCheckpoint(Racer racer, Location location, double radius) {
+        String circuitName = racer.getCircuitName();
+        if (circuitName == null || circuitName.equalsIgnoreCase("")) {
+            return null;
+        }
+
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
 
-        List<Entity> nearbyCheckPoint = new ArrayList<Entity>();
-        for (Entity entity : entityList) {
-            if (isSpecificCircuitCheckPointEntity(entity, racer.getCircuitName())) {
-                if (!racer.getPassedCheckPointList().contains(currentLaps + entity.getUniqueId().toString())) {
-                    nearbyCheckPoint.add(entity);
-                }
+        Iterator<Entity> iterator = entityList.iterator();
+        Entity tempEntity;
+        while (iterator.hasNext()) {
+            tempEntity = iterator.next();
+
+            // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
+            if (!isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
+                iterator.remove();
+            }
+
+            // 通過済みのチェックポイントを配列から削除
+            if (racer.getPassedCheckPointList().contains(currentLaps + tempEntity.getUniqueId().toString())) {
+                iterator.remove();
             }
         }
 
-        if (nearbyCheckPoint.isEmpty()) {
+        if (entityList == null || entityList.isEmpty()) {
             return null;
         }
 
-        return nearbyCheckPoint;
+        return entityList;
     }
 
-    public static Entity getNearestUnpassedCheckpoint(Location l, double radius, Racer r) {
-        List<Entity> checkpoint = getNearbyUnpassedCheckpoint(r, l, radius);
-        if (checkpoint == null)
-            return null;
-
-        return Util.getNearestEntity(checkpoint, l);
-    }
-
-    public static ArrayList<String> getNearbyCheckpointID(String circuitName, Location location, double radius) {
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), radius);
-
-        ArrayList<String> nearbyCheckPoint = new ArrayList<String>();
-        for (Entity entity : entityList) {
-            if (isSpecificCircuitCheckPointEntity(entity, circuitName)) {
-                nearbyCheckPoint.add(entity.getUniqueId().toString());
-            }
-        }
-
-        if (nearbyCheckPoint.isEmpty()) {
+    /**
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄の未通過のチェックポイントを返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param racer 参加中のプレイヤーのRacerインスタンス
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントエンティティ
+     */
+    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double radius) {
+        List<Entity> checkPointList = getNearbyUnpassedCheckpoint(racer, location, radius);
+        if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
 
-        return nearbyCheckPoint;
+        return Util.getNearestEntity(checkPointList, location);
     }
 
     /**
@@ -599,7 +633,7 @@ public class RaceManager {
      * @param uuid チェックするレース参加プレイヤーのUUID
      * @return 申請していたレースが規定人数を満たし参加者が召集された状態かどうか
      */
-    public static Boolean isStandBy(UUID uuid) {
+    public static Boolean isStandby(UUID uuid) {
         if (isEntry(uuid)) {
             if (getRace(uuid).isStandby()) {
                 return true;
@@ -614,7 +648,7 @@ public class RaceManager {
      */
     public static Boolean isStarted(UUID uuid) {
         if (isEntry(uuid)) {
-            if (isStandBy(uuid)) {
+            if (isStandby(uuid)) {
                 Circuit circuit = getCircuit(uuid);
                 if (circuit != null) {
                     if (circuit.isStarted()) {
@@ -632,7 +666,7 @@ public class RaceManager {
      */
     public static Boolean isStillRacing(UUID uuid) {
         if (isEntry(uuid)) {
-            if (isStandBy(uuid)) {
+            if (isStandby(uuid)) {
                 Circuit circuit = getCircuit(uuid);
                 if (circuit != null) {
                     if (circuit.isStarted()) {
@@ -795,6 +829,7 @@ public class RaceManager {
 
     // 〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /** 全サーキットに設置されている妨害エンティティをデスポーンさせる。 */
     public static void removeAllJammerEntity() {
         for (Circuit cir : circuit.values()) {
             cir.removeAllJammerEntity();

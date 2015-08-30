@@ -35,7 +35,7 @@ public class KartCommand extends Command {
                     return true;
                 }
             }
-            RaceManager.setKartRaceData(player.getUniqueId(), kart);
+            RaceManager.racerSetter_Kart(player.getUniqueId(), kart);
             return true;
             // ka ride all {kart name}
             // ka ride {player name} {kart name}
@@ -58,7 +58,7 @@ public class KartCommand extends Command {
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.setKartRaceData(other.getUniqueId(), kart);
+                    RaceManager.racerSetter_Kart(other.getUniqueId(), kart);
                 }
                 if (isRandomKart)
                     MessageEnum.cmdRideRandomAll.sendConvertedMessage(sender);
@@ -74,7 +74,7 @@ public class KartCommand extends Command {
                 }
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
-                RaceManager.setKartRaceData(other.getUniqueId(), kart);
+                RaceManager.racerSetter_Kart(other.getUniqueId(), kart);
                 MessageEnum.cmdRideOther.sendConvertedMessage(sender, new Object[] { other, kart });
                 return true;
             }

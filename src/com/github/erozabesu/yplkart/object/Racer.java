@@ -176,10 +176,10 @@ public class Racer extends PlayerObject{
 
         //初期化 順序に注意
         this.setStart(false);
-        RaceManager.clearKartRaceData(this.getUUID());
+        RaceManager.racerSetter_DeselectKart(this.getUUID());
         RaceManager.leaveRacingKart(getPlayer());
         this.recoveryAll();
-        RaceManager.clearCharacterRaceData(this.getUUID());
+        RaceManager.racerSetter_DeselectCharacter(this.getUUID());
     }
 
     /**

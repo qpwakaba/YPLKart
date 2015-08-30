@@ -1,6 +1,5 @@
 package com.github.erozabesu.yplkart.listener;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,7 +78,7 @@ public class DataListener implements Listener {
         Racer racer = RaceManager.getRacer(player);
 
         //レース中はキャンセル
-        if (RaceManager.isStandBy(player.getUniqueId())) {
+        if (RaceManager.isStandby(player.getUniqueId())) {
             if (!racer.isGoal()) {
                 event.setCancelled(true);
                 return;
@@ -96,7 +95,7 @@ public class DataListener implements Listener {
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
-        if (RaceManager.isStandBy(player.getUniqueId())) {
+        if (RaceManager.isStandby(player.getUniqueId())) {
             event.setCancelled(true);
         }
     }
@@ -165,7 +164,7 @@ public class DataListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        if (RaceManager.isStandBy(uuid) && !RaceManager.isStarted(uuid)) {
+        if (RaceManager.isStandby(uuid) && !RaceManager.isStarted(uuid)) {
             if (!event.getFrom().equals(event.getTo())) {
                 Location from = event.getFrom();
                 Location to = event.getTo();
@@ -190,7 +189,7 @@ public class DataListener implements Listener {
 
         //マッチングが終了しているプレイヤー以外は除外
         Player player = event.getPlayer();
-        if (!RaceManager.isStandBy(player.getUniqueId())) {
+        if (!RaceManager.isStandby(player.getUniqueId())) {
             return;
         }
 
@@ -272,16 +271,13 @@ public class DataListener implements Listener {
         String circuitName = racer.getCircuitName();
         Location location = player.getLocation();
 
-        //半径100ブロック以内の全チェックポイントを取得
-        ArrayList<Entity> checkPointEntityList = RaceManager.getNearbyCheckpoint(circuitName, location, 100.0D);
+        //半径100ブロック以内の最寄のチェックポイントを取得
+        Entity nearestCheckPoint = RaceManager.getNearestUnpassedCheckpoint(racer, location, 100.0D);
 
-        //検出できなかった場合return
-        if (checkPointEntityList == null || checkPointEntityList.isEmpty()) {
+        //取得できなかった場合return
+        if (nearestCheckPoint == null) {
             return;
         }
-
-        //最寄のチェックポイントを抽出
-        Entity nearestCheckPoint = Util.getNearestEntity(checkPointEntityList, location);
 
         //config.ymlからチェックポイントの検出範囲を取得
         Integer detectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(nearestCheckPoint, circuitName);
@@ -334,7 +330,7 @@ public class DataListener implements Listener {
             return;
         }
 
-        if (RaceManager.isStandBy(p.getUniqueId()) && !racer.isGoal()) {
+        if (RaceManager.isStandby(p.getUniqueId()) && !racer.isGoal()) {
 
             // issue #197
             Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
@@ -347,12 +343,12 @@ public class DataListener implements Listener {
 
                     //カート、もしくはキャラクターが未選択の場合強制的にランダム選択する : issue #121
                     if (racer.getCharacter() == null) {
-                        RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
+                        RaceManager.racerSetter_Character(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         ItemEnum.removeAllKeyItems(p);
                     }
 
                     if (circuitData.getRaceType().equals(RaceType.KART)) {
-                        RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
+                        RaceManager.racerSetter_Kart(p.getUniqueId(), KartConfig.getRandomKart());
                         ItemEnum.removeAllKeyItems(p);
                     }
 
@@ -382,7 +378,7 @@ public class DataListener implements Listener {
         //ログアウト中にレースが終了してしまった場合、レース前の情報が全て消えてしまうため、
         //レース中ログアウトした場合、現在のプレイヤー情報を保存し、体力等をレース前の状態に戻す
         //再度レース中にログインした場合は、DataListener.onJoin()で、ログアウト時に保存したプレイヤーデータを復元しレースに復帰させる
-        if (RaceManager.isStandBy(player.getUniqueId())) {
+        if (RaceManager.isStandby(player.getUniqueId())) {
             Scoreboards.hideBoard(player.getUniqueId());
 
             racer.savePlayerDataOnQuit();
@@ -392,8 +388,8 @@ public class DataListener implements Listener {
             //レース前のパラメータを復元する
             racer.recoveryAll();
         } else if (RaceManager.isEntry(player.getUniqueId())
-                && !RaceManager.isStandBy(player.getUniqueId())) {
-            RaceManager.clearEntryRaceData(player.getUniqueId());
+                && !RaceManager.isStandby(player.getUniqueId())) {
+            RaceManager.racerSetter_UnEntry(player.getUniqueId());
         }
     }
 
@@ -402,7 +398,7 @@ public class DataListener implements Listener {
         if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
             return;
         }
-        if (!RaceManager.isStandBy(event.getPlayer().getUniqueId())) {
+        if (!RaceManager.isStandby(event.getPlayer().getUniqueId())) {
             return;
         }
 
@@ -472,7 +468,7 @@ public class DataListener implements Listener {
             }
 
         //スタンバイ状態～レース開始までのダメージを無効
-        } else if (RaceManager.isStandBy(uuid) && !RaceManager.isStarted(uuid)) {
+        } else if (RaceManager.isStandby(uuid) && !RaceManager.isStarted(uuid)) {
             if (event.getCause() != DamageCause.VOID) {
                 event.setCancelled(true);
             }
@@ -486,7 +482,7 @@ public class DataListener implements Listener {
         }
         final Player p = (Player) e.getEntity();
 
-        if (!RaceManager.isStandBy(p.getUniqueId())) {
+        if (!RaceManager.isStandby(p.getUniqueId())) {
             return;
         }
         Racer r = RaceManager.getRacer(p);
@@ -527,7 +523,7 @@ public class DataListener implements Listener {
         if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
             return;
         }
-        if (!RaceManager.isStandBy(((Player) e.getPlayer()).getUniqueId())) {
+        if (!RaceManager.isStandby(((Player) e.getPlayer()).getUniqueId())) {
             return;
         }
 
@@ -623,7 +619,7 @@ public class DataListener implements Listener {
         }
 
         //スタンバイ状態以降はインベントリの操作をさせない
-        if (RaceManager.isStandBy(player.getUniqueId())) {
+        if (RaceManager.isStandby(player.getUniqueId())) {
             e.setCancelled(true);
             player.updateInventory();
         }
@@ -649,11 +645,11 @@ public class DataListener implements Listener {
                 player.closeInventory();
                 //ランダムボタン
             } else if (EnumSelectMenu.CHARACTER_RANDOM.equalsIgnoreCase(clickedItemName)) {
-                RaceManager.setCharacterRaceData(uuid, CharacterConfig.getRandomCharacter());
+                RaceManager.racerSetter_Character(uuid, CharacterConfig.getRandomCharacter());
                 //ネクストプレビューボタン
             } else if (EnumSelectMenu.CHARACTER_NEXT.equalsIgnoreCase(clickedItemName)
                     || EnumSelectMenu.CHARACTER_PREVIOUS.equalsIgnoreCase(clickedItemName)) {
-                if (RaceManager.isStandBy(uuid)) {
+                if (RaceManager.isStandby(uuid)) {
                     if (racer.getCharacter() == null) {
                         MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
                                 player, RaceManager.getCircuit(racer.getCircuitName()));
@@ -670,7 +666,7 @@ public class DataListener implements Listener {
                 }
                 //キャラクター選択
             } else if (CharacterConfig.getCharacter(clickedItemName) != null) {
-                RaceManager.setCharacterRaceData(uuid, CharacterConfig.getCharacter(clickedItemName));
+                RaceManager.racerSetter_Character(uuid, CharacterConfig.getCharacter(clickedItemName));
             }
             player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
         } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
@@ -692,11 +688,11 @@ public class DataListener implements Listener {
                 player.closeInventory();
             } else if (EnumSelectMenu.KART_RANDOM.equalsIgnoreCase(clicked)) {
                 //ランダムボタン
-                RaceManager.setKartRaceData(uuid, KartConfig.getRandomKart());
+                RaceManager.racerSetter_Kart(uuid, KartConfig.getRandomKart());
             } else if (EnumSelectMenu.KART_NEXT.equalsIgnoreCase(clicked)
                     || EnumSelectMenu.KART_PREVIOUS.equalsIgnoreCase(clicked)) {
                 //ネクストプレビューボタン
-                if (RaceManager.isStandBy(uuid)) {
+                if (RaceManager.isStandby(uuid)) {
                     if (racer.getKart() == null) {
                         MessageEnum.raceMustSelectKart.sendConvertedMessage(
                                 player, RaceManager.getCircuit(racer.getCircuitName()));
@@ -714,7 +710,7 @@ public class DataListener implements Listener {
                 }
             } else if (KartConfig.getKart(clicked) != null) {
                 //カート選択
-                RaceManager.setKartRaceData(uuid, KartConfig.getKart(clicked));
+                RaceManager.racerSetter_Kart(uuid, KartConfig.getKart(clicked));
             }
             player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
         }

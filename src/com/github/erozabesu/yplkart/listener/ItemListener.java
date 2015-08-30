@@ -565,7 +565,7 @@ public class ItemListener extends RaceManager implements Listener {
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
-        if (!isStandBy(player.getUniqueId())) {
+        if (!isStandby(player.getUniqueId())) {
             return;
         }
         if (getRace(player.getUniqueId()).isGoal()) {
@@ -580,7 +580,7 @@ public class ItemListener extends RaceManager implements Listener {
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
-        if (!isStandBy(player.getUniqueId())) {
+        if (!isStandby(player.getUniqueId())) {
             return;
         }
         if (getRace(player.getUniqueId()).isGoal()) {
@@ -726,7 +726,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
         if (getRank(user) == 0)
             return;
-        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRacer(user)) == null) {
+        if (getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), checkPointDetectRadius + 20) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -762,7 +762,7 @@ public class ItemListener extends RaceManager implements Listener {
                     ItemEnum.THORNED_TURTLE.getItem() });
             return;
         }
-        if (getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20, getRacer(user)) == null) {
+        if (getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), checkPointDetectRadius + 20) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -783,8 +783,8 @@ public class ItemListener extends RaceManager implements Listener {
         if (getRank(user) == 0)
             return;
 
-        Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(user.getLocation(), checkPointDetectRadius + 20,
-                getRacer(user));
+        Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(),
+                checkPointDetectRadius + 20);
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });

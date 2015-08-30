@@ -125,7 +125,7 @@ public class KartUtil extends ReflectionUtil {
         Player clickedPlayer = (Player) ReflectionUtil.invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityHuman);
 
         //クリックしたプレイヤーがレース中、かつゴールしていない場合return
-        if (RaceManager.isStandBy(clickedPlayer.getUniqueId()) && !RaceManager.getRacer(clickedPlayer).isGoal()) {
+        if (RaceManager.isStandby(clickedPlayer.getUniqueId()) && !RaceManager.getRacer(clickedPlayer).isGoal()) {
             return false;
         }
 
@@ -696,7 +696,7 @@ public class KartUtil extends ReflectionUtil {
         }
 
         //周囲のチェックポイントを取得し、検出できなかった場合return
-        ArrayList<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(racer.getCircuitName(), kartLocation, 100);
+        List<Entity> nearbyCPList = RaceManager.getNearbyCheckpoint(racer.getCircuitName(), kartLocation, 100);
         if (nearbyCPList == null || nearbyCPList.isEmpty()) {
             return;
         }

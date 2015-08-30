@@ -16,7 +16,7 @@ public class DenyCommand extends Command {
             //TODO: ここでコマンドの使い方を表示させられる。
             return false;
         Player player = (Player)sender;
-        RaceManager.clearMatchingCircuitData(player.getUniqueId());
+        RaceManager.circuitSetter_DenyMatching(player.getUniqueId());
         return true;
     }
 }

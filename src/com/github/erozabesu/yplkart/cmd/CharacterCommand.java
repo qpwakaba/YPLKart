@@ -35,7 +35,7 @@ public class CharacterCommand extends Command {
                     return true;
                 }
             }
-            RaceManager.setCharacterRaceData(player.getUniqueId(), character);
+            RaceManager.racerSetter_Character(player.getUniqueId(), character);
             return true;
             //ka character {player} {character name}
             //ka character all {character name}
@@ -58,7 +58,7 @@ public class CharacterCommand extends Command {
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.setCharacterRaceData(other.getUniqueId(), character);
+                    RaceManager.racerSetter_Character(other.getUniqueId(), character);
                 }
                 MessageEnum.cmdCharacterRandomAll.sendConvertedMessage(sender);
                 return true;
@@ -70,7 +70,7 @@ public class CharacterCommand extends Command {
                 }
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
-                RaceManager.setCharacterRaceData(other.getUniqueId(), character);
+                RaceManager.racerSetter_Character(other.getUniqueId(), character);
                 MessageEnum.cmdCharacterOther.sendConvertedMessage(sender, new Object[] { other, character });
                 return true;
             }

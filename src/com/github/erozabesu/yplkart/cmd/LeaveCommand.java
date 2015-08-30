@@ -24,7 +24,7 @@ public class LeaveCommand extends Command {
                 return true;
             Player player = (Player) sender;
             RaceManager.leaveRacingKart(player);
-            RaceManager.clearKartRaceData(player.getUniqueId());
+            RaceManager.racerSetter_DeselectKart(player.getUniqueId());
             return true;
             // ka leave {player}
             // ka leave all
@@ -35,7 +35,7 @@ public class LeaveCommand extends Command {
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     RaceManager.leaveRacingKart(other);
-                    RaceManager.clearKartRaceData(other.getUniqueId());
+                    RaceManager.racerSetter_DeselectKart(other.getUniqueId());
                 }
                 MessageEnum.cmdLeaveAll.sendConvertedMessage(sender);
                 return true;
@@ -49,7 +49,7 @@ public class LeaveCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.leaveRacingKart(other);
-                RaceManager.clearKartRaceData(other.getUniqueId());
+                RaceManager.racerSetter_DeselectKart(other.getUniqueId());
                 MessageEnum.cmdLeaveOther.sendConvertedMessage(sender, other);
                 return true;
             }

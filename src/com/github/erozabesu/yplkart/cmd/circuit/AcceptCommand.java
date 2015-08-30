@@ -17,7 +17,7 @@ public class AcceptCommand extends Command {
             // TODO: ここでコマンドの使い方を表示させられる。
             return false;
         Player player = (Player) sender;
-        RaceManager.setMatchingCircuitData(player.getUniqueId());
+        RaceManager.circuitSetter_AcceptMatching(player.getUniqueId());
         return true;
     }
 }

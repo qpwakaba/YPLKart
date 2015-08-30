@@ -34,7 +34,7 @@ public class EntryCommand extends Command {
                     return true;
                 }
 
-                RaceManager.setEntryRaceData(player.getUniqueId(), circuitName, false);
+                RaceManager.racerSetter_Entry(player.getUniqueId(), circuitName, false);
                 return true;
             }
             // ka entry {player name} {circuit name}
@@ -51,7 +51,7 @@ public class EntryCommand extends Command {
             }
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.setEntryRaceData(other.getUniqueId(), args[2], false);
+                    RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], false);
                 }
                 MessageEnum.cmdEntryAll.sendConvertedMessage(sender, args[2]);
                 return true;
@@ -66,7 +66,7 @@ public class EntryCommand extends Command {
                 Circuit circuit = new Circuit();
                 circuit.setCircuitName(circuitName);
                 MessageEnum.cmdEntryOther.sendConvertedMessage(sender, circuit, other);
-                RaceManager.setEntryRaceData(other.getUniqueId(), circuitName, false);
+                RaceManager.racerSetter_Entry(other.getUniqueId(), circuitName, false);
                 return true;
             }
         }

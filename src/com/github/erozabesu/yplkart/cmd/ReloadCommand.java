@@ -22,7 +22,7 @@ public class ReloadCommand extends Command {
             return true;
 
         for (Player other : Bukkit.getOnlinePlayers()) {
-            RaceManager.clearEntryRaceData(other.getUniqueId());
+            RaceManager.racerSetter_UnEntry(other.getUniqueId());
         }
         RaceManager.endAllCircuit();
 

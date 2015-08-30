@@ -158,7 +158,7 @@ public class Circuit {
         while (i.hasNext()) {
             id = i.next();
             i.remove();
-            RaceManager.clearEntryRaceData(id);
+            RaceManager.racerSetter_UnEntry(id);
         }
 
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
@@ -171,7 +171,7 @@ public class Circuit {
                         Circuit c = RaceManager.setupCircuit(getCircuitName());
                         for (UUID id : nextentry) {
                             if (Bukkit.getPlayer(id) != null) {
-                                RaceManager.setEntryRaceData(id, getCircuitName(), false);
+                                RaceManager.racerSetter_Entry(id, getCircuitName(), false);
                                 c.entryPlayer(id);
                             }
                         }
@@ -211,8 +211,8 @@ public class Circuit {
                 racer.setCircuitName(getCircuitName());
                 racer.setStandby(true);
                 racer.setKartEntityLocation(Util.adjustBlockLocation(position.get(count)));
-                RaceManager.clearCharacterRaceData(uuid);
-                RaceManager.clearKartRaceData(uuid);
+                RaceManager.racerSetter_DeselectCharacter(uuid);
+                RaceManager.racerSetter_DeselectKart(uuid);
                 RaceManager.leaveRacingKart(player);
 
                 //開始地点にテレポート、メニュー表示
@@ -409,7 +409,7 @@ public class Circuit {
                         if (!Bukkit.getPlayer(denyPlayerUUID).isOnline() || !getMatchingAcceptPlayerList().contains(denyPlayerUUID)) {
                             denyPlayerList.remove();
                             denyMatching(denyPlayerUUID);
-                            RaceManager.clearEntryRaceData(denyPlayerUUID);
+                            RaceManager.racerSetter_UnEntry(denyPlayerUUID);
                         }
                     }
 
@@ -502,12 +502,12 @@ public class Circuit {
                 } else if (getStandbyCountDownTime() == 12) {
                     for (Player p : getEntryPlayer()) {
                         if (RaceManager.getRacer(p).getCharacter() == null) {
-                            RaceManager.setCharacterRaceData(p.getUniqueId(), CharacterConfig.getRandomCharacter());
+                            RaceManager.racerSetter_Character(p.getUniqueId(), CharacterConfig.getRandomCharacter());
                         }
 
                         if (RaceManager.getRacer(p).getKart() == null
                                 && circuitData.getRaceType().equals(RaceType.KART)) {
-                            RaceManager.setKartRaceData(p.getUniqueId(), KartConfig.getRandomKart());
+                            RaceManager.racerSetter_Kart(p.getUniqueId(), KartConfig.getRandomKart());
                         }
                         p.closeInventory();
                         ItemEnum.removeAllKeyItems(p);
