@@ -71,6 +71,9 @@ public class Circuit {
     /** スタンバイタスクの制限時間 */
     private int standbyCountDownTime;
 
+    /** スタンバイタスクが起動されているかどうか */
+    private boolean isStandby;
+
     /** レースの経過時間に応じ自動終了させるタスク */
     private BukkitTask limitTimeTask;
 
@@ -101,6 +104,7 @@ public class Circuit {
         this.setStandbyCountDownTime(0);
         this.setStarted(false);
         this.setMatching(false);
+        this.setStandby(false);
         this.setEntryPlayerList(new ArrayList<UUID>());
         this.setReserveEntryPlayerList(new ArrayList<UUID>());
         this.setMatchingAcceptPlayerList(new ArrayList<UUID>());
@@ -511,6 +515,9 @@ public class Circuit {
 
         this.setStandbyCountDownTime(circuitData.getMenuTime() + 12);
 
+        // フラグOn
+        this.setStandby(true);
+
         this.setStandbyTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 setStandbyCountDownTime(getStandbyCountDownTime() - 1);
@@ -571,6 +578,7 @@ public class Circuit {
                     startRace();
                 } else if (getStandbyCountDownTime() < 0) {
                     setStandbyCountDownTime(0);
+                    setStandby(false);
                     getStandbyTask().cancel();
                     setStandbyTask(null);
                     return;
@@ -827,6 +835,11 @@ public class Circuit {
         return this.standbyCountDownTime;
     }
 
+    /** @return スタンバイタスクが起動されているかどうか */
+    public boolean isStandby() {
+        return isStandby;
+    }
+
     /** @return レースの経過時間に応じ自動終了させるタスク */
     public BukkitTask getLimitTimeTask() {
         return this.limitTimeTask;
@@ -902,6 +915,11 @@ public class Circuit {
     /** @param standbyCountDownTime スタンバイタスクの制限時間 */
     public void setStandbyCountDownTime(int standbyCountDownTime) {
         this.standbyCountDownTime = standbyCountDownTime;
+    }
+
+    /** @param isStandby スタンバイタスクが起動されているかどうか */
+    public void setStandby(boolean isStandby) {
+        this.isStandby = isStandby;
     }
 
     /** @param limitTimeTask レースの経過時間に応じ自動終了させるタスク */

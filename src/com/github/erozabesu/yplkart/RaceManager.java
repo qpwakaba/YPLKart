@@ -227,7 +227,7 @@ public class RaceManager {
             } else {
                 racer.setCircuitName(circuitName);
 
-                if (circuit.isStarted()) {
+                if (circuit.isStandby()) {
                     circuit.entryReservePlayer(uuid);
                     MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, circuit);
                 } else {
