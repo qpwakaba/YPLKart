@@ -237,7 +237,7 @@ public class RaceManager {
                     // スタート位置を取得
                     int startLocationListSize = circuit.getEntryPlayerList().size();
                     List<Location> startLocationList =
-                            CircuitConfig.getCircuitData(circuit.getCircuitName()).getStartLocationList(startLocationListSize);
+                            CircuitConfig.getCircuitData(circuit.getCircuitName()).getStartLocationList(startLocationListSize - 1);
 
                     // スタート位置にテレポート、プレイヤーの状態をレース用に初期化
                     circuit.setupRacer(uuid, startLocationList.get(startLocationListSize));
