@@ -780,8 +780,17 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemKiller(final Player user) {
-        if (getRank(user) == 0)
+        if (getRank(user) == 0) {
             return;
+        }
+
+        final Racer r = getRacer(user);
+
+        // 通過済みのチェックポイントが1つ以上ない場合はreturn
+        if (r.getPassedCheckPointList().size() < 1) {
+            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            return;
+        }
 
         Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(),
                 checkPointDetectRadius + 20);
@@ -790,8 +799,6 @@ public class ItemListener extends RaceManager implements Listener {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
-
-        final Racer r = getRacer(user);
 
         if (r.getUsingKiller() != null) {
             MessageEnum.itemAlreadyUsing.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
