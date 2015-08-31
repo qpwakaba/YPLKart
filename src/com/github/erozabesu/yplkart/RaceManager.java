@@ -524,36 +524,52 @@ public class RaceManager {
 
     /**
      * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄の未通過のチェックポイントを返す。<br>
-     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * チェックポイントが検出されなかった場合は{@code null}を返す。<br>
+     * また、検出できても閾値が引数sightThresholdの視野において視認できない場合も{@code null}を返す。
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param radius 半径
+     * @param sightThreshold 視野の閾値
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double radius) {
+    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double radius, float sightThreshold) {
         List<Entity> checkPointList = getNearbyUnpassedCheckpoint(racer, location, radius);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        Entity nearestCheckPoint = Util.getNearestEntity(checkPointList, location);
+
+        if (!Util.isLocationInSight(racer.getPlayer(), nearestCheckPoint.getLocation(), sightThreshold)) {
+            return null;
+        }
+
+        return nearestCheckPoint;
     }
 
     /**
      * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄のチェックポイントを返す。<br>
-     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * チェックポイントが検出されなかった場合は{@code null}を返す。<br>
+     * また、検出できても閾値が引数sightThresholdの視野において視認できない場合も{@code null}を返す。
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param radius 半径
+     * @param sightThreshold 視野の閾値
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestCheckpoint(Racer racer, Location location, double radius) {
+    public static Entity getNearestCheckpoint(Racer racer, Location location, double radius, float sightThreshold) {
         List<Entity> checkPointList = getNearbyCheckpoint(racer.getCircuitName(), location, radius);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        Entity nearestCheckPoint = Util.getNearestEntity(checkPointList, location);
+
+        if (!Util.isLocationInSight(racer.getPlayer(), nearestCheckPoint.getLocation(), sightThreshold)) {
+            return null;
+        }
+
+        return nearestCheckPoint;
     }
 
     /**

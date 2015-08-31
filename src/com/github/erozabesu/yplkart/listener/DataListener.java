@@ -271,11 +271,18 @@ public class DataListener implements Listener {
         String circuitName = racer.getCircuitName();
         Location location = player.getLocation();
 
-        //半径100ブロック以内の最寄のチェックポイントを取得
-        Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, 100.0D);
+        //最高階級のチェックポイントの検出範囲内から最寄のチェックポイントを取得
+        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, detectCheckPointRadius, 360.0F);
 
         //取得できなかった場合return
         if (nearestCheckPoint == null) {
+            racer.applyCourseOut();
+            return;
+        }
+
+        //
+        if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 270.0F)) {
             return;
         }
 
@@ -294,8 +301,7 @@ public class DataListener implements Listener {
 
         // 最後に通過したチェックポイントとの距離が検出範囲を超えている場合コースアウトと判定する
         Entity lastPassedCheckPoint = racer.getLastPassedCheckPointEntity();
-        Integer lastPassedCheckPointDetectRadius =
-                RaceManager.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
+        Integer lastPassedCheckPointDetectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
         if (lastPassedCheckPoint != null && lastPassedCheckPointDetectRadius != null) {
             if (lastPassedCheckPointDetectRadius < location.distance(lastPassedCheckPoint.getLocation())) {
                 racer.applyCourseOut();

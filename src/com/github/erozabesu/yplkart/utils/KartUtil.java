@@ -638,7 +638,7 @@ public class KartUtil extends ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     public static void setKillerMotion(Object entityKart, Racer racer) {
-        double cPHeihgt = RaceManager.checkPointHeight - 1.5;
+        double cPHeihgt = RaceManager.checkPointHeight - 2;
         Entity bukkitEntityKart = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, entityKart));
         Location kartLocation = bukkitEntityKart.getLocation();
 
@@ -684,7 +684,8 @@ public class KartUtil extends ReflectionUtil {
                 , Util.getYawFromVector(new Vector(motX, motY, motZ)) + 90, 0);
 
         // 最寄の未通過チェックポイントを取得し、存在しない場合はreturn
-        Entity nearestCP = RaceManager.getNearestUnpassedCheckpoint(racer, kartLocation, 20);
+        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        Entity nearestCP = RaceManager.getNearestUnpassedCheckpoint(racer, kartLocation, detectCheckPointRadius, 180.0F);
         if (nearestCP == null) {
             return;
         }
