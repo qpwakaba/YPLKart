@@ -122,7 +122,7 @@ public class PlayerObject {
         if (player == null) {
             return;
         }
-        player.teleport(getLocation());
+        player.teleport(getLocation().add(0.0D, 1.5D, 0.0D));
     }
 
     /** フィジカルを復元する */
