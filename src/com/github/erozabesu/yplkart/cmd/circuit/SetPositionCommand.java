@@ -20,12 +20,15 @@ public class SetPositionCommand extends Command {
     // 0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!Permission.hasPermission(sender, Permission.OP_CMD_CIRCUIT, false))
+        if (!Permission.hasPermission(sender, Permission.OP_CMD_CIRCUIT, false)) {
             return true;
+        }
+
         // 引数が9個指定されたときか、プレイヤーが3つ指定したとき
-        if (args.length == 9 || (args.length == 3 && Util.isPlayer(sender)))
+        if (args.length != 9 && !(args.length == 3 && Util.isPlayer(sender))) {
             // TODO: ここでコマンドの説明を表示させられる。
             return false;
+        }
 
         String circuitName = args[2];
         Location location;
