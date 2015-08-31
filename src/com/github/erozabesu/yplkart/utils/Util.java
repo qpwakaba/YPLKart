@@ -607,6 +607,7 @@ public class Util extends ReflectionUtil {
         double dx = vector.getX();
         double dz = vector.getZ();
         double yaw = 0;
+
         if (dx != 0) {
             if (dx < 0) {
                 yaw = 1.5 * Math.PI;
@@ -617,7 +618,47 @@ public class Util extends ReflectionUtil {
         } else if (dz < 0) {
             yaw = Math.PI;
         }
+
         return (float) (-yaw * 180 / Math.PI - 90);
+    }
+
+    /**
+     * 引数playerからの視界に引数targetの座標が含まれているかどうかを返す。
+     * @param player チェックするプレイヤー
+     * @param target 視界に入っているかチェックする座標
+     * @param threshold 視野の広さ。0.0F～360.0Fの数値を指定する
+     * @return 引数fromからの視界に引数toの座標が含まれているかどうか
+     */
+    public static boolean isLocationInSight(Player player, Location target, float threshold) {
+        // 360.0F以上を指定された場合は無条件でtrueを返す
+        if (360.0F <= threshold) {
+            return true;
+        }
+
+        // 座標の取得。playerがカートに搭乗している場合はカートの座標を格納。
+        // また、カートのYawは意図的に90.0Fが加算されているため、カートに搭乗している場合はYawを90.0F減算する。
+        Location location = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
+
+        float playerYaw = adjustYawToNegativeDegree(location.getYaw());
+        float vectorYaw = adjustYawToNegativeDegree((getYawFromVector(getVectorToLocation(location, target)) % 360.0F) + 90.0F);
+
+        return getDoubleDifference(playerYaw, vectorYaw) < threshold / 2.0F;
+    }
+
+    /**
+     * 引数yawが180.0Fを超えていた場合、0～-180.0Fの間の数値に変換し返す。<br>
+     * 180.0Fを超えていない場合は引数yawをそのまま返す。
+     * @param yaw 変換するYaw
+     * @return 変換したYaw
+     */
+    public static float adjustYawToNegativeDegree(float yaw) {
+        if (180.0F <= yaw) {
+            return (180.0F - (yaw - 180.0F)) * -1;
+        } else if (yaw <= -180.0F) {
+            return 180.0F + (yaw + 180.0F);
+        }
+
+        return yaw;
     }
 
     //〓 Nms Object 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -757,6 +798,30 @@ public class Util extends ReflectionUtil {
         Random random = new Random();
         newvalue = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
         return newvalue;
+    }
+
+    /**
+     * 引数valueと引数value2の符号を考慮した差を返す。<br>
+     * お互いの符号が一致する場合は、双方の絶対値の差を返す。<br>
+     * 符号が一致しない場合は、双方の絶対値の和を返す。
+     * @param value 差を求める数値
+     * @param value2 差を求める数値
+     * @return 差
+     */
+    public static double getDoubleDifference(double value, double value2) {
+        double absValue = Math.abs(value);
+        double absValue2 = Math.abs(value2);
+
+        // お互いの符号が一致している場合
+        if ((Math.signum(value) == 1.0D && Math.signum(value2) == 1.0D)
+                || (Math.signum(value) == -1.0D && Math.signum(value2) == -1.0D)) {
+
+            return Math.abs(absValue - absValue2);
+
+        // お互いの符号が一致していない場合
+        } else {
+            return absValue + absValue2;
+        }
     }
 
     //〓 String 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
