@@ -83,7 +83,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         if (isthornedturtle) {
             Util.createSafeExplosion(this.shooter, this.projectile.getLocation()
-                    , ItemEnum.THORNED_TURTLE.getMovingDamage() + this.adjustdamage, 5, 0.0F, true, Particle.CRIT_MAGIC, Particle.PORTAL);
+                    , ItemEnum.THORNED_TURTLE.getMovingDamage() + this.adjustdamage, 5, 0.0F, 0.0F, Particle.CRIT_MAGIC, Particle.PORTAL);
         }
 
         //モーション 読み込まれていないチャンクに居る場合はMotionの値ずつテレポートで移動させる
@@ -117,7 +117,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
                 if (target.getLocation().distance(this.projectile.getLocation()) < 3) {
                     Util.createSafeExplosion(this.shooter, target.getLocation()
-                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3, 2.0F, false, Particle.EXPLOSION_LARGE);
+                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
                     die();
                 }
                 return;

@@ -253,7 +253,7 @@ public class KartUtil extends ReflectionUtil {
 
             //周囲のプレイヤーへダメージ
             Util.createSafeExplosion(player, location, ItemEnum.KILLER.getMovingDamage()
-                    + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 6, 0.0F, true);
+                    + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 6, 0.1F, 0.0F);
         } else {
             if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
 

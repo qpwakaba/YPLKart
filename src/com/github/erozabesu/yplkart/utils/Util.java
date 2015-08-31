@@ -41,182 +41,35 @@ import com.github.erozabesu.yplkart.task.FlowerShowerTask;
 
 public class Util extends ReflectionUtil {
 
-    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Player 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /**
-     * value以下の乱数を生成する
-     * 生成した乱数は50％の確率で負の値に変換される
-     * @param value 乱数の上限・下限数値
-     * @return 生成した乱数
-     */
-    public static int getRandom(int value) {
-        int newvalue;
-        Random random = new Random();
-        newvalue = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
-        return newvalue;
+    public static boolean isPlayer(Object object) {
+        return (object instanceof Player);
     }
 
-    /**
-     * textに含まれるChatColorを返す
-     * 複数のChatColorが含まれていた場合文字列の最後に適応されているChatColorを返す
-     * ChatColorが含まれていない場合はChatColor.WHITEを返す
-     * @param text ChatColorを抽出する文字列
-     * @return 抽出されたChatColor
-     */
-    public static ChatColor getChatColorFromText(String text) {
-        String color = ChatColor.getLastColors(text);
-        if (color == null)
-            return ChatColor.WHITE;
-        if (color.length() == 0)
-            return ChatColor.WHITE;
-
-        return ChatColor.getByChar(color.substring(1));
+    public static Boolean isOnline(String name) {
+        return Bukkit.getPlayerExact(name) != null;
     }
 
-    /**
-     * Location fromからtoへのVectorを返す
-     * @param from
-     * @param to
-     * @return Location fromからtoへのVector
-     */
-    public static Vector getVectorToLocation(Location from, Location to) {
-        Vector vector = to.toVector().subtract(from.toVector());
-        return vector.normalize();
+    public static Boolean isOnline(UUID id) {
+        return Bukkit.getPlayer(id) != null;
     }
 
-    /**
-     * vectorから偏揺れ角Yawを算出し返す
-     * 偏揺れ角はLocation型変数に用いられる水平方向の向きを表す方位角
-     * @see org.bukkit.Location
-     * @param vector ベクター
-     * @return 偏揺れ角
-     */
-    public static float getYawFromVector(Vector vector) {
-        double dx = vector.getX();
-        double dz = vector.getZ();
-        double yaw = 0;
-        if (dx != 0) {
-            if (dx < 0) {
-                yaw = 1.5 * Math.PI;
-            } else {
-                yaw = 0.5 * Math.PI;
-            }
-            yaw -= Math.atan(dz / dx);
-        } else if (dz < 0) {
-            yaw = Math.PI;
+    public static void setPotionEffect(Player p, PotionEffectType effect, int second, int level) {
+        p.removePotionEffect(effect);
+        p.addPotionEffect(new PotionEffect(effect, second * 20, level));
+    }
+
+    public static void setItemDecrease(Player p) {
+        int i = p.getItemInHand().getAmount();
+        if (i == 1) {
+            p.setItemInHand(null);
+        } else if (i > 1) {
+            p.getItemInHand().setAmount(i - 1);
         }
-        return (float) (-yaw * 180 / Math.PI - 90);
     }
 
-    /**
-     * 引数locationを基点に、引数heightの数値だけ下方の最も近い固形Blockを返す。
-     * @param location 基点となる座標
-     * @param height 高さ
-     * @return 直下の固形ブロック。固形ブロックが存在しない場合は{@code null}を返す。
-     */
-    public static Block getGroundBlock(Location location, int height) {
-        Location cloneLocation = location.clone();
-        for (int i = 0; i <= height; i++) {
-            if (isSolidBlock(cloneLocation)) {
-                return cloneLocation.getBlock();
-            }
-            cloneLocation.add(0, -1, 0);
-        }
-        return null;
-    }
-
-    /**
-     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのIDを返す。
-     * @param location 基点となる座標
-     * @param height 高さ
-     * @return BlockのID、データのString
-     */
-    public static String getGroundBlockID(Location location, int height) {
-        Block block = getGroundBlock(location, height);
-        if (block == null) {
-            return "0:0";
-        }
-
-        return String.valueOf(block.getTypeId()) + ":" + String.valueOf(block.getData());
-    }
-
-    /**
-     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのMaterialを返す
-     * @param location 基点となる座標
-     * @param height 高さ
-     * @return BlockのMaterial
-     */
-    public static Material getGroundBlockMaterial(Location location, int height) {
-        Block block = getGroundBlock(location, height);
-        if (block == null) {
-            return Material.AIR;
-        }
-
-        return block.getType();
-    }
-
-    /**
-     * locationを基点にoffsetの数値だけ前後に移動した座標を返す
-     * offsetが正の数値であれば前方、負の数値であれば後方へ移動する
-     * 前後の方角はlocationの偏揺れ角yawから算出している
-     * @param location 基点となる座標
-     * @param offset オフセット
-     * @return offsetの数値だけ前後に移動した座標
-     */
-    public static Location getForwardLocationFromYaw(Location location, double offset) {
-        Vector direction = location.getDirection();
-        double x = direction.getX();
-        double z = direction.getZ();
-
-        return new Location(location.getWorld(),
-                location.getX() + x * offset,
-                location.getY(),
-                location.getZ() + z * offset,
-                location.getYaw(), location.getPitch());
-    }
-
-    /**
-     * locationを基点にoffsetの数値だけ左右に移動した座標を返す
-     * offsetが正の数値であれば左方、負の数値であれば右方へ移動する
-     * 左右の方角はlocationの偏揺れ角yawから算出している
-     * @param location 基点となる座標
-     * @param offset オフセット
-     * @return offsetの数値だけ左右に移動した座標
-     */
-    public static Location getSideLocationFromYaw(Location location, double offset) {
-        Location adjustlocation = adjustBlockLocation(location);
-        float yaw = adjustlocation.getYaw();
-        double x = Math.cos(Math.toRadians(yaw));
-        double z = Math.sin(Math.toRadians(yaw));
-
-        return new Location(adjustlocation.getWorld(),
-                adjustlocation.getX() + x * offset,
-                adjustlocation.getY(),
-                adjustlocation.getZ() + z * offset,
-                yaw, adjustlocation.getPitch());
-    }
-
-    /**
-     * 引数locationから半径radiusブロック以内のチャンクを返す。
-     * @param location 基点となる座標
-     * @param radius 半径
-     * @return 引数locationから半径radiusブロック以内のチャンク
-     */
-    public static List<Chunk> getNearbyChunks(Location location, double radius) {
-        List<Chunk> nearbyChunks = new ArrayList<Chunk>();
-
-        location.add(radius, 0, radius);
-
-        double round = (radius / 16) + 1;
-        for (int x = 0; x < round; x++) {
-            for (int z = 0; z < round; z++) {
-                Chunk chunk = location.getWorld().getChunkAt(location.clone().add(-16 * x, 0, -16 * z));
-                nearbyChunks.add(chunk);
-            }
-        }
-
-        return nearbyChunks;
-    }
+    //〓 Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 引数locationから半径radiusブロック以内のチャンクに存在するエンティティを返す。
@@ -370,71 +223,6 @@ public class Util extends ReflectionUtil {
         return entitylist;
     }
 
-    //〓 Reflection Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public static Location getStandingLocationByBoudingBox(Entity entity) {
-        Location location = entity.getLocation();
-        Object boudingBox = ReflectionUtil.invoke(Methods.nmsEntity_getBoundingBox, entity);
-
-        location.setX((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locX, entity));
-        location.setY((Double) ReflectionUtil.getFieldValue(Fields.nmsAxisAlignedBB_locYBottom, boudingBox));
-        location.setZ((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locZ, entity));
-
-        return location;
-    }
-
-    public static Object getBlockPosition(Location location) {
-        double locX = Math.floor(location.getX());
-        double locY = Math.floor(location.getY());
-        double locZ = Math.floor(location.getZ());
-
-        return ReflectionUtil.newInstance(Constructors.nmsBlockPosition, locX, locY, locZ);
-    }
-
-    /**
-     * 引数locationのブロックがよじ登ることができるブロックかどうかを判別する
-     * @param location 座標
-     * @return よじ登ることができるブロックかどうか
-     */
-    public static boolean isClimbableBlock(Location location) {
-        Material blockMaterial = location.getBlock().getType();
-        return (blockMaterial == Material.LADDER || blockMaterial == Material.VINE);
-    }
-
-    public static Object getCraftEntity(Entity entity) {
-        String className = entity.getClass().getSimpleName();
-        Method getHandle = Methods.craftEntity_getHandle.get(className);
-
-        if (getHandle == null) {
-            getHandle = getMethod(entity.getClass(), "getHandle");
-            Methods.craftEntity_getHandle.put(className, getHandle);
-        }
-
-        return invoke(getHandle, entity);
-    }
-
-    public static Object getNewCraftEntityFromClass(World world, Class<?> nmsEntityClass) {
-        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
-
-        if (constructor == null) {
-            constructor = getConstructor(nmsEntityClass, Classes.nmsWorld);
-            Constructors.nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
-        }
-
-        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
-    }
-
-    public static Object getNewCraftEntityFromClassName(World world, String classname) {
-        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(classname);
-
-        if (constructor == null) {
-            constructor = getConstructor(getNMSClass(classname), Classes.nmsWorld);
-            Constructors.nmsEntity_Constructor.put(classname, constructor);
-        }
-
-        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
-    }
-
     /**
      * 引数nmsEntityオブジェクトからBukkitEntityを取得し返す
      * @param nmsEntity BukkitEntityを取得するNmsEntity
@@ -444,142 +232,39 @@ public class Util extends ReflectionUtil {
         return (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntity);
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public static void setPotionEffect(Player p, PotionEffectType effect, int second, int level) {
-        p.removePotionEffect(effect);
-        p.addPotionEffect(new PotionEffect(effect, second * 20, level));
-    }
-
-    public static void setItemDecrease(Player p) {
-        int i = p.getItemInHand().getAmount();
-        if (i == 1) {
-            p.setItemInHand(null);
-        } else if (i > 1) {
-            p.getItemInHand().setAmount(i - 1);
-        }
-    }
-
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    public static Boolean isOnline(String name) {
-        return Bukkit.getPlayerExact(name) != null;
-    }
-
-    public static Boolean isOnline(UUID id) {
-        return Bukkit.getPlayer(id) != null;
-    }
-
-    @Deprecated
-    public static boolean isNumber(String number) {
-        try {
-            Integer.parseInt(number);
-            return true;
-        } catch (NumberFormatException e) {
+    /**
+     * entityの物理判定を無効にする
+     * 無効に設定されたEntityはBlockへの接触判定が行われない
+     * @param entity
+     */
+    public static void removeEntityCollision(Entity entity) {
+        Object craftentity = getCraftEntity(entity);
+        Field noclip = getField(craftentity, "noclip");
+        if (noclip != null) {
             try {
-                Float.parseFloat(number);
-                return true;
-            } catch (NumberFormatException ee) {
-                try {
-                    Double.parseDouble(number);
-                    return true;
-                } catch (NumberFormatException eee) {
-                    return false;
-                }
+                noclip.setBoolean(craftentity, true);
+            }catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
-    /**
-     * 引数valueが数値、booleanに一致しない文字列かどうかを返す。
-     * @param value チェックする文字列
-     * @return 引数valueが数値、booleanに一致しない文字列かどうかを返す。
-     */
-    public static boolean isString(String value) {
-        return !isInteger(value) && !isFloat(value) && !isBoolean(value);
-    }
-
-    /**
-     * 引数valueがIntegerに変換できるかどうかを返す
-     * @param value 調べるString
-     * @return 引数valueがIntegerに変換できるかどうか
-     */
-    public static boolean isInteger(String value) {
+    //TODO 負荷の原因になっている可能性あり
+    public static void removeEntityVerticalMotion(Entity e) {
         try {
-            Integer.parseInt(value);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+            Object craftentity = getCraftEntity(e);
+            Field nmsField;
+            for (Field f : craftentity.getClass().getFields()) {
+                if (!f.getName().equalsIgnoreCase("motY"))
+                    continue;
+                nmsField = f;
+                nmsField.setAccessible(true);
+                nmsField.setDouble(craftentity, f.getDouble(craftentity) + 0.03999999910593033D);
+                return;
+            }
+        } catch (Exception exception) {
         }
     }
-
-    /**
-     * 引数valueがFloatに変換できるかどうかを返す。
-     * @param value チェックする文字列
-     * @return 引数valueがFloatに変換できるかどうか
-     */
-    public static boolean isFloat(String value) {
-        try {
-            Float.parseFloat(value);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * 引数valueがBooleanに変換できるかどうかを返す。
-     * @return 引数valueがBooleanに変換できるかどうか
-     */
-    public static boolean isBoolean(String value) {
-        if (value.equals("true") || value.equals("false")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean isPlayer(Object object) {
-        return (object instanceof Player);
-    }
-
-    /**
-     * 引数locationのBlockが固形Blockか判別する
-     * @param location 判別するBlockの座標
-     * @return 固形Blockかどうか
-     */
-    public static Boolean isSolidBlock(Location location) {
-        Object nmsBlock = invoke(Methods.static_nmsBlock_getById, null, location.getBlock().getTypeId());
-        Object nmsMaterial = invoke(Methods.nmsBlock_getMaterial, nmsBlock);
-        return (Boolean) invoke(Methods.nmsMaterial_isSolid, nmsMaterial);
-    }
-
-    public static Boolean isSlabBlock(Location l) {
-        int id = l.getBlock().getTypeId();
-        if (id == 44 || id == 126 || id == 182)
-            return true;
-        return false;
-    }
-
-    /**
-     * 引数blockが下半分に設置された半ブロックかどうかを返す。<br>
-     * 上半分に設置された半ブロックの場合、もしくは半ブロックではない場合はfalseを返す。
-     * @param block チェックするブロック
-     * @return 引数blockが下半分に設置された半ブロックかどうか
-     */
-    public static Boolean isBottomSlabBlock(Block block) {
-        if (!isSlabBlock(block.getLocation())) {
-            return false;
-        }
-
-        if (8 <= block.getData()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 引数damagedに引数damageの値だけダメージを与える。<br>
@@ -658,41 +343,139 @@ public class Util extends ReflectionUtil {
         }
     }
 
+    //〓 World 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
     /**
-     * entityの物理判定を無効にする
-     * 無効に設定されたEntityはBlockへの接触判定が行われない
-     * @param entity
+     * ブロック、非生物エンティティに影響しない爆発を生成する。
+     * @param executor 爆発を引き起こしたプレイヤーとしてキルログに表示するプレイヤー
+     * @param location 生成する座標
+     * @param damage 爆発ダメージ
+     * @param range 爆発の半径
+     * @param soundVolume 爆発音声の音量
+     * @param offset 爆発パーティクルを生成する際のXYZのオフセット
+     * @param particles 生成するパーティクル
      */
-    public static void removeEntityCollision(Entity entity) {
-        Object craftentity = getCraftEntity(entity);
-        Field noclip = getField(craftentity, "noclip");
-        if (noclip != null) {
-            try {
-                noclip.setBoolean(craftentity, true);
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
+    public static void createSafeExplosion(Player executor, Location location, int damage, int range, float soundVolume, float offset, Particle...particles) {
+        for (Particle particle : particles) {
+            PacketUtil.sendParticlePacket(null, particle, location, offset, offset, offset, 1.0F, 20, new int[]{});
         }
-    }
 
-    //TODO 負荷の原因になっている可能性あり
-    public static void removeEntityVerticalMotion(Entity e) {
-        try {
-            Object craftentity = getCraftEntity(e);
-            Field nmsField;
-            for (Field f : craftentity.getClass().getFields()) {
-                if (!f.getName().equalsIgnoreCase("motY"))
+        location.getWorld().playSound(location, Sound.EXPLODE, soundVolume, 1.0F);
+
+        List<LivingEntity> entities = Util.getNearbyLivingEntities(location, range);
+        for (LivingEntity damaged : entities) {
+            if (executor != null) {
+                if (damaged.getUniqueId() == executor.getUniqueId()) {
                     continue;
-                nmsField = f;
-                nmsField.setAccessible(true);
-                nmsField.setDouble(craftentity, f.getDouble(craftentity) + 0.03999999910593033D);
-                return;
+                }
             }
-        } catch (Exception exception) {
+            if (0 < damaged.getNoDamageTicks()) {
+                continue;
+            }
+            if (damaged.isDead()) {
+                continue;
+            }
+            if (!(damaged instanceof Player)) {
+                continue;
+            }
+            if (!RaceManager.isStillRacing(((Player) damaged).getUniqueId())) {
+                continue;
+            }
+
+            Vector v = Util.getVectorToLocation(damaged.getLocation(), location);
+            v.setX(v.clone().multiply(-1).getX());
+            v.setY(0);
+            v.setZ(v.clone().multiply(-1).getZ());
+            damaged.setVelocity(v);
+
+            addDamage(damaged, executor, damage);
         }
     }
 
-    public static Location adjustBlockLocation(Location location) {
+    //〓 Chunk 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数locationから半径radiusブロック以内のチャンクを返す。
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return 引数locationから半径radiusブロック以内のチャンク
+     */
+    public static List<Chunk> getNearbyChunks(Location location, double radius) {
+        List<Chunk> nearbyChunks = new ArrayList<Chunk>();
+
+        location.add(radius, 0, radius);
+
+        double round = (radius / 16) + 1;
+        for (int x = 0; x < round; x++) {
+            for (int z = 0; z < round; z++) {
+                Chunk chunk = location.getWorld().getChunkAt(location.clone().add(-16 * x, 0, -16 * z));
+                nearbyChunks.add(chunk);
+            }
+        }
+
+        return nearbyChunks;
+    }
+
+    //〓 Location 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * locationを基点にoffsetの数値だけ前後に移動した座標を返す
+     * offsetが正の数値であれば前方、負の数値であれば後方へ移動する
+     * 前後の方角はlocationの偏揺れ角yawから算出している
+     * @param location 基点となる座標
+     * @param offset オフセット
+     * @return offsetの数値だけ前後に移動した座標
+     */
+    public static Location getForwardLocationFromYaw(Location location, double offset) {
+        Vector direction = location.getDirection();
+        double x = direction.getX();
+        double z = direction.getZ();
+
+        return new Location(location.getWorld(),
+                location.getX() + x * offset,
+                location.getY(),
+                location.getZ() + z * offset,
+                location.getYaw(), location.getPitch());
+    }
+
+    /**
+     * locationを基点にoffsetの数値だけ左右に移動した座標を返す
+     * offsetが正の数値であれば左方、負の数値であれば右方へ移動する
+     * 左右の方角はlocationの偏揺れ角yawから算出している
+     * @param location 基点となる座標
+     * @param offset オフセット
+     * @return offsetの数値だけ左右に移動した座標
+     */
+    public static Location getSideLocationFromYaw(Location location, double offset) {
+        Location adjustlocation = adjustLocationToBlockCenter(location);
+        float yaw = adjustlocation.getYaw();
+        double x = Math.cos(Math.toRadians(yaw));
+        double z = Math.sin(Math.toRadians(yaw));
+
+        return new Location(adjustlocation.getWorld(),
+                adjustlocation.getX() + x * offset,
+                adjustlocation.getY(),
+                adjustlocation.getZ() + z * offset,
+                yaw, adjustlocation.getPitch());
+    }
+
+    public static Location getStandingLocationByBoudingBox(Entity entity) {
+        Location location = entity.getLocation();
+        Object boudingBox = ReflectionUtil.invoke(Methods.nmsEntity_getBoundingBox, entity);
+
+        location.setX((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locX, entity));
+        location.setY((Double) ReflectionUtil.getFieldValue(Fields.nmsAxisAlignedBB_locYBottom, boudingBox));
+        location.setZ((Double) ReflectionUtil.getFieldValue(Fields.nmsEntity_locZ, entity));
+
+        return location;
+    }
+
+    /**
+     * 引数locationに設置されたブロックの中心座標を返す。
+     * @param location 基点となる座標
+     * @return 引数locationに設置されたブロックの中心座標
+     */
+    public static Location adjustLocationToBlockCenter(Location location) {
         Location cloneLocation = location.clone();
         double x = cloneLocation.getBlockX() + 0.5D;
         double z = cloneLocation.getBlockZ() + 0.5D;
@@ -700,7 +483,300 @@ public class Util extends ReflectionUtil {
         return new Location(cloneLocation.getWorld(), x, cloneLocation.getY(), z, cloneLocation.getYaw(), cloneLocation.getPitch());
     }
 
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Block 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数locationを基点に、引数heightの数値だけ下方の最も近い固形Blockを返す。
+     * @param location 基点となる座標
+     * @param height 高さ
+     * @return 直下の固形ブロック。固形ブロックが存在しない場合は{@code null}を返す。
+     */
+    public static Block getGroundBlock(Location location, int height) {
+        Location cloneLocation = location.clone();
+        for (int i = 0; i <= height; i++) {
+            if (isSolidBlock(cloneLocation)) {
+                return cloneLocation.getBlock();
+            }
+            cloneLocation.add(0, -1, 0);
+        }
+        return null;
+    }
+
+    /**
+     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのIDを返す。
+     * @param location 基点となる座標
+     * @param height 高さ
+     * @return BlockのID、データのString
+     */
+    public static String getGroundBlockID(Location location, int height) {
+        Block block = getGroundBlock(location, height);
+        if (block == null) {
+            return "0:0";
+        }
+
+        return String.valueOf(block.getTypeId()) + ":" + String.valueOf(block.getData());
+    }
+
+    /**
+     * locationを基点に、引数heightの数値だけ下方の最も近い固形BlockのMaterialを返す
+     * @param location 基点となる座標
+     * @param height 高さ
+     * @return BlockのMaterial
+     */
+    public static Material getGroundBlockMaterial(Location location, int height) {
+        Block block = getGroundBlock(location, height);
+        if (block == null) {
+            return Material.AIR;
+        }
+
+        return block.getType();
+    }
+
+    /**
+     * 引数locationのブロックがよじ登ることができるブロックかどうかを判別する
+     * @param location 座標
+     * @return よじ登ることができるブロックかどうか
+     */
+    public static boolean isClimbableBlock(Location location) {
+        Material blockMaterial = location.getBlock().getType();
+        return (blockMaterial == Material.LADDER || blockMaterial == Material.VINE);
+    }
+
+    /**
+     * 引数blockが下半分に設置された半ブロックかどうかを返す。<br>
+     * 上半分に設置された半ブロックの場合、もしくは半ブロックではない場合はfalseを返す。
+     * @param block チェックするブロック
+     * @return 引数blockが下半分に設置された半ブロックかどうか
+     */
+    public static Boolean isBottomSlabBlock(Block block) {
+        if (!isSlabBlock(block.getLocation())) {
+            return false;
+        }
+
+        if (8 <= block.getData()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 引数locationのBlockが固形Blockか判別する
+     * @param location 判別するBlockの座標
+     * @return 固形Blockかどうか
+     */
+    public static Boolean isSolidBlock(Location location) {
+        Object nmsBlock = invoke(Methods.static_nmsBlock_getById, null, location.getBlock().getTypeId());
+        Object nmsMaterial = invoke(Methods.nmsBlock_getMaterial, nmsBlock);
+        return (Boolean) invoke(Methods.nmsMaterial_isSolid, nmsMaterial);
+    }
+
+    /**
+     * 引数locationに設置されているブロックが半ブロックかどうかを返す。
+     * @param location ブロックをチェックする座標
+     * @return 半ブロックかどうか
+     */
+    public static Boolean isSlabBlock(Location location) {
+        int id = location.getBlock().getTypeId();
+        if (id == 44 || id == 126 || id == 182)
+            return true;
+        return false;
+    }
+
+    //〓 Vector 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * Location fromからtoへのVectorを返す
+     * @param from
+     * @param to
+     * @return Location fromからtoへのVector
+     */
+    public static Vector getVectorToLocation(Location from, Location to) {
+        Vector vector = to.toVector().subtract(from.toVector());
+        return vector.normalize();
+    }
+
+    /**
+     * vectorから偏揺れ角Yawを算出し返す
+     * 偏揺れ角はLocation型変数に用いられる水平方向の向きを表す方位角
+     * @see org.bukkit.Location
+     * @param vector ベクター
+     * @return 偏揺れ角
+     */
+    public static float getYawFromVector(Vector vector) {
+        double dx = vector.getX();
+        double dz = vector.getZ();
+        double yaw = 0;
+        if (dx != 0) {
+            if (dx < 0) {
+                yaw = 1.5 * Math.PI;
+            } else {
+                yaw = 0.5 * Math.PI;
+            }
+            yaw -= Math.atan(dz / dx);
+        } else if (dz < 0) {
+            yaw = Math.PI;
+        }
+        return (float) (-yaw * 180 / Math.PI - 90);
+    }
+
+    //〓 Nms Object 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static Object getBlockPosition(Location location) {
+        double locX = Math.floor(location.getX());
+        double locY = Math.floor(location.getY());
+        double locZ = Math.floor(location.getZ());
+
+        return ReflectionUtil.newInstance(Constructors.nmsBlockPosition, locX, locY, locZ);
+    }
+
+    public static Object getCraftEntity(Entity entity) {
+        String className = entity.getClass().getSimpleName();
+        Method getHandle = Methods.craftEntity_getHandle.get(className);
+
+        if (getHandle == null) {
+            getHandle = getMethod(entity.getClass(), "getHandle");
+            Methods.craftEntity_getHandle.put(className, getHandle);
+        }
+
+        return invoke(getHandle, entity);
+    }
+
+    public static Object getNewCraftEntityFromClass(World world, Class<?> nmsEntityClass) {
+        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(nmsEntityClass.getSimpleName());
+
+        if (constructor == null) {
+            constructor = getConstructor(nmsEntityClass, Classes.nmsWorld);
+            Constructors.nmsEntity_Constructor.put(nmsEntityClass.getSimpleName(), constructor);
+        }
+
+        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
+    }
+
+    public static Object getNewCraftEntityFromClassName(World world, String classname) {
+        Constructor<?> constructor = Constructors.nmsEntity_Constructor.get(classname);
+
+        if (constructor == null) {
+            constructor = getConstructor(getNMSClass(classname), Classes.nmsWorld);
+            Constructors.nmsEntity_Constructor.put(classname, constructor);
+        }
+
+        return newInstance(constructor, invoke(Methods.craftWorld_getHandle, world));
+    }
+
+    //〓 Particle 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static void createFlowerShower(Player p, int maxlife) {
+        new FlowerShowerTask(p, maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
+    }
+
+    public static void createSignalFireworks(Location l) {
+        World w = l.getWorld();
+        FireworkEffect effect = FireworkEffect.builder().withColor(Color.GREEN).withFade(Color.LIME)
+                .with(Type.BALL_LARGE).build();
+        FireworkEffect effect2 = FireworkEffect.builder().withColor(Color.YELLOW).withFade(Color.ORANGE)
+                .with(Type.STAR).build();
+        FireworkEffect effect3 = FireworkEffect.builder().withColor(Color.RED).withFade(Color.PURPLE)
+                .with(Type.CREEPER).build();
+        FireworkEffect effect4 = FireworkEffect.builder().withColor(Color.AQUA).withFade(Color.BLUE).with(Type.BURST)
+                .build();
+
+        for (int i = 0; i <= 2; i++) {
+            try {
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect2);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect3);
+                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect4);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    //〓 Java Class Format 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * 引数valueが数値、booleanに一致しない文字列かどうかを返す。
+     * @param value チェックする文字列
+     * @return 引数valueが数値、booleanに一致しない文字列かどうかを返す。
+     */
+    public static boolean isString(String value) {
+        return !isInteger(value) && !isFloat(value) && !isBoolean(value);
+    }
+
+    /**
+     * 引数valueがIntegerに変換できるかどうかを返す
+     * @param value 調べるString
+     * @return 引数valueがIntegerに変換できるかどうか
+     */
+    public static boolean isInteger(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 引数valueがFloatに変換できるかどうかを返す。
+     * @param value チェックする文字列
+     * @return 引数valueがFloatに変換できるかどうか
+     */
+    public static boolean isFloat(String value) {
+        try {
+            Float.parseFloat(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 引数valueがBooleanに変換できるかどうかを返す。
+     * @return 引数valueがBooleanに変換できるかどうか
+     */
+    public static boolean isBoolean(String value) {
+        if (value.equals("true") || value.equals("false")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //〓 Math 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * value以下の乱数を生成する
+     * 生成した乱数は50％の確率で負の値に変換される
+     * @param value 乱数の上限・下限数値
+     * @return 生成した乱数
+     */
+    public static int getRandom(int value) {
+        int newvalue;
+        Random random = new Random();
+        newvalue = random.nextInt(10) < 5 ? random.nextInt(value) : -random.nextInt(value);
+        return newvalue;
+    }
+
+    //〓 String 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    /**
+     * textに含まれるChatColorを返す
+     * 複数のChatColorが含まれていた場合文字列の最後に適応されているChatColorを返す
+     * ChatColorが含まれていない場合はChatColor.WHITEを返す
+     * @param text ChatColorを抽出する文字列
+     * @return 抽出されたChatColor
+     */
+    public static ChatColor getChatColorFromText(String text) {
+        String color = ChatColor.getLastColors(text);
+        if (color == null)
+            return ChatColor.WHITE;
+        if (color.length() == 0)
+            return ChatColor.WHITE;
+
+        return ChatColor.getByChar(color.substring(1));
+    }
 
     public static String convertSignNumber(int number) {
         return 0 <= number ? "<gold>+" + String.valueOf(number) : "<blue>" + String.valueOf(number);
@@ -755,73 +831,5 @@ public class Util extends ReflectionUtil {
         String other = string.substring(1, string.length()).toLowerCase();
 
         return initial + other;
-    }
-
-    //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    //ブロック、非生物エンティティに影響しない爆発を発生
-    public static void createSafeExplosion(Player executor, Location l, int damage, int range, float offset, boolean noSound, Particle...particles) {
-        for (Particle particle : particles) {
-            PacketUtil.sendParticlePacket(null, particle, l, offset, offset, offset, 1.0F, 20, new int[]{});
-        }
-        if (!noSound) {
-            l.getWorld().playSound(l, Sound.EXPLODE, 0.2F, 1.0F);
-        }
-
-        List<LivingEntity> entities = Util.getNearbyLivingEntities(l, range);
-        for (LivingEntity damaged : entities) {
-            if (executor != null) {
-                if (damaged.getUniqueId() == executor.getUniqueId()) {
-                    continue;
-                }
-            }
-            if (0 < damaged.getNoDamageTicks()) {
-                continue;
-            }
-            if (damaged.isDead()) {
-                continue;
-            }
-            if (!(damaged instanceof Player)) {
-                continue;
-            }
-            if (!RaceManager.isStillRacing(((Player) damaged).getUniqueId())) {
-                continue;
-            }
-
-            Vector v = Util.getVectorToLocation(damaged.getLocation(), l);
-            v.setX(v.clone().multiply(-1).getX());
-            v.setY(0);
-            v.setZ(v.clone().multiply(-1).getZ());
-            damaged.setVelocity(v);
-
-            addDamage(damaged, executor, damage);
-        }
-    }
-
-    public static void createFlowerShower(Player p, int maxlife) {
-        new FlowerShowerTask(p, maxlife).runTaskTimer(YPLKart.getInstance(), 0, 1);
-    }
-
-    public static void createSignalFireworks(Location l) {
-        World w = l.getWorld();
-        FireworkEffect effect = FireworkEffect.builder().withColor(Color.GREEN).withFade(Color.LIME)
-                .with(Type.BALL_LARGE).build();
-        FireworkEffect effect2 = FireworkEffect.builder().withColor(Color.YELLOW).withFade(Color.ORANGE)
-                .with(Type.STAR).build();
-        FireworkEffect effect3 = FireworkEffect.builder().withColor(Color.RED).withFade(Color.PURPLE)
-                .with(Type.CREEPER).build();
-        FireworkEffect effect4 = FireworkEffect.builder().withColor(Color.AQUA).withFade(Color.BLUE).with(Type.BURST)
-                .build();
-
-        for (int i = 0; i <= 2; i++) {
-            try {
-                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect);
-                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect2);
-                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect3);
-                FireWorks.playFirework(w, l.clone().add(Util.getRandom(20), 5, Util.getRandom(20)), effect4);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 }

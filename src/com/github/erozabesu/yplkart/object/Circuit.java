@@ -235,7 +235,7 @@ public class Circuit {
             racer.applyRaceParameter();
             racer.setCircuitName(getCircuitName());
             racer.setStandby(true);
-            racer.setKartEntityLocation(Util.adjustBlockLocation(location));
+            racer.setKartEntityLocation(Util.adjustLocationToBlockCenter(location));
             RaceManager.racerSetter_DeselectCharacter(uuid);
             RaceManager.racerSetter_DeselectKart(uuid);
             RaceManager.leaveRacingKart(player);

@@ -30,7 +30,7 @@ public class ItemTurtleTask extends BukkitRunnable {
         this.hitdamage = ItemEnum.TURTLE.getHitDamage()
                 + RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
 
-        this.vector = Util.getVectorToLocation(Util.adjustBlockLocation(this.projectile.getLocation()), next);
+        this.vector = Util.getVectorToLocation(Util.adjustLocationToBlockCenter(this.projectile.getLocation()), next);
         this.x = this.vector.getX();
         this.z = this.vector.getZ();
         this.y = this.verticalonhover;
@@ -60,7 +60,7 @@ public class ItemTurtleTask extends BukkitRunnable {
                     continue;
 
             //発射したプレイヤーにも跳ね返って自滅するよう1つ目の引数はnull
-            Util.createSafeExplosion(null, this.projectile.getLocation(), this.hitdamage, 3, 2.0F, false, Particle.EXPLOSION_LARGE);
+            Util.createSafeExplosion(null, this.projectile.getLocation(), this.hitdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
             this.cancel();
             this.projectile.remove();
@@ -99,7 +99,7 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
         }
 
-        Location current = Util.adjustBlockLocation(this.projectile.getLocation());
+        Location current = Util.adjustLocationToBlockCenter(this.projectile.getLocation());
 
         if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//北東
             if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {

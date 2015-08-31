@@ -172,7 +172,7 @@ public class DataListener implements Listener {
                 if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
                     return;
                 }
-                player.teleport(Util.adjustBlockLocation(from).add(0, 1, 0));
+                player.teleport(Util.adjustLocationToBlockCenter(from).add(0, 1, 0));
                 event.setCancelled(true);
             }
         }
