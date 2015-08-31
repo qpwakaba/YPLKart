@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -47,7 +48,7 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceManager {
-    public static int checkPointHeight = 8;
+    public static int checkPointHeight = 6;
     public static int checkPointDetectRadius = 20;
 
     /** プレイヤーUUIDとRacerオブジェクトを格納する */
@@ -1000,6 +1001,12 @@ public class RaceManager {
         armorStand.setVisible(false);
         armorStand.setGravity(false);
         armorStand.setBasePlate(false);
+
+        armorStand.setItemInHand(new ItemStack(Material.STICK));
+
+        Object kartEntity = Util.getCraftEntity(armorStand);
+        Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + l.getPitch(), 1.00F, 0.0F);
+        ReflectionUtil.invoke(Methods.nmsEntityArmorStand_setRightArmPose, kartEntity, vector3f);
 
         return armorStand;
     }
