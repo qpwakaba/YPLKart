@@ -271,27 +271,27 @@ public class DataListener implements Listener {
         String circuitName = racer.getCircuitName();
         Location location = player.getLocation();
 
-        //最高階級のチェックポイントの検出範囲内から最寄のチェックポイントを取得
+        // 最高階級のチェックポイントの検出範囲内から最寄のチェックポイントを取得
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, detectCheckPointRadius, 360.0F);
 
-        //取得できなかった場合return
+        // チェックポイントが取得できなかった場合コースアウト
         if (nearestCheckPoint == null) {
             racer.applyCourseOut();
             return;
         }
 
-        //
+        // 取得したチェックポイントが視界に入っていない場合はreturn
         if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 270.0F)) {
             return;
         }
 
-        //config.ymlからチェックポイントの検出範囲を取得
+        // config.ymlからチェックポイントの検出範囲を取得
         Integer detectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(nearestCheckPoint, circuitName);
 
-        //チェックポイントとの距離が検出範囲内
+        // チェックポイントとの距離が検出範囲内
         if (nearestCheckPoint.getLocation().distance(location) < detectRadius) {
-            //未通過のチェックポイントだった場合は通過済みリストに格納
+            // 未通過のチェックポイントだった場合は通過済みリストに格納
             String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
             if (!racer.getPassedCheckPointList().contains(currentLaps + nearestCheckPoint.getUniqueId().toString())) {
                 racer.setLastPassedCheckPointEntity(nearestCheckPoint);
