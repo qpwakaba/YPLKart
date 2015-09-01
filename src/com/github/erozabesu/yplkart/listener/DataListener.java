@@ -416,9 +416,7 @@ public class DataListener implements Listener {
             public void run() {
 
                 //プレイヤーにデスペナルティを適用
-                if (racer.getUsingKiller() == null) {
-                    racer.applyDeathPenalty();
-                }
+                racer.applyDeathPenalty();
 
                 //生前カートに搭乗していた場合はカートエンティティを再生成し搭乗する
                 racer.recoveryKart();

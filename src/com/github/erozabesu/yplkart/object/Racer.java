@@ -308,6 +308,11 @@ public class Racer extends PlayerObject{
      * 同時に一定時間後にフィジカルを本来の数値に戻すタスクを起動する。
      */
     public void applyDeathPenalty() {
+        // キラー使用中は除外
+        if (this.getUsingKiller() != null) {
+            return;
+        }
+
         final Player player = this.getPlayer();
         final Character character = this.getCharacter();
 
