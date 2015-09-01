@@ -41,6 +41,13 @@ public class Methods extends ReflectionUtil {
     public static Method nmsWorld_getNmsEntityById = getMethod(Classes.nmsWorld, "a", int.class);
 
     /**
+     * @param NmsVec3D
+     * @param NmsVec3D
+     * @return NmsMovingObjectPosition
+     */
+    public static Method nmsWorld_rayTrace = getMethod(Classes.nmsWorld, "rayTrace", Classes.nmsVec3D, Classes.nmsVec3D);
+
+    /**
      * 引数NmsEntityをスポーンさせる
      * @param Instance NmsEntityをスポーンさせるNmsWorld
      * @param NmsEntity スポーンさせるNmsEntity

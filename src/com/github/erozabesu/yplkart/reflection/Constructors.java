@@ -21,6 +21,13 @@ public class Constructors extends ReflectionUtil{
     public static Constructor<?> nmsBlockPosition = getConstructor(Classes.nmsBlockPosition, double.class, double.class, double.class);
 
     /**
+     * @param Double
+     * @param Double
+     * @param Double
+     */
+    public static Constructor<?> nmsVec3D = getConstructor(Classes.nmsVec3D, double.class, double.class, double.class);
+
+    /**
      * @param Float
      * @param Float
      * @param Float

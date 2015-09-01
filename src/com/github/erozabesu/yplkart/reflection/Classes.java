@@ -10,6 +10,7 @@ public class Classes extends ReflectionUtil{
     public static Class<?> nmsBlockPosition = getNMSClass("BlockPosition");
     public static Class<?> nmsDamageSource = getNMSClass("DamageSource");
     public static Class<?> nmsMathHelper = getNMSClass("MathHelper");
+    public static Class<?> nmsVec3D = getNMSClass("Vec3D");
     public static Class<?> nmsVector3f = getNMSClass("Vector3f");
     public static Class<?> nmsWorld = getNMSClass("World");
     public static Class<?> nmsBlock = getNMSClass("Block");

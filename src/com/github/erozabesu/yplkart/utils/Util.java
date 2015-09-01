@@ -483,6 +483,24 @@ public class Util extends ReflectionUtil {
         return new Location(cloneLocation.getWorld(), x, cloneLocation.getY(), z, cloneLocation.getYaw(), cloneLocation.getPitch());
     }
 
+    /**
+     * 引数fromから引数targetの座標間に固形ブロックが存在しておらず、引数targetの座標を視認できるかどうかを返す。
+     * @param from チェックする座標
+     * @param target チェックする座標
+     * @return 引数fromから引数targetの座標を視認できるかどうか
+     */
+    public static boolean canSeeLocation(Location from, Location target) {
+        if (!from.getWorld().equals(target.getWorld())) {
+            return false;
+        }
+
+        Object nmsWorld = ReflectionUtil.invoke(Methods.craftWorld_getHandle, from.getWorld());
+        Object fromVec3D = ReflectionUtil.newInstance(Constructors.nmsVec3D, from.getX(), from.getY(), from.getZ());
+        Object targetVec3D = ReflectionUtil.newInstance(Constructors.nmsVec3D, target.getX(), target.getY(), target.getZ());
+
+        return ReflectionUtil.invoke(Methods.nmsWorld_rayTrace, nmsWorld, fromVec3D, targetVec3D) == null;
+    }
+
     //〓 Block 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
