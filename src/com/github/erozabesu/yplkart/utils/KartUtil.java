@@ -1,7 +1,6 @@
 package com.github.erozabesu.yplkart.utils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -240,6 +239,21 @@ public class KartUtil extends ReflectionUtil {
 
                 // コリジョンをOFFに変更
                 setFieldValue(Fields.nmsEntity_noclip, nmsEntityKart, true);
+
+                // 現在の座標からチェックポイントへ向けたベクターを算出。Yベクターのみ用いる
+                Vector vectorToLocation = Util.getVectorToLocation(location, racer.getUsingKiller().getLocation().add(0, -RaceManager.checkPointHeight + 3, 0)).multiply(1.5D);
+
+                // チェックポイントのYawからベクターを算出。X、Zベクターのみ用いる
+                Location checkPointLocation = racer.getUsingKiller().getLocation().clone();
+                checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
+                Vector vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation).multiply(1.5D);
+
+                //算出したベクターのX、Y、Zモーションを格納
+                invoke(Methods.Ypl_setKillerX, nmsEntityKart, vectorByCheckPointYaw.getX());
+                invoke(Methods.Ypl_setKillerY, nmsEntityKart, vectorToLocation.getY());
+                invoke(Methods.Ypl_setKillerZ, nmsEntityKart, vectorByCheckPointYaw.getZ());
+
+                invoke(Methods.nmsEntity_setYawPitch, nmsEntityKart, racer.getUsingKiller().getLocation().getYaw() + 180.0F, 0);
             }
 
             //スピードスタックを一時的に常に最大値に固定する
@@ -334,7 +348,7 @@ public class KartUtil extends ReflectionUtil {
          * カートエンティティの描画位置をkart.ymlのmount_position_offsetの位置に強制描画させるため、
          * 現在座標のテレポートパケットを送信する
          * 描画位置の細かい計算は、パケットの送信をPlayerChannelHandlerがフックし行うためここでは送信するのみ
-         * キラー使用中は別の処理内で送信するためここでは送信しない
+         * キラー使用中は描画位置が不安定になるため送信しない
          */
         if (racer.getUsingKiller() == null) {
             if((Integer) getFieldValue(Fields.nmsEntity_ticksLived, nmsEntityKart) % 20 == 0) {
@@ -636,37 +650,10 @@ public class KartUtil extends ReflectionUtil {
      * @param entityKart Nmsカートエンティティ
      * @param racer 搭乗者のRacerインスタンス
      */
-    @SuppressWarnings("unchecked")
     public static void setKillerMotion(Object entityKart, Racer racer) {
         double cPHeihgt = RaceManager.checkPointHeight - 2;
         Entity bukkitEntityKart = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, entityKart));
-        Location kartLocation = bukkitEntityKart.getLocation();
-
-        // 正しく描画するためテレポートパケットの強制送信
-        PacketUtil.sendEntityTeleportPacket(null, bukkitEntityKart, kartLocation);
-
-        // 処理の中で毎回リフレクションを呼び出すのは冗長なため、一時的な配列として宣言
-        // 必ず処理の終了時に本来のフィールドにセットすること
-        List<String> passedCPList = (List<String>) invoke(Methods.Ypl_getKillerPassedCheckPointList, entityKart);
-
-        //初回起動時のみ
-        if (passedCPList == null || passedCPList.isEmpty()) {
-            //キラー使用者が通過済みのチェックポイントリストを引き継ぐ
-            passedCPList = new ArrayList<String>(racer.getPassedCheckPointList());
-            invoke(Methods.Ypl_setKillerPassedCheckPointList, entityKart, new ArrayList<String>(racer.getPassedCheckPointList()));
-
-            //キラー使用時に取得した、最寄の未通過のチェックポイントを格納
-            invoke(Methods.Ypl_setKillerLastPassedCheckPoint, entityKart, racer.getUsingKiller());
-
-            //最寄の未通過のチェックポイントへ向けたベクターを算出
-            Vector vector = Util.getVectorToLocation(kartLocation,
-                    racer.getUsingKiller().getLocation().add(0, -cPHeihgt, 0));
-
-            //算出したベクターのX、Y、Zモーションを格納
-            invoke(Methods.Ypl_setKillerX, entityKart, vector.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vector.getY());
-            invoke(Methods.Ypl_setKillerZ, entityKart, vector.getZ());
-        }
+        Location kartLocation = bukkitEntityKart.getLocation().clone();
 
         //キラー用モーションの適用
         double killerX = (Double) invoke(Methods.Ypl_getKillerX, entityKart);
@@ -676,34 +663,39 @@ public class KartUtil extends ReflectionUtil {
         setFieldValue(Fields.nmsEntity_motY, entityKart, killerY);
         setFieldValue(Fields.nmsEntity_motZ, entityKart, killerZ);
 
-        //Yawを現在のモーションの方向へ変更
-        double motX = (Double) getFieldValue(Fields.nmsEntity_motX, entityKart);
-        double motY = (Double) getFieldValue(Fields.nmsEntity_motY, entityKart);
-        double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, entityKart);
-        invoke(Methods.nmsEntity_setYawPitch, entityKart
-                , Util.getYawFromVector(new Vector(motX, motY, motZ)) + 90, 0);
-
-        // 最寄の未通過チェックポイントを取得し、存在しない場合はreturn
+        // 最寄のチェックポイントを取得し、存在しない場合はreturn
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        Entity nearestCP = RaceManager.getNearestUnpassedCheckpoint(racer, kartLocation, detectCheckPointRadius, 180.0F);
+        Entity nearestCP = RaceManager.getNearestCheckpoint(racer, kartLocation, detectCheckPointRadius, 360.0F);
         if (nearestCP == null) {
             return;
         }
 
-        // 最寄の未通過チェックポイントを通過済みリスト、前回通過したチェックポイントとして格納
-        String lap = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
-        passedCPList.add(lap + nearestCP.getUniqueId().toString());
-        invoke(Methods.Ypl_setKillerPassedCheckPointList, entityKart
-                , new ArrayList<String>(passedCPList));
-        invoke(Methods.Ypl_setKillerLastPassedCheckPoint, entityKart, nearestCP);
+        Location checkPointLocation = nearestCP.getLocation().clone();
 
-        //最寄の未通過チェックポイントへ向けたベクターを算出
-        Vector vector = Util.getVectorToLocation(kartLocation, nearestCP.getLocation().add(0, -cPHeihgt, 0)).multiply(2.0);
+        // 現在の座標からチェックポイントへ向けたベクターを算出
+        Vector vectorToLocation = Util.getVectorToLocation(kartLocation, checkPointLocation.clone().add(0, -cPHeihgt, 0)).normalize().multiply(1.5D);
+        Vector vectorByCheckPointYaw;
 
-        //算出したベクターのX、Y、Zモーションを格納
-        invoke(Methods.Ypl_setKillerX, entityKart, vector.getX());
-        invoke(Methods.Ypl_setKillerY, entityKart, vector.getY());
-        invoke(Methods.Ypl_setKillerZ, entityKart, vector.getZ());
+         // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
+        if (5.0F < checkPointLocation.distance(kartLocation) && Util.isLocationInSight(racer.getPlayer(), checkPointLocation, 180.0F)) {
+            invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
+            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
+            invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
+
+        // チェックポイントとの距離が5ブロック以内であればチェックポイントのYawから算出したベクターを格納
+        } else {
+            // チェックポイントのYawからベクターを算出。X、Zベクターのみ用いる
+            checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
+            vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation.add(0, -cPHeihgt, 0)).normalize().multiply(1.5D);
+
+            //算出したベクターのX、Y、Zモーションを格納する。Yモーションのみチェックポイントへ向けたベクターを格納する
+            invoke(Methods.Ypl_setKillerX, entityKart, vectorByCheckPointYaw.getX());
+            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
+            invoke(Methods.Ypl_setKillerZ, entityKart, vectorByCheckPointYaw.getZ());
+
+            //YawをチェックポイントのYawと同期
+            invoke(Methods.nmsEntity_setYawPitch, entityKart, checkPointLocation.getYaw() + 180.0F, 0);
+        }
     }
 
     /**

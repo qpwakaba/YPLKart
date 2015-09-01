@@ -547,8 +547,10 @@ public class RaceManager {
             return null;
         }
 
-        if (!Util.canSeeLocation(player.getEyeLocation(), nearestCheckPoint.getLocation())) {
-            return null;
+        if (!Util.canSeeLocation(player.getEyeLocation().add(0, 1, 0), nearestCheckPoint.getLocation())) {
+            if (racer.getUsingKiller() == null) {
+                return null;
+            }
         }
 
         return nearestCheckPoint;
@@ -578,8 +580,10 @@ public class RaceManager {
             return null;
         }
 
-        if (!Util.canSeeLocation(player.getEyeLocation(), nearestCheckPoint.getLocation())) {
-            return null;
+        if (!Util.canSeeLocation(player.getEyeLocation().clone().add(0, 1, 0), nearestCheckPoint.getLocation())) {
+            if (racer.getUsingKiller() == null) {
+                return null;
+            }
         }
 
         return nearestCheckPoint;

@@ -604,6 +604,20 @@ public class Util extends ReflectionUtil {
     //〓 Vector 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
+     * 引数fromが現在向いているYaw方向へのベクターを返す。
+     * @param from 取得する座標
+     * @return 引数fromが現在向いているYaw方向へのベクター
+     */
+    public static Vector getVectorByYaw(Location from){
+        float yaw = from.getYaw();
+        double x = -Math.sin(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
+        double z = Math.cos(Math.toRadians(yaw < 0 ? yaw + 360 : yaw));
+
+        Location to = new Location(from.getWorld(), from.getX()+x, from.getY(), from.getZ()+z);
+        return getVectorToLocation(to, from);
+    }
+
+    /**
      * Location fromからtoへのVectorを返す
      * @param from
      * @param to

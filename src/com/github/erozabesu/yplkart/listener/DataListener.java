@@ -199,8 +199,8 @@ public class DataListener implements Listener {
             return;
         }
 
-        String fromBlockId = Util.getGroundBlockID(event.getFrom(), 5);
-        String toBlockId = Util.getGroundBlockID(event.getTo(), 5);
+        String fromBlockId = Util.getGroundBlockID(event.getFrom(), 10);
+        String toBlockId = Util.getGroundBlockID(event.getTo(), 10);
 
         //現在の週回数
         int currentLaps = racer.getCurrentLaps();
