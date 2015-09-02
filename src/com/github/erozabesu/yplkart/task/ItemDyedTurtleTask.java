@@ -125,13 +125,13 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         }
 
         //チェックポイントの更新
-        Racer r = RaceManager.getRacer(this.shooter);
+        Racer racer = RaceManager.getRacer(this.shooter);
         ArrayList<Entity> checkpointlist = new ArrayList<Entity>();
 
         //アカこうらを1位から2位に向け発射した場合
         if (this.targetreverse) {
-            List<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    r.getCircuitName(), this.projectile.getLocation().clone().add(-this.motX * 3, 0, -this.motZ * 3), 30);
+            List<Entity> templist = RaceManager.getNearbyCheckPoints(
+                    racer, this.projectile.getLocation().clone().add(-this.motX * 3, 0, -this.motZ * 3), 30);
             if (templist == null)
                 return;
 
@@ -145,8 +145,8 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
             }
             //その他
         } else {
-            List<Entity> templist = RaceManager.getNearbyCheckpoint(
-                    r.getCircuitName(), this.projectile.getLocation().clone().add(this.motX * 3, 0, this.motZ * 3), 30);
+            List<Entity> templist = RaceManager.getNearbyCheckPoints(
+                    racer, this.projectile.getLocation().clone().add(this.motX * 3, 0, this.motZ * 3), 30);
             if (templist == null)
                 return;
 
