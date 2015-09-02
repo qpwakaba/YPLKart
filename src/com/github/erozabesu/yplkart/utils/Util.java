@@ -655,21 +655,19 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * 引数playerからの視界に引数targetの座標が含まれているかどうかを返す。
-     * @param player チェックするプレイヤー
+     * 引数eyeLocationからの視界に引数targetの座標が含まれているかどうかを返す。
+     * @param eyeLocation チェックする視点の座標
      * @param target 視界に入っているかチェックする座標
      * @param threshold 視野の広さ。0.0F～360.0Fの数値を指定する
      * @return 引数fromからの視界に引数toの座標が含まれているかどうか
      */
-    public static boolean isLocationInSight(Player player, Location target, float threshold) {
+    public static boolean isLocationInSight(Location eyeLocation, Location target, float threshold) {
         // 360.0F以上を指定された場合は無条件でtrueを返す
         if (360.0F <= threshold) {
             return true;
         }
 
         // 座標の取得。playerがカートに搭乗している場合はカートの座標を格納。
-        // また、カートのYawは意図的に90.0Fが加算されているため、カートに搭乗している場合はYawを90.0F減算する。
-        Location eyeLocation = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
         float eyeYaw = eyeLocation.getYaw();
 
         // マイナスの値になる場合があるため正の数に変換
@@ -687,7 +685,21 @@ public class Util extends ReflectionUtil {
         return isInSight(eyeYaw, vectorYaw, threshold);
     }
 
-    public static boolean isInSight(float baseYaw, float targetYaw, float threshold) {
+    /**
+     * 引数playerからの視界に引数targetの座標が含まれているかどうかを返す。
+     * @param player チェックするプレイヤー
+     * @param target 視界に入っているかチェックする座標
+     * @param threshold 視野の広さ。0.0F～360.0Fの数値を指定する
+     * @return 引数fromからの視界に引数toの座標が含まれているかどうか
+     */
+    public static boolean isLocationInSight(Player player, Location target, float threshold) {
+        // 座標の取得。playerがカートに搭乗している場合はカートの座標を格納。
+        Location eyeLocation = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
+
+        return isLocationInSight(eyeLocation, target, threshold);
+    }
+
+    private static boolean isInSight(float baseYaw, float targetYaw, float threshold) {
         // 360.0F以上を指定された場合は無条件でtrueを返す
         if (360.0F <= threshold) {
             return true;
@@ -740,7 +752,7 @@ public class Util extends ReflectionUtil {
      * @param yaw チェックするYaw
      * @return 引数yawが負の数値に換算されるかどうか
      */
-    public static boolean isNegativeRoundDegree(float yaw) {
+    private static boolean isNegativeRoundDegree(float yaw) {
         if ((0.0F <= yaw && yaw <= 180.0F) || yaw < -180.0F) {
             return false;
         }
@@ -754,7 +766,7 @@ public class Util extends ReflectionUtil {
      * @param yaw 変換するYaw
      * @return 変換したYaw
      */
-    public static float calcYawToRoundDegree(float yaw) {
+    private static float calcYawToRoundDegree(float yaw) {
         if (180.0F <= yaw) {
             return (180.0F - (yaw - 180.0F)) * -1;
         } else if (yaw <= -180.0F) {
