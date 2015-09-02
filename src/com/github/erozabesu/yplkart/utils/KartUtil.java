@@ -675,7 +675,7 @@ public class KartUtil extends ReflectionUtil {
         Vector vectorToLocation = Util.getVectorToLocation(kartLocation, checkPointLocation).multiply(1.5D);
         Vector vectorByCheckPointYaw;
 
-         // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
+        // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
         if (5.0F < checkPointLocation.distance(kartLocation) && Util.isLocationInSight(racer.getPlayer(), checkPointLocation, 180.0F)) {
             invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
             invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.clone().normalize().getY());

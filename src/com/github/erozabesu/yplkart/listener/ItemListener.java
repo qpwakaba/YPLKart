@@ -72,14 +72,111 @@ public class ItemListener extends RaceManager implements Listener {
     private static HashMap<Player, Boolean> itemboxCool = new HashMap<Player, Boolean>();
 
     @EventHandler
-    public void useItem(PlayerInteractEvent e) {
-        Player player = e.getPlayer();
+    public void useToolItem(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
         //プラグインが有効でない場合return
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
 
-        Action clickAction = e.getAction();
+        //手にアイテムを持っていない場合return
+        if (player.getItemInHand() == null) {
+            return;
+        }
+
+        ItemEnum itemEnum = ItemEnum.getItemByItemStack(player.getItemInHand());
+
+        //手に持っているアイテムがキーアイテムでない場合return
+        if (itemEnum == null) {
+            return;
+        }
+
+        //キーアイテムの使用パーミッションを所有していない場合return
+        if (!Permission.hasPermission(player, itemEnum.getUsePermission(), false)) {
+            return;
+        }
+
+        UUID uuid = player.getUniqueId();
+        Racer racer = RaceManager.getRace(uuid);
+        event.setCancelled(true);
+
+        //アクションが右クリック以外の場合return
+        Action clickAction = event.getAction();
+        if (clickAction != Action.RIGHT_CLICK_BLOCK && clickAction != Action.RIGHT_CLICK_AIR) {
+            return;
+        }
+
+        // スタンバイ状態、かつスタートしていない状態のみメニューアイテムを利用
+        if (racer.isStandby() && !racer.isStart()) {
+            //メニュー
+            if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
+                showSelectMenu(player, true);
+                return;
+            }
+        }
+
+        //チェックポイントツール
+        if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+
+        //チェックポイントツールTier2
+        } else if (ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())) {
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+
+        //チェックポイントツールTier3
+        } else if (ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand())) {
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+
+        //アイテムボックスツール
+        } else if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
+            //ブロックを右クリックした場合のみ動作
+            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                EnderCrystal endercrystal = b.getWorld()
+                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                endercrystal.setCustomName(ItemBoxName);
+                endercrystal.setCustomNameVisible(false);
+                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+            }
+
+        //アイテムボックスツールティアー2
+        } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(player.getItemInHand())) {
+            //ブロックを右クリックした場合のみ動作
+            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                EnderCrystal endercrystal = b.getWorld()
+                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                endercrystal.setCustomName(ItemBoxNameTier2);
+                endercrystal.setCustomNameVisible(true);
+                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+            }
+
+        //フェイクアイテムボックスツール
+        } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
+            //ブロックを右クリックした場合のみ動作
+            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                EnderCrystal endercrystal = b.getWorld()
+                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                endercrystal.setCustomName(ItemBoxNameFake);
+                endercrystal.setCustomNameVisible(true);
+                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+            }
+        }
+    }
+
+    @EventHandler
+    public void useRaceItem(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        //プラグインが有効でない場合return
+        if (!YPLKart.isPluginEnabled(player.getWorld())) {
+            return;
+        }
+
+        Action clickAction = event.getAction();
 
         //アクションが右クリック以外の場合return
         if (clickAction != Action.RIGHT_CLICK_BLOCK && clickAction != Action.RIGHT_CLICK_AIR) {
@@ -105,7 +202,12 @@ public class ItemListener extends RaceManager implements Listener {
 
         UUID uuid = player.getUniqueId();
         Racer racer = RaceManager.getRace(uuid);
-        e.setCancelled(true);
+        event.setCancelled(true);
+
+        // レース中、かつゴールしていない状態以外はreturn
+        if (!isStillRacing(uuid)) {
+            return;
+        }
 
         //アイテムを使用して間もない状態の場合return : issue #112
         if (racer.isItemUseCooling()) {
@@ -115,134 +217,74 @@ public class ItemListener extends RaceManager implements Listener {
         //アイテムを使用したフラグをtrueにセットする : issue #112
         racer.runItemUseCoolingTask();
 
-        //チェックポイントツール
-        if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
-            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-
-        //チェックポイントツールTier2
-        } else if (ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
-            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-
-        //チェックポイントツールTier3
-        } else if (ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
-            player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-
-        //アイテムボックスツール
-        } else if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = e.getClickedBlock().getRelative(e.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxName);
-                endercrystal.setCustomNameVisible(false);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
-
-        //アイテムボックスツールティアー2
-        } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = e.getClickedBlock().getRelative(e.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxNameTier2);
-                endercrystal.setCustomNameVisible(true);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
-
-        //フェイクアイテムボックスツール
-        } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = e.getClickedBlock().getRelative(e.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxNameFake);
-                endercrystal.setCustomNameVisible(true);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
-
-        //メニュー
-        } else if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
-            showSelectMenu(player, true);
-        }
-
-        //レース中、かつゴールしていない状態のみ利用できるアイテム群
-        if (isStillRacing(uuid)) {
-
-            //ダッシュきのこ
-            if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
-                Util.setItemDecrease(player);
-                setPositiveItemSpeed(player, ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
-
-            //パワフルダッシュキノコ
-            } else if (ItemEnum.POWERFULL_MUSHROOM.isSimilar(player.getItemInHand())) {
+        //ダッシュきのこ
+        if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
             Util.setItemDecrease(player);
-                setPositiveItemSpeed(player, ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
-                        ItemEnum.POWERFULL_MUSHROOM.getEffectLevel(), Sound.EXPLODE);
-                player.getWorld().playSound(player.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
+            setPositiveItemSpeed(player, ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
 
-            //バナナ
-            } else if (ItemEnum.BANANA.isSimilar(player.getItemInHand())) {
-                Util.setItemDecrease(player);
-                Location l = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
-                        .add(0.5, 0, 0.5);
+        //パワフルダッシュキノコ
+        } else if (ItemEnum.POWERFULL_MUSHROOM.isSimilar(player.getItemInHand())) {
+        Util.setItemDecrease(player);
+            setPositiveItemSpeed(player, ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
+                    ItemEnum.POWERFULL_MUSHROOM.getEffectLevel(), Sound.EXPLODE);
+            player.getWorld().playSound(player.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
 
-                FallingBlock b = player.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
-                b.setCustomName(ItemEnum.BANANA.getDisplayName());
-                b.setCustomNameVisible(false);
-                b.setDropItem(false);
-                Util.removeEntityCollision(b);
+        //バナナ
+        } else if (ItemEnum.BANANA.isSimilar(player.getItemInHand())) {
+            Util.setItemDecrease(player);
+            Location l = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+                    .add(0.5, 0, 0.5);
 
-                new ItemBananaTask(RaceManager.getCircuit(uuid), b, l).runTaskTimer(pl, 0, 1);
-                player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
+            FallingBlock b = player.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
+            b.setCustomName(ItemEnum.BANANA.getDisplayName());
+            b.setCustomNameVisible(false);
+            b.setDropItem(false);
+            Util.removeEntityCollision(b);
 
-            //にせアイテムボックス
-            } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
-                Util.setItemDecrease(player);
-                EnderCrystal endercrystal = player.getWorld().spawn(
-                        Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
-                                .add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(FakeItemBoxName);
-                endercrystal.setCustomNameVisible(true);
-                RaceManager.getCircuit(uuid).addJammerEntity(endercrystal);
-                player.getWorld().playEffect(player.getLocation(), Effect.CLICK1, 0);
+            new ItemBananaTask(RaceManager.getCircuit(uuid), b, l).runTaskTimer(pl, 0, 1);
+            player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
 
-            //サンダー
-            } else if (ItemEnum.THUNDER.isSimilar(player.getItemInHand())) {
-                itemThunder(player);
+        //にせアイテムボックス
+        } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
+            Util.setItemDecrease(player);
+            EnderCrystal endercrystal = player.getWorld().spawn(
+                    Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+                            .add(0.5, 0, 0.5), EnderCrystal.class);
+            endercrystal.setCustomName(FakeItemBoxName);
+            endercrystal.setCustomNameVisible(true);
+            RaceManager.getCircuit(uuid).addJammerEntity(endercrystal);
+            player.getWorld().playEffect(player.getLocation(), Effect.CLICK1, 0);
 
-            //スーパースター
-            } else if (ItemEnum.STAR.isSimilar(player.getItemInHand())) {
-                new ItemStarTask(player).runTaskTimer(pl, 0, 1);
+        //サンダー
+        } else if (ItemEnum.THUNDER.isSimilar(player.getItemInHand())) {
+            itemThunder(player);
 
-            //テレサ
-            } else if (ItemEnum.TERESA.isSimilar(player.getItemInHand())) {
-                itemTeresa(player);
+        //スーパースター
+        } else if (ItemEnum.STAR.isSimilar(player.getItemInHand())) {
+            new ItemStarTask(player).runTaskTimer(pl, 0, 1);
 
-            //ミドリこうら
-            } else if (ItemEnum.TURTLE.isSimilar(player.getItemInHand())) {
-                itemTurtle(player);
-            //アカこうら
-            } else if (ItemEnum.RED_TURTLE.isSimilar(player.getItemInHand())) {
-                itemRedturtle(player);
+        //テレサ
+        } else if (ItemEnum.TERESA.isSimilar(player.getItemInHand())) {
+            itemTeresa(player);
 
-            //トゲゾーこうら
-            } else if (ItemEnum.THORNED_TURTLE.isSimilar(player.getItemInHand())) {
-                itemThornedturtle(player);
+        //ミドリこうら
+        } else if (ItemEnum.TURTLE.isSimilar(player.getItemInHand())) {
+            itemTurtle(player);
+        //アカこうら
+        } else if (ItemEnum.RED_TURTLE.isSimilar(player.getItemInHand())) {
+            itemRedturtle(player);
 
-            //ゲッソー
-            } else if (ItemEnum.GESSO.isSimilar(player.getItemInHand())) {
-                itemGesso(player);
+        //トゲゾーこうら
+        } else if (ItemEnum.THORNED_TURTLE.isSimilar(player.getItemInHand())) {
+            itemThornedturtle(player);
 
-            //キラー
-            } else if (ItemEnum.KILLER.isSimilar(player.getItemInHand())) {
-                itemKiller(player);
-            }
+        //ゲッソー
+        } else if (ItemEnum.GESSO.isSimilar(player.getItemInHand())) {
+            itemGesso(player);
+
+        //キラー
+        } else if (ItemEnum.KILLER.isSimilar(player.getItemInHand())) {
+            itemKiller(player);
         }
     }
 
