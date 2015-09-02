@@ -651,7 +651,6 @@ public class KartUtil extends ReflectionUtil {
      * @param racer 搭乗者のRacerインスタンス
      */
     public static void setKillerMotion(Object entityKart, Racer racer) {
-        double cPHeihgt = RaceManager.checkPointHeight - 2;
         Entity bukkitEntityKart = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, entityKart));
         Location kartLocation = bukkitEntityKart.getLocation().clone();
 
@@ -673,24 +672,24 @@ public class KartUtil extends ReflectionUtil {
         Location checkPointLocation = nearestCP.getLocation().clone();
 
         // 現在の座標からチェックポイントへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(kartLocation, checkPointLocation.clone().add(0, -cPHeihgt, 0)).normalize().multiply(1.5D);
+        Vector vectorToLocation = Util.getVectorToLocation(kartLocation, checkPointLocation).multiply(1.5D);
         Vector vectorByCheckPointYaw;
 
          // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
         if (5.0F < checkPointLocation.distance(kartLocation) && Util.isLocationInSight(racer.getPlayer(), checkPointLocation, 180.0F)) {
             invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
+            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.clone().normalize().getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
 
         // チェックポイントとの距離が5ブロック以内であればチェックポイントのYawから算出したベクターを格納
         } else {
             // チェックポイントのYawからベクターを算出。X、Zベクターのみ用いる
             checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
-            vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation.add(0, -cPHeihgt, 0)).normalize().multiply(1.5D);
+            vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation).multiply(1.5D);
 
             //算出したベクターのX、Y、Zモーションを格納する。Yモーションのみチェックポイントへ向けたベクターを格納する
             invoke(Methods.Ypl_setKillerX, entityKart, vectorByCheckPointYaw.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
+            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.clone().normalize().getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorByCheckPointYaw.getZ());
 
             //YawをチェックポイントのYawと同期
