@@ -549,8 +549,8 @@ public class RaceManager {
             return null;
         }
 
-        if (!Util.canSeeLocation(player.getEyeLocation().add(0, 1, 0), nearestCheckPoint.getLocation())) {
-            if (racer.getUsingKiller() == null) {
+        if (!isVisibleCheckPointEntity(nearestCheckPoint)) {
+            if (!Util.canSeeLocation(player.getEyeLocation().add(0, 1, 0), nearestCheckPoint.getLocation())) {
                 return null;
             }
         }
@@ -582,8 +582,8 @@ public class RaceManager {
             return null;
         }
 
-        if (!Util.canSeeLocation(player.getEyeLocation().clone().add(0, 1, 0), nearestCheckPoint.getLocation())) {
-            if (racer.getUsingKiller() == null) {
+        if (!isVisibleCheckPointEntity(nearestCheckPoint)) {
+            if (!Util.canSeeLocation(player.getEyeLocation().clone().add(0, 1, 0), nearestCheckPoint.getLocation())) {
                 return null;
             }
         }
