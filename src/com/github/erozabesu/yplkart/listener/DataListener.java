@@ -282,7 +282,7 @@ public class DataListener implements Listener {
         }
 
         // 取得したチェックポイントが視界に入っていない場合はreturn
-        if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 270.0F)) {
+        if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 180.0F)) {
             return;
         }
 

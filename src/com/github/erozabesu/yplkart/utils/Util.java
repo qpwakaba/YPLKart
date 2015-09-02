@@ -669,12 +669,83 @@ public class Util extends ReflectionUtil {
 
         // 座標の取得。playerがカートに搭乗している場合はカートの座標を格納。
         // また、カートのYawは意図的に90.0Fが加算されているため、カートに搭乗している場合はYawを90.0F減算する。
-        Location location = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
+        Location eyeLocation = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
+        float eyeYaw = eyeLocation.getYaw();
 
-        float playerYaw = adjustYawToNegativeDegree(location.getYaw());
-        float vectorYaw = adjustYawToNegativeDegree((getYawFromVector(getVectorToLocation(location, target)) % 360.0F) + 90.0F);
+        // マイナスの値になる場合があるため正の数に変換
+        if (eyeYaw < 0) {
+            eyeYaw += 360.0F;
+        }
 
-        return getDoubleDifference(playerYaw, vectorYaw) < threshold / 2.0F;
+        // vectorYawと同じ逆時計周りに変更
+        eyeYaw -= 360.0F;
+        eyeYaw = Math.abs(eyeYaw);
+
+        float vectorYaw = getYawFromVector(getVectorToLocation(eyeLocation, target));
+        vectorYaw = Math.abs(vectorYaw) - 90.0F;
+
+        return isInSight(eyeYaw, vectorYaw, threshold);
+    }
+
+    public static boolean isInSight(float baseYaw, float targetYaw, float threshold) {
+        // 360.0F以上を指定された場合は無条件でtrueを返す
+        if (360.0F <= threshold) {
+            return true;
+        }
+
+        float positiveThreshold = baseYaw + (threshold) / 2.0F;
+
+        // 基準点に閾値を加算した結果が360未満の場合
+        if (positiveThreshold <= 360) {
+            if (baseYaw <= targetYaw && targetYaw <= positiveThreshold) {
+                return true;
+            }
+
+        // 基準点に閾値を加算した結果が360を超えた場合
+        } else {
+            if (baseYaw <= targetYaw && targetYaw <= 360.0F) {
+                return true;
+            } else{
+                positiveThreshold -= 360.0F;
+                if (0.0F <= targetYaw && targetYaw <= positiveThreshold) {
+                    return true;
+                }
+            }
+        }
+
+        float negativeThreshold = baseYaw - (threshold) / 2.0F;
+        // 基準点に閾値を減算した結果が0以上の場合
+        if (0 <= negativeThreshold) {
+            if (negativeThreshold <= targetYaw && targetYaw <= baseYaw) {
+                return true;
+            }
+
+        // 基準点に閾値を減算した結果が0未満の場合
+        } else {
+            if (0.0F <= targetYaw && targetYaw <= baseYaw) {
+                return true;
+            } else{
+                negativeThreshold += 360.0F;
+                if (negativeThreshold <= targetYaw && targetYaw <= 360.0F) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 引数yawを-180.0F～180.0Fの数値に換算した場合に、負の数値に換算されるかどうかを返す。
+     * @param yaw チェックするYaw
+     * @return 引数yawが負の数値に換算されるかどうか
+     */
+    public static boolean isNegativeRoundDegree(float yaw) {
+        if ((0.0F <= yaw && yaw <= 180.0F) || yaw < -180.0F) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -683,7 +754,7 @@ public class Util extends ReflectionUtil {
      * @param yaw 変換するYaw
      * @return 変換したYaw
      */
-    public static float adjustYawToNegativeDegree(float yaw) {
+    public static float calcYawToRoundDegree(float yaw) {
         if (180.0F <= yaw) {
             return (180.0F - (yaw - 180.0F)) * -1;
         } else if (yaw <= -180.0F) {
