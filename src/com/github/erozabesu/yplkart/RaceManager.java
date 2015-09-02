@@ -48,6 +48,8 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceManager {
+    public static ItemStack checkPointDisplayItem = new ItemStack(Material.PRISMARINE_SHARD);
+    public static ItemStack visibleCheckPointDisplayItem = new ItemStack(Material.PRISMARINE_CRYSTALS);
     public static int checkPointHeight = 6;
     public static int checkPointDetectRadius = 20;
 
@@ -1007,7 +1009,7 @@ public class RaceManager {
         return entity;
     }
 
-    public static Entity createCheckPointEntity(Location l, String circuitname) {
+    public static Entity createCheckPointEntity(Location l, String circuitname, boolean isVisible) {
         ArmorStand armorStand = l.getWorld().spawn(l.add(0, checkPointHeight, 0), ArmorStand.class);
 
         armorStand.getLocation().setYaw(l.getYaw());
@@ -1018,7 +1020,11 @@ public class RaceManager {
         armorStand.setGravity(false);
         armorStand.setBasePlate(false);
 
-        armorStand.setItemInHand(new ItemStack(Material.STICK));
+        if (isVisible) {
+            armorStand.setItemInHand(visibleCheckPointDisplayItem);
+        } else {
+            armorStand.setItemInHand(checkPointDisplayItem);
+        }
 
         Object kartEntity = Util.getCraftEntity(armorStand);
         Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + l.getPitch(), 1.00F, 0.0F);
