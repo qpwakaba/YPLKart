@@ -772,7 +772,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
         if (getRank(user) == 0)
             return;
-        if (getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
+        if (getNearestUnpassedCheckpointInSightAndVisible(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -808,7 +808,7 @@ public class ItemListener extends RaceManager implements Listener {
                     ItemEnum.THORNED_TURTLE.getItem() });
             return;
         }
-        if (getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
+        if (getNearestUnpassedCheckpointInSightAndVisible(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -838,7 +838,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Entity unpassedcheckpoint = getNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F);
+        Entity unpassedcheckpoint = getNearestUnpassedCheckpointInSightAndVisible(getRacer(user), user.getLocation(), 60, 180.0F);
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });

@@ -527,6 +527,23 @@ public class RaceManager {
 
     /**
      * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄の未通過のチェックポイントを返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param racer 参加中のプレイヤーのRacerインスタンス
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントエンティティ
+     */
+    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double radius) {
+        List<Entity> checkPointList = getNearbyUnpassedCheckpoint(racer, location, radius);
+        if (checkPointList == null || checkPointList.isEmpty()) {
+            return null;
+        }
+
+        return Util.getNearestEntity(checkPointList, location);
+    }
+
+    /**
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄の未通過のチェックポイントを返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。<br>
      * また、検出できても閾値が引数sightThresholdの視野において視認できない場合、<br>
      * もしくは、視野に含まれていても視点とチェックポイントの間に固形ブロックが存在している場合も{@code null}を返す。
@@ -536,26 +553,41 @@ public class RaceManager {
      * @param sightThreshold 視野の閾値
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double radius, float sightThreshold) {
-        List<Entity> checkPointList = getNearbyUnpassedCheckpoint(racer, location, radius);
-        if (checkPointList == null || checkPointList.isEmpty()) {
+    public static Entity getNearestUnpassedCheckpointInSightAndVisible(Racer racer, Location location, double radius, float sightThreshold) {
+        Entity nearestCheckPoint = getNearestUnpassedCheckpoint(racer, location, radius);
+        if (nearestCheckPoint == null) {
             return null;
         }
 
-        Entity nearestCheckPoint = Util.getNearestEntity(checkPointList, location);
         Player player = racer.getPlayer();
-
-        if (!Util.isLocationInSight(racer.getPlayer(), nearestCheckPoint.getLocation(), sightThreshold)) {
+        if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), sightThreshold)) {
             return null;
         }
 
         if (!isVisibleCheckPointEntity(nearestCheckPoint)) {
-            if (!Util.canSeeLocation(player.getEyeLocation().add(0, 1, 0), nearestCheckPoint.getLocation())) {
+            if (!Util.canSeeLocation(player.getEyeLocation(), nearestCheckPoint.getLocation())) {
                 return null;
             }
         }
 
         return nearestCheckPoint;
+    }
+
+    /**
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄のチェックポイントを返す。<br>
+     * チェックポイントが検出されなかった場合は{@code null}を返す。
+     * @param racer 参加中のプレイヤーのRacerインスタンス
+     * @param location 基点となる座標
+     * @param radius 半径
+     * @return チェックポイントエンティティ
+     */
+    public static Entity getNearestCheckpoint(Racer racer, Location location, double radius) {
+        List<Entity> checkPointList = getNearbyCheckpoint(racer.getCircuitName(), location, radius);
+        if (checkPointList == null || checkPointList.isEmpty()) {
+            return null;
+        }
+
+        return Util.getNearestEntity(checkPointList, location);
     }
 
     /**
@@ -569,15 +601,13 @@ public class RaceManager {
      * @param sightThreshold 視野の閾値
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestCheckpoint(Racer racer, Location location, double radius, float sightThreshold) {
-        List<Entity> checkPointList = getNearbyCheckpoint(racer.getCircuitName(), location, radius);
-        if (checkPointList == null || checkPointList.isEmpty()) {
+    public static Entity getNearestCheckpointInSightAndVisible(Racer racer, Location location, double radius, float sightThreshold) {
+        Entity nearestCheckPoint = getNearestCheckpoint(racer, location, radius);
+        if (nearestCheckPoint == null) {
             return null;
         }
 
-        Entity nearestCheckPoint = Util.getNearestEntity(checkPointList, location);
         Player player = racer.getPlayer();
-
         if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), sightThreshold)) {
             return null;
         }

@@ -39,6 +39,7 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.RaceType;
@@ -271,9 +272,9 @@ public class DataListener implements Listener {
         String circuitName = racer.getCircuitName();
         Location location = player.getLocation();
 
-        // 最高階級のチェックポイントの検出範囲内から最寄のチェックポイントを取得
+        // 最高階級のチェックポイントの検出範囲内から、通過済み、未通過を問わず最寄のチェックポイントを取得
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, detectCheckPointRadius, 360.0F);
+        Entity nearestCheckPoint = RaceManager.getNearestCheckpoint(racer, location, detectCheckPointRadius);
 
         // チェックポイントが取得できなかった場合コースアウト
         if (nearestCheckPoint == null) {
@@ -281,19 +282,18 @@ public class DataListener implements Listener {
             return;
         }
 
-        // 取得したチェックポイントが視界に入っていない場合はreturn
-        if (!Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 180.0F)) {
-            return;
-        }
-
-        // config.ymlからチェックポイントの検出範囲を取得
+        // config.ymlのチェックポイントの検出範囲
         Integer detectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(nearestCheckPoint, circuitName);
+        boolean isInDetectRadius = nearestCheckPoint.getLocation().distance(location) < detectRadius;
+        boolean isInSight = Util.isLocationInSight(player, nearestCheckPoint.getLocation(), 270.0F);
+        boolean isVisible = Util.canSeeLocation(player.getEyeLocation(), nearestCheckPoint.getLocation());
+        isVisible = RaceManager.isVisibleCheckPointEntity(nearestCheckPoint) ? true : isVisible;
 
-        // チェックポイントとの距離が検出範囲内
-        if (nearestCheckPoint.getLocation().distance(location) < detectRadius) {
+        if (isInDetectRadius && isInSight && isVisible) {
             // 未通過のチェックポイントだった場合は通過済みリストに格納
             String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
             if (!racer.getPassedCheckPointList().contains(currentLaps + nearestCheckPoint.getUniqueId().toString())) {
+                PacketUtil.sendParticlePacket(player, Particle.EXPLOSION_LARGE, nearestCheckPoint.getLocation(), 0, 0, 0, 1, 10, null);
                 racer.setLastPassedCheckPointEntity(nearestCheckPoint);
                 racer.addPassedCheckPoint(currentLaps + nearestCheckPoint.getUniqueId().toString());
             }
