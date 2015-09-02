@@ -74,24 +74,24 @@ public class ItemListener extends RaceManager implements Listener {
     @EventHandler
     public void useToolItem(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        //プラグインが有効でない場合return
+        // プラグインが有効でない場合return
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
 
-        //手にアイテムを持っていない場合return
+        // 手にアイテムを持っていない場合return
         if (player.getItemInHand() == null) {
             return;
         }
 
         ItemEnum itemEnum = ItemEnum.getItemByItemStack(player.getItemInHand());
 
-        //手に持っているアイテムがキーアイテムでない場合return
+        // 手に持っているアイテムがキーアイテムでない場合return
         if (itemEnum == null) {
             return;
         }
 
-        //キーアイテムの使用パーミッションを所有していない場合return
+        // キーアイテムの使用パーミッションを所有していない場合return
         if (!Permission.hasPermission(player, itemEnum.getUsePermission(), false)) {
             return;
         }
@@ -100,71 +100,75 @@ public class ItemListener extends RaceManager implements Listener {
         Racer racer = RaceManager.getRace(uuid);
         event.setCancelled(true);
 
-        //アクションが右クリック以外の場合return
         Action clickAction = event.getAction();
-        if (clickAction != Action.RIGHT_CLICK_BLOCK && clickAction != Action.RIGHT_CLICK_AIR) {
-            return;
+
+        // 右クリック専用アイテム
+        if (clickAction == Action.RIGHT_CLICK_BLOCK || clickAction == Action.RIGHT_CLICK_AIR) {
+            // スタンバイ状態、かつスタートしていない状態のみメニューアイテムを利用
+            if (racer.isStandby() && !racer.isStart()) {
+                // メニュー
+                if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
+                    showSelectMenu(player, true);
+                    return;
+                }
+            }
+
+            // アイテムボックスツール
+            if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
+                //ブロックを右クリックした場合のみ動作
+                if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                    EnderCrystal endercrystal = b.getWorld()
+                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                    endercrystal.setCustomName(ItemBoxName);
+                    endercrystal.setCustomNameVisible(false);
+                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                }
+
+            // アイテムボックスツールティアー2
+            } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(player.getItemInHand())) {
+                // ブロックを右クリックした場合のみ動作
+                if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                    EnderCrystal endercrystal = b.getWorld()
+                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                    endercrystal.setCustomName(ItemBoxNameTier2);
+                    endercrystal.setCustomNameVisible(true);
+                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                }
+
+            // フェイクアイテムボックスツール
+            } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
+                // ブロックを右クリックした場合のみ動作
+                if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
+                    EnderCrystal endercrystal = b.getWorld()
+                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
+                    endercrystal.setCustomName(ItemBoxNameFake);
+                    endercrystal.setCustomNameVisible(true);
+                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                }
+            }
+
         }
 
-        // スタンバイ状態、かつスタートしていない状態のみメニューアイテムを利用
-        if (racer.isStandby() && !racer.isStart()) {
-            //メニュー
-            if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
-                showSelectMenu(player, true);
-                return;
-            }
-        }
+        // 設置するチェックポイントが可視チェックポイントかどうか
+        boolean isVisible = clickAction == Action.LEFT_CLICK_BLOCK || clickAction == Action.LEFT_CLICK_AIR;
 
         //チェックポイントツール
         if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
         //チェックポイントツールTier2
         } else if (ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
         //チェックポイントツールTier3
         } else if (ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0));
+            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-
-        //アイテムボックスツール
-        } else if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxName);
-                endercrystal.setCustomNameVisible(false);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
-
-        //アイテムボックスツールティアー2
-        } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxNameTier2);
-                endercrystal.setCustomNameVisible(true);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
-
-        //フェイクアイテムボックスツール
-        } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-            //ブロックを右クリックした場合のみ動作
-            if (clickAction == Action.RIGHT_CLICK_BLOCK) {
-                Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                EnderCrystal endercrystal = b.getWorld()
-                        .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                endercrystal.setCustomName(ItemBoxNameFake);
-                endercrystal.setCustomNameVisible(true);
-                b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
-            }
         }
     }
 
