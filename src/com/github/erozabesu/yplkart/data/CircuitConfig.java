@@ -102,15 +102,6 @@ public class CircuitConfig {
             //ローカルファイルから削除
             circuitData.deleteConfiguration();
 
-            //設置済みのチェックポイントEntityを削除
-            for (World world : Bukkit.getWorlds()) {
-                for (Entity entity : world.getEntities()) {
-                    if (RaceManager.isSpecificCircuitCheckPointEntity(entity, circuitDataName)) {
-                        entity.remove();
-                    }
-                }
-            }
-
             //MessageEnumのメンバ変数を更新 : issue #154
             MessageEnum.reload();
 
