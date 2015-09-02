@@ -912,6 +912,33 @@ public class RaceManager {
         return true;
     }
 
+    /**
+     * 引数entityが透過チェックポイントエンティティかどうかを返す。<br>
+     * アーマースタンドエンティティではなく、旧チェックポイントであるウィザースカルエンティティの場合はfalseを返す。
+     * @param entity チェックするエンティティ
+     * @return 引数entityが透過チェックポイントエンティティかどうか
+     */
+    public static boolean isVisibleCheckPointEntity(Entity entity) {
+        if (!isCheckPointEntity(entity)) {
+            return false;
+        }
+
+        if (!(entity instanceof ArmorStand)) {
+            return false;
+        }
+
+        ItemStack itemInHand = ((ArmorStand) entity).getItemInHand();
+        if (itemInHand == null) {
+            return false;
+        }
+
+        if (itemInHand.isSimilar(checkPointDisplayItem)) {
+            return false;
+        }
+
+        return true;
+    }
+
     // 〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** 全サーキットに設置されている妨害エンティティをデスポーンさせる。 */
