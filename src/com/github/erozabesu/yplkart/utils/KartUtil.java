@@ -678,7 +678,6 @@ public class KartUtil extends ReflectionUtil {
         // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
         if (5.0F < checkPointLocation.distance(kartLocation) && Util.isLocationInSight(racer.getPlayer(), checkPointLocation, 180.0F)) {
             invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.clone().normalize().getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
 
         // チェックポイントとの距離が5ブロック以内であればチェックポイントのYawから算出したベクターを格納
@@ -689,12 +688,14 @@ public class KartUtil extends ReflectionUtil {
 
             //算出したベクターのX、Y、Zモーションを格納する。Yモーションのみチェックポイントへ向けたベクターを格納する
             invoke(Methods.Ypl_setKillerX, entityKart, vectorByCheckPointYaw.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.clone().normalize().getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorByCheckPointYaw.getZ());
 
             //YawをチェックポイントのYawと同期
             invoke(Methods.nmsEntity_setYawPitch, entityKart, checkPointLocation.getYaw() + 180.0F, 0);
         }
+
+        BigDecimal vectorYBD = new BigDecimal(vectorToLocation.clone().normalize().getY());
+        invoke(Methods.Ypl_setKillerY, entityKart, vectorYBD.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     /**
