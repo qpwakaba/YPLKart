@@ -73,9 +73,15 @@ public class ItemListener extends RaceManager implements Listener {
 
     @EventHandler
     public void removeCheckPoint(PlayerMoveEvent event) {
-        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld()))
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
+        }
+
         Player player = event.getPlayer();
+        if (Permission.hasPermission(player, Permission.OP_CMD_CIRCUIT, false)) {
+            return;
+        }
+
         if (!ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())
                 && !ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())
                 && !ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand()))
