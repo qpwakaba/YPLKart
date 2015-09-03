@@ -14,7 +14,9 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.listener.DataListener;
 import com.github.erozabesu.yplkart.listener.ItemListener;
+import com.github.erozabesu.yplkart.listener.KartListener;
 import com.github.erozabesu.yplkart.listener.NettyListener;
+import com.github.erozabesu.yplkart.listener.RaceListener;
 
 public class YPLKart extends JavaPlugin {
     private static YPLKart PLUGIN;
@@ -36,9 +38,11 @@ public class YPLKart extends JavaPlugin {
         //全コンフィグの読み込み、格納
         ConfigManager.reloadAllConfig();
 
-        new DataListener(this);
-        new ItemListener(this);
-        new NettyListener(this);
+        new DataListener();
+        new RaceListener();
+        new KartListener();
+        new ItemListener();
+        new NettyListener();
 
         //全DisplayKartオブジェクトのEntityを再生成する
         DisplayKartConfig.respawnAllKart();
@@ -46,9 +50,6 @@ public class YPLKart extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
         }
-
-        //Message.sendAbsolute(null,
-        //        "[" + PLUGIN_NAME + "] v." + PLUGIN_VERSION + " Plugin has been Enabled");
     }
 
     @Override

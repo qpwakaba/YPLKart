@@ -56,11 +56,9 @@ import com.github.erozabesu.yplkart.task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemListener extends RaceManager implements Listener {
-    private static YPLKart pl;
 
-    public ItemListener(YPLKart plugin) {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        pl = plugin;
+    public ItemListener() {
+        Bukkit.getServer().getPluginManager().registerEvents(this, YPLKart.getInstance());
     }
 
     private static String ItemBoxName = "ItemBox";
@@ -70,6 +68,30 @@ public class ItemListener extends RaceManager implements Listener {
     private static HashMap<Player, Boolean> boostRailCool = new HashMap<Player, Boolean>();
     private static HashMap<Player, Boolean> vectorRailCool = new HashMap<Player, Boolean>();
     private static HashMap<Player, Boolean> itemboxCool = new HashMap<Player, Boolean>();
+
+    @EventHandler
+    public void removeCheckPoint(PlayerMoveEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getFrom().getWorld()))
+            return;
+        Player player = event.getPlayer();
+        if (!ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())
+                && !ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())
+                && !ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand()))
+            return;
+
+        List<Entity> list = player.getNearbyEntities(1, 1, 1);
+        for (Entity entity : list) {
+            String circuitName = player.getItemInHand().getItemMeta().getLore().get(0);
+            if (RaceManager.isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+                if (entity.getLocation().distance(player.getLocation()) < 1.5) {
+                    player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
+                    entity.remove();
+                    MessageEnum.itemRemoveCheckPoint.sendConvertedMessage(player);
+                    break;
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void useToolItem(PlayerInteractEvent event) {
@@ -245,7 +267,7 @@ public class ItemListener extends RaceManager implements Listener {
             b.setDropItem(false);
             Util.removeEntityCollision(b);
 
-            new ItemBananaTask(RaceManager.getCircuit(uuid), b, l).runTaskTimer(pl, 0, 1);
+            new ItemBananaTask(RaceManager.getCircuit(uuid), b, l).runTaskTimer(YPLKart.getInstance(), 0, 1);
             player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
 
         //にせアイテムボックス
@@ -265,7 +287,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         //スーパースター
         } else if (ItemEnum.STAR.isSimilar(player.getItemInHand())) {
-            new ItemStarTask(player).runTaskTimer(pl, 0, 1);
+            new ItemStarTask(player).runTaskTimer(YPLKart.getInstance(), 0, 1);
 
         //テレサ
         } else if (ItemEnum.TERESA.isSimilar(player.getItemInHand())) {
@@ -340,7 +362,7 @@ public class ItemListener extends RaceManager implements Listener {
                         if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
                             entity.remove();
 
-                            pl.getServer().getScheduler().runTaskLater(pl, new Runnable() {
+                            Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                                 public void run() {
                                     EnderCrystal endercrystal = entity.getWorld().spawn(entity.getLocation(),
                                             EnderCrystal.class);
@@ -361,7 +383,7 @@ public class ItemListener extends RaceManager implements Listener {
                                 itemboxCool.put(player, false);
                             if (!itemboxCool.get(player)) {
                                 entity.remove();
-                                Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
+                                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                                     public void run() {
                                         EnderCrystal endercrystal = entity.getWorld().spawn(entity.getLocation(),
                                                 EnderCrystal.class);
@@ -405,7 +427,7 @@ public class ItemListener extends RaceManager implements Listener {
                                 Inventory i = player.getInventory();
                                 ItemEnum.addRandomItemFromTier(player, tier);
                                 itemboxCool.put(player, true);
-                                pl.getServer().getScheduler().runTaskLater(pl, new Runnable() {
+                                Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                                     public void run() {
                                         itemboxCool.put(player, false);
                                     }
@@ -762,7 +784,7 @@ public class ItemListener extends RaceManager implements Listener {
         b.setCustomNameVisible(false);
         b.setDropItem(false);
 
-        new ItemTurtleTask(p, b, Util.getForwardLocationFromYaw(p.getLocation(), 3), 60).runTaskTimer(pl, 0, 1);
+        new ItemTurtleTask(p, b, Util.getForwardLocationFromYaw(p.getLocation(), 3), 60).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemRedturtle(Player user) {
@@ -822,7 +844,7 @@ public class ItemListener extends RaceManager implements Listener {
         turtle.setDropItem(false);
 
         new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), 1), turtle, true, false).runTaskTimer(
-                pl, 0, 1);
+                YPLKart.getInstance(), 0, 1);
     }
 
     public void itemKiller(final Player user) {
@@ -869,7 +891,7 @@ public class ItemListener extends RaceManager implements Listener {
                 + getRacer(p).getCharacter().getAdjustNegativeEffectLevel());
 
         getRacer(p).setItemNegativeSpeedTask(
-                Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
+                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
                         p.removePotionEffect(PotionEffectType.SLOW);
@@ -892,7 +914,7 @@ public class ItemListener extends RaceManager implements Listener {
             p.setWalkSpeed(race.getCharacter().getWalkSpeed());
         }
         race.setItemPositiveSpeedTask(
-                Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
+                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
                         p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
                         p.removePotionEffect(PotionEffectType.SPEED);

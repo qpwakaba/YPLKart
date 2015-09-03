@@ -18,13 +18,10 @@ import com.github.erozabesu.yplkart.override.PlayerChannelHandler;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 
 public class NettyListener implements Listener {
-    private static YPLKart pl;
-
     private static HashMap<Integer, Player> playerEntityId = new HashMap<Integer, Player>();
 
-    public NettyListener(YPLKart plugin) {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        pl = plugin;
+    public NettyListener() {
+        Bukkit.getServer().getPluginManager().registerEvents(this, YPLKart.getInstance());
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -64,7 +61,7 @@ public class NettyListener implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) throws Exception {
-        if (event.getPlugin().equals(pl)) {
+        if (event.getPlugin().equals(YPLKart.getInstance())) {
             playerEntityId.clear();
             for (Player player : Bukkit.getOnlinePlayers()) {
                 playerEntityId.put(player.getEntityId(), player);
@@ -75,7 +72,7 @@ public class NettyListener implements Listener {
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) throws Exception {
-        if (event.getPlugin().equals(pl)) {
+        if (event.getPlugin().equals(YPLKart.getInstance())) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 remove(player);
             }
