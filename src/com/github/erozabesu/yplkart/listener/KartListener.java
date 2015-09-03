@@ -12,6 +12,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Classes;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 public class KartListener implements Listener {
@@ -63,7 +64,7 @@ public class KartListener implements Listener {
         }
 
         Entity armorStand = event.getRightClicked();
-        if (RaceManager.isCheckPointEntity(armorStand)) {
+        if (CheckPointUtil.isCheckPointEntity(armorStand)) {
             event.setCancelled(true);
             return;
         }

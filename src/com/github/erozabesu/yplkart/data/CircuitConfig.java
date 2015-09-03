@@ -15,11 +15,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
-import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.LapTime;
 import com.github.erozabesu.yplkart.object.RaceType;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 
 /**
  * レース設定を管理するクラス
@@ -161,7 +161,7 @@ public class CircuitConfig {
             //設置済みのチェックポイントの固有名をnewNameに変更する
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {
-                    if (RaceManager.isSpecificCircuitCheckPointEntity(entity, oldName)) {
+                    if (CheckPointUtil.isSpecificCircuitCheckPointEntity(entity, oldName)) {
                         entity.setCustomName(entity.getCustomName().replace(oldName, newName));
                     }
                 }

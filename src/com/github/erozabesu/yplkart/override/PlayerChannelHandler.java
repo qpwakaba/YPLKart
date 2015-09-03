@@ -136,11 +136,11 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
              */
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutEntityTeleport")) {
                 int entityId = (Integer) ReflectionUtil.getFieldValue(Fields.nmsPacketPlayOutEntityTeleport_EntityId, msg);
-                Entity kartEntity = RaceManager.getKartEntityByEntityId(entityId);
+                Entity kartEntity = KartUtil.getKartEntityByEntityId(entityId);
 
                 if (kartEntity != null) {
-                    if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
-                        Location location = KartUtil.getMountPositionAdjustedLocation(kartEntity);
+                    if (!KartUtil.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                        Location location = CustomArmorStandDelegator.getMountPositionAdjustedLocation(kartEntity);
 
                         ReflectionUtil.setFieldValue(
                                 Fields.nmsPacketPlayOutEntityTeleport_LocationY, msg, (int) (location.getY() * 32.0D));
@@ -155,11 +155,11 @@ public class PlayerChannelHandler extends ChannelDuplexHandler {
              */
             } else if (msg.getClass().getSimpleName().equalsIgnoreCase("PacketPlayOutSpawnEntity")) {
                 int id = (Integer) ReflectionUtil.getFieldValue(Fields.nmsPacketPlayOutSpawnEntity_EntityId, msg);
-                Entity kartEntity = RaceManager.getKartEntityByEntityId(id);
+                Entity kartEntity = KartUtil.getKartEntityByEntityId(id);
 
                 if (kartEntity != null) {
-                    if (!RaceManager.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
-                        Location location = KartUtil.getMountPositionAdjustedLocation(kartEntity);
+                    if (!KartUtil.isSpecificKartType(kartEntity, KartType.DisplayKart)) {
+                        Location location = CustomArmorStandDelegator.getMountPositionAdjustedLocation(kartEntity);
 
                         ReflectionUtil.setFieldValue(
                                 Fields.nmsPacketPlayOutSpawnEntity_LocationY, msg, (int) (location.getY() * 32.0D));

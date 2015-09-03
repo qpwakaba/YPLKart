@@ -8,11 +8,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.Permission;
-import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class DisplayCommand extends Command {
@@ -67,7 +67,7 @@ public class DisplayCommand extends Command {
             }
             location = new Location(world, x, y, z, yaw, pitch);
         }
-        RaceManager.createDisplayKart(location, kart, null);
+        KartUtil.createDisplayKart(location, kart, null);
         MessageEnum.cmdDisplayCreate.sendConvertedMessage(sender, kart);
         return true;
     }

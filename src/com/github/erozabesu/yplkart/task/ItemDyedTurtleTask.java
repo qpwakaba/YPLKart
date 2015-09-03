@@ -14,6 +14,7 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemDyedTurtleTask extends BukkitRunnable {
@@ -130,7 +131,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
 
         //アカこうらを1位から2位に向け発射した場合
         if (this.targetreverse) {
-            List<Entity> templist = RaceManager.getNearbyCheckPoints(
+            List<Entity> templist = CheckPointUtil.getNearbyCheckPoints(
                     racer, this.projectile.getLocation().clone().add(-this.motX * 3, 0, -this.motZ * 3), 30);
             if (templist == null)
                 return;
@@ -145,7 +146,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
             }
             //その他
         } else {
-            List<Entity> templist = RaceManager.getNearbyCheckPoints(
+            List<Entity> templist = CheckPointUtil.getNearbyCheckPoints(
                     racer, this.projectile.getLocation().clone().add(this.motX * 3, 0, this.motZ * 3), 30);
             if (templist == null)
                 return;
@@ -171,7 +172,7 @@ public class ItemDyedTurtleTask extends BukkitRunnable {
         Entity checkpoint = Util.getNearestEntity(checkpointlist, this.projectile.getLocation());
         this.turtlepassedcheckpoint.add(lap + checkpoint.getUniqueId().toString());
         Vector v = Util.getVectorToLocation(this.projectile.getLocation(),
-                checkpoint.getLocation().clone().add(0, -RaceManager.checkPointHeight, 0)).multiply(3);
+                checkpoint.getLocation().clone().add(0, -CheckPointUtil.checkPointHeight, 0)).multiply(3);
         this.motX = v.getX();
         this.motY = v.getY();
         this.motZ = v.getZ();

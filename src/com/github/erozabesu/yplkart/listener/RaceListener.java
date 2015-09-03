@@ -37,7 +37,9 @@ import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceListener implements Listener {
@@ -179,13 +181,13 @@ public class RaceListener implements Listener {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
 
         // 周囲のチェックポイントのうち、視認が可能な未通過のチェックポイントを取得
-        Entity nearestInSightAndVisibleUnpassedCheckPoint = RaceManager.getInSightAndVisibleNearestUnpassedCheckpoint(racer, location, detectCheckPointRadius, 270.0F);
+        Entity nearestInSightAndVisibleUnpassedCheckPoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(racer, location, detectCheckPointRadius, 270.0F);
 
         // 前回通過したチェックポイント
         Entity lastPassedCheckPoint = racer.getLastPassedCheckPointEntity();
 
         // 前回通過したチェックポイントの検出範囲
-        Integer lastPassedCheckPointDetectRadius = RaceManager.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
+        Integer lastPassedCheckPointDetectRadius = CheckPointUtil.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
 
         // 新しい未通過かつ視認可能なチェックポイントが取得できず、
         // かつ前回通過したチェックポイントとの距離が検出範囲を超えている場合コースアウトと判定する
@@ -282,7 +284,7 @@ public class RaceListener implements Listener {
         //ディスプレイカートに搭乗中ログアウトするとディスプレイカートまで削除されてしまうため、
         //ログアウト前に降ろしておく。何故カートが削除されてしまうのかは原因不明
         if (player.getVehicle() != null) {
-            if (RaceManager.isSpecificKartType(player.getVehicle(), KartType.DisplayKart)) {
+            if (KartUtil.isSpecificKartType(player.getVehicle(), KartType.DisplayKart)) {
                 racer.leaveVehicle();
             }
         }
@@ -332,7 +334,7 @@ public class RaceListener implements Listener {
         //最後に通過したチェックポイントの座標にリスポーンする
         if (racer.getLastPassedCheckPointEntity() != null) {
             Location respawn = racer.getLastPassedCheckPointEntity().getLocation()
-                    .add(0, -RaceManager.checkPointHeight, 0);
+                    .add(0, -CheckPointUtil.checkPointHeight, 0);
             event.setRespawnLocation(
                     new Location(respawn.getWorld()
                             , respawn.getX(), respawn.getY(), respawn.getZ(), racer.getLastYaw(), 0));
@@ -373,7 +375,7 @@ public class RaceListener implements Listener {
             //カート搭乗中の落下ダメージを無効
             if (event.getCause() == DamageCause.FALL) {
                 if (player.getVehicle() != null) {
-                    if (RaceManager.isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
+                    if (KartUtil.isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
                         event.setCancelled(true);
                     }
                 }
@@ -418,7 +420,7 @@ public class RaceListener implements Listener {
             r.setKartEntityLocation(r.getRaceStartLocation());
         } else {
             r.setKartEntityLocation(
-                    r.getLastPassedCheckPointEntity().getLocation().add(0.0D, -RaceManager.checkPointHeight, 0.0D));
+                    r.getLastPassedCheckPointEntity().getLocation().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D));
         }
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(YPLKart.getInstance(), new Runnable() {

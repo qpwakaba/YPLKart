@@ -18,9 +18,11 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
@@ -270,7 +272,7 @@ public class Racer extends PlayerObject{
 
         //ランニングレース中にキラーを使用した場合、新規にキラー用カートエンティティを生成し搭乗する
         if (this.getKart() == null) {
-            Entity kartEntity = RaceManager.createRacingKart(player.getLocation(), KartConfig.getKillerKart());
+            Entity kartEntity = KartUtil.createRacingKart(player.getLocation(), KartConfig.getKillerKart());
             kartEntity.setPassenger(player);
         }
 
@@ -357,7 +359,7 @@ public class Racer extends PlayerObject{
     public void applyCourseOut() {
         Entity lastPassedCheckPoint = this.getLastPassedCheckPointEntity();
         if (lastPassedCheckPoint != null) {
-            final Location teleportLocation = lastPassedCheckPoint.getLocation().add(0, -RaceManager.checkPointHeight, 0);
+            final Location teleportLocation = lastPassedCheckPoint.getLocation().add(0, -CheckPointUtil.checkPointHeight, 0);
             Entity kartEntity = this.getPlayer().getVehicle();
             if (kartEntity != null) {
                 this.getPlayer().leaveVehicle();
@@ -404,7 +406,7 @@ public class Racer extends PlayerObject{
         if (vehicle == null) {
             return;
         }
-        if (!RaceManager.isSpecificKartType(vehicle, KartType.RacingKart)) {
+        if (!KartUtil.isSpecificKartType(vehicle, KartType.RacingKart)) {
             return;
         }
 
@@ -430,9 +432,9 @@ public class Racer extends PlayerObject{
         if (vehicle != null) {
 
             //カートエンティティに搭乗している場合パラメータの変更のみ行いreturn
-            if (RaceManager.isKartEntity(vehicle)) {
-                Object kartEntity = RaceManager.getCustomMinecartObjectByEntityMetaData(vehicle);
-                KartUtil.setParameter(kartEntity, this.getKart());
+            if (KartUtil.isKartEntity(vehicle)) {
+                Object kartEntity = KartUtil.getCustomMinecartObjectByEntityMetaData(vehicle);
+                CustomArmorStandDelegator.setParameter(kartEntity, this.getKart());
                 return;
 
             //カートエンティティ以外に搭乗している場合は降ろす
@@ -442,7 +444,7 @@ public class Racer extends PlayerObject{
         }
 
         //新規に生成したカートエンティティに搭乗させる
-        Entity kartEntity = RaceManager.createRacingKart(this.getKartEntityLocation(), kart);
+        Entity kartEntity = KartUtil.createRacingKart(this.getKartEntityLocation(), kart);
         kartEntity.setPassenger(player);
 
         //クライアントで搭乗が解除されている状態で描画されるのを回避するため

@@ -12,10 +12,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import com.github.erozabesu.yplkart.ConfigManager;
-import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.DisplayKart;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.utils.KartUtil;
 
 /**
  * ディスプレイカート設定を管理するクラス
@@ -183,7 +183,7 @@ public class DisplayKartConfig {
             }
             //Entityのスポーン
             if (flag) {
-                RaceManager.createDisplayKart(displayKart.getLocation()
+                KartUtil.createDisplayKart(displayKart.getLocation()
                         , kart, displayKart.getConfigKey());
             }
         }
@@ -208,8 +208,8 @@ public class DisplayKartConfig {
         //リロードした場合はエンティティの自動消滅が行われないため、明示的にデスポーンさせる
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
-                if (RaceManager.isKartEntity(entity)) {
-                    RaceManager.removeKartEntity(entity);
+                if (KartUtil.isKartEntity(entity)) {
+                    KartUtil.removeKartEntity(entity);
                 }
             }
         }

@@ -53,6 +53,8 @@ import com.github.erozabesu.yplkart.task.ItemDyedTurtleTask;
 import com.github.erozabesu.yplkart.task.ItemStarTask;
 import com.github.erozabesu.yplkart.task.ItemTurtleTask;
 import com.github.erozabesu.yplkart.task.SendCountDownTitleTask;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
+import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemListener extends RaceManager implements Listener {
@@ -82,7 +84,7 @@ public class ItemListener extends RaceManager implements Listener {
         List<Entity> list = player.getNearbyEntities(1, 1, 1);
         for (Entity entity : list) {
             String circuitName = player.getItemInHand().getItemMeta().getLore().get(0);
-            if (RaceManager.isSpecificCircuitCheckPointEntity(entity, circuitName)) {
+            if (CheckPointUtil.isSpecificCircuitCheckPointEntity(entity, circuitName)) {
                 if (entity.getLocation().distance(player.getLocation()) < 1.5) {
                     player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
                     entity.remove();
@@ -179,17 +181,17 @@ public class ItemListener extends RaceManager implements Listener {
 
         //チェックポイントツール
         if (ItemEnum.CHECKPOINT_TOOL.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
+            CheckPointUtil.createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
         //チェックポイントツールTier2
         } else if (ItemEnum.CHECKPOINT_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
+            CheckPointUtil.createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
 
         //チェックポイントツールTier3
         } else if (ItemEnum.CHECKPOINT_TOOL_TIER3.isSimilar(player.getItemInHand())) {
-            createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
+            CheckPointUtil.createCheckPointEntity(player.getLocation(), player.getItemInHand().getItemMeta().getLore().get(0), isVisible);
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
         }
     }
@@ -465,7 +467,7 @@ public class ItemListener extends RaceManager implements Listener {
                 }, 10L);
 
                 if (player.getVehicle() != null) {
-                    if (isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
+                    if (KartUtil.isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
                         getRacer(player).runStepDashBoardInitializeTask();
                         player.playSound(event.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
                         return;
@@ -794,7 +796,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
         if (getRank(user) == 0)
             return;
-        if (getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
+        if (CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -830,7 +832,7 @@ public class ItemListener extends RaceManager implements Listener {
                     ItemEnum.THORNED_TURTLE.getItem() });
             return;
         }
-        if (getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
+        if (CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F) == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
@@ -860,7 +862,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Entity unpassedcheckpoint = getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F);
+        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 60, 180.0F);
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });

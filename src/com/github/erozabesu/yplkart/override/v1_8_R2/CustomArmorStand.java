@@ -15,9 +15,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.reflection.Fields;
 import com.github.erozabesu.yplkart.reflection.Methods;
-import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 /**
@@ -90,7 +90,7 @@ public class CustomArmorStand extends EntityArmorStand {
         super(world);
 
         //生存チェックタスク
-        KartUtil.runLivingCheckTask(this);
+        CustomArmorStandDelegator.runLivingCheckTask(this);
 
         //以下順序を変更しないこと
 
@@ -111,7 +111,7 @@ public class CustomArmorStand extends EntityArmorStand {
         }
 
         //カートのパラメーター
-        KartUtil.setParameter(this, kart);
+        CustomArmorStandDelegator.setParameter(this, kart);
 
         //外見とかコリジョンとか
         setArms(true);
@@ -149,7 +149,7 @@ public class CustomArmorStand extends EntityArmorStand {
     @Override
     public void t_() {//XXX: CraftBukkit Unstable
         super.t_();
-        KartUtil.livingUpdate(this);
+        CustomArmorStandDelegator.livingUpdate(this);
     }
 
     /**
@@ -178,19 +178,19 @@ public class CustomArmorStand extends EntityArmorStand {
     /** エンティティ同士の衝突 */
     @Override
     public void collide(Entity entity) {
-        KartUtil.moveByCollision(this, entity);
+        CustomArmorStandDelegator.moveByCollision(this, entity);
     }
 
     /** アーマースタンドを左クリックした場合 */
     @Override
     public boolean damageEntity(DamageSource damageSource, float f) {
-        return KartUtil.onLeftClicked(this, damageSource);
+        return CustomArmorStandDelegator.onLeftClicked(this, damageSource);
     }
 
     /** アーマースタンドを右クリックした場合 */
     @Override
     public boolean a(EntityHuman entityHuman, Vec3D vec3d) {
-        return KartUtil.onRightClicked(this, entityHuman);
+        return CustomArmorStandDelegator.onRightClicked(this, entityHuman);
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
