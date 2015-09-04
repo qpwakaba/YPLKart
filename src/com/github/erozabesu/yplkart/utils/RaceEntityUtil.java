@@ -33,18 +33,18 @@ public class RaceEntityUtil {
     private static String ItemBoxName = ChatColor.GOLD + "ItemBox";
     private static String FakeItemBoxName = ItemBoxName + "！！";
     private static String DisposableFakeItemBoxName = ItemBoxName + "！";
-    private static Set<Chunk> jammerEntityExistChunkMap = new HashSet<Chunk>();
+    private static Set<Chunk> jammerEntityExistChunkArray = new HashSet<Chunk>();
 
-    private static Set<Chunk> getJammerEntityExistChunkMap() {
-        return jammerEntityExistChunkMap;
+    private static Set<Chunk> getJammerEntityExistChunkArray() {
+        return jammerEntityExistChunkArray;
     }
 
-    private static void addJammerEntityExistChunkMap(Chunk chunk) {
-        getJammerEntityExistChunkMap().add(chunk);
+    private static void addJammerEntityExistChunkArray(Chunk chunk) {
+        getJammerEntityExistChunkArray().add(chunk);
     }
 
-    private static void removeJammerEntityExistChunkMap(Chunk chunk) {
-        getJammerEntityExistChunkMap().remove(chunk);
+    private static void removeJammerEntityExistChunkArray(Chunk chunk) {
+        getJammerEntityExistChunkArray().remove(chunk);
     }
 
     //〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -81,6 +81,7 @@ public class RaceEntityUtil {
         endercrystal.setCustomNameVisible(true);
 
         circuit.addJammerEntity(endercrystal);
+        addJammerEntityExistChunkArray(endercrystal.getLocation().getChunk());
 
         return endercrystal;
     }

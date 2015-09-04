@@ -1,7 +1,6 @@
 package com.github.erozabesu.yplkart.listener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -60,10 +59,6 @@ public class ItemListener extends RaceManager implements Listener {
     public ItemListener() {
         Bukkit.getServer().getPluginManager().registerEvents(this, YPLKart.getInstance());
     }
-
-    private static HashMap<Player, Boolean> boostRailCool = new HashMap<Player, Boolean>();
-    private static HashMap<Player, Boolean> vectorRailCool = new HashMap<Player, Boolean>();
-    private static HashMap<Player, Boolean> itemboxCool = new HashMap<Player, Boolean>();
 
     @EventHandler
     public void removeCheckPoint(PlayerMoveEvent event) {
