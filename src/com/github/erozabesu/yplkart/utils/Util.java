@@ -942,6 +942,22 @@ public class Util extends ReflectionUtil {
     //〓 String 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
+     * 引数textの文字列から整数値を抽出し返す。<br>
+     * 抽出できなかった場合は0を返す。
+     * @param text 抽出する文字列
+     * @return 抽出した整数値
+     */
+    public static int extractIntegerFromString(String text) {
+        text = ChatColor.stripColor(text);
+        text = text.replaceAll("[^0-9]", "");
+        try {
+            return Integer.valueOf(text);
+        } catch(NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    /**
      * textに含まれるChatColorを返す
      * 複数のChatColorが含まれていた場合文字列の最後に適応されているChatColorを返す
      * ChatColorが含まれていない場合はChatColor.WHITEを返す

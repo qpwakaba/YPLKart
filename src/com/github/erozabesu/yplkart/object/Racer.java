@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.erozabesu.yplkart.RaceManager;
@@ -56,6 +57,9 @@ public class Racer extends PlayerObject{
      */
     private Location kartEntityLocation;
 
+    /** アイテムボックスに接触して間もない状態かどうか */
+    private boolean isItemBoxCooling;
+
     /**
      * issue #112<br>
      * アイテムを使用して間もない状態かどうか<br>
@@ -84,6 +88,9 @@ public class Racer extends PlayerObject{
 
     /** 最後に通過したチェックポイントエンティティ */
     private Entity lastPassedCheckPointEntity;
+
+    /** アイテムボックスに接触して間もない状態かどうかをセットするタスク */
+    private BukkitTask itemBoxCoolingTask;
 
     /**
      * issue #112<br>
@@ -132,6 +139,7 @@ public class Racer extends PlayerObject{
 
         this.setKartEntityLocation(null);
 
+        this.setItemBoxCooling(false);
         this.setItemUseCooling(false);
         this.setStandby(false);
         this.setStart(false);
@@ -142,6 +150,7 @@ public class Racer extends PlayerObject{
         this.setPassedCheckPointList(new ArrayList<String>());
         this.setLastPassedCheckPointEntity(null);
 
+        this.setItemBoxCoolingTask(null);
         this.setItemUseCoolingTask(null);
         this.setDeathPenaltyTask(null);
         this.setDeathPenaltyTitleSendTask(null);
@@ -289,14 +298,24 @@ public class Racer extends PlayerObject{
     }
 
     /**
-     * ダッシュボードを連続して踏めないよう、効果時間中はフラグをtrueにし、<br>
+     * ダッシュボードを踏んだ際のポーションエフェクトを付与する。<br>
+     * また、ダッシュボードを連続して踏めないよう、効果時間中はフラグをtrueにし、<br>
      * 効果時間が切れた場合はフラグをfalseに戻すタスクを起動する。
      */
-    public void runStepDashBoardInitializeTask() {
+    public void runStepDashBoardTask() {
+        if (this.isStepDashBoard()) {
+            return;
+        }
+
+        this.setStepDashBoard(true);
         int effectSecond = ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
                 + this.getCharacter().getAdjustPositiveEffectSecond()) * 20;
 
-        this.setStepDashBoard(true);
+        this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
+        this.runPositiveItemSpeedTask(
+                (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
+                , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
+                , Sound.EXPLODE);
 
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(),new Runnable() {
             public void run() {
@@ -305,6 +324,47 @@ public class Racer extends PlayerObject{
         }, effectSecond);
     }
 
+    public void runNegativeItemSpeedTask(int effectSecond, int effectLevel, Sound sound) {
+        final Player player = this.getPlayer();
+        Character character = this.getCharacter();
+        effectSecond = (effectSecond + character.getAdjustNegativeEffectSecond()) * 20;
+
+        player.playSound(player.getLocation(), sound, 0.5F, -1.0F);
+        Util.setPotionEffect(player, PotionEffectType.SLOW, effectSecond, effectLevel + character.getAdjustNegativeEffectLevel());
+
+        this.setItemNegativeSpeedTask(
+            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+                    player.removePotionEffect(PotionEffectType.SLOW);
+                    setItemNegativeSpeedTask(null);
+                }
+            }, effectSecond)
+        );
+    }
+
+    public void runPositiveItemSpeedTask(int effectSecond, int level, Sound sound) {
+        final Player player = this.getPlayer();
+        Character character = this.getCharacter();
+        effectSecond = (effectSecond + character.getAdjustPositiveEffectSecond()) * 20;
+
+        player.playSound(player.getLocation(), sound, 0.5F, -1.0F);
+        Util.setPotionEffect(player, PotionEffectType.SPEED, effectSecond, level + character.getAdjustPositiveEffectLevel());
+
+        if (this.getDeathPenaltyTask() != null) {
+            this.removeDeathPenalty();
+        }
+
+        this.setItemPositiveSpeedTask(
+            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+                    player.removePotionEffect(PotionEffectType.SPEED);
+                    setItemPositiveSpeedTask(null);
+                }
+            }, effectSecond)
+        );
+    }
     /**
      * プレイヤーにデスペナルティのフィジカルパラメータを適用し、諸々の演出を再生する。<br>
      * 同時に一定時間後にフィジカルを本来の数値に戻すタスクを起動する。
@@ -332,15 +392,7 @@ public class Racer extends PlayerObject{
         this.setDeathPenaltyTask(
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-
-                        //フィジカルを本来の数値に戻す
-                        player.setWalkSpeed(character.getWalkSpeed());
-
-                        //演出
-                        player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-
-                        //FOVの初期化用
-                        player.setSprinting(true);
+                        removeDeathPenalty();
                     }
                 }, character.getPenaltySecond() * 20)
                 );
@@ -391,7 +443,33 @@ public class Racer extends PlayerObject{
         this.setItemUseCoolingTask(itemUseCoolingTask);
     }
 
+    /** アイテムボックスに接触して間もない状態かどうかをセットするタスクを起動する */
+    public void runItemBoxCoolingTask() {
+        this.setItemBoxCooling(true);
+        this.setItemBoxCoolingTask(Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable(){
+            public void run() {
+                setItemBoxCooling(false);
+            }
+        }, 30L));
+    }
+
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public void removeDeathPenalty() {
+        Player player = this.getPlayer();
+
+        this.setDeathPenaltyTask(null);
+        this.setDeathPenaltyTitleSendTask(null);
+
+        //フィジカルを本来の数値に戻す
+        player.setWalkSpeed(character.getWalkSpeed());
+
+        //演出
+        player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
+
+        //FOVの初期化用
+        player.setSprinting(true);
+    }
 
     /** 搭乗しているカートエンティティの座標を格納する */
     public void saveKartEntityLocation() {
@@ -501,6 +579,11 @@ public class Racer extends PlayerObject{
         return kartEntityLocation;
     }
 
+    /** @return アイテムボックスに接触して間もない状態かどうか */
+    public boolean isItemBoxCooling() {
+        return isItemBoxCooling;
+    }
+
     /** @return アイテムを使用して間もない状態かどうか */
     public boolean isItemUseCooling() {
         return isItemUseCooling;
@@ -534,6 +617,11 @@ public class Racer extends PlayerObject{
     /** @return 最後に通過したチェックポイントエンティティ */
     public Entity getLastPassedCheckPointEntity() {
         return this.lastPassedCheckPointEntity;
+    }
+
+    /** @return アイテムボックスに接触して間もない状態かどうかをセットするタスク */
+    public BukkitTask getItemBoxCoolingTask() {
+        return itemBoxCoolingTask;
     }
 
     /** @return アイテムを使用して間もない状態かどうかをセットするタスク */
@@ -608,6 +696,11 @@ public class Racer extends PlayerObject{
         this.kartEntityLocation = kartEntityLocation;
     }
 
+    /** @param isItemBoxCooling アイテムボックスに接触して間もない状態かどうか */
+    public void setItemBoxCooling(boolean isItemBoxCooling) {
+        this.isItemBoxCooling = isItemBoxCooling;
+    }
+
     /** @param isItemUseCooling アイテムを使用して間もない状態かどうか */
     public void setItemUseCooling(boolean isItemUseCooling) {
         this.isItemUseCooling = isItemUseCooling;
@@ -641,6 +734,14 @@ public class Racer extends PlayerObject{
     /** @param lastPassedCheckPointEntity 最後に通過したチェックポイントエンティティ */
     public void setLastPassedCheckPointEntity(Entity lastPassedCheckPointEntity) {
         this.lastPassedCheckPointEntity = lastPassedCheckPointEntity;
+    }
+
+    /** @param itemBoxCoolingTask アイテムボックスに接触して間もない状態かどうかをセットするタスク */
+    public void setItemBoxCoolingTask(BukkitTask itemBoxCoolingTask) {
+        if (this.itemBoxCoolingTask != null) {
+            this.itemBoxCoolingTask.cancel();
+        }
+        this.itemBoxCoolingTask = itemBoxCoolingTask;
     }
 
     /** @param itemUseCoolingTask アイテムを使用して間もない状態かどうかをセットするタスク */

@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,7 +45,6 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
-import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.task.ItemBananaTask;
 import com.github.erozabesu.yplkart.task.ItemDyedTurtleTask;
@@ -54,7 +52,7 @@ import com.github.erozabesu.yplkart.task.ItemStarTask;
 import com.github.erozabesu.yplkart.task.ItemTurtleTask;
 import com.github.erozabesu.yplkart.task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
-import com.github.erozabesu.yplkart.utils.KartUtil;
+import com.github.erozabesu.yplkart.utils.RaceEntityUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemListener extends RaceManager implements Listener {
@@ -63,10 +61,6 @@ public class ItemListener extends RaceManager implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(this, YPLKart.getInstance());
     }
 
-    private static String ItemBoxName = "ItemBox";
-    private static String ItemBoxNameTier2 = ChatColor.GOLD + ItemBoxName + "Tier2";
-    private static String ItemBoxNameFake = ChatColor.GOLD + ItemBoxName + "！！";
-    private static String FakeItemBoxName = ChatColor.GOLD + ItemBoxName + "！";
     private static HashMap<Player, Boolean> boostRailCool = new HashMap<Player, Boolean>();
     private static HashMap<Player, Boolean> vectorRailCool = new HashMap<Player, Boolean>();
     private static HashMap<Player, Boolean> itemboxCool = new HashMap<Player, Boolean>();
@@ -102,7 +96,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     @EventHandler
-    public void useToolItem(PlayerInteractEvent event) {
+    public void useTool(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         // プラグインが有効でない場合return
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
@@ -135,9 +129,8 @@ public class ItemListener extends RaceManager implements Listener {
         // 右クリック専用アイテム
         if (clickAction == Action.RIGHT_CLICK_BLOCK || clickAction == Action.RIGHT_CLICK_AIR) {
             // スタンバイ状態、かつスタートしていない状態のみメニューアイテムを利用
-            if (racer.isStandby() && !racer.isStart()) {
-                // メニュー
-                if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
+            if (ItemEnum.MENU.isSimilar(player.getItemInHand())) {
+                if (racer.isStandby() && !racer.isStart()) {
                     showSelectMenu(player, true);
                     return;
                 }
@@ -145,34 +138,25 @@ public class ItemListener extends RaceManager implements Listener {
 
             // 空気ブロック以外のブロックを右クリックした場合のみ動作するアイテム
             if (clickAction == Action.RIGHT_CLICK_BLOCK) {
+
+                Block clickedBlock = event.getClickedBlock().getRelative(event.getBlockFace());
+
                 // アイテムボックスツール
                 if (ItemEnum.ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                    EnderCrystal endercrystal = b.getWorld()
-                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                    endercrystal.setCustomName(ItemBoxName);
-                    endercrystal.setCustomNameVisible(false);
-                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                    RaceEntityUtil.createItemBox(clickedBlock.getLocation(), 1);
+                    clickedBlock.getWorld().playSound(clickedBlock.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                     return;
 
                 // アイテムボックスツールティアー2
                 } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(player.getItemInHand())) {
-                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                    EnderCrystal endercrystal = b.getWorld()
-                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                    endercrystal.setCustomName(ItemBoxNameTier2);
-                    endercrystal.setCustomNameVisible(true);
-                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                    RaceEntityUtil.createItemBox(clickedBlock.getLocation(), 2);
+                    clickedBlock.getWorld().playSound(clickedBlock.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                     return;
 
                 // フェイクアイテムボックスツール
                 } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(player.getItemInHand())) {
-                    Block b = event.getClickedBlock().getRelative(event.getBlockFace());
-                    EnderCrystal endercrystal = b.getWorld()
-                            .spawn(b.getLocation().add(0.5, 0, 0.5), EnderCrystal.class);
-                    endercrystal.setCustomName(ItemBoxNameFake);
-                    endercrystal.setCustomNameVisible(true);
-                    b.getWorld().playSound(b.getLocation(), Sound.CLICK, 1.0F, 1.0F);
+                    RaceEntityUtil.createFakeItemBox(clickedBlock.getLocation());
+                    clickedBlock.getWorld().playSound(clickedBlock.getLocation(), Sound.CLICK, 1.0F, 1.0F);
                     return;
                 }
             }
@@ -250,12 +234,12 @@ public class ItemListener extends RaceManager implements Listener {
         //ダッシュきのこ
         if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
             Util.setItemDecrease(player);
-            setPositiveItemSpeed(player, ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
+            racer.runPositiveItemSpeedTask(ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
 
         //パワフルダッシュキノコ
         } else if (ItemEnum.POWERFULL_MUSHROOM.isSimilar(player.getItemInHand())) {
         Util.setItemDecrease(player);
-            setPositiveItemSpeed(player, ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
+        racer.runPositiveItemSpeedTask(ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
                     ItemEnum.POWERFULL_MUSHROOM.getEffectLevel(), Sound.EXPLODE);
             player.getWorld().playSound(player.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
 
@@ -277,11 +261,8 @@ public class ItemListener extends RaceManager implements Listener {
         //にせアイテムボックス
         } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
             Util.setItemDecrease(player);
-            EnderCrystal endercrystal = player.getWorld().spawn(
-                    Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
-                            .add(0.5, 0, 0.5), EnderCrystal.class);
-            endercrystal.setCustomName(FakeItemBoxName);
-            endercrystal.setCustomNameVisible(true);
+            Location createLocation = Util.getForwardLocationFromYaw(player.getLocation().clone().add(0, 0.5, 0), -5);
+            EnderCrystal endercrystal = RaceEntityUtil.createDesposableFakeItemBox(createLocation, RaceManager.getCircuit(racer.getCircuitName()));
             RaceManager.getCircuit(uuid).addJammerEntity(endercrystal);
             player.getWorld().playEffect(player.getLocation(), Effect.CLICK1, 0);
 
@@ -318,7 +299,6 @@ public class ItemListener extends RaceManager implements Listener {
         }
     }
 
-    //TODO 冗長
     @EventHandler
     public void onInteractObjectEntity(PlayerMoveEvent event) {
         if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
@@ -330,114 +310,32 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        List<Entity> entities = player.getNearbyEntities(0.7, 2, 0.7);
-
+        List<Entity> entities = player.getNearbyEntities(0.7, 0.7, 0.7);
         for (final Entity entity : entities) {
-            if (entity.getCustomName() != null) {
+            if (entity.getCustomName() != null && !entity.getCustomName().equalsIgnoreCase("")) {
                 if (entity instanceof FallingBlock) {
-                    if (entity.getCustomName().equalsIgnoreCase(ItemEnum.BANANA.getDisplayName())) {
-                        if (Permission.hasPermission(player, Permission.INTERACT_BANANA, false)) {
-                            RaceManager.getCircuit(uuid).removeJammerEntity(entity);
-                            entity.remove();
-
-                            if (player.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractBanana.sendConvertedMessage(player,
-                                        RaceManager.getCircuit(uuid));
-                                setNegativeItemSpeed(player, ItemEnum.BANANA.getEffectSecond(),
-                                        ItemEnum.BANANA.getEffectLevel(), Sound.SLIME_WALK);
-                            }
+                    if (Permission.hasPermission(player, Permission.INTERACT_BANANA, false)) {
+                        if (RaceEntityUtil.isBananaEntity(entity)) {
+                            RaceEntityUtil.collideBanana(player, entity);
                         }
                     }
                 } else if (entity instanceof EnderCrystal) {
-                    //偽アイテムボックス
-                    if (entity.getCustomName().equalsIgnoreCase(FakeItemBoxName)) {
-                        if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
-                            entity.remove();
+                    if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
+                        // ツールで設置した偽アイテムボックス
+                        if (RaceEntityUtil.isNormalFakeItemBox(entity)) {
+                            RaceEntityUtil.collideNormalFakeItemBox(player, entity);
+                            return;
 
-                            if (player.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player,
-                                        RaceManager.getCircuit(uuid));
-                                Util.createSafeExplosion(null, player.getLocation(),
-                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
-                            }
+                        // 復活するタイプの偽アイテムボックス
+                        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)) {
+                            RaceEntityUtil.collideDisposableFakeItemBox(player, entity);
+                            return;
                         }
-                    //偽アイテムボックス復活するタイプ
-                    } else if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameFake)) {
-                        if (Permission.hasPermission(player, Permission.INTERACT_FAKEITEMBOX, false)) {
-                            entity.remove();
+                    }
 
-                            Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                                public void run() {
-                                    EnderCrystal endercrystal = entity.getWorld().spawn(entity.getLocation(),
-                                            EnderCrystal.class);
-                                    endercrystal.setCustomName(ItemBoxNameFake);
-                                    endercrystal.setCustomNameVisible(true);
-                                }
-                            }, 2 * 20L + 10L);
-
-                            if (player.getNoDamageTicks() == 0) {
-                                MessageEnum.raceInteractBanana.sendConvertedMessage(player, RaceManager.getCircuit(uuid));
-                                Util.createSafeExplosion(null, player.getLocation(),
-                                        ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
-                            }
-                        }
-                    } else if (entity.getCustomName().contains(ItemBoxName)) {
-                        if (Permission.hasPermission(player, Permission.INTERACT_ITEMBOX, false)) {
-                            if (itemboxCool.get(player) == null)
-                                itemboxCool.put(player, false);
-                            if (!itemboxCool.get(player)) {
-                                entity.remove();
-                                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                                    public void run() {
-                                        EnderCrystal endercrystal = entity.getWorld().spawn(entity.getLocation(),
-                                                EnderCrystal.class);
-                                        if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameTier2)) {
-                                            endercrystal.setCustomName(ItemBoxNameTier2);
-                                            endercrystal.setCustomNameVisible(true);
-                                        } else {
-                                            endercrystal.setCustomName(ItemBoxName);
-                                            endercrystal.setCustomNameVisible(false);
-                                        }
-                                    }
-                                }, 2 * 20L + 10L);
-
-                                int denominator = getRacingPlayer(getRacer(player).getCircuitName()).size();
-                                //denominator = denominator + getGoalPlayer(getRace(p).getEntry()).size();
-                                if (denominator == 0)
-                                    denominator = 1;
-                                int rank = getRank(player);
-                                if (rank == 0)
-                                    rank = 1;
-
-                                int percent = 100 / (denominator / rank);
-                                int tier = 0;
-                                int settingsTier1 = (Integer) ConfigEnum.ITEM_TIER1.getValue();
-                                int settingsTier2 = (Integer) ConfigEnum.ITEM_TIER2.getValue();
-                                int settingsTier3 = (Integer) ConfigEnum.ITEM_TIER3.getValue();
-
-                                if (percent < settingsTier1)
-                                    tier = 1;
-                                else if (settingsTier1 <= percent && percent < settingsTier2)
-                                    tier = 2;
-                                else if (settingsTier2 <= percent && percent < settingsTier3)
-                                    tier = 3;
-                                else
-                                    tier = 4;
-
-                                if (entity.getCustomName().equalsIgnoreCase(ItemBoxNameTier2))
-                                    if (tier < 4)
-                                        tier++;
-
-                                Inventory i = player.getInventory();
-                                ItemEnum.addRandomItemFromTier(player, tier);
-                                itemboxCool.put(player, true);
-                                Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                                    public void run() {
-                                        itemboxCool.put(player, false);
-                                    }
-                                }, 30L);
-                            }
-                        }
+                    if (Permission.hasPermission(player, Permission.INTERACT_ITEMBOX, false)) {
+                        RaceEntityUtil.collideItemBox(player, entity);
+                        return;
                     }
                 }
             }
@@ -454,81 +352,51 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         final Player player = event.getPlayer();
-        final UUID uuid = player.getUniqueId();
 
         if (Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_BASE
                 || Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_STICKY_BASE) {
             if (Permission.hasPermission(player, Permission.INTERACT_DASHBOARD, false)) {
-                if (boostRailCool.get(player) != null)
-                    if (boostRailCool.get(player))
-                        return;
-                Bukkit.getServer().getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        boostRailCool.put(player, false);
-                    }
-                }, 10L);
-
-                if (player.getVehicle() != null) {
-                    if (KartUtil.isSpecificKartType(player.getVehicle(), KartType.RacingKart)) {
-                        getRacer(player).runStepDashBoardInitializeTask();
-                        player.playSound(event.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
-                        return;
-                    }
-                }
-
-                setPositiveItemSpeed(player
-                        , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
-                        , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
-                        , Sound.EXPLODE);
-                //p.playSound(e.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
-                boostRailCool.put(player, true);
+                getRacer(player).runStepDashBoardTask();
             }
         }
-
-        /*if (Util.getStepBlock(p.getLocation()).equalsIgnoreCase(Settings.DirtBlock)){
-        	double x = p.getVelocity().clone().multiply(0.5).getX();
-        	double z = p.getVelocity().clone().multiply(0.5).getZ();
-        	double y = p.getVelocity().clone().getY();
-        	p.setVelocity(new Vector(x,y,z));
-        }*/
     }
 
     @EventHandler
-    public void onItemBoxDamaged(EntityDamageByEntityEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onItemBoxDamagedByPlayer(EntityDamageByEntityEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (!(e.getEntity() instanceof EnderCrystal))
+        }
+        if (!(event.getDamager() instanceof Player)) {
             return;
-        if (e.getEntity().getCustomName() == null)
+        }
+
+        Player player = (Player) event.getDamager();
+        ItemStack handItem = player.getItemInHand();
+        if (handItem == null) {
             return;
-        if (!(e.getDamager() instanceof Player))
-            return;
-        Player p = (Player) e.getDamager();
-        if (p.getItemInHand() == null)
-            return;
-        if (ItemEnum.ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
-            if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxName)) {
-                e.getEntity().remove();
-                MessageEnum.itemRemoveItemBox.sendConvertedMessage(p);
-                e.setCancelled(true);
+        }
+
+        Entity entity = event.getEntity();
+        if (ItemEnum.ITEMBOX_TOOL.isSimilar(handItem)) {
+            if (RaceEntityUtil.isNormalItemBoxEntity(entity)) {
+                event.getEntity().remove();
+                MessageEnum.itemRemoveItemBox.sendConvertedMessage(player);
+                event.setCancelled(true);
             }
-        } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(p.getItemInHand())) {
-            if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameTier2)) {
-                e.getEntity().remove();
-                MessageEnum.itemRemoveItemBox.sendConvertedMessage(p);
-                e.setCancelled(true);
+        } else if (ItemEnum.ITEMBOX_TOOL_TIER2.isSimilar(handItem)) {
+            if (RaceEntityUtil.isHighGradeItemBoxEntity(entity)) {
+                event.getEntity().remove();
+                MessageEnum.itemRemoveItemBox.sendConvertedMessage(player);
+                event.setCancelled(true);
             }
-        } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(p.getItemInHand())) {
-            if (e.getEntity().getCustomName().equalsIgnoreCase(ItemBoxNameFake)
-                    || e.getEntity().getCustomName().equalsIgnoreCase(FakeItemBoxName)) {
-                e.getEntity().remove();
-                MessageEnum.itemRemoveItemBox.sendConvertedMessage(p);
-                e.setCancelled(true);
+        } else if (ItemEnum.FAKE_ITEMBOX_TOOL.isSimilar(handItem)) {
+            if (RaceEntityUtil.isNormalFakeItemBox(entity) || RaceEntityUtil.isDisposableFakeItemBox(entity)) {
+                event.getEntity().remove();
+                MessageEnum.itemRemoveItemBox.sendConvertedMessage(player);
+                event.setCancelled(true);
             }
         }
     }
-
-    //〓
 
     @EventHandler
     public void onInteractwithDye(PlayerInteractEntityEvent e) {
@@ -542,70 +410,82 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     @EventHandler
-    public void onJammerObjectDamaged(EntityInteractEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onJammerObjectDamaged(EntityInteractEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (e.getEntity().getCustomName() == null)
+        }
+        if (event.getEntity().getCustomName() == null || event.getEntity().getCustomName().equalsIgnoreCase("")) {
             return;
+        }
 
-        Entity entity = e.getEntity();
-        if (entity instanceof EnderCrystal) {
-            if (entity.getCustomName().contains(ItemBoxName))
-                e.setCancelled(true);
-        } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(ItemEnum.BANANA.getDisplayName()))
-                e.setCancelled(true);
+        Entity entity = event.getEntity();
+        if (RaceEntityUtil.isBananaEntity(entity)) {
+            event.setCancelled(true);
+        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+                || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
+                || RaceEntityUtil.isNormalFakeItemBox(entity)
+                || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onJammerObjectDamaged(EntityDamageEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onJammerObjectDamaged(EntityDamageEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (e.getEntity().getCustomName() == null)
+        }
+        if (event.getEntity().getCustomName() == null || event.getEntity().getCustomName().equalsIgnoreCase("")) {
             return;
+        }
 
-        Entity entity = e.getEntity();
-        if (entity instanceof EnderCrystal) {
-            if (entity.getCustomName().contains(ItemBoxName))
-                e.setCancelled(true);
-        } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(ItemEnum.BANANA.getDisplayName()))
-                e.setCancelled(true);
+        Entity entity = event.getEntity();
+        if (RaceEntityUtil.isBananaEntity(entity)) {
+            event.setCancelled(true);
+        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+                || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
+                || RaceEntityUtil.isNormalFakeItemBox(entity)
+                || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onJammerObjectExplode(EntityExplodeEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onJammerObjectExplode(EntityExplodeEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (e.getEntity().getCustomName() == null)
+        }
+        if (event.getEntity().getCustomName() == null || event.getEntity().getCustomName().equalsIgnoreCase("")) {
             return;
+        }
 
-        Entity entity = e.getEntity();
-        if (entity instanceof EnderCrystal) {
-            if (entity.getCustomName().contains(ItemBoxName))
-                e.setCancelled(true);
-        } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(ItemEnum.BANANA.getDisplayName()))
-                e.setCancelled(true);
+        Entity entity = event.getEntity();
+        if (RaceEntityUtil.isBananaEntity(entity)) {
+            event.setCancelled(true);
+        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+                || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
+                || RaceEntityUtil.isNormalFakeItemBox(entity)
+                || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onJammerObjectExplosionPrime(ExplosionPrimeEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getEntity().getWorld()))
+    public void onJammerObjectExplosionPrime(ExplosionPrimeEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
-        if (e.getEntity().getCustomName() == null)
+        }
+        if (event.getEntity().getCustomName() == null || event.getEntity().getCustomName().equalsIgnoreCase("")) {
             return;
+        }
 
-        Entity entity = e.getEntity();
-        if (entity instanceof EnderCrystal) {
-            if (entity.getCustomName().contains(ItemBoxName))
-                e.setCancelled(true);
-        } else if (e.getEntity() instanceof FallingBlock) {
-            if (entity.getCustomName().contains(ItemEnum.BANANA.getDisplayName()))
-                e.setCancelled(true);
+        Entity entity = event.getEntity();
+        if (RaceEntityUtil.isBananaEntity(entity)) {
+            event.setCancelled(true);
+        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+                || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
+                || RaceEntityUtil.isNormalFakeItemBox(entity)
+                || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
+            event.setCancelled(true);
         }
     }
 
@@ -885,46 +765,5 @@ public class ItemListener extends RaceManager implements Listener {
                 YPLKart.getInstance(), 0, 1);
 
         r.runKillerInitializeTask(life, unpassedcheckpoint);
-    }
-
-    public static void setNegativeItemSpeed(final Player p, int second, int level, Sound sound) {
-        p.playSound(p.getLocation(), sound, 0.5F, -1.0F);
-        second = (second + getRacer(p).getCharacter().getAdjustNegativeEffectSecond()) * 20;
-
-        Util.setPotionEffect(p, PotionEffectType.SLOW, second, level
-                + getRacer(p).getCharacter().getAdjustNegativeEffectLevel());
-
-        getRacer(p).setItemNegativeSpeedTask(
-                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-                        p.removePotionEffect(PotionEffectType.SLOW);
-                        getRacer(p).setItemNegativeSpeedTask(null);
-                    }
-                }, second)
-                );
-    }
-
-    public static void setPositiveItemSpeed(final Player p, int second, int level, Sound sound) {
-        p.playSound(p.getLocation(), sound, 0.5F, -1.0F);
-        final Racer race = getRacer(p);
-
-        second = (second + race.getCharacter().getAdjustPositiveEffectSecond()) * 20;
-        Util.setPotionEffect(p, PotionEffectType.SPEED, second, level
-                + race.getCharacter().getAdjustPositiveEffectLevel());
-        if (race.getDeathPenaltyTask() != null) {
-            race.setDeathPenaltyTask(null);
-            race.setDeathPenaltyTitleSendTask(null);
-            p.setWalkSpeed(race.getCharacter().getWalkSpeed());
-        }
-        race.setItemPositiveSpeedTask(
-                Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                    public void run() {
-                        p.playSound(p.getLocation(), Sound.ITEM_BREAK, 1.0F, 1.0F);
-                        p.removePotionEffect(PotionEffectType.SPEED);
-                        race.setItemPositiveSpeedTask(null);
-                    }
-                }, second)
-                );
     }
 }
