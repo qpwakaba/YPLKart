@@ -375,6 +375,11 @@ public class Racer extends PlayerObject{
             return;
         }
 
+        // 無敵時間中は除外
+        if (0 < this.getPlayer().getNoDamageTicks()) {
+            return;
+        }
+
         final Player player = this.getPlayer();
         final Character character = this.getCharacter();
 

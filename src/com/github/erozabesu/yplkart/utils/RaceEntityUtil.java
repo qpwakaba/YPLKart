@@ -257,7 +257,7 @@ public class RaceEntityUtil {
     public static void collideItemBox(Player player, Entity itemBox) {
         // アイテムボックスの階級を取得
         final int itemBoxTier = getTierByItemBoxEntity(itemBox);
-System.out.println(itemBoxTier);
+
         // 階級が0以下の場合アイテムボックスエンティティではないためreturn
         if (itemBoxTier <= 0) {
             return;

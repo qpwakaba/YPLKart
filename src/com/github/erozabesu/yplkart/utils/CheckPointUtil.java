@@ -335,14 +335,11 @@ public class CheckPointUtil {
      */
     public static Integer getDetectCheckPointRadiusByCheckPointEntity(Entity entity) {
         Integer tier = getCheckPointEntityTier(entity);
-        System.out.println(0);
+
         if (tier == null) {
             return null;
         }
-System.out.println("1");
-System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue());
-System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue());
-System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue());
+
         switch(tier) {
             case 1:
                 return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
