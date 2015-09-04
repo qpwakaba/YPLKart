@@ -37,9 +37,9 @@ import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class RaceListener implements Listener {
@@ -177,28 +177,34 @@ public class RaceListener implements Listener {
         String circuitName = racer.getCircuitName();
         Location location = player.getLocation();
 
-        // 最高階級のチェックポイントの検出範囲内から、通過済み、未通過を問わずチェックポイントを取得
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-
         // 周囲のチェックポイントのうち、視認が可能な未通過のチェックポイントを取得
-        Entity nearestInSightAndVisibleUnpassedCheckPoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(racer, location, detectCheckPointRadius, 270.0F);
+        Entity nearestCheckPoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(racer, location, 270.0F);
 
         // 前回通過したチェックポイント
         Entity lastPassedCheckPoint = racer.getLastPassedCheckPointEntity();
 
+        // 初回通過の場合は取得したチェックポイントを格納してreturn
+        if (lastPassedCheckPoint == null) {
+            if (nearestCheckPoint != null) {
+                racer.setLastPassedCheckPointEntity(nearestCheckPoint);
+                racer.addPassedCheckPoint(racer.getCurrentLaps() + nearestCheckPoint.getUniqueId().toString());
+                return;
+            }
+        }
+
         // 前回通過したチェックポイントの検出範囲
-        Integer lastPassedCheckPointDetectRadius = CheckPointUtil.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint, circuitName);
+        Integer lastPassedCheckPointDetectRadius = CheckPointUtil.getDetectCheckPointRadiusByCheckPointEntity(lastPassedCheckPoint);
 
         // 新しい未通過かつ視認可能なチェックポイントが取得できず、
         // かつ前回通過したチェックポイントとの距離が検出範囲を超えている場合コースアウトと判定する
-        if (nearestInSightAndVisibleUnpassedCheckPoint == null) {
+        if (nearestCheckPoint == null) {
             if (lastPassedCheckPoint != null && lastPassedCheckPointDetectRadius != null) {
                 if (lastPassedCheckPointDetectRadius < location.distance(lastPassedCheckPoint.getLocation())) {
                     racer.applyCourseOut();
                 }
             }
         } else {
-            Location checkPointLocation = nearestInSightAndVisibleUnpassedCheckPoint.getLocation();
+            Location checkPointLocation = nearestCheckPoint.getLocation();
 
             // まだ前回通過したチェックポイントの検出範囲内に居る場合、
             // かつ最寄の視認可能な未通過のチェックポイントとの距離が前回通過したチェックポイントとの距離よりも遠い場合return
@@ -212,8 +218,8 @@ public class RaceListener implements Listener {
                 }
             }
 
-            racer.setLastPassedCheckPointEntity(nearestInSightAndVisibleUnpassedCheckPoint);
-            racer.addPassedCheckPoint(racer.getCurrentLaps() + nearestInSightAndVisibleUnpassedCheckPoint.getUniqueId().toString());
+            racer.setLastPassedCheckPointEntity(nearestCheckPoint);
+            racer.addPassedCheckPoint(racer.getCurrentLaps() + nearestCheckPoint.getUniqueId().toString());
         }
     }
 

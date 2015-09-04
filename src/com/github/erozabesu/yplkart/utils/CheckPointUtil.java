@@ -136,19 +136,19 @@ public class CheckPointUtil {
     }
 
     /**
-     * 引数circuitNameが名称のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径detectRadiusブロック以内に設置されたチェックポイント、かつ、
-     * 引数racerインスタンスのプレイヤーから視認できるチェックポイントを配列で返す。<br>
+     * 引数circuitNameが名称のサーキットに設置されたチェックポイントのうち、引数locationを基点に、
+     * 引数racerインスタンスのプレイヤーから視認でき、かつ、検出範囲内のチェックポイントを配列で返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param circuitName サーキット名
      * @param location 基点となる座標
-     * @param detectRadius チェックポイントを検出する範囲の半径
      * @param sightThreshold 視野
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndVisibleNearbyCheckPoints(Racer racer, Location location, double detectRadius, float sightThreshold) {
+    public static List<Entity> getInSightAndVisibleNearbyCheckPoints(Racer racer, Location location, float sightThreshold) {
         String circuitName = racer.getCircuitName();
         Player player = racer.getPlayer();
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectRadius);
+        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
@@ -156,7 +156,7 @@ public class CheckPointUtil {
             tempEntity = iterator.next();
 
             //引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
-            if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
+            if (!isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
                 iterator.remove();
                 continue;
             }
@@ -168,11 +168,26 @@ public class CheckPointUtil {
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
-            if (!CheckPointUtil.isVisibleCheckPointEntity(tempEntity)) {
+            if (!isVisibleCheckPointEntity(tempEntity)) {
                 if (!Util.canSeeLocation(player.getEyeLocation(), tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
+            }
+
+            // チェックポイントの検出範囲
+            Integer detectRadius = getDetectCheckPointRadiusByCheckPointEntity(tempEntity);
+
+            // 検出範囲が取得できなかった場合は配列から削除
+            if (detectRadius == null) {
+                iterator.remove();
+                continue;
+            }
+
+            // プレイヤーとチェックポイントの距離が検出距離を超えている場合は配列から削除
+            if (detectRadius < player.getLocation().distance(tempEntity.getLocation())) {
+                iterator.remove();
+                continue;
             }
         }
 
@@ -184,16 +199,15 @@ public class CheckPointUtil {
     }
 
     /**
-     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された未通過のチェックポイント、かつ、
-     * 引数racerインスタンスのプレイヤーから視認できるチェックポイントを配列で返す。<br>
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に、
+     * 未通過かつ、引数racerインスタンスのプレイヤーから視認でき、かつ、検出範囲内のチェックポイントを配列で返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
-     * @param detectRadius チェックポイントを検出する範囲の半径
      * @param sightThreshold 視野
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndVisibleNearbyUnpassedCheckPoints(Racer racer, Location location, double detectRadius, float sightThreshold) {
+    public static List<Entity> getInSightAndVisibleNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold) {
         String circuitName = racer.getCircuitName();
         Player player = racer.getPlayer();
         if (circuitName == null || circuitName.equalsIgnoreCase("")) {
@@ -201,7 +215,8 @@ public class CheckPointUtil {
         }
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectRadius);
+        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectCheckPointRadius);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
@@ -226,11 +241,27 @@ public class CheckPointUtil {
                 continue;
             }
 
+            // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!CheckPointUtil.isVisibleCheckPointEntity(tempEntity)) {
                 if (!Util.canSeeLocation(player.getEyeLocation(), tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
+            }
+
+            // チェックポイントの検出範囲
+            Integer detectRadius = getDetectCheckPointRadiusByCheckPointEntity(tempEntity);
+
+            // 検出範囲が取得できなかった場合は配列から削除
+            if (detectRadius == null) {
+                iterator.remove();
+                continue;
+            }
+
+            // プレイヤーとチェックポイントの距離が検出距離を超えている場合は配列から削除
+            if (detectRadius < player.getLocation().distance(tempEntity.getLocation())) {
+                iterator.remove();
+                continue;
             }
         }
 
@@ -242,16 +273,15 @@ public class CheckPointUtil {
     }
 
     /**
-     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄のチェックポイント、かつ、
-     * 引数racerインスタンスのプレイヤーから視認できるチェックポイントを返す。<br>
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に、
+     * 引数racerインスタンスのプレイヤーから視認でき、かつ、検出範囲内の最寄のチェックポイントを返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
-     * @param detectRadius チェックポイントを検出する範囲の半径
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndVisibleNearestCheckpoint(Racer racer, Location location, double detectRadius, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndVisibleNearbyCheckPoints(racer, location, detectRadius, sightThreshold);
+    public static Entity getInSightAndVisibleNearestCheckpoint(Racer racer, Location location, float sightThreshold) {
+        List<Entity> checkPointList = getInSightAndVisibleNearbyCheckPoints(racer, location, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -260,17 +290,16 @@ public class CheckPointUtil {
     }
 
     /**
-     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に半径radiusブロック以内に設置された最寄の未通過のチェックポイント、かつ、
-     * 引数racerインスタンスのプレイヤーから視認できるチェックポイントを返す。<br>
+     * 引数racerが参加中のサーキットに設置されたチェックポイントのうち、引数locationを基点に、
+     * 引数racerインスタンスのプレイヤーから視認でき、かつ、検出範囲内の最寄のチェックポイントを返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
-     * @param detectRadius チェックポイントを検出する範囲の半径
-     * @param sightThreshold
+     * @param sightThreshold 視野
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndVisibleNearestUnpassedCheckpoint(Racer racer, Location location, double detectRadius, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndVisibleNearbyUnpassedCheckPoints(racer, location, detectRadius, sightThreshold);
+    public static Entity getInSightAndVisibleNearestUnpassedCheckpoint(Racer racer, Location location, float sightThreshold) {
+        List<Entity> checkPointList = getInSightAndVisibleNearbyUnpassedCheckPoints(racer, location, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -299,21 +328,21 @@ public class CheckPointUtil {
     }
 
     /**
-     * 引数entityが引数circuitNameが名称のサーキットに設置されたチェックポイントエンティティの場合、対応する階級からチェックポイントの検出距離を返す。<br>
-     * チェックポイントエンティティでない場合は{@code null}を返す。
+     * 引数entityのカスタムネームカラーから、対応する階級のチェックポイントの検出距離を返す。<br>
+     * 対応する設定がない場合は{@code null}を返す。
      * @param entity 取得するエンティティ
      * @return チェックポイントの検出距離
      */
-    public static Integer getDetectCheckPointRadiusByCheckPointEntity(Entity entity, String circuitName) {
-        if (!isSpecificCircuitCheckPointEntity(entity, circuitName)) {
-            return null;
-        }
-
+    public static Integer getDetectCheckPointRadiusByCheckPointEntity(Entity entity) {
         Integer tier = getCheckPointEntityTier(entity);
+        System.out.println(0);
         if (tier == null) {
             return null;
         }
-
+System.out.println("1");
+System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue());
+System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue());
+System.out.println((Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue());
         switch(tier) {
             case 1:
                 return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
@@ -323,10 +352,9 @@ public class CheckPointUtil {
 
             case 3:
                 return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-
-            default:
-                return null;
         }
+
+        return null;
     }
 
     // 〓 Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

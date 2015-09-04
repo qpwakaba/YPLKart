@@ -668,8 +668,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         setFieldValue(Fields.nmsEntity_motZ, entityKart, killerZ);
 
         // 最寄のチェックポイントを取得し、存在しない場合はreturn
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        Entity nearestCP = CheckPointUtil.getInSightAndVisibleNearestCheckpoint(racer, kartLocation, detectCheckPointRadius, 360.0F);
+        Entity nearestCP = CheckPointUtil.getInSightAndVisibleNearestCheckpoint(racer, kartLocation, 360.0F);
         if (nearestCP == null) {
             return;
         }
