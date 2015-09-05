@@ -686,15 +686,15 @@ public class Util extends ReflectionUtil {
     }
 
     /**
-     * 引数playerからの視界に引数targetの座標が含まれているかどうかを返す。
-     * @param player チェックするプレイヤー
+     * 引数entityからの視界に引数targetの座標が含まれているかどうかを返す。
+     * @param entity チェックするエンティティ
      * @param target 視界に入っているかチェックする座標
      * @param threshold 視野の広さ。0.0F～360.0Fの数値を指定する
      * @return 引数fromからの視界に引数toの座標が含まれているかどうか
      */
-    public static boolean isLocationInSight(Player player, Location target, float threshold) {
-        // 座標の取得。playerがカートに搭乗している場合はカートの座標を格納。
-        Location eyeLocation = player.getVehicle() == null ? player.getLocation().clone() : player.getVehicle().getLocation().clone();
+    public static boolean isLocationInSight(Entity entity, Location target, float threshold) {
+        // 座標の取得。entityが乗り物に搭乗している場合は乗り物の座標を格納。
+        Location eyeLocation = entity.getVehicle() == null ? entity.getLocation().clone() : entity.getVehicle().getLocation().clone();
 
         return isLocationInSight(eyeLocation, target, threshold);
     }
