@@ -1,8 +1,10 @@
 package com.github.erozabesu.yplkart.object;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -36,20 +38,20 @@ public class Circuit {
     private String circuitName;
 
     /** サーキットに設置された妨害アイテムエンティティリスト */
-    private List<Entity> jammerEntityList;
+    private Set<Entity> jammerEntityList;
 
     /** エントリーしているプレイヤーのUUIDリスト */
-    private List<UUID> entryPlayerList;
+    private Set<UUID> entryPlayerList;
 
     /**
      * リザーブエントリーしているプレイヤーのUUIDリスト<br>
      * リザーブエントリーは、現在のエントリー人数が最大人数を上回っている、<br>
      * もしくは既にレースがスタートしている場合に利用する、次回開催するレースに繰り越すエントリーリスト
      */
-    private List<UUID> reserveEntryPlayerList;
+    private Set<UUID> reserveEntryPlayerList;
 
     /** レース参加の招待を承認したプレイヤーのUUIDリスト */
-    private List<UUID> matchingAcceptPlayerList;
+    private Set<UUID> matchingAcceptPlayerList;
 
     /**
      * 参加人数が最小人数を満たしているかを検知するタスク<br>
@@ -106,10 +108,10 @@ public class Circuit {
         this.setStarted(false);
         this.setMatching(false);
         this.setStandby(false);
-        this.setEntryPlayerList(new ArrayList<UUID>());
-        this.setReserveEntryPlayerList(new ArrayList<UUID>());
-        this.setMatchingAcceptPlayerList(new ArrayList<UUID>());
-        this.setJammerEntityList(new ArrayList<Entity>());
+        this.setEntryPlayerList(new HashSet<UUID>());
+        this.setReserveEntryPlayerList(new HashSet<UUID>());
+        this.setMatchingAcceptPlayerList(new HashSet<UUID>());
+        this.setJammerEntityList(new HashSet<Entity>());
 
         if (this.getDetectEndTask() != null)
             getDetectEndTask().cancel();
@@ -257,13 +259,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void entryPlayer(UUID uuid) {
-        if (!this.getEntryPlayerList().contains(uuid)) {
-            this.getEntryPlayerList().add(uuid);
-        }
-
-        if (this.getReserveEntryPlayerList().contains(uuid)) {
-            this.getReserveEntryPlayerList().remove(uuid);
-        }
+        this.getEntryPlayerList().add(uuid);
+        this.getReserveEntryPlayerList().remove(uuid);
     }
 
     /**
@@ -271,13 +268,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void entryReservePlayer(UUID uuid) {
-        if (!this.getReserveEntryPlayerList().contains(uuid)) {
-            this.getReserveEntryPlayerList().add(uuid);
-        }
-
-        if (this.getEntryPlayerList().contains(uuid)) {
-            this.getEntryPlayerList().remove(uuid);
-        }
+        this.getReserveEntryPlayerList().add(uuid);
+        this.getEntryPlayerList().remove(uuid);
     }
 
     /**
@@ -285,13 +277,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void exitPlayer(UUID uuid) {
-        if (this.getEntryPlayerList().contains(uuid)) {
-            this.getEntryPlayerList().remove(uuid);
-        }
-
-        if (this.getReserveEntryPlayerList().contains(uuid)) {
-            this.getReserveEntryPlayerList().remove(uuid);
-        }
+        this.getEntryPlayerList().remove(uuid);
+        this.getReserveEntryPlayerList().remove(uuid);
 
         this.denyMatching(uuid);
     }
@@ -304,12 +291,7 @@ public class Circuit {
      * @return リストへの追加に成功したかどうか
      */
     public boolean acceptMatching(UUID uuid) {
-        if (!this.getMatchingAcceptPlayerList().contains(uuid)) {
-            this.getMatchingAcceptPlayerList().add(uuid);
-            return true;
-        }
-
-        return false;
+        return this.getMatchingAcceptPlayerList().add(uuid);
     }
 
     /**
@@ -319,12 +301,7 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public boolean denyMatching(UUID uuid) {
-        if (this.getMatchingAcceptPlayerList().contains(uuid)) {
-            this.getMatchingAcceptPlayerList().remove(uuid);
-            return true;
-        }
-
-        return false;
+        return this.getMatchingAcceptPlayerList().remove(uuid);
     }
 
     /**
@@ -340,9 +317,7 @@ public class Circuit {
      * @param entity 追加するエンティティ
      */
     public void removeJammerEntity(Entity entity) {
-        if (this.getJammerEntityList().contains(entity)) {
-            this.getJammerEntityList().remove(entity);
-        }
+        this.getJammerEntityList().remove(entity);
     }
 
     /** サーキットに設置された全妨害エンティティをデスポーンする */
@@ -795,22 +770,22 @@ public class Circuit {
     }
 
     /** @return サーキットに設置された妨害アイテムエンティティリスト */
-    public List<Entity> getJammerEntityList() {
+    public Set<Entity> getJammerEntityList() {
         return this.jammerEntityList;
     }
 
     /** @return エントリーしているプレイヤーのUUIDリスト */
-    public List<UUID> getEntryPlayerList() {
+    public Set<UUID> getEntryPlayerList() {
         return this.entryPlayerList;
     }
 
     /** @return リザーブエントリーしているプレイヤーのUUIDリスト */
-    public List<UUID> getReserveEntryPlayerList() {
+    public Set<UUID> getReserveEntryPlayerList() {
         return this.reserveEntryPlayerList;
     }
 
     /** @return レース参加の招待を承認したプレイヤーのUUIDリスト */
-    public List<UUID> getMatchingAcceptPlayerList() {
+    public Set<UUID> getMatchingAcceptPlayerList() {
         return this.matchingAcceptPlayerList;
     }
 
@@ -877,22 +852,22 @@ public class Circuit {
     }
 
     /** @param jammerEntityList サーキットに設置された妨害アイテムエンティティリスト */
-    public void setJammerEntityList(List<Entity> jammerEntityList) {
+    public void setJammerEntityList(Set<Entity> jammerEntityList) {
         this.jammerEntityList = jammerEntityList;
     }
 
     /** @param entryPlayerList エントリーしているプレイヤーのUUIDリスト */
-    public void setEntryPlayerList(List<UUID> entryPlayerList) {
+    public void setEntryPlayerList(Set<UUID> entryPlayerList) {
         this.entryPlayerList = entryPlayerList;
     }
 
     /** @param reserveEntryPlayerList リザーブエントリーしているプレイヤーのUUIDリスト */
-    public void setReserveEntryPlayerList(List<UUID> reserveEntryPlayerList) {
+    public void setReserveEntryPlayerList(Set<UUID> reserveEntryPlayerList) {
         this.reserveEntryPlayerList = reserveEntryPlayerList;
     }
 
     /** @param matchingAcceptPlayerList レース参加の招待を承認したプレイヤーのUUIDリスト */
-    public void setMatchingAcceptPlayerList(List<UUID> matchingAcceptPlayerList) {
+    public void setMatchingAcceptPlayerList(Set<UUID> matchingAcceptPlayerList) {
         this.matchingAcceptPlayerList = matchingAcceptPlayerList;
     }
 
