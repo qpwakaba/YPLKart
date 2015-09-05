@@ -1,17 +1,20 @@
 package com.github.erozabesu.yplkart.utils;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
@@ -21,6 +24,8 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplkart.reflection.Constructors;
+import com.github.erozabesu.yplkart.reflection.Methods;
 
 /**
  * レース用エンティティの取得、操作を行うユーティリティクラス。<br>
@@ -34,6 +39,7 @@ public class RaceEntityUtil {
     private static String FakeItemBoxName = ItemBoxName + "！！";
     private static String DisposableFakeItemBoxName = ItemBoxName + "！";
     private static Set<Chunk> jammerEntityExistChunkArray = new HashSet<Chunk>();
+    private static ItemStack bananaEntityItem = new ItemStack(Material.QUARTZ);
 
     public static Set<Chunk> getJammerEntityExistChunkArray() {
         return jammerEntityExistChunkArray;
@@ -48,6 +54,28 @@ public class RaceEntityUtil {
     }
 
     //〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+
+    public static ArmorStand createBanana(Location location) {
+        location.setYaw(new Random().nextInt(360));
+        ArmorStand banana = location.getWorld().spawn(location, ArmorStand.class);
+
+        banana.setItemInHand(bananaEntityItem);
+        banana.getLocation().setYaw(location.getYaw());
+        banana.getLocation().setPitch(location.getPitch());
+        banana.setCustomName(ItemEnum.BANANA.getDisplayName());
+        banana.setCustomNameVisible(false);
+        banana.setVisible(false);
+        banana.setGravity(true);
+        banana.setBasePlate(false);
+
+        Object nmsBanana = Util.getCraftEntity(banana);
+        Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + location.getPitch(), 1.00F, 0.0F);
+        ReflectionUtil.invoke(Methods.nmsEntityArmorStand_setRightArmPose, nmsBanana, vector3f);
+
+        addJammerEntityExistChunkArray(banana.getLocation().getChunk());
+
+        return banana;
+    }
 
     public static EnderCrystal createItemBox(Location location, int tier) {
         Location blockLocation = Util.adjustLocationToBlockCenter(location.getBlock().getLocation());
@@ -207,7 +235,7 @@ public class RaceEntityUtil {
     }
 
     public static boolean isBananaEntity(Entity entity) {
-        if (!(entity instanceof FallingBlock)) {
+        if (!(entity instanceof ArmorStand)) {
             return false;
         }
 

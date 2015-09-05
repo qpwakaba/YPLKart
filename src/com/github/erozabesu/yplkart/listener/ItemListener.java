@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -47,7 +48,6 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.task.ItemBananaTask;
 import com.github.erozabesu.yplkart.task.ItemDyedTurtleTask;
 import com.github.erozabesu.yplkart.task.ItemStarTask;
 import com.github.erozabesu.yplkart.task.ItemTurtleTask;
@@ -259,17 +259,10 @@ public class ItemListener extends RaceManager implements Listener {
         //バナナ
         } else if (ItemEnum.BANANA.isSimilar(player.getItemInHand())) {
             Util.setItemDecrease(player);
-            Location l = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+            Location location = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                     .add(0.5, 0, 0.5);
-
-            FallingBlock b = player.getWorld().spawnFallingBlock(l, Material.HUGE_MUSHROOM_1, (byte) 8);
-            b.setCustomName(ItemEnum.BANANA.getDisplayName());
-            b.setCustomNameVisible(false);
-            b.setDropItem(false);
-            Util.removeEntityCollision(b);
-
-            new ItemBananaTask(RaceManager.getCircuit(uuid), b, l).runTaskTimer(YPLKart.getInstance(), 0, 1);
             player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
+            RaceManager.getCircuit(racer.getCircuitName()).addJammerEntity(RaceEntityUtil.createBanana(location));
 
         //にせアイテムボックス
         } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
@@ -326,7 +319,7 @@ public class ItemListener extends RaceManager implements Listener {
         List<Entity> entities = player.getNearbyEntities(0.7, 0.7, 0.7);
         for (final Entity entity : entities) {
             if (entity.getCustomName() != null && !entity.getCustomName().equalsIgnoreCase("")) {
-                if (entity instanceof FallingBlock) {
+                if (entity instanceof ArmorStand) {
                     if (Permission.hasPermission(player, Permission.INTERACT_BANANA, false)) {
                         if (RaceEntityUtil.isBananaEntity(entity)) {
                             RaceEntityUtil.collideBanana(player, entity);
