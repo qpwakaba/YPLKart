@@ -38,6 +38,7 @@ import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.RaceEntityUtil;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -389,6 +390,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         //接触対象のエンティティによって接触判定から除外しreturn
         if (entityOther instanceof EnderCrystal || entityOther instanceof WitherSkull) {
+            return;
+        }
+        if (RaceEntityUtil.isBananaEntity(entityOther)) {
             return;
         }
 
