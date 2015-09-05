@@ -271,7 +271,11 @@ public enum ItemEnum {
         //レース用アイテム
         } else {
             //外見マテリアル
-            if (this.equals(KILLER)) {
+            if (this.equals(KILLER)
+                    || this.equals(BANANA)
+                    || this.equals(TURTLE)
+                    || this.equals(RED_TURTLE)
+                    || this.equals(THORNED_TURTLE)) {
                 Material defaultDisplayMaterial = Material.getMaterial(defaultConfig.getString(nodePrefix + "display_material"));
                 setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_material", defaultDisplayMaterial));
 

@@ -123,6 +123,8 @@ banana:
   tier: 1
   material: "INK_SACK"
   material_data: 6
+  display_material: "QUARTZ"
+  display_material_data: 0
   max_stack_size: 5
   effect_level: 2
   effect_second: 2
@@ -142,6 +144,8 @@ turtle:
   tier: 1
   material: "INK_SACK"
   material_data: 3
+  display_material: "EMERALD"
+  display_material_data: 0
   max_stack_size: 3
   hit_damage: 6
   multiple:
@@ -151,6 +155,8 @@ red_turtle:
   tier: 2
   material: "INK_SACK"
   material_data: 4
+  display_material: "NETHER_WARTS"
+  display_material_data: 0
   max_stack_size: 3
   hit_damage: 6
   multiple:
@@ -160,6 +166,8 @@ thorned_turtle:
   tier: 4
   material: "INK_SACK"
   material_data: 5
+  display_material: "NETHER_BRICK_ITEM"
+  display_material_data: 0
   max_stack_size: 1
   hit_damage: 20
   moving_damage: 6
