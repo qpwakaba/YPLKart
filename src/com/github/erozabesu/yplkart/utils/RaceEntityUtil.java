@@ -35,15 +35,15 @@ public class RaceEntityUtil {
     private static String DisposableFakeItemBoxName = ItemBoxName + "！";
     private static Set<Chunk> jammerEntityExistChunkArray = new HashSet<Chunk>();
 
-    private static Set<Chunk> getJammerEntityExistChunkArray() {
+    public static Set<Chunk> getJammerEntityExistChunkArray() {
         return jammerEntityExistChunkArray;
     }
 
-    private static void addJammerEntityExistChunkArray(Chunk chunk) {
+    public static void addJammerEntityExistChunkArray(Chunk chunk) {
         getJammerEntityExistChunkArray().add(chunk);
     }
 
-    private static void removeJammerEntityExistChunkArray(Chunk chunk) {
+    public static void removeJammerEntityExistChunkArray(Chunk chunk) {
         getJammerEntityExistChunkArray().remove(chunk);
     }
 
@@ -221,6 +221,21 @@ public class RaceEntityUtil {
         }
 
         return true;
+    }
+
+    /**
+     * 引数chunkがバナナ、使い捨てのにせアイテムボックスを含んでいるかどうかを返す。
+     * @param chunk チェックするチャンク
+     * @return 妨害エンティティが設置されているチャンクかどうか
+     */
+    public static boolean containsJammerEntity(Chunk chunk) {
+        for (Entity entity : chunk.getEntities()) {
+            if (isBananaEntity(entity) || isDisposableFakeItemBox(entity)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //〓 Util - Collide 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

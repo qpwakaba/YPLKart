@@ -23,6 +23,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplkart.utils.RaceEntityUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 /**
@@ -350,6 +351,11 @@ public class Circuit {
             for (Entity entity : this.getJammerEntityList()) {
                 if (!entity.isDead()) {
                     entity.remove();
+
+                    // チャンクに妨害エンティティが残っていない場合は配列から削除
+                    if (!RaceEntityUtil.containsJammerEntity(entity.getLocation().getChunk())) {
+                        RaceEntityUtil.removeJammerEntityExistChunkArray(entity.getLocation().getChunk());
+                    }
                 }
             }
             this.getJammerEntityList().clear();
