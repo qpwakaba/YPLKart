@@ -1,6 +1,7 @@
 package com.github.erozabesu.yplkart.object;
 
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,10 +16,7 @@ import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemDyedTurtle extends BukkitRunnable {
-    int life = 0;
-    int maxLife = 500;
-
-    Entity turtle;
+    ArmorStand turtle;
     Entity lastCheckPoint;
     String circuitName;
     Player shooter;
@@ -32,8 +30,9 @@ public class ItemDyedTurtle extends BukkitRunnable {
     double motY = 0.0D;
     double motZ = 0.0D;
 
+    boolean isLoadedChunk = true;
 
-    public ItemDyedTurtle(String circuitName, Entity turtle, Entity firstCheckPoint, Player shooter, Player target, ItemEnum itemEnum) {
+    public ItemDyedTurtle(String circuitName, ArmorStand turtle, Entity firstCheckPoint, Player shooter, Player target, ItemEnum itemEnum) {
         this.turtle = turtle;
         this.lastCheckPoint = firstCheckPoint;
         this.circuitName = circuitName;
@@ -52,15 +51,14 @@ public class ItemDyedTurtle extends BukkitRunnable {
     }
 
     private void die() {
-        this.turtle.remove();
+        if (!this.turtle.isDead()) {
+            //this.turtle.setHealth(0.0D);
+        }
         this.cancel();
     }
 
     @Override
     public void run() {
-        // 寿命の加算
-        life++;
-
         Racer targerRacer = RaceManager.getRacer(target);
 
         // 何らかの原因でエンティティがデスポーンしている場合はタスクを終了
@@ -69,22 +67,24 @@ public class ItemDyedTurtle extends BukkitRunnable {
             return;
         }
 
-        // ターゲットがゴールしている場合デスポーンしタスクを終了
-        if (targerRacer != null) {
-            if (targerRacer.isGoal()) {
-                die();
-                return;
-            }
+        // ターゲットが走行中でない場合はタスクを終了
+        if (!RaceManager.isStillRacing(this.target.getUniqueId())) {
+            die();
+            return;
         }
 
         // ターゲットがオフライン、もしくは寿命が尽きた場合デスポーンしタスクを終了
-        if (!Util.isOnline(target.getName()) || this.maxLife < life / 20) {
+        if (!Util.isOnline(target.getName())) {
             die();
             return;
         }
 
         this.move();
         this.rotate();
+        if (this.createHitDamage()) {
+            die();
+            return;
+        }
         this.createMovingDamage();
 
         this.updateCheckPoint();
@@ -95,11 +95,12 @@ public class ItemDyedTurtle extends BukkitRunnable {
     private void move() {
         Location location = this.turtle.getLocation().clone();
 
-        // モーションの値だけ座標を移動する。
-        this.turtle.setVelocity(new Vector(this.motX, this.motY, this.motZ));
+        // 読み込まれているチャンクの場合はベクターを割り当てる
+        if (this.isLoadedChunk) {
+            this.turtle.setVelocity(new Vector(this.motX, this.motY, this.motZ));
 
-        // 読み込まれていないチャンクにいる場合はテレポート
-        if (!location.getChunk().isLoaded()) {
+        // 読み込まれていないチャンクの場合はテレポートで移動する。
+        } else {
             this.turtle.teleport(location.clone().add(this.motX, this.motY, this.motZ));
         }
     }
@@ -112,10 +113,24 @@ public class ItemDyedTurtle extends BukkitRunnable {
         ReflectionUtil.invoke(Methods.nmsEntity_setYawPitch, nmsTurtle, turtleLocation.getYaw() + 30.0F, 0.0F);
     }
 
+    /**
+     * ターゲットプレイヤーとの距離が3ブロック以内の場合ターゲットプレイヤーの座標に爆発を引き起こしtrueを返す。<br>
+     * 距離が3ブロックを超えている場合はfalseを返す。
+     * @return 爆発に成功したかどうか
+     */
+    private boolean createHitDamage() {
+        if (this.target.getLocation().distance(this.turtle.getLocation()) < 3.0D) {
+            Util.createSafeExplosion(this.shooter, target.getLocation(), hitDamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /** movingDamageが0でない場合は5チックおきに周囲にダメージを発生させる。 */
     private void createMovingDamage() {
         if (this.movingDamage != 0) {
-            if (this.life % 5 == 0) {
+            if (this.turtle.getTicksLived() % 5 == 0) {
                 Util.createSafeExplosion(this.shooter, this.turtle.getLocation(), this.movingDamage, 10, 0.0F, 0.0F, Particle.CRIT_MAGIC, Particle.PORTAL);
             }
         }
@@ -132,7 +147,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
         if (this.turtle.getLocation().distance(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 5) {
             this.lastCheckPoint.getLocation().setYaw(this.lastCheckPoint.getLocation().getYaw());
-            Entity newCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(this.circuitName, this.lastCheckPoint, 180.0F);
+            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, this.lastCheckPoint, 180.0F);
             if (newCheckPoint != null) {
                 this.lastCheckPoint = newCheckPoint;
 
@@ -150,99 +165,31 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     /** lastPassecCheckPointへ向けたモーションを格納する。 */
     private void updateMotion() {
-        Location turtleLocation = this.turtle.getLocation().clone();
-        Location checkPointLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
+        Location fromLocation = this.turtle.getLocation().clone();
+        Location toLocation;
 
-        // 現在の座標からチェックポイントへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(turtleLocation, checkPointLocation).multiply(2.0D);
+        // ターゲットとの距離が20ブロック以内の場合はtoLocationにターゲットの座標を格納する
+        if (this.target.getLocation().distance(fromLocation) <= 20.0D) {
+            toLocation = this.target.getLocation();
+
+        // そうでない場合はチェックポイントの座標を格納する
+        } else {
+            toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
+        }
+
+        // fromLocationからtoLocationへ向けたベクターを算出
+        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
+
+        // 現在のモーション値と全く同じ値の場合、読み込まれていないチャンクのためフラグを立てる
+        if (this.motX == vectorToLocation.getX() && this.motY == vectorToLocation.getY() && this.motZ == vectorToLocation.getZ()) {
+            this.isLoadedChunk = false;
+        } else {
+            this.isLoadedChunk = true;
+        }
 
         //算出したベクターのX、Y、Zモーションを格納
         this.motX = vectorToLocation.getX();
         this.motY = vectorToLocation.getY();
         this.motZ = vectorToLocation.getZ();
     }
-
-    /*@Override
-    public void run() {
-        //周回数の更新
-        if (lastStepBlock.equalsIgnoreCase(
-                (String) ConfigEnum.START_BLOCK_ID.getValue())) {
-            if (Util.getGroundBlockID(this.projectile.getLocation(), 5).equalsIgnoreCase(
-                    (String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
-                lap++;
-            }
-        }
-        this.lastStepBlock = Util.getGroundBlockID(this.projectile.getLocation(), 5);
-
-        //targetを発見したら突撃return
-        List<LivingEntity> livingentity = Util.getNearbyLivingEntities(this.projectile.getLocation(), 20);
-        for (LivingEntity target : livingentity) {
-            if (this.target.getUniqueId().toString().equalsIgnoreCase(target.getUniqueId().toString())) {
-                Vector v = Util.getVectorToLocation(this.projectile.getLocation(), target.getLocation())
-                        .multiply(3);
-                this.motX = v.getX();
-                this.motY = v.getY();
-                this.motZ = v.getZ();
-
-                if (target.getLocation().distance(this.projectile.getLocation()) < 3) {
-                    Util.createSafeExplosion(this.shooter, target.getLocation()
-                            , ItemEnum.RED_TURTLE.getHitDamage() + this.adjustdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
-                    die();
-                }
-                return;
-            }
-        }
-
-        //チェックポイントの更新
-        Racer racer = RaceManager.getRacer(this.shooter);
-        ArrayList<Entity> checkpointlist = new ArrayList<Entity>();
-
-        //アカこうらを1位から2位に向け発射した場合
-        if (this.targetreverse) {
-            List<Entity> templist = CheckPointUtil.getNearbyCheckPoints(
-                    racer, this.projectile.getLocation().clone().add(-this.motX * 3, 0, -this.motZ * 3), 30);
-            if (templist == null)
-                return;
-
-            for (Entity e : templist) {
-                if (this.shooterpassedcheckpoint.contains(lap + e.getUniqueId().toString())) {
-                    if (!targerRacer.getPassedCheckPointList()
-                            .contains(lap + e.getUniqueId().toString()))
-                        if (!this.turtlepassedcheckpoint.contains(lap + e.getUniqueId().toString()))
-                            checkpointlist.add(e);
-                }
-            }
-            //その他
-        } else {
-            List<Entity> templist = CheckPointUtil.getNearbyCheckPoints(
-                    racer, this.projectile.getLocation().clone().add(this.motX * 3, 0, this.motZ * 3), 30);
-            if (templist == null)
-                return;
-
-            for (Entity e : templist) {
-                if (!this.shooterpassedcheckpoint.contains(lap + e.getUniqueId().toString())) {
-                    if (!this.turtlepassedcheckpoint.contains(lap + e.getUniqueId().toString()))
-                        checkpointlist.add(e);
-                }
-            }
-        }
-
-        /*if(checkpoint.isEmpty()){
-        	for (org.bukkit.entity.Entity e : templist) {
-        		if(!r.getFirstPassedCheckPoint().equalsIgnoreCase(e.getUniqueId().toString())){
-        			checkpoint.add(e);
-        		}
-        	}
-        }*/
-        /*if (checkpointlist.isEmpty())
-            return;
-
-        Entity checkpoint = Util.getNearestEntity(checkpointlist, this.projectile.getLocation());
-        this.turtlepassedcheckpoint.add(lap + checkpoint.getUniqueId().toString());
-        Vector v = Util.getVectorToLocation(this.projectile.getLocation(),
-                checkpoint.getLocation().clone().add(0, -CheckPointUtil.checkPointHeight, 0)).multiply(3);
-        this.motX = v.getX();
-        this.motY = v.getY();
-        this.motZ = v.getZ();
-    }*/
 }
