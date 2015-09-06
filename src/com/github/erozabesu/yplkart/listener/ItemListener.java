@@ -662,17 +662,20 @@ public class ItemListener extends RaceManager implements Listener {
         }
     }
 
-    public void itemTurtle(Player p) {
-        if (getRank(p) == 0)
+    public void itemTurtle(Player player) {
+        if (RaceManager.getRank(player) == 0) {
             return;
+        }
 
-        Util.setItemDecrease(p);
-        FallingBlock b = p.getWorld().spawnFallingBlock(p.getLocation(), Material.HUGE_MUSHROOM_1, (byte) 7);
-        b.setCustomName(ItemEnum.TURTLE.getDisplayName());
-        b.setCustomNameVisible(false);
-        b.setDropItem(false);
+        Circuit circuit = RaceManager.getCircuit(player.getUniqueId());
+        if (circuit == null) {
+            return;
+        }
 
-        new ItemTurtleTask(p, b, Util.getForwardLocationFromYaw(p.getLocation(), 3), 60).runTaskTimer(YPLKart.getInstance(), 0, 1);
+        Util.setItemDecrease(player);
+
+        ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, player.getLocation(), ItemEnum.TURTLE);
+        new ItemTurtleTask(turtle, player).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemRedturtle(Player user) {

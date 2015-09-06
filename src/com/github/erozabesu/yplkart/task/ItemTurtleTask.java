@@ -1,6 +1,7 @@
 package com.github.erozabesu.yplkart.task;
 
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,7 +13,7 @@ import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemTurtleTask extends BukkitRunnable {
-    Entity projectile;
+    ArmorStand turtle;
     Vector vector;
     double x;
     double y;
@@ -24,62 +25,51 @@ public class ItemTurtleTask extends BukkitRunnable {
     final double verticalonhover = 0.00;
     final double verticalonwall = 0.5;
 
-    public ItemTurtleTask(Player shooter, Entity projectile, Location next, int life) {
+    public ItemTurtleTask(ArmorStand turtle, Player shooter) {
+        this.turtle = turtle;
         this.shooter = shooter;
-        this.projectile = projectile;
-        this.hitdamage = ItemEnum.TURTLE.getHitDamage()
-                + RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
+        this.hitdamage = ItemEnum.TURTLE.getHitDamage() + RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
 
-        this.vector = Util.getVectorToLocation(Util.adjustLocationToBlockCenter(this.projectile.getLocation()), next);
+        Location fromLocation = Util.adjustLocationToBlockCenter(this.turtle.getLocation());
+        Location toLocation = Util.getForwardLocationFromYaw(fromLocation, 3);
+        this.vector = Util.getVectorToLocation(fromLocation, toLocation);
         this.x = this.vector.getX();
         this.z = this.vector.getZ();
         this.y = this.verticalonhover;
-        this.projectile.setVelocity(this.vector);
-        this.life = life * 20;
-        this.maxlife = life * 20;
-        Util.removeEntityCollision(projectile);
-        Util.removeEntityVerticalMotion(projectile);
+        this.turtle.setVelocity(this.vector);
+        Util.removeEntityCollision(turtle);
+        Util.removeEntityVerticalMotion(turtle);
     }
 
     @Override
     public void run() {
-        if (life < 0 || projectile.isDead()) {
-            this.cancel();
-            this.projectile.remove();
-            return;
-        }
-        life--;
-
-        for (Entity e : this.projectile.getNearbyEntities(1.5, 2, 1.5)) {
-            if (!(e instanceof Player))
+        for (Entity entity : this.turtle.getNearbyEntities(1.5, 2, 1.5)) {
+            if (!(entity instanceof Player)) {
                 continue;
+            }
 
             //発射したプレイヤーに発射した瞬間当たらないようにeがshooterだった場合は発射後2秒経過するまではcontinueする
-            if (e.getUniqueId() == this.shooter.getUniqueId())
-                if (this.maxlife - 40 < this.life)
+            if (this.turtle.getTicksLived() < 40) {
+                if (entity.getUniqueId() == this.shooter.getUniqueId()) {
                     continue;
+                }
+            }
 
             //発射したプレイヤーにも跳ね返って自滅するよう1つ目の引数はnull
-            Util.createSafeExplosion(null, this.projectile.getLocation(), this.hitdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+            Util.createSafeExplosion(null, this.turtle.getLocation(), this.hitdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
             this.cancel();
-            this.projectile.remove();
+            this.turtle.remove();
             break;
         }
 
-        try {
-            setNextVector();
-            projectile.setVelocity(new Vector(this.x, this.y, this.z).multiply(1.5).setY(this.y));
-            //projectile.getLocation().setDirection(projectile.getVelocity());
-
-            //Util.setPositionRotation(projectile, /*Util.getYawfromVector(projectile.getVelocity())*/0, 0);
-        } catch (Exception e) {
-        }
+        setNextVector();
+        turtle.setVelocity(new Vector(this.x, this.y, this.z).multiply(1.5).setY(this.y));
     }
 
     private boolean isInWall() {
         try {
-            if (Util.isSolidBlock(this.projectile.getLocation()))
+            if (Util.isSolidBlock(this.turtle.getLocation()))
                 return true;
         } catch (Exception e) {
         }
@@ -88,18 +78,18 @@ public class ItemTurtleTask extends BukkitRunnable {
 
     //真下が空気の場合は優先して下方向へ行く
     //ただしyがx,zを超えてしまうと地面に接触してしまうため注意
-    public void setNextVector() throws Exception {
+    public void setNextVector() {
         boolean onair = false;
         //真下とその更に後ろが非ソリッドブロックなら下へ
         //1ブロックだけ非ソリッドの場合に下に降ろしてしまうと、直前のソリッドブロックの先端に接触してしまう
-        if (!Util.isSolidBlock(this.projectile.getLocation().clone().add(0, -1, 0))) {
-            if (!Util.isSolidBlock(this.projectile.getLocation().clone().add(-this.x, -1, -this.z))) {
+        if (!Util.isSolidBlock(this.turtle.getLocation().clone().add(0, -1, 0))) {
+            if (!Util.isSolidBlock(this.turtle.getLocation().clone().add(-this.x, -1, -this.z))) {
                 this.y = -0.8;
                 onair = true;
             }
         }
 
-        Location current = Util.adjustLocationToBlockCenter(this.projectile.getLocation());
+        Location current = Util.adjustLocationToBlockCenter(this.turtle.getLocation());
 
         if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//北東
             if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {
