@@ -155,7 +155,7 @@ red_turtle:
   tier: 2
   material: "INK_SACK"
   material_data: 4
-  display_material: "NETHER_WARTS"
+  display_material: "NETHER_STALK"
   display_material_data: 0
   max_stack_size: 3
   hit_damage: 6
