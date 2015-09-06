@@ -189,6 +189,10 @@ public class RaceListener implements Listener {
                 racer.setLastPassedCheckPointEntity(nearestCheckPoint);
                 racer.addPassedCheckPoint(racer.getCurrentLaps() + nearestCheckPoint.getUniqueId().toString());
                 return;
+
+            // チェックポイントが検出できていない場合は何もせずreturn
+            } else {
+                return;
             }
         }
 
