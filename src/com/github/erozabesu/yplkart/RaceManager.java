@@ -191,7 +191,7 @@ public class RaceManager {
                 if (circuit.isStandby() || circuit.isStarted()) {
 
                     // スタート位置を取得
-                    int startLocationListSize = circuit.getEntryPlayerList().size();
+                    int startLocationListSize = circuit.getEntryPlayerSet().size();
                     List<Location> startLocationList =
                             CircuitConfig.getCircuitData(circuit.getCircuitName()).getStartLocationList(startLocationListSize - 1);
 

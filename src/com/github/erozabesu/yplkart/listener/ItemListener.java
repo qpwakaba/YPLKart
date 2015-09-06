@@ -699,7 +699,7 @@ public class ItemListener extends RaceManager implements Listener {
         Util.setItemDecrease(user);
 
         Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
-        Entity turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.RED_TURTLE);
+        ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.RED_TURTLE);
 
         int rank = RaceManager.getRank(user);
         rank = rank == 1 ? rank + 1 : rank - 1;
@@ -728,7 +728,7 @@ public class ItemListener extends RaceManager implements Listener {
         Util.setItemDecrease(user);
 
         Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
-        Entity turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.THORNED_TURTLE);
+        ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.THORNED_TURTLE);
 
         Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), 1);
         new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);

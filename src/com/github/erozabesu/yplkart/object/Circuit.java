@@ -108,10 +108,10 @@ public class Circuit {
         this.setStarted(false);
         this.setMatching(false);
         this.setStandby(false);
-        this.setEntryPlayerList(new HashSet<UUID>());
-        this.setReserveEntryPlayerList(new HashSet<UUID>());
-        this.setMatchingAcceptPlayerList(new HashSet<UUID>());
-        this.setJammerEntityList(new HashSet<Entity>());
+        this.setEntryPlayerSet(new HashSet<UUID>());
+        this.setReserveEntryPlayerSet(new HashSet<UUID>());
+        this.setMatchingAcceptPlayerSet(new HashSet<UUID>());
+        this.setJammerEntitySet(new HashSet<Entity>());
 
         if (this.getDetectEndTask() != null)
             getDetectEndTask().cancel();
@@ -160,7 +160,7 @@ public class Circuit {
      */
     public void endRace() {
         this.sendMessageEntryPlayer(MessageEnum.raceEnd, this);
-        Iterator<UUID> currentEntryListIterator = getEntryPlayerList().iterator();
+        Iterator<UUID> currentEntryListIterator = getEntryPlayerSet().iterator();
         UUID currentUuid;
         while (currentEntryListIterator.hasNext()) {
             currentUuid = currentEntryListIterator.next();
@@ -171,7 +171,7 @@ public class Circuit {
         //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
         //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
         if (YPLKart.getInstance().isEnabled()) {
-            final List<UUID> nextEntryList = new ArrayList<UUID>(getReserveEntryPlayerList());
+            final List<UUID> nextEntryList = new ArrayList<UUID>(getReserveEntryPlayerSet());
             if (0 < nextEntryList.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
@@ -202,7 +202,7 @@ public class Circuit {
         List<Location> position = CircuitConfig.getCircuitData(getCircuitName()).getStartLocationList(listSize);
         int count = 0;
 
-        for (UUID uuid : getEntryPlayerList()) {
+        for (UUID uuid : getEntryPlayerSet()) {
             this.setupRacer(uuid, position.get(count));
             count++;
         }
@@ -259,8 +259,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void entryPlayer(UUID uuid) {
-        this.getEntryPlayerList().add(uuid);
-        this.getReserveEntryPlayerList().remove(uuid);
+        this.getEntryPlayerSet().add(uuid);
+        this.getReserveEntryPlayerSet().remove(uuid);
     }
 
     /**
@@ -268,8 +268,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void entryReservePlayer(UUID uuid) {
-        this.getReserveEntryPlayerList().add(uuid);
-        this.getEntryPlayerList().remove(uuid);
+        this.getReserveEntryPlayerSet().add(uuid);
+        this.getEntryPlayerSet().remove(uuid);
     }
 
     /**
@@ -277,8 +277,8 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public void exitPlayer(UUID uuid) {
-        this.getEntryPlayerList().remove(uuid);
-        this.getReserveEntryPlayerList().remove(uuid);
+        this.getEntryPlayerSet().remove(uuid);
+        this.getReserveEntryPlayerSet().remove(uuid);
 
         this.denyMatching(uuid);
     }
@@ -291,7 +291,7 @@ public class Circuit {
      * @return リストへの追加に成功したかどうか
      */
     public boolean acceptMatching(UUID uuid) {
-        return this.getMatchingAcceptPlayerList().add(uuid);
+        return this.getMatchingAcceptPlayerSet().add(uuid);
     }
 
     /**
@@ -301,7 +301,7 @@ public class Circuit {
      * @param uuid 追加するプレイヤーのUUID
      */
     public boolean denyMatching(UUID uuid) {
-        return this.getMatchingAcceptPlayerList().remove(uuid);
+        return this.getMatchingAcceptPlayerSet().remove(uuid);
     }
 
     /**
@@ -309,7 +309,7 @@ public class Circuit {
      * @param entity 追加するエンティティ
      */
     public void addJammerEntity(Entity entity) {
-        this.getJammerEntityList().add(entity);
+        this.getJammerEntitySet().add(entity);
     }
 
     /**
@@ -317,13 +317,13 @@ public class Circuit {
      * @param entity 追加するエンティティ
      */
     public void removeJammerEntity(Entity entity) {
-        this.getJammerEntityList().remove(entity);
+        this.getJammerEntitySet().remove(entity);
     }
 
     /** サーキットに設置された全妨害エンティティをデスポーンする */
     public void removeAllJammerEntity() {
-        if (this.getJammerEntityList().size() != 0) {
-            for (Entity entity : this.getJammerEntityList()) {
+        if (this.getJammerEntitySet().size() != 0) {
+            for (Entity entity : this.getJammerEntitySet()) {
                 if (!entity.isDead()) {
                     entity.remove();
 
@@ -333,7 +333,7 @@ public class Circuit {
                     }
                 }
             }
-            this.getJammerEntityList().clear();
+            this.getJammerEntitySet().clear();
         }
     }
 
@@ -349,7 +349,7 @@ public class Circuit {
             public void run() {
 
                 //エントリーしたプレイヤーが規定人数以上
-                if (getEntryPlayerList().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
+                if (getEntryPlayerSet().size() < CircuitConfig.getCircuitData(getCircuitName()).getMinPlayer()) {
                     return;
                 }
                 //オンラインのプレイヤー人数が規定人数以上
@@ -392,13 +392,13 @@ public class Circuit {
                 if (0 < getMatchingCountDownTime()) {
 
                     // エントリー者が全員意思決定を終えている場合は制限時間をタイムアップさせる
-                    if (getEntryPlayerList().size() == getMatchingAcceptPlayerList().size()) {
+                    if (getEntryPlayerSet().size() == getMatchingAcceptPlayerSet().size()) {
                         setMatchingCountDownTime(0);
                         return;
                     }
 
                     Player entryPlayer = null;
-                    for (UUID id : getEntryPlayerList()) {
+                    for (UUID id : getEntryPlayerSet()) {
                         if ((entryPlayer = Bukkit.getPlayer(id)) != null) {
                             PacketUtil.sendTitle(entryPlayer, MessageEnum.titleRacePrepared.getMessage(), 0, 25, 0, false);
                             PacketUtil.sendTitle(entryPlayer
@@ -414,11 +414,11 @@ public class Circuit {
                 } else {
 
                     //参加拒否したプレイヤーをエントリー取り消し
-                    Iterator<UUID> denyPlayerList = getEntryPlayerList().iterator();
+                    Iterator<UUID> denyPlayerList = getEntryPlayerSet().iterator();
                     UUID denyPlayerUUID;
                     while (denyPlayerList.hasNext()) {
                         denyPlayerUUID = denyPlayerList.next();
-                        if (!Bukkit.getPlayer(denyPlayerUUID).isOnline() || !getMatchingAcceptPlayerList().contains(denyPlayerUUID)) {
+                        if (!Bukkit.getPlayer(denyPlayerUUID).isOnline() || !getMatchingAcceptPlayerSet().contains(denyPlayerUUID)) {
                             denyPlayerList.remove();
                             denyMatching(denyPlayerUUID);
                             RaceManager.racerSetter_UnEntry(denyPlayerUUID);
@@ -426,7 +426,7 @@ public class Circuit {
                     }
 
                     //参加承認したプレイヤーがサーキットの規定人数を満たしていればレースを開始する
-                    if (circuitData.getMinPlayer() <= getMatchingAcceptPlayerList().size()) {
+                    if (circuitData.getMinPlayer() <= getMatchingAcceptPlayerSet().size()) {
 
                         //プレイヤーの状態をレース用に初期化
                         setupAllRacer();
@@ -445,7 +445,7 @@ public class Circuit {
                         setMatching(false);
 
                         //リザーブエントリーがあればサーキットの最大人数以内でエントリーに昇格する
-                        Iterator<UUID> reservePlayerList = getReserveEntryPlayerList().iterator();
+                        Iterator<UUID> reservePlayerList = getReserveEntryPlayerSet().iterator();
                         UUID reservePlayer = null;
                         while (reservePlayerList.hasNext()) {
                             reservePlayer = reservePlayerList.next();
@@ -466,7 +466,7 @@ public class Circuit {
                     }
 
                     //初期化
-                    getMatchingAcceptPlayerList().clear();
+                    getMatchingAcceptPlayerSet().clear();
                     setMatchingCountDownTime(0);
 
                     if (getMatchingTask() != null) {
@@ -645,7 +645,7 @@ public class Circuit {
     public List<Player> getOnlineEntryPlayerList() {
         List<Player> entryList = new ArrayList<Player>();
 
-        for (UUID uuid : this.getEntryPlayerList()) {
+        for (UUID uuid : this.getEntryPlayerSet()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 entryList.add(player);
@@ -660,7 +660,7 @@ public class Circuit {
      */
     public List<UUID> getOnlineEntryPlayerUuidList() {
         List<UUID> entryList = new ArrayList<UUID>();
-        for (UUID uuid : this.getEntryPlayerList()) {
+        for (UUID uuid : this.getEntryPlayerSet()) {
             if (Bukkit.getPlayer(uuid) != null) {
                 entryList.add(uuid);
             }
@@ -669,7 +669,7 @@ public class Circuit {
     }
 
     public boolean isFillPlayer() {
-        if (CircuitConfig.getCircuitData(this.getCircuitName()).getMaxPlayer() <= this.getEntryPlayerList().size()) {
+        if (CircuitConfig.getCircuitData(this.getCircuitName()).getMaxPlayer() <= this.getEntryPlayerSet().size()) {
             return true;
         }
         return false;
@@ -706,7 +706,7 @@ public class Circuit {
     }
 
     public boolean isJammerEntity(Entity entity) {
-        return this.getJammerEntityList().contains(entity);
+        return this.getJammerEntitySet().contains(entity);
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -726,8 +726,8 @@ public class Circuit {
     public void sendRaceInviteMessage() {
         String tellraw = " [\"\",{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[参加する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースへの参加を承認します\n\",\"color\":\"yellow\"},{\"text\":\"承認した参加者が規定人数を満たせばレースが開始されます\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"====\",\"color\":\"gray\",\"bold\":\"true\"},{\"text\":\"[辞退する]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/ka circuit deny\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"レースの参加を辞退し、エントリーを取り消します\",\"color\":\"yellow\"}]}},\"bold\":\"false\"},{\"text\":\"========\",\"color\":\"gray\",\"bold\":\"true\"}]";
 
-        for (UUID uuid : getEntryPlayerList()) {
-            if (!this.getMatchingAcceptPlayerList().contains(uuid)) {
+        for (UUID uuid : getEntryPlayerSet()) {
+            if (!this.getMatchingAcceptPlayerSet().contains(uuid)) {
                 Player player = Bukkit.getPlayer(uuid);
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
                 MessageEnum.raceReady.sendConvertedMessage(player, getInstance());
@@ -770,22 +770,22 @@ public class Circuit {
     }
 
     /** @return サーキットに設置された妨害アイテムエンティティリスト */
-    public Set<Entity> getJammerEntityList() {
+    public Set<Entity> getJammerEntitySet() {
         return this.jammerEntityList;
     }
 
     /** @return エントリーしているプレイヤーのUUIDリスト */
-    public Set<UUID> getEntryPlayerList() {
+    public Set<UUID> getEntryPlayerSet() {
         return this.entryPlayerList;
     }
 
     /** @return リザーブエントリーしているプレイヤーのUUIDリスト */
-    public Set<UUID> getReserveEntryPlayerList() {
+    public Set<UUID> getReserveEntryPlayerSet() {
         return this.reserveEntryPlayerList;
     }
 
     /** @return レース参加の招待を承認したプレイヤーのUUIDリスト */
-    public Set<UUID> getMatchingAcceptPlayerList() {
+    public Set<UUID> getMatchingAcceptPlayerSet() {
         return this.matchingAcceptPlayerList;
     }
 
@@ -852,22 +852,22 @@ public class Circuit {
     }
 
     /** @param jammerEntityList サーキットに設置された妨害アイテムエンティティリスト */
-    public void setJammerEntityList(Set<Entity> jammerEntityList) {
+    public void setJammerEntitySet(Set<Entity> jammerEntityList) {
         this.jammerEntityList = jammerEntityList;
     }
 
     /** @param entryPlayerList エントリーしているプレイヤーのUUIDリスト */
-    public void setEntryPlayerList(Set<UUID> entryPlayerList) {
+    public void setEntryPlayerSet(Set<UUID> entryPlayerList) {
         this.entryPlayerList = entryPlayerList;
     }
 
     /** @param reserveEntryPlayerList リザーブエントリーしているプレイヤーのUUIDリスト */
-    public void setReserveEntryPlayerList(Set<UUID> reserveEntryPlayerList) {
+    public void setReserveEntryPlayerSet(Set<UUID> reserveEntryPlayerList) {
         this.reserveEntryPlayerList = reserveEntryPlayerList;
     }
 
     /** @param matchingAcceptPlayerList レース参加の招待を承認したプレイヤーのUUIDリスト */
-    public void setMatchingAcceptPlayerList(Set<UUID> matchingAcceptPlayerList) {
+    public void setMatchingAcceptPlayerSet(Set<UUID> matchingAcceptPlayerList) {
         this.matchingAcceptPlayerList = matchingAcceptPlayerList;
     }
 
