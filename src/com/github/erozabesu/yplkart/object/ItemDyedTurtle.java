@@ -22,6 +22,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
     Player shooter;
     Player target;
     ItemEnum itemEnum;
+    boolean isReverse;
 
     int hitDamage = 0;
     int movingDamage = 0;
@@ -32,12 +33,23 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     boolean isLoadedChunk = true;
 
-    public ItemDyedTurtle(String circuitName, ArmorStand turtle, Entity firstCheckPoint, Player shooter, Player target, ItemEnum itemEnum) {
+    /**
+     * コンストラクタ。
+     * @param circuitName サーキット名
+     * @param turtle タートルエンティティ
+     * @param firstCheckPoint アイテム使用時に取得した最寄のチェックポイント
+     * @param shooter アイテム使用者
+     * @param target 攻撃対象のプレイヤー
+     * @param itemEnum こうらアイテムのItemEnum。ItemEnum.RED_TURTLE、もしくはItemEnum.THORNED_TURTLEを指定する
+     * @param isReverse コースの逆方向へ向けて移動するかどうか
+     */
+    public ItemDyedTurtle(String circuitName, ArmorStand turtle, Entity firstCheckPoint, Player shooter, Player target, ItemEnum itemEnum, boolean isReverse) {
         this.turtle = turtle;
         this.lastCheckPoint = firstCheckPoint;
         this.circuitName = circuitName;
         this.shooter = shooter;
         this.target = target;
+        this.isReverse = isReverse;
 
         int adjustDamage = RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
         if (itemEnum == ItemEnum.RED_TURTLE) {
@@ -146,8 +158,14 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // 前回通過したチェックポイントとの距離が5ブロック以内の場合、
         // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
         if (this.turtle.getLocation().distance(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 5) {
-            this.lastCheckPoint.getLocation().setYaw(this.lastCheckPoint.getLocation().getYaw());
-            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, this.lastCheckPoint, 180.0F);
+
+            // 逆走フラグがtrueの場合はYawに180.0Fを加算
+            Location checkPointLocation = this.lastCheckPoint.getLocation().clone();
+            if (this.isReverse) {
+                checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
+            }
+
+            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, checkPointLocation, 180.0F);
             if (newCheckPoint != null) {
                 this.lastCheckPoint = newCheckPoint;
 

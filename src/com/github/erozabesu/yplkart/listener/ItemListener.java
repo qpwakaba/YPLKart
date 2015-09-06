@@ -697,11 +697,11 @@ public class ItemListener extends RaceManager implements Listener {
         Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.RED_TURTLE);
 
-        int rank = RaceManager.getRank(user);
-        rank = rank == 1 ? rank + 1 : rank - 1;
-        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), rank);
+        int ownRank = RaceManager.getRank(user);
+        int targetRank = ownRank == 1 ? ownRank + 1 : ownRank - 1;
+        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), targetRank);
 
-        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.RED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);
+        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.RED_TURTLE, ownRank == 1).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemThornedturtle(Player user) {
@@ -730,7 +730,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         int targetRank = ownRank == 1 ? 2 : 1;
         Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), targetRank);
-        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);
+        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemKiller(final Player user) {
