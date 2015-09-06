@@ -16,15 +16,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -414,7 +413,7 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     @EventHandler
-    public void onJammerObjectDamaged(EntityInteractEvent event) {
+    public void onJammerObjectInteract(EntityInteractEvent event) {
         if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
             return;
         }
@@ -436,6 +435,9 @@ public class ItemListener extends RaceManager implements Listener {
     @EventHandler
     public void onJammerObjectDamaged(EntityDamageEvent event) {
         if (!YPLKart.isPluginEnabled(event.getEntity().getWorld())) {
+            return;
+        }
+        if (!event.getCause().equals(DamageCause.VOID)) {
             return;
         }
         if (event.getEntity().getCustomName() == null || event.getEntity().getCustomName().equalsIgnoreCase("")) {
@@ -490,28 +492,6 @@ public class ItemListener extends RaceManager implements Listener {
                 || RaceEntityUtil.isNormalFakeItemBox(entity)
                 || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
             event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onFallingBlockFalled(EntityChangeBlockEvent e) {
-        Entity entity = e.getEntity();
-        String customName = entity.getCustomName();
-
-        if (!YPLKart.isPluginEnabled(entity.getWorld())) {
-            return;
-        }
-        if (!(entity instanceof FallingBlock)) {
-            return;
-        }
-        if (customName == null) {
-            return;
-        }
-        if (customName.equalsIgnoreCase(ItemEnum.RED_TURTLE.getDisplayName())
-                || customName.equalsIgnoreCase(ItemEnum.THORNED_TURTLE.getDisplayName())
-                || customName.equalsIgnoreCase(ItemEnum.TURTLE.getDisplayName())
-                || customName.equalsIgnoreCase(ItemEnum.BANANA.getDisplayName())) {
-            e.setCancelled(true);
         }
     }
 
