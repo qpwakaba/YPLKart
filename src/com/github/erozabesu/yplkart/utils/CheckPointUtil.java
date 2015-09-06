@@ -81,16 +81,16 @@ public class CheckPointUtil {
 
     /**
      * 引数circuitNameが名称のサーキットに設置されたチェックポイントのうち、
-     * 引数entityの座標を基点に引数entityから視認できるチェックポイントを配列で返す。<br>
+     * 引数locationを基点に視認できるチェックポイントを配列で返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold) {
+    public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Location location, float sightThreshold) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        List<Entity> entityList = Util.getNearbyEntities(entity.getLocation().clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
@@ -104,14 +104,14 @@ public class CheckPointUtil {
             }
 
             // 視野に含まれていない場合配列から削除
-            if (!Util.isLocationInSight(entity, tempEntity.getLocation(), sightThreshold)) {
+            if (!Util.isLocationInSight(location, tempEntity.getLocation(), sightThreshold)) {
                 iterator.remove();
                 continue;
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!isVisibleCheckPointEntity(tempEntity)) {
-                if (!Util.canSeeLocation(entity.getLocation(), tempEntity.getLocation())) {
+                if (!Util.canSeeLocation(location, tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
@@ -127,20 +127,20 @@ public class CheckPointUtil {
 
     /**
      * 引数circuitNameが名称のサーキットに設置されたチェックポイントのうち、
-     * 引数entityの座標を基点に引数entityから視認できる最寄のチェックポイントを返す。<br>
+     * 引数locationを基点に視認できる最寄のチェックポイントを返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightNearestCheckpoint(String circuitName, Entity entity, float sightThreshold) {
-        List<Entity> checkPointList = getInSightNearbyCheckPoints(circuitName, entity, sightThreshold);
+    public static Entity getInSightNearestCheckpoint(String circuitName, Location location, float sightThreshold) {
+        List<Entity> checkPointList = getInSightNearbyCheckPoints(circuitName, location, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, entity.getLocation());
+        return Util.getNearestEntity(checkPointList, location);
     }
 
     // 〓 Get InSight / Detectable 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
