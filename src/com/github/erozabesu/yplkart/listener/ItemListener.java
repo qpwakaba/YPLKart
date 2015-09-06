@@ -71,11 +71,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         Chunk chunk = event.getChunk();
         if (RaceEntityUtil.getJammerEntityExistChunkArray().contains(chunk)) {
-            if (RaceEntityUtil.containsJammerEntity(chunk)) {
-                event.setCancelled(true);
-                return;
-            }
-            RaceEntityUtil.removeJammerEntityExistChunkArray(chunk);
+            event.setCancelled(true);
         }
     }
 
@@ -715,7 +711,9 @@ public class ItemListener extends RaceManager implements Listener {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
-        if (RaceManager.getRank(user) == 0) {
+
+        int ownRank = RaceManager.getRank(user);
+        if (ownRank == 0) {
             return;
         }
 
@@ -730,7 +728,8 @@ public class ItemListener extends RaceManager implements Listener {
         Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.THORNED_TURTLE);
 
-        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), 1);
+        int targetRank = ownRank == 1 ? 2 : 1;
+        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), targetRank);
         new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
