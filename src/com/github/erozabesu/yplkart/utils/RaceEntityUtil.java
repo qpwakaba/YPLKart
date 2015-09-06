@@ -84,8 +84,6 @@ public class RaceEntityUtil {
         ItemStack handItem = new ItemStack(ItemEnum.BANANA.getDisplayBlockMaterial(), 1, (short) 0, ItemEnum.BANANA.getDisplayBlockMaterialData());
         ArmorStand banana = createJammerArmorStand(circuit, location, ItemEnum.BANANA.getDisplayName(), handItem);
 
-        addJammerEntityExistChunkArray(banana.getLocation().getChunk());
-
         return banana;
     }
 

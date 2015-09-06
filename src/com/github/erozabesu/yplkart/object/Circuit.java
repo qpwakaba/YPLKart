@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -324,7 +325,9 @@ public class Circuit {
     public void removeAllJammerEntity() {
         if (this.getJammerEntitySet().size() != 0) {
             for (Entity entity : this.getJammerEntitySet()) {
-                if (!entity.isDead()) {
+                if (entity instanceof LivingEntity) {
+                    ((LivingEntity) entity).setHealth(0.0D);
+                } else {
                     entity.remove();
 
                     // チャンクに妨害エンティティが残っていない場合は配列から削除
