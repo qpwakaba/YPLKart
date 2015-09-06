@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderCrystal;
@@ -39,7 +38,6 @@ public class RaceEntityUtil {
     private static String FakeItemBoxName = ItemBoxName + "！！";
     private static String DisposableFakeItemBoxName = ItemBoxName + "！";
     private static Set<Chunk> jammerEntityExistChunkArray = new HashSet<Chunk>();
-    private static ItemStack bananaEntityItem = new ItemStack(Material.QUARTZ);
 
     public static Set<Chunk> getJammerEntityExistChunkArray() {
         return jammerEntityExistChunkArray;
@@ -55,26 +53,58 @@ public class RaceEntityUtil {
 
     //〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static ArmorStand createBanana(Location location) {
-        location.setYaw(new Random().nextInt(360));
-        ArmorStand banana = location.getWorld().spawn(location, ArmorStand.class);
+    public static ArmorStand createJammerArmorStand(Circuit circuit, Location location, String customName, ItemStack handItem) {
+        ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
 
-        banana.setItemInHand(bananaEntityItem);
-        banana.getLocation().setYaw(location.getYaw());
-        banana.getLocation().setPitch(location.getPitch());
-        banana.setCustomName(ItemEnum.BANANA.getDisplayName());
-        banana.setCustomNameVisible(false);
-        banana.setVisible(false);
-        banana.setGravity(true);
-        banana.setBasePlate(false);
+        armorStand.setItemInHand(handItem);
+        armorStand.setCustomName(customName);
+        armorStand.setCustomNameVisible(false);
+        armorStand.setVisible(false);
+        armorStand.setBasePlate(false);
+        armorStand.setRemoveWhenFarAway(false);
+        armorStand.setGravity(true);
 
-        Object nmsBanana = Util.getCraftEntity(banana);
+        Object nmsBanana = Util.getCraftEntity(armorStand);
         Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + location.getPitch(), 1.00F, 0.0F);
         ReflectionUtil.invoke(Methods.nmsEntityArmorStand_setRightArmPose, nmsBanana, vector3f);
+
+        circuit.addJammerEntity(armorStand);
+
+        return armorStand;
+    }
+
+    public static ArmorStand createBanana(Circuit circuit, Location location) {
+        if (circuit == null) {
+            return null;
+        }
+
+        location.setYaw(new Random().nextInt(360));
+        location.setPitch(0.0F);
+
+        ItemStack handItem = new ItemStack(ItemEnum.BANANA.getDisplayBlockMaterial(), 1, (short) 0, ItemEnum.BANANA.getDisplayBlockMaterialData());
+        ArmorStand banana = createJammerArmorStand(circuit, location, ItemEnum.BANANA.getDisplayName(), handItem);
 
         addJammerEntityExistChunkArray(banana.getLocation().getChunk());
 
         return banana;
+    }
+
+    public static ArmorStand createTurtle(Circuit circuit, Location location, ItemEnum itemEnum) {
+        if (circuit == null) {
+            return null;
+        }
+        if (!itemEnum.equals(ItemEnum.TURTLE)
+                && !itemEnum.equals(ItemEnum.RED_TURTLE)
+                && !itemEnum.equals(ItemEnum.THORNED_TURTLE)) {
+            return null;
+        }
+
+        location.setPitch(0.0F);
+
+        ItemStack handItem = new ItemStack(itemEnum.getDisplayBlockMaterial(), 1, (short) 0, itemEnum.getDisplayBlockMaterialData());
+        ArmorStand turtle = createJammerArmorStand(circuit, location, itemEnum.getDisplayName(), handItem);
+
+        return turtle;
     }
 
     public static EnderCrystal createItemBox(Location location, int tier) {
@@ -243,8 +273,25 @@ public class RaceEntityUtil {
         if (customName == null || customName.equalsIgnoreCase("")) {
             return false;
         }
-        ItemEnum.BANANA.getDisplayName();
+
         if (!customName.matches("^(§.)*" +  ItemEnum.BANANA.getDisplayName() + "$")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isRedTurtleEntity(Entity entity) {
+        if (!(entity instanceof ArmorStand)) {
+            return false;
+        }
+
+        String customName = entity.getCustomName();
+        if (customName == null || customName.equalsIgnoreCase("")) {
+            return false;
+        }
+
+        if (!customName.matches("^(§.)*" +  ItemEnum.RED_TURTLE.getDisplayName() + "$")) {
             return false;
         }
 
