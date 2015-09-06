@@ -47,8 +47,9 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.ItemDyedTurtle;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.task.ItemDyedTurtleTask;
 import com.github.erozabesu.yplkart.task.ItemStarTask;
 import com.github.erozabesu.yplkart.task.ItemTurtleTask;
 import com.github.erozabesu.yplkart.task.SendCountDownTitleTask;
@@ -262,7 +263,7 @@ public class ItemListener extends RaceManager implements Listener {
             Location location = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                     .add(0.5, 0, 0.5);
             player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
-            RaceManager.getCircuit(racer.getCircuitName()).addJammerEntity(RaceEntityUtil.createBanana(location));
+            RaceEntityUtil.createBanana(RaceManager.getCircuit(racer.getCircuitName()), location);
 
         //にせアイテムボックス
         } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
@@ -426,9 +427,9 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         Entity entity = event.getEntity();
-        if (RaceEntityUtil.isBananaEntity(entity)) {
-            event.setCancelled(true);
-        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+        if (RaceEntityUtil.isBananaEntity(entity)
+                || RaceEntityUtil.isRedTurtleEntity(entity)
+                || RaceEntityUtil.isDisposableFakeItemBox(entity)
                 || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
                 || RaceEntityUtil.isNormalFakeItemBox(entity)
                 || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
@@ -446,9 +447,9 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         Entity entity = event.getEntity();
-        if (RaceEntityUtil.isBananaEntity(entity)) {
-            event.setCancelled(true);
-        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+        if (RaceEntityUtil.isBananaEntity(entity)
+                || RaceEntityUtil.isRedTurtleEntity(entity)
+                || RaceEntityUtil.isDisposableFakeItemBox(entity)
                 || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
                 || RaceEntityUtil.isNormalFakeItemBox(entity)
                 || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
@@ -466,9 +467,9 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         Entity entity = event.getEntity();
-        if (RaceEntityUtil.isBananaEntity(entity)) {
-            event.setCancelled(true);
-        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+        if (RaceEntityUtil.isBananaEntity(entity)
+                || RaceEntityUtil.isRedTurtleEntity(entity)
+                || RaceEntityUtil.isDisposableFakeItemBox(entity)
                 || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
                 || RaceEntityUtil.isNormalFakeItemBox(entity)
                 || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
@@ -486,9 +487,9 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         Entity entity = event.getEntity();
-        if (RaceEntityUtil.isBananaEntity(entity)) {
-            event.setCancelled(true);
-        } else if (RaceEntityUtil.isDisposableFakeItemBox(entity)
+        if (RaceEntityUtil.isBananaEntity(entity)
+                || RaceEntityUtil.isRedTurtleEntity(entity)
+                || RaceEntityUtil.isDisposableFakeItemBox(entity)
                 || RaceEntityUtil.isHighGradeItemBoxEntity(entity)
                 || RaceEntityUtil.isNormalFakeItemBox(entity)
                 || RaceEntityUtil.isNormalItemBoxEntity(entity)) {
@@ -679,63 +680,58 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemRedturtle(Player user) {
-        if (getRacingPlayer(getRacer(user).getCircuitName()).size() <= 1) {
+        Racer racer = RaceManager.getRacer(user);
+        if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
-        if (getRank(user) == 0)
+        if (getRank(user) == 0) {
             return;
-        if (CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F) == null) {
+        }
+
+        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), detectCheckPointRadius);
+        if (firstCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
 
         Util.setItemDecrease(user);
 
-        FallingBlock turtle = user.getWorld().spawnFallingBlock(user.getEyeLocation(), Material.HUGE_MUSHROOM_1,
-                (byte) 5);
-        turtle.setCustomName(ItemEnum.RED_TURTLE.getDisplayName());
-        turtle.setCustomNameVisible(false);
-        turtle.setDropItem(false);
+        Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
+        Entity turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.RED_TURTLE);
 
-        int rank = getRank(user);
-        Player target = null;
-        if (rank == 1)
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), rank + 1), turtle, false, true)
-                    .runTaskTimer(YPLKart.getInstance(), 0, 1);
-        else
-            new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), rank - 1), turtle, false, false)
-                    .runTaskTimer(YPLKart.getInstance(), 0, 1);
+        int rank = RaceManager.getRank(user);
+        rank = rank == 1 ? rank + 1 : rank - 1;
+        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), rank);
+
+        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.RED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemThornedturtle(Player user) {
-        if (getRacingPlayer(getRacer(user).getCircuitName()).size() <= 1) {
+        Racer racer = RaceManager.getRacer(user);
+
+        if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
-        int rank = getRank(user);
-        if (rank == 0)
-            return;
-        else if (rank == 1) {
-            MessageEnum.itemHighestPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()),
-                    ItemEnum.THORNED_TURTLE.getItem() });
+        if (RaceManager.getRank(user) == 0) {
             return;
         }
-        if (CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F) == null) {
+
+        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), 50.0D);
+        if (firstCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
             return;
         }
 
         Util.setItemDecrease(user);
 
-        FallingBlock turtle = user.getWorld().spawnFallingBlock(user.getEyeLocation(), Material.HUGE_MUSHROOM_1,
-                (byte) 6);
-        turtle.setCustomName(ItemEnum.THORNED_TURTLE.getDisplayName());
-        turtle.setCustomNameVisible(false);
-        turtle.setDropItem(false);
+        Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
+        Entity turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation(), ItemEnum.THORNED_TURTLE);
 
-        new ItemDyedTurtleTask(user, getPlayerfromRank(getRacer(user).getCircuitName(), 1), turtle, true, false).runTaskTimer(
-                YPLKart.getInstance(), 0, 1);
+        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), 1);
+        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemKiller(final Player user) {
