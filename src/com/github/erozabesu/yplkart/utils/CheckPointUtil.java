@@ -86,7 +86,7 @@ public class CheckPointUtil {
      * @param sightThreshold 視野
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndVisibleNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold) {
+    public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         List<Entity> entityList = Util.getNearbyEntities(entity.getLocation().clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
 
@@ -147,8 +147,8 @@ public class CheckPointUtil {
      * @param sightThreshold 視野
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndVisibleNearestCheckpoint(String circuitName, Entity entity, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndVisibleNearbyCheckPoints(circuitName, entity, sightThreshold);
+    public static Entity getInSightAndDetectableNearestCheckpoint(String circuitName, Entity entity, float sightThreshold) {
+        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, entity, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -222,7 +222,7 @@ public class CheckPointUtil {
      * @param sightThreshold 視野
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndVisibleNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold) {
+    public static List<Entity> getInSightAndDetectableNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold) {
         String circuitName = racer.getCircuitName();
         Player player = racer.getPlayer();
         if (circuitName == null || circuitName.equalsIgnoreCase("")) {
@@ -296,8 +296,8 @@ public class CheckPointUtil {
      * @param sightThreshold 視野
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndVisibleNearestUnpassedCheckpoint(Racer racer, Location location, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndVisibleNearbyUnpassedCheckPoints(racer, location, sightThreshold);
+    public static Entity getInSightAndDetectableNearestUnpassedCheckpoint(Racer racer, Location location, float sightThreshold) {
+        List<Entity> checkPointList = getInSightAndDetectableNearbyUnpassedCheckPoints(racer, location, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }

@@ -178,7 +178,7 @@ public class RaceListener implements Listener {
         Location location = player.getLocation();
 
         // 周囲のチェックポイントのうち、視認が可能な未通過のチェックポイントを取得
-        Entity nearestCheckPoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(racer, location, 270.0F);
+        Entity nearestCheckPoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(racer, location, 270.0F);
 
         // 前回通過したチェックポイント
         Entity lastPassedCheckPoint = racer.getLastPassedCheckPointEntity();

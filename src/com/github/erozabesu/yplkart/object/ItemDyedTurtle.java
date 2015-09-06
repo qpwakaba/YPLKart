@@ -132,7 +132,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
         if (this.turtle.getLocation().distance(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 5) {
             this.lastCheckPoint.getLocation().setYaw(this.lastCheckPoint.getLocation().getYaw());
-            Entity newCheckPoint = CheckPointUtil.getInSightAndVisibleNearestCheckpoint(this.circuitName, this.lastCheckPoint, 180.0F);
+            Entity newCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(this.circuitName, this.lastCheckPoint, 180.0F);
             if (newCheckPoint != null) {
                 this.lastCheckPoint = newCheckPoint;
 

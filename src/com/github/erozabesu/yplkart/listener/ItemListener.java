@@ -747,7 +747,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndVisibleNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F);
+        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F);
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
