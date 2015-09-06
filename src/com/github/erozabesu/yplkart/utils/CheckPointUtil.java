@@ -135,7 +135,7 @@ public class CheckPointUtil {
      * @return チェックポイントエンティティ
      */
     public static Entity getInSightNearestCheckpoint(String circuitName, Entity entity, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, entity, sightThreshold);
+        List<Entity> checkPointList = getInSightNearbyCheckPoints(circuitName, entity, sightThreshold);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
