@@ -201,8 +201,8 @@ public class Racer extends PlayerObject{
     private void sendResult() {
         String circuitName = this.getCircuitName();
         Circuit circuit = RaceManager.getCircuit(circuitName);
-        double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
-        int currentRank = RaceManager.getGoalPlayer(circuitName).size();
+        double lapTime = circuit.getLapMilliSecond() / 1000.0D;
+        int currentRank = circuit.getGoalPlayerUuidSet().size();
         Number[] messagePartsRaceResult = new Number[]{currentRank, lapTime};
 
         //〓ゴールしたプレイヤー向けメッセージ送信
