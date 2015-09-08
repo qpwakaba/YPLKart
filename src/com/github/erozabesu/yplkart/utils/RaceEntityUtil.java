@@ -21,7 +21,9 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
+import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Methods;
@@ -318,15 +320,15 @@ public class RaceEntityUtil {
         banana.remove();
 
         if (player.getNoDamageTicks() == 0) {
-            Circuit circuit = new Circuit();
-            circuit.setCircuitName(racer.getCircuitName());
-            MessageEnum.raceInteractBanana.sendConvertedMessage(player, circuit);
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageEnum.raceInteractBanana.sendConvertedMessage(player, circuitParts);
             racer.runNegativeItemSpeedTask(ItemEnum.BANANA.getEffectSecond(), ItemEnum.BANANA.getEffectLevel(), Sound.SLIME_WALK);
         }
     }
 
     public static void collideDisposableFakeItemBox(Player player, Entity fakeItemBox) {
-        MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player, RaceManager.getCircuit(player.getUniqueId()));
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(player.getUniqueId()));
+        MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player, circuitParts);
         Util.createSafeExplosion(null, player.getLocation(), ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
         fakeItemBox.remove();

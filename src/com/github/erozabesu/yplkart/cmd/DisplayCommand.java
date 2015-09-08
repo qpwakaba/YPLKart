@@ -12,6 +12,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
@@ -68,7 +69,7 @@ public class DisplayCommand extends Command {
             location = new Location(world, x, y, z, yaw, pitch);
         }
         KartUtil.createDisplayKart(location, kart, null);
-        MessageEnum.cmdDisplayCreate.sendConvertedMessage(sender, kart);
+        MessageEnum.cmdDisplayCreate.sendConvertedMessage(sender, MessageParts.getMessageParts(kart));
         return true;
     }
 }

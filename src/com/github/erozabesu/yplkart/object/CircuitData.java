@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.utils.Util;
 
 /**
@@ -352,25 +353,33 @@ public class CircuitData {
      * @param address ログの送信先
      */
     public void sendInformation(CommandSender address) {
-        Location l = this.getStartLocation();
-        Number[] numberdata = {
-                this.getNumberOfLaps(), this.getMinPlayer(), this.getMaxPlayer()
-                , this.getLimitTime(), this.getMenuTime(), this.getMatchingTime()
-                , l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch() };
+        Location location = this.getStartLocation();
 
-        Circuit circuit = new Circuit();
-        circuit.setCircuitName(this.getCircuitDataName());
-        MessageEnum.tableCircuitInformation
-                .sendConvertedMessage(address, circuit, this.getRaceType(), l.getWorld().getName(), numberdata, this.getBroadcastGoalMessage());
+        MessageParts numberParts = MessageParts.getMessageParts(
+                        this.getNumberOfLaps()
+                        , this.getMinPlayer()
+                        , this.getMaxPlayer()
+                        , this.getLimitTime()
+                        , this.getMenuTime()
+                        , this.getMatchingTime()
+                        , location.getBlockX()
+                        , location.getBlockY()
+                        , location.getBlockZ()
+                        , location.getYaw()
+                        , location.getPitch());
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, this.getCircuitDataName());
+        MessageParts raceTypeParts = MessageParts.getMessageParts(this.getRaceType());
+        MessageParts flagParts = MessageParts.getMessageParts(this.getBroadcastGoalMessage());
+        MessageParts textParts = new MessageParts(TagType.TEXT_ARRAY, location.getWorld().getName());
+
+        MessageEnum.tableCircuitInformation.sendConvertedMessage(address, numberParts, circuitParts, raceTypeParts, flagParts, textParts);
     }
 
     public void sendRanking(CommandSender address) {
 
         //ランキングデータがない
         if (this.getRunLapTimeList().size() == 0 && this.getKartLapTimeList().size() == 0) {
-            Circuit circuit = new Circuit();
-            circuit.setCircuitName(this.getCircuitDataName());
-            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(address, circuit);
+            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(address, new MessageParts(TagType.CIRCUIT, this.getCircuitDataName()));
             return;
         }
 

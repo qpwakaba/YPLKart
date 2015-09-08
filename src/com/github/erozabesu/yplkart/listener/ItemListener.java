@@ -48,6 +48,7 @@ import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.ItemDyedTurtle;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.task.ItemStarTask;
 import com.github.erozabesu.yplkart.task.ItemTurtleTask;
@@ -532,9 +533,11 @@ public class ItemListener extends RaceManager implements Listener {
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public void itemTeresa(Player user) {
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+
         List<Player> entry = getRacingPlayer(getRacer(user).getCircuitName());
         if (entry.size() <= 1) {
-            MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
         Util.setItemDecrease(user);
@@ -553,14 +556,14 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         if (targetitem.isEmpty() || 0 < target.getNoDamageTicks()) {
-            MessageEnum.itemTeresaNoItem.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemTeresaNoItem.sendConvertedMessage(user, circuitParts);
             user.playSound(user.getLocation(), Sound.BURP, 1.0F, 0.5F);
         } else {
             ItemStack rob = targetitem.get(new Random().nextInt(targetitem.size()));
             targetinv.remove(rob);
-            MessageEnum.itemTeresaRob.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()), rob });
+            MessageEnum.itemTeresaRob.sendConvertedMessage(user, circuitParts, MessageParts.getMessageParts(rob));
             user.playSound(user.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-            MessageEnum.itemTeresaRobbed.sendConvertedMessage(target, new Object[] { getCircuit(user.getUniqueId()), rob });
+            MessageEnum.itemTeresaRobbed.sendConvertedMessage(target, circuitParts, MessageParts.getMessageParts(rob));
             target.playSound(user.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
             ItemEnum.addItem(user, rob);
             user.updateInventory();
@@ -571,7 +574,8 @@ public class ItemListener extends RaceManager implements Listener {
     public void itemThunder(Player user) {
         List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
         if (list.size() <= 1) {
-            MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+            MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
         Util.setItemDecrease(user);
@@ -603,9 +607,11 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemGesso(Player user) {
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+
         List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
         if (list.size() <= 1) {
-            MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
         ArrayList<Player> target = new ArrayList<Player>();
@@ -616,7 +622,7 @@ public class ItemListener extends RaceManager implements Listener {
                 target.add(entry);
         }
         if (target.isEmpty()) {
-            MessageEnum.itemNoHigherPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoHigherPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
 
@@ -659,9 +665,11 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemRedturtle(Player user) {
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+
         Racer racer = RaceManager.getRacer(user);
         if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
-            MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
         if (getRank(user) == 0) {
@@ -671,7 +679,7 @@ public class ItemListener extends RaceManager implements Listener {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), detectCheckPointRadius);
         if (firstCheckPoint == null) {
-            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
@@ -688,10 +696,11 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemThornedturtle(Player user) {
-        Racer racer = RaceManager.getRacer(user);
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
 
+        Racer racer = RaceManager.getRacer(user);
         if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
-            MessageEnum.itemNoPlayer.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
 
@@ -702,7 +711,7 @@ public class ItemListener extends RaceManager implements Listener {
 
         Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), 50.0D);
         if (firstCheckPoint == null) {
-            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
@@ -721,34 +730,35 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        final Racer r = getRacer(user);
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
 
+        final Racer racer = getRacer(user);
         // 通過済みのチェックポイントが1つ以上ない場合はreturn
-        if (r.getPassedCheckPointList().size() < 1) {
-            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+        if (racer.getPassedCheckPointList().size() < 1) {
+            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
         Entity unpassedcheckpoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F);
 
         if (unpassedcheckpoint == null) {
-            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
-        if (r.getUsingKiller() != null) {
-            MessageEnum.itemAlreadyUsing.sendConvertedMessage(user, new Object[] { getCircuit(user.getUniqueId()) });
+        if (racer.getUsingKiller() != null) {
+            MessageEnum.itemAlreadyUsing.sendConvertedMessage(user, circuitParts);
             return;
         }
 
         Util.setItemDecrease(user);
 
-        Character character = r.getCharacter();
+        Character character = racer.getCharacter();
 
         int life = ItemEnum.KILLER.getEffectSecond() + character.getAdjustPositiveEffectSecond();
         new SendCountDownTitleTask(user, life, MessageEnum.titleUsingKiller.getMessage()).runTaskTimer(
                 YPLKart.getInstance(), 0, 1);
 
-        r.runKillerInitializeTask(life, unpassedcheckpoint);
+        racer.runKillerInitializeTask(life, unpassedcheckpoint);
     }
 }

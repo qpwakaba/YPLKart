@@ -33,6 +33,7 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Fields;
@@ -319,14 +320,15 @@ public class Util extends ReflectionUtil {
                     player.setHealth(player.getMaxHealth());
 
                     //攻撃実行者が明確な場合、レース参加者に他殺のデスログを送信
+                    MessageParts circuitParts = MessageParts.getMessageParts(circuit);
                     if (executor != null) {
-                        Player[] messagePartsPlayers = new Player[]{(Player) damaged, (Player) executor};
-                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerKill, circuit, messagePartsPlayers);
+                        MessageParts playerParts = MessageParts.getMessageParts((Player) damaged, (Player) executor);
+                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerKill, circuitParts, playerParts);
 
                     //攻撃実行者が不明の場合、レース参加者に死亡したことのみを伝えるデスログを送信
                     } else {
-                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerDead
-                                , new Object[] { circuit, (Player) damaged });
+                        MessageParts playerParts = MessageParts.getMessageParts((Player) damaged);
+                        circuit.sendMessageEntryPlayer(MessageEnum.racePlayerDead, circuitParts, playerParts);
                     }
 
                     //プレイヤーにデスペナルティを適用

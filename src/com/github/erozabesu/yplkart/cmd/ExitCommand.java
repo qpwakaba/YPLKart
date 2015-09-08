@@ -9,6 +9,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ExitCommand extends Command {
@@ -26,8 +27,9 @@ public class ExitCommand extends Command {
                 return true;
             }
         } else if (args.length == 2) {
-            if (!Permission.hasPermission(sender, Permission.CMD_EXIT.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMDOTHER_EXIT, false)) {
                 return true;
+            }
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
@@ -45,7 +47,7 @@ public class ExitCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.racerSetter_UnEntry(other.getUniqueId());
-                MessageEnum.cmdExitOther.sendConvertedMessage(sender, other);
+                MessageEnum.cmdExitOther.sendConvertedMessage(sender, MessageParts.getMessageParts(other));
                 return true;
             }
         }

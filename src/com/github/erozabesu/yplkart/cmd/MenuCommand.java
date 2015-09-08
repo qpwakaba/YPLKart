@@ -9,6 +9,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class MenuCommand extends Command {
@@ -25,7 +26,7 @@ public class MenuCommand extends Command {
                 return true;
             }
         } else if (args.length == 2) {
-            if (!Permission.hasPermission(sender, Permission.CMD_MENU.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMDOTHER_MENU, false))
                 return true;
 
             if (args[1].equalsIgnoreCase("all")) {
@@ -44,7 +45,7 @@ public class MenuCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.showSelectMenu(other, true);
-                MessageEnum.cmdMenuOther.sendConvertedMessage(sender, other);
+                MessageEnum.cmdMenuOther.sendConvertedMessage(sender, MessageParts.getMessageParts(other));
                 return true;
             }
         }

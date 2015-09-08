@@ -11,6 +11,7 @@ import com.github.erozabesu.yplkart.data.CharacterConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Character;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class CharacterCommand extends Command {
@@ -37,13 +38,15 @@ public class CharacterCommand extends Command {
             }
             RaceManager.racerSetter_Character(player.getUniqueId(), character);
             return true;
-            //ka character {player} {character name}
-            //ka character all {character name}
-            //ka character {player} random
-            //ka character all random
+
+        //ka character {player} {character name}
+        //ka character all {character name}
+        //ka character {player} random
+        //ka character all random
         } else if (args.length == 3) {
-            if (!Permission.hasPermission(sender, Permission.CMD_CHARACTER.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMDOTHER_CHARACTER, false)) {
                 return true;
+            }
 
             Character character;
             if (args[2].equalsIgnoreCase("random")) {
@@ -71,7 +74,10 @@ public class CharacterCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.racerSetter_Character(other.getUniqueId(), character);
-                MessageEnum.cmdCharacterOther.sendConvertedMessage(sender, new Object[] { other, character });
+
+                MessageParts playerParts = MessageParts.getMessageParts(other);
+                MessageParts characterParts = MessageParts.getMessageParts(character);
+                MessageEnum.cmdCharacterOther.sendConvertedMessage(sender, playerParts, characterParts);
                 return true;
             }
         } else {

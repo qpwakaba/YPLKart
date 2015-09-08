@@ -147,7 +147,7 @@ public class Kart {
 
     /** @return カートのパラメーター一覧 */
     public String getParameter() {
-        String[] parameter = new String[] {
+        MessageParts textParts = MessageParts.getMessageParts(
                 String.valueOf(getWeight()),
                 String.valueOf(getMaxSpeed()),
                 String.valueOf(getBoostedMaxSpeed()),
@@ -156,10 +156,9 @@ public class Kart {
                 String.valueOf(getDriftCorneringPower()),
                 String.valueOf(getSpeedDecreaseOnDrift()),
                 String.valueOf(getSpeedDecreaseOnDirt()),
-                String.valueOf(getClimbableHeight())
-        };
+                String.valueOf(getClimbableHeight()));
 
-        return MessageEnum.tableKartParameter.getConvertedMessage(new Object[] {parameter});
+        return MessageEnum.tableKartParameter.getConvertedMessage(textParts);
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

@@ -9,6 +9,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class LeaveCommand extends Command {
@@ -50,7 +51,7 @@ public class LeaveCommand extends Command {
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.leaveRacingKart(other);
                 RaceManager.racerSetter_DeselectKart(other.getUniqueId());
-                MessageEnum.cmdLeaveOther.sendConvertedMessage(sender, other);
+                MessageEnum.cmdLeaveOther.sendConvertedMessage(sender, MessageParts.getMessageParts(other));
                 return true;
             }
         } else {

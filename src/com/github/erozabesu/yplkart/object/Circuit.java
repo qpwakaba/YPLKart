@@ -92,17 +92,12 @@ public class Circuit {
 
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public Circuit() {
-    }
-
     public Circuit(String circuitName) {
         this.setCircuitName(circuitName);
         this.initialize();
-
-        this.runDetectReadyTask();
     }
 
-    public void initialize() {
+    private void initialize() {
         this.setCurrentTime(0);
         this.setMatchingCountDownTime(0);
         this.setStandbyCountDownTime(0);
@@ -114,25 +109,32 @@ public class Circuit {
         this.setMatchingAcceptPlayerSet(new HashSet<UUID>());
         this.setJammerEntitySet(new HashSet<Entity>());
 
-        if (this.getDetectEndTask() != null)
+        if (this.getDetectEndTask() != null) {
             getDetectEndTask().cancel();
+        }
         this.setDetectEndTask(null);
 
-        if (this.getLimitTimeTask() != null)
+        if (this.getLimitTimeTask() != null) {
             this.getLimitTimeTask().cancel();
+        }
         this.setLimitTimeTask(null);
 
-        if (this.getDetectReadyTask() != null)
+        if (this.getDetectReadyTask() != null) {
             this.getDetectReadyTask().cancel();
+        }
         this.setDetectReadyTask(null);
 
-        if (this.getMatchingTask() != null)
+        if (this.getMatchingTask() != null) {
             this.getMatchingTask().cancel();
+        }
         this.setMatchingTask(null);
 
-        if (this.getStandbyTask() != null)
+        if (this.getStandbyTask() != null) {
             this.getStandbyTask().cancel();
+        }
         this.setStandbyTask(null);
+
+        this.runDetectReadyTask();
     }
 
     //〓 Race Management 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -160,7 +162,7 @@ public class Circuit {
      * 新たにマッチングを開始する
      */
     public void endRace() {
-        this.sendMessageEntryPlayer(MessageEnum.raceEnd, this);
+        this.sendMessageEntryPlayer(MessageEnum.raceEnd, MessageParts.getMessageParts(this));
         Iterator<UUID> currentEntryListIterator = getEntryPlayerSet().iterator();
         UUID currentUuid;
         while (currentEntryListIterator.hasNext()) {
@@ -169,17 +171,16 @@ public class Circuit {
             RaceManager.racerSetter_UnEntry(currentUuid);
         }
 
-        //リザーブエントリーがあれば終了処理後に改めてサーキットを新規作成する
-        //ただしYPLKart.onDisable()から呼び出されている場合は何もしない
+        // リザーブエントリーがあれば終了処理後に改めてエントリーさせる
+        // ただしYPLKart.onDisable()から呼び出されている場合は何もしない
         if (YPLKart.getInstance().isEnabled()) {
             final List<UUID> nextEntryList = new ArrayList<UUID>(getReserveEntryPlayerSet());
             if (0 < nextEntryList.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        Circuit circuit = RaceManager.setupCircuit(getCircuitName());
                         for (UUID nextUuid : nextEntryList) {
                             if (Bukkit.getPlayer(nextUuid) != null) {
-                                circuit.entryPlayer(nextUuid);
+                                entryPlayer(nextUuid);
                             }
                         }
                     }
@@ -190,7 +191,6 @@ public class Circuit {
         //初期化
         this.removeAllJammerEntity();
         this.initialize();
-        RaceManager.clearCircuitData(getCircuitName());
         Scoreboards.endCircuit(getCircuitName());
     }
 
@@ -227,7 +227,7 @@ public class Circuit {
             Racer racer = RaceManager.getRacer(player);
 
             //メッセージ送信
-            MessageEnum.raceStart.sendConvertedMessage(player, new Object[] {getInstance()});
+            MessageEnum.raceStart.sendConvertedMessage(player, MessageParts.getMessageParts(getInstance()));
 
             //レース用スコアボードを表示
             Scoreboards.entryCircuit(uuid);
@@ -405,7 +405,7 @@ public class Circuit {
                         if ((entryPlayer = Bukkit.getPlayer(id)) != null) {
                             PacketUtil.sendTitle(entryPlayer, MessageEnum.titleRacePrepared.getMessage(), 0, 25, 0, false);
                             PacketUtil.sendTitle(entryPlayer
-                                    , MessageEnum.titleCountDown.getConvertedMessage(getMatchingCountDownTime())
+                                    , MessageEnum.titleCountDown.getConvertedMessage(MessageParts.getMessageParts(getMatchingCountDownTime()))
                                     , 0, 25, 0, true);
 
                             //カウントダウン効果音の再生
@@ -444,7 +444,7 @@ public class Circuit {
                     } else {
 
                         //規定人数の参加承認に失敗したことを参加者に通知
-                        sendMessageEntryPlayer(MessageEnum.raceMatchingFailed, new Object[] { getInstance() });
+                        sendMessageEntryPlayer(MessageEnum.raceMatchingFailed, MessageParts.getMessageParts(getInstance()));
                         setMatching(false);
 
                         //リザーブエントリーがあればサーキットの最大人数以内でエントリーに昇格する
@@ -512,7 +512,7 @@ public class Circuit {
                     for (Player p : getOnlineEntryPlayerList()) {
                         int count = getStandbyCountDownTime() - 12;
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceMenu.getMessage(), 0, 25, 0, false);
-                        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(count), 0, 25, 0, true);
+                        PacketUtil.sendTitle(p, MessageEnum.titleCountDown.getConvertedMessage(MessageParts.getMessageParts(count)), 0, 25, 0, true);
                         playCountDownSound(p, count);
                     }
 
@@ -534,17 +534,14 @@ public class Circuit {
                     }
                 } else if (getStandbyCountDownTime() == 10) {
                     for (Player p : getOnlineEntryPlayerList()) {
-                        PacketUtil.sendTitle(
-                                p, MessageEnum.titleRaceLaps.getConvertedMessage(
-                                        CircuitConfig.getCircuitData(getCircuitName()).getNumberOfLaps())
-                                        , 10, 40, 10, false);
+                        MessageParts numberParts = MessageParts.getMessageParts(CircuitConfig.getCircuitData(getCircuitName()).getNumberOfLaps());
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceLaps.getConvertedMessage(numberParts), 10, 40, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceLapsSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (getStandbyCountDownTime() == 8) {
                     for (Player p : getOnlineEntryPlayerList()) {
-                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(
-                                CircuitConfig.getCircuitData(getCircuitName()).getLimitTime()), 10,
-                                40, 10, false);
+                        MessageParts numberParts = MessageParts.getMessageParts(CircuitConfig.getCircuitData(getCircuitName()).getLimitTime());
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimit.getConvertedMessage(numberParts), 10, 40, 10, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceTimeLimitSub.getMessage(), 10, 40, 10, true);
                     }
                 } else if (getStandbyCountDownTime() == 6) {
@@ -555,7 +552,8 @@ public class Circuit {
                 } else if (0 < getStandbyCountDownTime() && getStandbyCountDownTime() < 4) {
                     for (Player p : getOnlineEntryPlayerList()) {
                         p.playSound(p.getLocation(), Sound.NOTE_PIANO, 4.0F, 2.0F);
-                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(getStandbyCountDownTime()), 0, 20,
+                        MessageParts numberParts = MessageParts.getMessageParts(getStandbyCountDownTime());
+                        PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDown.getConvertedMessage(numberParts), 0, 20,
                                 0, false);
                         PacketUtil.sendTitle(p, MessageEnum.titleRaceStartCountDownSub.getMessage(), 0, 20, 0, true);
                     }
@@ -585,31 +583,33 @@ public class Circuit {
                 setCurrentTime(getCurrentTime() + 1);
 
                 if (getCurrentTime() % 20 == 0) {
+                    MessageParts circuitParts = MessageParts.getMessageParts(getInstance());
+
                     int remainTime = limitTime - getCurrentTime() / 20;
                     if (remainTime == 60) {
                         for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
-                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 60 });
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, circuitParts, MessageParts.getMessageParts(60));
                         }
                     } else if (remainTime == 30) {
                         for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
-                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 30 });
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, circuitParts, MessageParts.getMessageParts(30));
                         }
                     } else if (remainTime == 10) {
                         for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
-                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, new Object[] { getInstance(), (int) 10 });
+                            MessageEnum.raceTimeLimitAlert.sendConvertedMessage(p, circuitParts, MessageParts.getMessageParts(10));
                         }
                     } else if (0 < remainTime && remainTime < 10) {
                         for (Player p : getOnlineEntryPlayerList()) {
                             playCountDownSound(p, remainTime);
-                            MessageEnum.raceTimeLimitCountDown.sendConvertedMessage(p, new Object[] { getInstance(), remainTime });
+                            MessageEnum.raceTimeLimitCountDown.sendConvertedMessage(p, circuitParts, MessageParts.getMessageParts(remainTime));
                         }
                     } else if (remainTime == 0) {
                         for (Player p : getOnlineEntryPlayerList()) {
                             p.playSound(p.getLocation(), Sound.ITEM_BREAK, 2.0F, 1.0F);
-                            MessageEnum.raceTimeUp.sendConvertedMessage(p, new Object[] { getInstance() });
+                            MessageEnum.raceTimeUp.sendConvertedMessage(p, circuitParts);
                         }
                     } else if (remainTime < 0) {
                         endRace();
@@ -719,9 +719,9 @@ public class Circuit {
      * @param message MessageEnum
      * @param object タグ変換する変数
      */
-    public void sendMessageEntryPlayer(MessageEnum message, Object... object) {
+    public void sendMessageEntryPlayer(MessageEnum message, MessageParts... messageParts) {
         for (Player player : getOnlineEntryPlayerList()) {
-            message.sendConvertedMessage(player, object);
+            message.sendConvertedMessage(player, messageParts);
         }
     }
 
@@ -733,7 +733,7 @@ public class Circuit {
             if (!this.getMatchingAcceptPlayerSet().contains(uuid)) {
                 Player player = Bukkit.getPlayer(uuid);
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-                MessageEnum.raceReady.sendConvertedMessage(player, getInstance());
+                MessageEnum.raceReady.sendConvertedMessage(player, MessageParts.getMessageParts(getInstance()));
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + tellraw);
             }
         }

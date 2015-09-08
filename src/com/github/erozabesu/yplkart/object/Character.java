@@ -163,11 +163,10 @@ public class Character {
 
     /** @return キャラクターのパラメーター一覧 */
     public String getParameter() {
-        String[] parameter = new String[] {
+        MessageParts textParts = MessageParts.getMessageParts(
                 String.valueOf(this.getMaxHealth()),
                 String.valueOf(this.getWalkSpeed()),
-                String.valueOf(this.getAdjustMaxSlotSize()
-                        + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
+                String.valueOf(this.getAdjustMaxSlotSize() + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
                 Util.convertSignNumber(this.getAdjustMaxStackSize()),
                 Util.convertSignNumber(this.getAdjustAttackDamage()),
                 String.valueOf(this.getPenaltyAntiReskillSecond()),
@@ -176,10 +175,9 @@ public class Character {
                 Util.convertSignNumber(this.getAdjustPositiveEffectLevel()),
                 Util.convertSignNumber(this.getAdjustPositiveEffectSecond()),
                 Util.convertSignNumberR(this.getAdjustNegativeEffectLevel()),
-                Util.convertSignNumberR(this.getAdjustNegativeEffectSecond())
-        };
+                Util.convertSignNumberR(this.getAdjustNegativeEffectSecond()));
 
-        return MessageEnum.tableCharacterParameter.getConvertedMessage(new Object[] {parameter});
+        return MessageEnum.tableCharacterParameter.getConvertedMessage(textParts);
     }
 
     public void playMenuSelectSound(Player player) {

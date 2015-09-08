@@ -10,16 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.YPLKart;
-import com.github.erozabesu.yplkart.object.Character;
-import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.Kart;
-import com.github.erozabesu.yplkart.object.PermissionObject;
+import com.github.erozabesu.yplkart.enumdata.TagType;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.RaceType;
-import com.github.erozabesu.yplkart.utils.Util;
 
 /**
  * プラグインから出力されるテキストメッセージを格納するクラス
@@ -242,16 +238,16 @@ public enum MessageEnum {
 
     //〓 Message 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public String getConvertedMessage(Object... object) {
-        String message = getMessage();
-        for (int i = 0; i < object.length; i++) {
-            message = replaceLimitedTags(message, object[i]);
+    public String getConvertedMessage(MessageParts... messageParts) {
+        String message = this.getMessage();
+        for (int i = 0; i < messageParts.length; i++) {
+            message = replaceLimitedTags(message, messageParts[i]);
         }
         return message;
     }
 
-    public void sendConvertedMessage(CommandSender address, Object... object) {
-        sendMessage(address, getConvertedMessage(object));
+    public void sendConvertedMessage(CommandSender address, MessageParts... messageParts) {
+        sendMessage(address, getConvertedMessage(messageParts));
     }
 
     //サーキットのランキング表のような、タグ置換ではどうしようもないStringを送信する際に用います
@@ -382,62 +378,26 @@ public enum MessageEnum {
     }
 
     /**
-     * 動的なメッセージタグをobjectに含まれるデータに置換する
-     * 動的データを扱うためメッセージの送信段階でのみ利用する
-     * @param basemessage
-     * @param object
-     * @return
+     * 引数baseMessageに含まれる動的なメッセージタグを引数messagePartsに含まれるデータに置換し返す。<br>
+     * 動的データを扱うためメッセージの送信段階でのみ利用する。
+     * @param basemessage 置換する文字列
+     * @param messageParts 置換するタグ、対応する文字列が格納されたMessagePartsインスタンス
+     * @return 置換後の文字列
      */
-    private static String replaceLimitedTags(String basemessage, Object object) {
-        if (object == null) {
-            return basemessage;
+    private static String replaceLimitedTags(String baseMessage, MessageParts messageParts) {
+        TagType tagType = messageParts.getTagType();
+        String[] partsText = messageParts.getMessage();
+
+        if (tagType.isArray()) {
+            for (int i = 0; i < partsText.length; i++) {
+                int tagnumber = i + 1;
+                baseMessage = baseMessage.replace("<" + tagType.getTagText() + tagnumber + ">", partsText[i]);
+            }
+        } else {
+            baseMessage = baseMessage.replace("<" + tagType.getTagText() + ">", partsText[0]);
         }
 
-        if (object instanceof Number) {
-            basemessage = basemessage.replace("<number>", String.valueOf((Number) object));
-        } else if (object instanceof Number[]) {
-            Number[] num = (Number[]) object;
-            for (int i = 0; i < num.length; i++) {
-                int tagnumber = i + 1;
-                basemessage = basemessage.replace("<number" + tagnumber + ">", String.valueOf(num[i]));
-            }
-        } else if (object instanceof String[]) {
-            String[] text = (String[]) object;
-            for (int i = 0; i < text.length; i++) {
-                int tagnumber = i + 1;
-                basemessage = basemessage.replace("<text" + tagnumber + ">", text[i]);
-            }
-        } else if (object instanceof String) {
-            basemessage = basemessage.replace("<text1>", (String) object);
-        } else if (object instanceof Boolean) {
-            basemessage = basemessage.replace("<flag>", String.valueOf(object));
-        } else if (object instanceof Player) {
-            basemessage = basemessage.replace("<player>", ((Player) object).getName());
-        } else if (object instanceof Player[]) {
-            for (int i = 0; i < ((Player[]) object).length; i++) {
-                int tagnumber = i + 1;
-                basemessage = basemessage.replace("<player" + tagnumber + ">",
-                        String.valueOf(((Player[]) object)[i].getName()));
-            }
-        } else if (object instanceof PermissionObject) {
-            if (basemessage.contains("<perm>")) {
-                basemessage = basemessage.replace("<perm>", ((PermissionObject) object).getPermissionNode());
-            }
-        } else if (object instanceof Circuit) {
-            basemessage = basemessage.replace("<circuitname>",
-                    Util.convertInitialUpperString(((Circuit) object).getCircuitName()));
-        } else if (object instanceof RaceType) {
-            basemessage = basemessage.replace("<racetype>", ((RaceType) object).name());
-        } else if (object instanceof Character) {
-            basemessage = basemessage.replace("<character>", ((Character) object).getCharacterName());
-        } else if (object instanceof Kart) {
-            basemessage = basemessage.replace("<kart>", ((Kart) object).getKartName());
-        } else if (object instanceof ItemStack) {
-            basemessage = basemessage.replace("<item>",
-                    ChatColor.stripColor(((ItemStack) object).getItemMeta().getDisplayName()));
-        }
-
-        return basemessage;
+        return baseMessage;
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

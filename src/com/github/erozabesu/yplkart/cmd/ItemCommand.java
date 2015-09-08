@@ -10,6 +10,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class ItemCommand extends Command {
@@ -58,7 +59,7 @@ public class ItemCommand extends Command {
                     this.addItem(other, itemStack);
                 }
 
-                MessageEnum.cmdItemAll.sendConvertedMessage(sender, itemStack);
+                MessageEnum.cmdItemAll.sendConvertedMessage(sender, MessageParts.getMessageParts(itemStack));
 
                 return true;
 
@@ -88,7 +89,7 @@ public class ItemCommand extends Command {
                 }
 
                 this.addItem(otherPlayer, itemStack);
-                MessageEnum.cmdItemOther.sendConvertedMessage(sender, otherPlayer, itemStack);
+                MessageEnum.cmdItemOther.sendConvertedMessage(sender, MessageParts.getMessageParts(otherPlayer), MessageParts.getMessageParts(itemStack));
 
                 return true;
             }
@@ -120,7 +121,7 @@ public class ItemCommand extends Command {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     this.addItem(other, itemStack);
                 }
-                MessageEnum.cmdItemAll.sendConvertedMessage(sender, itemStack);
+                MessageEnum.cmdItemAll.sendConvertedMessage(sender, MessageParts.getMessageParts(itemStack));
 
             // ka [アイテム] [プレイヤー] [数量]
             } else {
@@ -131,7 +132,7 @@ public class ItemCommand extends Command {
                 }
 
                 this.addItem(otherPlayer, itemStack);
-                MessageEnum.cmdItemOther.sendConvertedMessage(sender, otherPlayer, itemStack);
+                MessageEnum.cmdItemOther.sendConvertedMessage(sender, MessageParts.getMessageParts(otherPlayer), MessageParts.getMessageParts(itemStack));
             }
         } else {
             SystemMessageEnum.referenceAddItem.sendConvertedMessage(sender);
@@ -152,7 +153,7 @@ public class ItemCommand extends Command {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             player.getInventory().addItem(itemStack);
-            MessageEnum.cmdItem.sendConvertedMessage(sender, itemStack);
+            MessageEnum.cmdItem.sendConvertedMessage(sender, MessageParts.getMessageParts(itemStack));
             return true;
         }
 

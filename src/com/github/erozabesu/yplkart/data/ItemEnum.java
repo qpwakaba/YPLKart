@@ -21,6 +21,7 @@ import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.object.CircuitData;
+import com.github.erozabesu.yplkart.object.MessageParts;
 
 /**
  * アイテム設定を格納するクラス
@@ -713,6 +714,7 @@ public enum ItemEnum {
         }
 
         //ランダム抽出
+        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(uuid));
         if (itemList.size() != 0) {
             //HashMapをItemStackの配列に変換し、ランダムなインデックスから1要素を抽出
             ItemStack[] itemStackArray = itemList.keySet().toArray(new ItemStack[itemList.size()]);
@@ -721,11 +723,11 @@ public enum ItemEnum {
             //アイテムの配布
             addItem(player, itemStack);
             MessageEnum.raceInteractItemBox.sendConvertedMessage(player
-                    , new Object[] { RaceManager.getCircuit(uuid), itemStack });
+                    , circuitParts, MessageParts.getMessageParts(itemStack));
             player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1.0F, 2.0F);
         } else {
             //アイテム利用パーミッションがない等の理由から取得できるアイテムが無かった場合
-            MessageEnum.raceInteractItemBoxFailed.sendConvertedMessage(player, RaceManager.getCircuit(uuid));
+            MessageEnum.raceInteractItemBoxFailed.sendConvertedMessage(player, circuitParts);
         }
     }
 

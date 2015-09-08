@@ -9,6 +9,7 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class CharacterResetCommand extends Command {
@@ -18,14 +19,17 @@ public class CharacterResetCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length == 1 && sender instanceof Player) {
-            if (!Permission.hasPermission(sender, Permission.CMD_CHARACTERRESET, false))
+            if (!Permission.hasPermission(sender, Permission.CMD_CHARACTERRESET, false)) {
                 return true;
+            }
+
             Player player = (Player) sender;
             RaceManager.racerSetter_DeselectCharacter(player.getUniqueId());
             return true;
         } else if (args.length == 2) {
-            if (!Permission.hasPermission(sender, Permission.CMD_CHARACTERRESET.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMDOTHER_CHARACTERRESET, false)) {
                 return true;
+            }
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
@@ -43,7 +47,9 @@ public class CharacterResetCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.racerSetter_DeselectCharacter(other.getUniqueId());
-                MessageEnum.cmdCharacterResetOther.sendConvertedMessage(sender, other);
+
+                MessageParts playerParts = MessageParts.getMessageParts(other);
+                MessageEnum.cmdCharacterResetOther.sendConvertedMessage(sender, playerParts);
                 return true;
             }
         } else {

@@ -127,7 +127,7 @@ public class DisplayKartConfig {
             //ローカルファイルから削除
             displayKart.deleteConfiguration();
 
-            MessageEnum.cmdDisplayDelete.sendConvertedMessage(address, uuid);
+            MessageEnum.cmdDisplayDelete.sendConvertedMessage(address);
         }
     }
 

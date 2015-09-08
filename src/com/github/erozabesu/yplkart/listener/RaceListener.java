@@ -33,8 +33,10 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
@@ -105,6 +107,7 @@ public class RaceListener implements Listener {
             return;
         }
 
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
         String fromBlockId = Util.getGroundBlockID(event.getFrom(), 10);
         String toBlockId = Util.getGroundBlockID(event.getTo(), 10);
 
@@ -129,8 +132,7 @@ public class RaceListener implements Listener {
 
                     //2周目以降。周回数が変動したことをプレイヤーに通知する
                     } else {
-                        MessageEnum.raceUpdateLap.sendConvertedMessage(player,
-                                new Object[] { (currentLaps + 1), RaceManager.getCircuit(racer.getCircuitName()) });
+                        MessageEnum.raceUpdateLap.sendConvertedMessage(player, MessageParts.getMessageParts(currentLaps + 1), circuitParts);
                     }
 
                     //周回数を加算
@@ -143,7 +145,7 @@ public class RaceListener implements Listener {
             if (toBlockId.equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
 
                 //逆走していることをプレイヤーに通知
-                MessageEnum.raceReverseRun.sendConvertedMessage(player, RaceManager.getCircuit(racer.getCircuitName()));
+                MessageEnum.raceReverseRun.sendConvertedMessage(player, circuitParts);
 
                 //周回数を減算
                 if (currentLaps <= 0) {
@@ -443,25 +445,25 @@ public class RaceListener implements Listener {
 
     //エントリー中の場合、キャラクター・カートが未選択の場合はメニューを閉じさせません
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getPlayer().getWorld())) {
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getPlayer().getWorld())) {
             return;
         }
-        if (!RaceManager.isStandby(((Player) e.getPlayer()).getUniqueId())) {
+        if (!RaceManager.isStandby(((Player) event.getPlayer()).getUniqueId())) {
             return;
         }
 
-        final Player p = (Player) e.getPlayer();
-        Racer r = RaceManager.getRacer(p);
-        if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
+        final Player player = (Player) event.getPlayer();
+        Racer racer = RaceManager.getRacer(player);
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+        if (event.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
 
             //まだキャラクターを選択していない場合は別の画面に遷移させない
-            if (r.getCharacter() == null) {
-                MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getCircuitName()));
+            if (racer.getCharacter() == null) {
+                MessageEnum.raceMustSelectCharacter.sendConvertedMessage(player, circuitParts);
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        RaceManager.showSelectMenu(p, true);
+                        RaceManager.showSelectMenu(player, true);
                     }
                 });
                 return;
@@ -471,33 +473,31 @@ public class RaceListener implements Listener {
              * まだカートを選択しておらず、かつ参加しているサーキットのレースタイプがKARTの場合、
              * 強制的にカート選択画面に遷移する
              */
-            CircuitData circuitData = CircuitConfig.getCircuitData(r.getCircuitName());
+            CircuitData circuitData = CircuitConfig.getCircuitData(racer.getCircuitName());
             if (circuitData != null) {
-                if (r.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
-                    MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                            p, RaceManager.getCircuit(r.getCircuitName()));
+                if (racer.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
+                    MessageEnum.raceMustSelectKart.sendConvertedMessage(player, circuitParts);
                     Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                         public void run() {
-                            RaceManager.showSelectMenu(p, false);
+                            RaceManager.showSelectMenu(player, false);
                         }
                     });
                     return;
                 }
             }
-        } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
+        } else if (event.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
 
             /*
              * まだカートを選択しておらず、かつ参加しているサーキットのレースタイプがKARTの場合、
              * 別の画面に遷移させない
              */
-            CircuitData circuitData = CircuitConfig.getCircuitData(r.getCircuitName());
+            CircuitData circuitData = CircuitConfig.getCircuitData(racer.getCircuitName());
             if (circuitData != null) {
-                if (r.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
-                    MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                            p, RaceManager.getCircuit(r.getCircuitName()));
+                if (racer.getKart() == null && circuitData.getRaceType().equals(RaceType.KART)) {
+                    MessageEnum.raceMustSelectKart.sendConvertedMessage(player, circuitParts);
                     Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                         public void run() {
-                            RaceManager.showSelectMenu(p, false);
+                            RaceManager.showSelectMenu(player, false);
                         }
                     });
                     return;
@@ -505,12 +505,11 @@ public class RaceListener implements Listener {
             }
 
             //まだキャラクターを選択していない場合、強制的にキャラクター選択画面に遷移する
-            if (r.getCharacter() == null) {
-                MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                        p, RaceManager.getCircuit(r.getCircuitName()));
+            if (racer.getCharacter() == null) {
+                MessageEnum.raceMustSelectCharacter.sendConvertedMessage(player, circuitParts);
                 Bukkit.getScheduler().runTaskAsynchronously(YPLKart.getInstance(), new Runnable() {
                     public void run() {
-                        RaceManager.showSelectMenu(p, true);
+                        RaceManager.showSelectMenu(player, true);
                     }
                 });
                 return;
@@ -521,15 +520,15 @@ public class RaceListener implements Listener {
     //エントリー中：cancel
     //インベントリネーム一致：cancel
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
-        if (!YPLKart.isPluginEnabled(e.getWhoClicked().getWorld())) {
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getWhoClicked().getWorld())) {
             return;
         }
-        if (!(e.getWhoClicked() instanceof Player)) {
+        if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
 
-        Player player = (Player) e.getWhoClicked();
+        Player player = (Player) event.getWhoClicked();
         UUID uuid = player.getUniqueId();
 
         //クライアントを×ボタン等で強制終了した場合、プレイヤーはオフラインになるためreturn
@@ -544,22 +543,23 @@ public class RaceListener implements Listener {
 
         //スタンバイ状態以降はインベントリの操作をさせない
         if (RaceManager.isStandby(player.getUniqueId())) {
-            e.setCancelled(true);
+            event.setCancelled(true);
             player.updateInventory();
         }
 
         Racer racer = RaceManager.getRacer(player);
-        if (e.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
-            e.setCancelled(true);
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+        if (event.getInventory().getName().equalsIgnoreCase("Character Select Menu")) {
+            event.setCancelled(true);
             player.updateInventory();
 
-            ItemStack item = e.getCurrentItem();
-            if (item == null) {
+            ItemStack itemStack = event.getCurrentItem();
+            if (itemStack == null) {
                 return;
             }
 
-            String clickedItemName = item.hasItemMeta()
-                    ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : null;
+            String clickedItemName = itemStack.hasItemMeta()
+                    ? ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()) : null;
             if (clickedItemName == null) {
                 return;
             }
@@ -575,8 +575,7 @@ public class RaceListener implements Listener {
                     || EnumSelectMenu.CHARACTER_PREVIOUS.equalsIgnoreCase(clickedItemName)) {
                 if (RaceManager.isStandby(uuid)) {
                     if (racer.getCharacter() == null) {
-                        MessageEnum.raceMustSelectCharacter.sendConvertedMessage(
-                                player, RaceManager.getCircuit(racer.getCircuitName()));
+                        MessageEnum.raceMustSelectCharacter.sendConvertedMessage(player, circuitParts);
                     } else {
                         player.closeInventory();
 
@@ -593,11 +592,11 @@ public class RaceListener implements Listener {
                 RaceManager.racerSetter_Character(uuid, CharacterConfig.getCharacter(clickedItemName));
             }
             player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
-        } else if (e.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
-            e.setCancelled(true);
+        } else if (event.getInventory().getName().equalsIgnoreCase("Kart Select Menu")) {
+            event.setCancelled(true);
             player.updateInventory();
 
-            ItemStack item = e.getCurrentItem();
+            ItemStack item = event.getCurrentItem();
             if (item == null) {
                 return;
             }
@@ -618,8 +617,7 @@ public class RaceListener implements Listener {
                 //ネクストプレビューボタン
                 if (RaceManager.isStandby(uuid)) {
                     if (racer.getKart() == null) {
-                        MessageEnum.raceMustSelectKart.sendConvertedMessage(
-                                player, RaceManager.getCircuit(racer.getCircuitName()));
+                        MessageEnum.raceMustSelectKart.sendConvertedMessage(player, circuitParts);
                     } else {
                         player.closeInventory();
 

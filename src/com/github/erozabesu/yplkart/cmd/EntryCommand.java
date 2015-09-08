@@ -10,7 +10,8 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
-import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.enumdata.TagType;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class EntryCommand extends Command {
@@ -38,9 +39,8 @@ public class EntryCommand extends Command {
                 // 存在しないサーキットを指定した場合はreturn
                 String circuitName = args[1];
                 if (CircuitConfig.getCircuitData(circuitName) == null) {
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(circuitName);
-                    MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuit);
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
+                    MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                     return true;
                 }
 
@@ -63,9 +63,8 @@ public class EntryCommand extends Command {
             // 存在しないサーキットを指定した場合はreturn
             String circuitName = args[2].equalsIgnoreCase("-f") ? args[1] : args[2];
             if (CircuitConfig.getCircuitData(circuitName) == null) {
-                Circuit circuit = new Circuit();
-                circuit.setCircuitName(circuitName);
-                MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuit);
+                MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
+                MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                 return true;
             }
 
@@ -85,7 +84,7 @@ public class EntryCommand extends Command {
                     return true;
                 }
             } else {
-                if (!Permission.hasPermission(sender, Permission.CMD_ENTRY.getTargetOtherPermission(), false)) {
+                if (!Permission.hasPermission(sender, Permission.CMDOTHER_ENTRY, false)) {
                     return true;
                 }
 
@@ -94,9 +93,9 @@ public class EntryCommand extends Command {
                     for (Player other : Bukkit.getOnlinePlayers()) {
                         RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], false);
                     }
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(args[2]);
-                    MessageEnum.cmdEntryAll.sendConvertedMessage(sender, circuit);
+
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, args[2]);
+                    MessageEnum.cmdEntryAll.sendConvertedMessage(sender, circuitParts);
 
                     return true;
 
@@ -110,9 +109,9 @@ public class EntryCommand extends Command {
 
                     @SuppressWarnings("deprecation")
                     Player other = Bukkit.getPlayer(playerName);
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(circuitName);
-                    MessageEnum.cmdEntryOther.sendConvertedMessage(sender, circuit, other);
+                    MessageParts playerParts = MessageParts.getMessageParts(other);
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
+                    MessageEnum.cmdEntryOther.sendConvertedMessage(sender, circuitParts, playerParts);
                     RaceManager.racerSetter_Entry(other.getUniqueId(), circuitName, false);
 
                     return true;
@@ -125,16 +124,15 @@ public class EntryCommand extends Command {
         */
         } else if (args.length == 4) {
             if (args[3].equalsIgnoreCase("-f")) {
-                if (!Permission.hasPermission(sender, Permission.CMD_ENTRY.getTargetOtherPermission(), false)) {
+                if (!Permission.hasPermission(sender, Permission.CMDOTHER_ENTRY, false)) {
                     return true;
                 }
 
                 // 存在しないサーキットを指定した場合はreturn
                 String circuitName = args[2];
                 if (CircuitConfig.getCircuitData(circuitName) == null) {
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(circuitName);
-                    MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuit);
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
+                    MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                     return true;
                 }
 
@@ -144,9 +142,8 @@ public class EntryCommand extends Command {
                         RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], true);
                     }
 
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(args[2]);
-                    MessageEnum.cmdEntryForceAll.sendConvertedMessage(sender, circuit);
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, args[2]);
+                    MessageEnum.cmdEntryForceAll.sendConvertedMessage(sender, circuitParts);
 
                     return true;
 
@@ -160,9 +157,9 @@ public class EntryCommand extends Command {
 
                     @SuppressWarnings("deprecation")
                     Player other = Bukkit.getPlayer(playerName);
-                    Circuit circuit = new Circuit();
-                    circuit.setCircuitName(circuitName);
-                    MessageEnum.cmdEntryForceOther.sendConvertedMessage(sender, circuit, other);
+                    MessageParts playerParts = MessageParts.getMessageParts(other);
+                    MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
+                    MessageEnum.cmdEntryForceOther.sendConvertedMessage(sender, circuitParts, playerParts);
                     RaceManager.racerSetter_Entry(other.getUniqueId(), circuitName, true);
 
                     return true;

@@ -11,6 +11,7 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Kart;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
 public class KartCommand extends Command {
@@ -42,7 +43,7 @@ public class KartCommand extends Command {
             // ka ride all random
             // ka ride {player name} random
         } else if (args.length == 3) {
-            if (!Permission.hasPermission(sender, Permission.CMD_KART.getTargetOtherPermission(), false))
+            if (!Permission.hasPermission(sender, Permission.CMDOTHER_KART, false))
                 return true;
             Kart kart = null;
             boolean isRandomKart = args[2].equalsIgnoreCase("random");
@@ -63,7 +64,7 @@ public class KartCommand extends Command {
                 if (isRandomKart)
                     MessageEnum.cmdRideRandomAll.sendConvertedMessage(sender);
                 else
-                    MessageEnum.cmdRideAll.sendConvertedMessage(sender, kart);
+                    MessageEnum.cmdRideAll.sendConvertedMessage(sender, MessageParts.getMessageParts(kart));
 
                 return true;
             } else {
@@ -75,7 +76,7 @@ public class KartCommand extends Command {
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
                 RaceManager.racerSetter_Kart(other.getUniqueId(), kart);
-                MessageEnum.cmdRideOther.sendConvertedMessage(sender, new Object[] { other, kart });
+                MessageEnum.cmdRideOther.sendConvertedMessage(sender, MessageParts.getMessageParts(other), MessageParts.getMessageParts(kart));
                 return true;
             }
         } else {

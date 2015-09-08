@@ -23,11 +23,13 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
+import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.RaceType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Classes;
@@ -107,25 +109,18 @@ public class RaceManager {
         }
     }
 
-    public static Circuit setupCircuit(String circuitname) {
-        if (circuitMap.get(circuitname) == null)
+    public static Circuit putCircuit(String circuitname) {
+        if (circuitMap.get(circuitname) == null) {
             circuitMap.put(circuitname, new Circuit(circuitname));
+        }
 
         return circuitMap.get(circuitname);
-    }
-
-    public static void clearCircuitData(String circuitname) {
-        if (circuitMap.get(circuitname) != null) {
-            circuitMap.get(circuitname).initialize();
-            circuitMap.remove(circuitname);
-        }
     }
 
     public static void endAllCircuit() {
         for (Circuit c : circuitMap.values()) {
             c.endRace();
         }
-        circuitMap.clear();
     }
 
     // 〓 Circuit Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -146,7 +141,7 @@ public class RaceManager {
         }
 
         if (circuit.acceptMatching(uuid)) {
-            MessageEnum.raceAccept.sendConvertedMessage(player, circuit);
+            MessageEnum.raceAccept.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
         }
     }
 
@@ -174,17 +169,17 @@ public class RaceManager {
         Player player = Bukkit.getPlayer(uuid);
         Racer racer = getRace(uuid);
         if (isEntry(uuid)) {
-            String oldcircuitname = Util.convertInitialUpperString(racer.getCircuitName());
-            MessageEnum.raceEntryAlready.sendConvertedMessage(player, oldcircuitname);
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(racer.getCircuitName()));
+            MessageEnum.raceEntryAlready.sendConvertedMessage(player, circuitParts);
         } else {
-            Circuit circuit = setupCircuit(circuitName);
+            Circuit circuit = putCircuit(circuitName);
 
             // プレイヤーの意思決定に関わらず強制的にエントリー
             if (forceEntry) {
                 racer.setCircuitName(circuitName);
                 circuit.entryPlayer(uuid);
                 Scoreboards.entryCircuit(uuid);
-                MessageEnum.raceEntryForce.sendConvertedMessage(player, circuit);
+                MessageEnum.raceEntryForce.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
                 circuit.acceptMatching(uuid);
 
                 // 既にレースがスタートしている場合はレースに割り込ませる
@@ -209,17 +204,17 @@ public class RaceManager {
             } else {
                 if (circuit.isFillPlayer()) {
                     circuit.entryReservePlayer(uuid);
-                    MessageEnum.raceEntryFull.sendConvertedMessage(player, circuit);
+                    MessageEnum.raceEntryFull.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
                 } else {
                     racer.setCircuitName(circuitName);
 
                     if (circuit.isStandby() || circuit.isStarted()) {
                         circuit.entryReservePlayer(uuid);
-                        MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, circuit);
+                        MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
                     } else {
                         circuit.entryPlayer(uuid);
                         Scoreboards.entryCircuit(uuid);
-                        MessageEnum.raceEntry.sendConvertedMessage(player, circuit);
+                        MessageEnum.raceEntry.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
 
                         // サーキットが既にマッチングフェーズの場合は自動的に参加に同意する
                         if (circuit.isMatching()) {
@@ -240,7 +235,7 @@ public class RaceManager {
         }
 
         if (!isStandby(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
             return;
         }
 
@@ -251,7 +246,10 @@ public class RaceManager {
 
         PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
         character.playMenuSelectSound(player);
-        MessageEnum.raceCharacter.sendConvertedMessage(player, new Object[] { character, getCircuit(racer.getCircuitName()) });
+
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+        MessageParts characterParts = MessageParts.getMessageParts(character);
+        MessageEnum.raceCharacter.sendConvertedMessage(player, circuitParts, characterParts);
     }
 
     public static void racerSetter_Kart(UUID uuid, Kart kart) {
@@ -262,7 +260,7 @@ public class RaceManager {
         }
 
         if (!isStandby(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(player, getCircuit(uuid));
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
             return;
         }
 
@@ -271,7 +269,9 @@ public class RaceManager {
         racer.setKart(kart);
         racer.recoveryKart();
 
-        MessageEnum.raceKart.sendConvertedMessage(player, new Object[] { kart, getCircuit(racer.getCircuitName()) });
+        MessageParts kartParts = MessageParts.getMessageParts(kart);
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+        MessageEnum.raceKart.sendConvertedMessage(player, kartParts, circuitParts);
     }
 
     public static void racerSetter_UnEntry(UUID uuid) {
@@ -293,7 +293,7 @@ public class RaceManager {
                         racer.recoveryAll();
                     }
                 }
-                MessageEnum.raceExit.sendConvertedMessage(player, circuit);
+                MessageEnum.raceExit.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
             }
 
             racer.initializeRacer();
@@ -312,9 +312,9 @@ public class RaceManager {
         if (player != null) {
             racer.recoveryPhysical();
             PacketUtil.disguiseLivingEntity(null, player, Classes.nmsEntityHuman);
-            Circuit circuit = new Circuit();
-            circuit.setCircuitName(racer.getCircuitName());
-            MessageEnum.raceCharacterReset.sendConvertedMessage(player, circuit);
+
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageEnum.raceCharacterReset.sendConvertedMessage(player, circuitParts);
         }
     }
 
@@ -327,9 +327,8 @@ public class RaceManager {
         racer.setKart(null);
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
-            Circuit circuit = new Circuit();
-            circuit.setCircuitName(racer.getCircuitName());
-            MessageEnum.raceLeave.sendConvertedMessage(player, circuit);
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageEnum.raceLeave.sendConvertedMessage(player, circuitParts);
         }
     }
 

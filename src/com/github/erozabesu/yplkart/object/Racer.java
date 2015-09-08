@@ -203,7 +203,10 @@ public class Racer extends PlayerObject{
         Circuit circuit = RaceManager.getCircuit(circuitName);
         double lapTime = circuit.getLapMilliSecond() / 1000.0D;
         int currentRank = circuit.getGoalPlayerUuidSet().size();
-        Number[] messagePartsRaceResult = new Number[]{currentRank, lapTime};
+
+        MessageParts playerParts = MessageParts.getMessageParts(this.getPlayer());
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        MessageParts numberParts = MessageParts.getMessageParts(currentRank, lapTime);
 
         //〓ゴールしたプレイヤー向けメッセージ送信
 
@@ -212,22 +215,20 @@ public class Racer extends PlayerObject{
                 YPLKart.getInstance(), 0, 1);
 
         //リザルトのサブタイトルを送信
-        String messageResultTitle = MessageEnum.titleGoalRank.getConvertedMessage(new Object[]{messagePartsRaceResult});
+        String messageResultTitle = MessageEnum.titleGoalRank.getConvertedMessage(numberParts);
         PacketUtil.sendTitle(getPlayer(), messageResultTitle, 10, 100, 10, true);
 
         //〓全体メッセージ送信
 
-        Object[] messageBroadcastParts = new Object[]{getPlayer(), circuit, messagePartsRaceResult};
-
         //全体通知機能がtrueであれば、ゴールしたプレイヤーのリザルトをサーバーの全プレイヤーに送信する
         if (CircuitConfig.getCircuitData(circuitName).getBroadcastGoalMessage()) {
             for (Player other : Bukkit.getOnlinePlayers()) {
-                MessageEnum.raceGoal.sendConvertedMessage(other, messageBroadcastParts);
+                MessageEnum.raceGoal.sendConvertedMessage(other, playerParts, circuitParts, numberParts);
             }
 
         //全体通知機能がfalseであれば、ゴールしたプレイヤーのリザルトをレースの参加者のみに送信する
         } else {
-            circuit.sendMessageEntryPlayer(MessageEnum.raceGoal, messageBroadcastParts);
+            circuit.sendMessageEntryPlayer(MessageEnum.raceGoal, playerParts, circuitParts, numberParts);
         }
     }
 

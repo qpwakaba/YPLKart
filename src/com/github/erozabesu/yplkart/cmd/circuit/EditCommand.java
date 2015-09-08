@@ -8,7 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.enumdata.TagType;
+import com.github.erozabesu.yplkart.object.MessageParts;
 
 public class EditCommand extends Command {
     public EditCommand() {
@@ -27,17 +28,16 @@ public class EditCommand extends Command {
 
         Player player = (Player)sender;
         String circuitName = args[2];
-        Circuit circuit = new Circuit();
-        circuit.setCircuitName(circuitName);
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
         ItemStack[] checkPointTools = ItemEnum.getCheckPointTools(circuitName);
         if (checkPointTools == null) {
-            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuit);
+            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuitParts);
             return true;
         }
 
         player.getInventory().addItem(checkPointTools);
-        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuit);
+        MessageEnum.cmdCircuitEdit.sendConvertedMessage(player, circuitParts);
 
         return true;
     }

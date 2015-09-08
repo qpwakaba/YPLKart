@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.object.PermissionObject;
+import com.github.erozabesu.yplkart.object.MessageParts;
 
 /**
  * パーミッションノード、及びconfig.ymlのパーミッション設定を管理するクラス
@@ -87,12 +87,6 @@ public enum Permission {
     /** パーミッションノード */
     private String permissionNode;
 
-    /**
-     * パーミッションオブジェクト<br>
-     * 現状MessageEnum.replaceLimitedTags(permission)のメッセージ変換以外に利用していない
-     */
-    private PermissionObject permission;
-
     /** config.ymlのパーミッション設定 */
     private ConfigEnum permissionConfig;
 
@@ -110,7 +104,6 @@ public enum Permission {
     private Permission(ConfigEnum permissionConfig) {
         String name = name().toLowerCase();
         this.setPermissionNode(YPLKart.PLUGIN_NAME + "." + name.replace('_', '.'));
-        this.setPermission(new PermissionObject(this.getPermissionNode()));
 
         this.setPermissionConfig(permissionConfig);
         this.reloadPermissionConfigValue();
@@ -159,7 +152,7 @@ public enum Permission {
             return false;
         }
 
-        MessageEnum.noPermission.sendConvertedMessage(target, permission.getPermission());
+        MessageEnum.noPermission.sendConvertedMessage(target, MessageParts.getMessageParts(permission));
         return false;
     }
 
@@ -193,13 +186,8 @@ public enum Permission {
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return パーミッションノード */
-    private String getPermissionNode() {
+    public String getPermissionNode() {
         return this.permissionNode;
-    }
-
-    /** @return パーミッションオブジェクト */
-    private PermissionObject getPermission() {
-        return this.permission;
     }
 
     /** @return settingsNode config.ymlのパーミッション設定 */
@@ -217,11 +205,6 @@ public enum Permission {
     /** @param permissionNode パーミッションノード */
     public void setPermissionNode(String permissionNode) {
         this.permissionNode = permissionNode;
-    }
-
-    /** @param permission パーミッションオブジェクト */
-    public void setPermission(PermissionObject permission) {
-        this.permission = permission;
     }
 
     /** @param settingsNode config.ymlのパーミッション設定 */
