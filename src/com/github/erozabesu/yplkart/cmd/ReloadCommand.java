@@ -18,14 +18,19 @@ public class ReloadCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!Permission.hasPermission(sender, Permission.OP_CMD_RELOAD, false))
+        if (!Permission.hasPermission(sender, Permission.OP_CMD_RELOAD, false)) {
             return true;
-
-        for (Player other : Bukkit.getOnlinePlayers()) {
-            RaceManager.racerSetter_UnEntry(other.getUniqueId());
         }
-        RaceManager.endAllCircuit();
 
+        // 全プレイヤーのエントリーを解除
+        for (Player other : Bukkit.getOnlinePlayers()) {
+            RaceManager.racerSetter_UnEntry(RaceManager.getRacer(other));
+        }
+
+        // 全サーキットのレースをリザーブエントリーを破棄して終了
+        RaceManager.endAllCircuit(false);
+
+        // コンフィグのリロード
         ConfigManager.reloadAllConfig();
 
         // 全DisplayKartオブジェクトのEntityを再生成する

@@ -29,7 +29,7 @@ import com.github.erozabesu.yplkart.utils.Util;
 public class CircuitData {
 
     /** サーキット名 */
-    private String circuitDataName;
+    private String circuitName;
 
     /** ワールド名 */
     private String worldName;
@@ -86,62 +86,62 @@ public class CircuitData {
      * 設定をメンバ変数へ格納する。<br>
      * ユーザ側で新規に追加するデータを扱うため、ConfigManager.getDefaultConfig()には何も記述されていない。<br>
      * そのため、ConfigManager.getXxxx(String configKey, Object defaultValue)メソッドのdefaultValueには手動で固定値を渡す。
-     * @param circuitDataName サーキット名
+     * @param circuitName サーキット名
      */
-    public CircuitData(String circuitDataName) {
-        this.setCircuitDataName(circuitDataName);
+    public CircuitData(String circuitName) {
+        this.setCircuitName(circuitName);
 
         init();
     }
 
-    public CircuitData(String circuitDataName, Location location) {
-        this.setCircuitDataName(circuitDataName);
+    public CircuitData(String circuitName, Location location) {
+        this.setCircuitName(circuitName);
 
         init();
 
         ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
 
         this.setWorldName(location.getWorld().getName());
-        configManager.setValue(this.getCircuitDataName() + ".world", location.getWorld().getName());
+        configManager.setValue(this.getCircuitName() + ".world", location.getWorld().getName());
 
         this.setLocationX(location.getX());
-        configManager.setValue(this.getCircuitDataName() + ".x", location.getX());
+        configManager.setValue(this.getCircuitName() + ".x", location.getX());
 
         this.setLocationY(location.getY());
-        configManager.setValue(this.getCircuitDataName() + ".y", location.getY());
+        configManager.setValue(this.getCircuitName() + ".y", location.getY());
 
         this.setLocationZ(location.getZ());
-        configManager.setValue(this.getCircuitDataName() + ".z", location.getZ());
+        configManager.setValue(this.getCircuitName() + ".z", location.getZ());
 
         this.setLocationPitch(location.getPitch());
-        configManager.setValue(this.getCircuitDataName() + ".pitch", location.getPitch());
+        configManager.setValue(this.getCircuitName() + ".pitch", location.getPitch());
 
         this.setLocationYaw(location.getYaw());
-        configManager.setValue(this.getCircuitDataName() + ".yaw", location.getYaw());
+        configManager.setValue(this.getCircuitName() + ".yaw", location.getYaw());
     }
 
     /** メンバ変数をコンフィグの値を基に初期値する */
-    public void init() {
+    private void init() {
         ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
         YamlConfiguration defaultConfig = configManager.getDefaultConfig();
 
-        this.setWorldName(configManager.getString(this.getCircuitDataName() + ".world", "world"));
+        this.setWorldName(configManager.getString(this.getCircuitName() + ".world", "world"));
 
-        this.setLocationX(configManager.getDouble(this.getCircuitDataName() + ".x", 0.0D));
-        this.setLocationY(configManager.getDouble(this.getCircuitDataName() + ".y", 0.0D));
-        this.setLocationZ(configManager.getDouble(this.getCircuitDataName() + ".z", 0.0D));
-        this.setLocationPitch(configManager.getFloat(this.getCircuitDataName() + ".pitch", 0.0F));
-        this.setLocationYaw(configManager.getFloat(this.getCircuitDataName() + ".yaw", 0.0F));
+        this.setLocationX(configManager.getDouble(this.getCircuitName() + ".x", 0.0D));
+        this.setLocationY(configManager.getDouble(this.getCircuitName() + ".y", 0.0D));
+        this.setLocationZ(configManager.getDouble(this.getCircuitName() + ".z", 0.0D));
+        this.setLocationPitch(configManager.getFloat(this.getCircuitName() + ".pitch", 0.0F));
+        this.setLocationYaw(configManager.getFloat(this.getCircuitName() + ".yaw", 0.0F));
 
-        this.setNumberOfLaps(configManager.getInteger(this.getCircuitDataName() + ".numberoflaps", 3));
-        this.setMinPlayer(configManager.getInteger(this.getCircuitDataName() + ".minplayer", 3));
-        this.setMaxPlayer(configManager.getInteger(this.getCircuitDataName() + ".maxplayer", 10));
-        this.setMatchingTime(configManager.getInteger(this.getCircuitDataName() + ".matchingtime", 30));
-        this.setMenuTime(configManager.getInteger(this.getCircuitDataName() + ".menutime", 30));
-        this.setLimitTime(configManager.getInteger(this.getCircuitDataName() + ".limittime", 300));
-        this.setBroadcastGoalMessage(configManager.getBoolean(this.getCircuitDataName() + ".broadcastgoalmessage", false));
+        this.setNumberOfLaps(configManager.getInteger(this.getCircuitName() + ".numberoflaps", 3));
+        this.setMinPlayer(configManager.getInteger(this.getCircuitName() + ".minplayer", 3));
+        this.setMaxPlayer(configManager.getInteger(this.getCircuitName() + ".maxplayer", 10));
+        this.setMatchingTime(configManager.getInteger(this.getCircuitName() + ".matchingtime", 30));
+        this.setMenuTime(configManager.getInteger(this.getCircuitName() + ".menutime", 30));
+        this.setLimitTime(configManager.getInteger(this.getCircuitName() + ".limittime", 300));
+        this.setBroadcastGoalMessage(configManager.getBoolean(this.getCircuitName() + ".broadcastgoalmessage", false));
 
-        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(this.getCircuitDataName() + ".race_type", "KART"));
+        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(this.getCircuitName() + ".race_type", "KART"));
         this.setRaceType(raceType);
         this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
         this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
@@ -230,7 +230,7 @@ public class CircuitData {
      * コマンド等で設定データが変更された場合逐一上書きすること
      */
     public void saveConfiguration() {
-        String configKey = getCircuitDataName();
+        String configKey = getCircuitName();
         ConfigManager config = ConfigManager.RACEDATA_CONFIG;
 
         //設定データに値を上書き
@@ -276,22 +276,10 @@ public class CircuitData {
     public void deleteConfiguration() {
         ConfigManager config = ConfigManager.RACEDATA_CONFIG;
 
-        config.setValue(getCircuitDataName(), null);
+        config.setValue(getCircuitName(), null);
 
         //設定データをローカルファイルに保存
         config.saveConfiguration();
-    }
-
-    /** 全く同様のメンバ変数を持つオブジェクトを新規に生成し返す */
-    public CircuitData cloneCircuitData() {
-
-        //ローカルファイルへ未保存のメンバ変数がある可能性があるため保存しておく
-        this.saveConfiguration();
-
-        //新たに生成したオブジェクトを返す
-        //コンストラクタから、サーキット名がキーのローカル設定データを読み込むため
-        //メンバ変数の代入等は不要
-        return new CircuitData(this.getCircuitDataName());
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -367,7 +355,7 @@ public class CircuitData {
                         , location.getBlockZ()
                         , location.getYaw()
                         , location.getPitch());
-        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, this.getCircuitDataName());
+        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, this.getCircuitName());
         MessageParts raceTypeParts = MessageParts.getMessageParts(this.getRaceType());
         MessageParts flagParts = MessageParts.getMessageParts(this.getBroadcastGoalMessage());
         MessageParts textParts = new MessageParts(TagType.TEXT_ARRAY, location.getWorld().getName());
@@ -379,7 +367,7 @@ public class CircuitData {
 
         //ランキングデータがない
         if (this.getRunLapTimeList().size() == 0 && this.getKartLapTimeList().size() == 0) {
-            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(address, new MessageParts(TagType.CIRCUIT, this.getCircuitDataName()));
+            MessageEnum.cmdCircuitRankingNoScoreData.sendConvertedMessage(address, new MessageParts(TagType.CIRCUIT, this.getCircuitName()));
             return;
         }
 
@@ -423,7 +411,7 @@ public class CircuitData {
                 String ranking = "";
 
                 //ヘッダー
-                ranking += "<darkaqua>====== " + "<aqua>" + getCircuitDataName().toUpperCase()
+                ranking += "<darkaqua>====== " + "<aqua>" + getCircuitName().toUpperCase()
                         + "<darkaqua> Running Race Ranking" + " - <aqua>" + numberOfLaps
                         + " <darkaqua>Laps" + " <darkaqua>======<br>";
 
@@ -502,7 +490,7 @@ public class CircuitData {
                 String ranking = "";
 
                 //ヘッダー
-                ranking += "<darkaqua>====== " + "<aqua>" + getCircuitDataName().toUpperCase()
+                ranking += "<darkaqua>====== " + "<aqua>" + getCircuitName().toUpperCase()
                         + "<darkaqua> Kart Race Ranking" + " - <aqua>" + numberOfLaps
                         + " <darkaqua>Laps" + " <darkaqua>======<br>";
 
@@ -574,7 +562,7 @@ public class CircuitData {
         FileConfiguration config = manager.getLocalConfig();
 
         //<Circuit name>.<Race Type>.<Number of Laps>のセクションを取得
-        String lapKey = this.getCircuitDataName() + "." + raceTypeKey;
+        String lapKey = this.getCircuitName() + "." + raceTypeKey;
         ConfigurationSection lapSection = config.getConfigurationSection(lapKey);
 
         //存在しないセクションであれば空のListを返す
@@ -602,8 +590,8 @@ public class CircuitData {
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return configKey サーキット名 */
-    public String getCircuitDataName() {
-        return this.circuitDataName;
+    public String getCircuitName() {
+        return this.circuitName;
     }
 
     /** @return ワールド名 */
@@ -689,8 +677,8 @@ public class CircuitData {
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param configKey サーキット名 */
-    public void setCircuitDataName(String circuitDataName) {
-        this.circuitDataName = circuitDataName;
+    public void setCircuitName(String circuitDataName) {
+        this.circuitName = circuitDataName;
     }
 
     /** @param worldName ワールド名 */

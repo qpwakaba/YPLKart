@@ -1,6 +1,7 @@
 package com.github.erozabesu.yplkart.data;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -15,10 +16,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
-import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.LapTime;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.RaceType;
@@ -34,7 +33,7 @@ import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 public class CircuitConfig {
 
     /** RaceDataオブジェクトを格納しているハッシュマップ */
-    private static HashMap<String, CircuitData> circuitDataMap = new HashMap<String, CircuitData>();
+    private static HashMap<String, Circuit> circuitDataMap = new HashMap<String, Circuit>();
 
     //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -54,28 +53,26 @@ public class CircuitConfig {
      * 新規にオブジェクトを生成しハッシュマップに格納する
      */
     public static void reload() {
-        clearCircuitData();
+        clear();
 
         for(String configKey : ConfigManager.RACEDATA_CONFIG.getLocalConfig().getKeys(false)) {
-            putCircuitData(configKey, new CircuitData(configKey));
+            put(configKey, new Circuit(configKey));
         }
     }
 
     /**
-     * 引数circuitNameが名称の新規のCircuitDataオブジェクトを作成しハッシュマップに格納し、ローカルコンフィグファイルに設定を保存する。<br>
-     * 同時に、新規のCircuitインスタンスをRaceManagerクラスに格納する。
+     * 引数circuitNameが名称の新規のCircuitインスタンスを作成しハッシュマップに格納し、ローカルコンフィグファイルに設定を保存する。<br>
      * @param address ログの送信先
      * @param circuitName サーキット名
      * @param location レース開始座標
      */
     public static void createCircuit(CommandSender address, String circuitName, Location location) {
-        CircuitData circuitData = getCircuitData(circuitName);
-        if (circuitData == null) {
-            circuitData = new CircuitData(circuitName, location);
-            circuitData.saveConfiguration();
+        Circuit circuit = get(circuitName);
+        if (circuit == null) {
+            circuit = new Circuit(circuitName, location);
+            circuit.saveConfiguration();
 
-            putCircuitData(circuitName, circuitData);
-            Circuit circuit = RaceManager.putCircuit(circuitName);
+            put(circuitName, circuit);
 
             // MessageEnumのメンバ変数を更新 : issue #154
             MessageEnum.reload();
@@ -93,14 +90,17 @@ public class CircuitConfig {
      * @param circuitName 削除するCircuitDataオブジェクト名
      */
     public static void deleteCircuit(CommandSender address, String circuitName) {
-        CircuitData circuitData = getCircuitData(circuitName);
-        if (circuitData != null) {
+        Circuit circuit = get(circuitName);
+        if (circuit != null) {
+
+            // サーキットのレースを終了
+            circuit.endRace(false);
 
             //ハッシュマップから削除
-            removeCircuitData(circuitName);
+            remove(circuitName);
 
             //ローカルファイルから削除
-            circuitData.deleteConfiguration();
+            circuit.deleteConfiguration();
 
             //MessageEnumのメンバ変数を更新 : issue #154
             MessageEnum.reload();
@@ -119,36 +119,42 @@ public class CircuitConfig {
      * @param newName 変更後のキー
      */
     public static void renameCircuit(CommandSender address, String oldName, String newName) {
-        CircuitData oldCircuitData = getCircuitData(oldName);
-        CircuitData newCircuitData = getCircuitData(newName);
+        Circuit oldCircuit = get(oldName);
+        Circuit newCircuit = get(newName);
 
-        //名称を変更するCircuitDataObjectが存在しない
-        if (oldCircuitData == null) {
+        //名称を変更するCircuitObjectが存在しない
+        if (oldCircuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, new MessageParts(TagType.CIRCUIT, oldName));
 
         //新たな名称のCircuitDataObjectが既に存在している
-        } else if (newCircuitData != null) {
+        } else if (newCircuit != null) {
             MessageEnum.cmdCircuitAlreadyExist.sendConvertedMessage(address, new MessageParts(TagType.CIRCUIT, newName));
 
         } else {
 
-            //既存のオブジェクトのメンバ変数を引き継いだ新たなオブジェクトを生成
-            newCircuitData = oldCircuitData.cloneCircuitData();
+            // 古いサーキットのレースを強制終了
+            oldCircuit.endRace(false);
 
-            //新たなキーに名称を変更
-            newCircuitData.setCircuitDataName(newName);
+            // 現在の状態を保存
+            oldCircuit.saveConfiguration();
+
+            // 古いサーキットの設定を引き継ぐため、古い名称のサーキットインスタンスを新規生成
+            newCircuit = new Circuit(oldCircuit.getCircuitName());
+
+            // 新たな名称に変更
+            newCircuit.setCircuitName(newName);
 
             //ローカルファイルへ保存
-            newCircuitData.saveConfiguration();
+            newCircuit.saveConfiguration();
 
             //ハッシュマップに追加
-            putCircuitData(newName, newCircuitData);
+            put(newName, newCircuit);
 
             //古いCircuitDataオブジェクトをハッシュマップから削除
-            removeCircuitData(oldName);
+            remove(oldName);
 
             //古いCircuitDataオブジェクトをローカルファイルから削除
-            oldCircuitData.deleteConfiguration();
+            oldCircuit.deleteConfiguration();
 
             //設置済みのチェックポイントの固有名をnewNameに変更する
             for (World world : Bukkit.getWorlds()) {
@@ -177,16 +183,15 @@ public class CircuitConfig {
     public static void addRaceLapTime(Player player, String circuitName
             , double lapTime, boolean isKartRace) {
 
-        CircuitData circuitData = getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             return;
         }
 
         UUID uuid = player.getUniqueId();
-        LapTime newLapTimeObject = new LapTime(circuitData.getNumberOfLaps(), uuid, lapTime);
-        LapTime oldLapTimeObject = isKartRace
-                ? circuitData.getKartLapTime(uuid) : circuitData.getRunLapTime(uuid);
+        LapTime newLapTimeObject = new LapTime(circuit.getNumberOfLaps(), uuid, lapTime);
+        LapTime oldLapTimeObject = isKartRace ? circuit.getKartLapTime(uuid) : circuit.getRunLapTime(uuid);
 
         //プレイヤーの記録が既に存在している
         if (oldLapTimeObject != null) {
@@ -195,9 +200,9 @@ public class CircuitConfig {
             if (lapTime < oldLapTimeObject.getLapTime()) {
                 //古い記録を削除
                 if (isKartRace) {
-                    circuitData.removeKartLapTime(uuid);
+                    circuit.removeKartLapTime(uuid);
                 } else {
-                    circuitData.removeRunLapTime(uuid);
+                    circuit.removeRunLapTime(uuid);
                 }
 
                 //テキストメッセージの送信
@@ -211,207 +216,201 @@ public class CircuitConfig {
 
         //新しい記録を格納
         if (isKartRace) {
-            circuitData.addKartLapTimeList(newLapTimeObject);
+            circuit.addKartLapTimeList(newLapTimeObject);
         } else {
-            circuitData.addRunLapTimeList(newLapTimeObject);
+            circuit.addRunLapTimeList(newLapTimeObject);
         }
 
         //ローカルファイルへ保存
-        circuitData.saveConfiguration();
+        circuit.saveConfiguration();
     }
 
     //〓 static config edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトのレース開始座標を
+     * 引数circuitNameをキーに持つCircuitオブジェクトのレース開始座標を
      * 引数locationの座標に設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param location 設定座標
      */
     public static void setStartPosition(CommandSender address, String circuitName, Location location) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setStartLocation(location);
-            circuitData.saveConfiguration();
+            circuit.setStartLocation(location);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetPosition.sendConvertedMessage(address, circuitParts);
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの周回数を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトの周回数を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue 周回数
      */
     public static void setNumberOfLaps(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setNumberOfLaps(newValue);
-            circuitData.saveConfiguration();
+            circuit.setNumberOfLaps(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetLap.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * 最小プレイ人数を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトの最小プレイ人数を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue 最小プレイ人数
      */
     public static void setMinPlayer(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
 
         //最大プレイ人数を越える値は設定できない
-        } else if (circuitData.getMaxPlayer() < newValue) {
-            MessageEnum.cmdCircuitOutOfMaxPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(circuitData.getMaxPlayer()));
+        } else if (circuit.getMaxPlayer() < newValue) {
+            MessageEnum.cmdCircuitOutOfMaxPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(circuit.getMaxPlayer()));
         } else {
-            circuitData.setMinPlayer(newValue);
-            circuitData.saveConfiguration();
+            circuit.setMinPlayer(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetMinPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * 最大プレイ人数を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトの最大プレイ人数を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue 最大プレイ人数
      */
     public static void setMaxPlayer(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
 
         //最小プレイ人数を下回る数値は設定できない
-        } else if (newValue < circuitData.getMinPlayer()) {
-            MessageEnum.cmdCircuitOutOfMinPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(circuitData.getMinPlayer()));
+        } else if (newValue < circuit.getMinPlayer()) {
+            MessageEnum.cmdCircuitOutOfMinPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(circuit.getMinPlayer()));
         } else {
-            circuitData.setMaxPlayer(newValue);
-            circuitData.saveConfiguration();
+            circuit.setMaxPlayer(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetMaxPlayer.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * マッチング猶予時間を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトのマッチング猶予時間を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue マッチング猶予時間
      */
     public static void setMatchingTime(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setMatchingTime(newValue);
-            circuitData.saveConfiguration();
+            circuit.setMatchingTime(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetMatchingTime.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * メニュー選択猶予時間を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトのメニュー選択猶予時間を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue メニュー選択猶予時間
      */
     public static void setMenuTime(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setMenuTime(newValue);
-            circuitData.saveConfiguration();
+            circuit.setMenuTime(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetMenuTime.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * レース終了までの制限時間を設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトのレース終了までの制限時間を設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue レース終了までの制限時間
      */
     public static void setLimitTime(CommandSender address, String circuitName, int newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setLimitTime(newValue);
-            circuitData.saveConfiguration();
+            circuit.setLimitTime(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetLimitTime.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトの
-     * ゴール時のサーバー全体通知をするかどうかを設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトのゴール時のサーバー全体通知をするかどうかを設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param newValue ゴール時のサーバー全体通知をするかどうか
      */
     public static void setBroadcastGoalMessage(CommandSender address, String circuitName, boolean newValue) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setBroadcastGoalMessage(newValue);
-            circuitData.saveConfiguration();
+            circuit.setBroadcastGoalMessage(newValue);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetBroadcastGoalMessage.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(newValue));
         }
     }
 
     /**
-     * 引数circuitDataNameをキーに持つCircuitDataオブジェクトのレースタイプを設定する
+     * 引数circuitNameをキーに持つCircuitオブジェクトのレースタイプを設定する
      * @param address ログの送信先
      * @param circuitName CircuitDataオブジェクトキー
      * @param raceType レースタイプ
      */
     public static void setRaceType(CommandSender address, String circuitName, RaceType raceType) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        Circuit circuit = get(circuitName);
         MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
 
-        if (circuitData == null) {
+        if (circuit == null) {
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
         } else {
-            circuitData.setRaceType(raceType);
-            circuitData.saveConfiguration();
+            circuit.setRaceType(raceType);
+            circuit.saveConfiguration();
 
             MessageEnum.cmdCircuitSetRaceType.sendConvertedMessage(address, circuitParts, MessageParts.getMessageParts(raceType));
         }
@@ -426,46 +425,51 @@ public class CircuitConfig {
      * @param circuitName CircuitDataオブジェクトキー
      */
     public static void sendRanking(CommandSender address, String circuitName) {
-        CircuitData circuitData = getCircuitData(circuitName);
-        if (circuitData == null) {
+        Circuit circuit = get(circuitName);
+        if (circuit == null) {
             MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
             MessageEnum.invalidCircuit.sendConvertedMessage(address, circuitParts);
             return;
         }
 
-        circuitData.sendRanking(address);
+        circuit.sendRanking(address);
     }
 
     //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return CircuitDataオブジェクトを格納しているハッシュマップ */
-    public static HashMap<String, CircuitData> getCircuitDataMap() {
+    public static HashMap<String, Circuit> getMap() {
         return circuitDataMap;
     }
 
     /**
-     * 引数circuitDataNameに対応するCircuitDataオブジェクトを返す
-     * @param circuitDataName 取得するCircuitDataオブジェクト名
+     * 引数circuitNameに対応するCircuitオブジェクトを返す
+     * @param circuitName 取得するCircuitDataオブジェクト名
      * @return CircuitDataオブジェクト
      */
-    public static CircuitData getCircuitData(String circuitDataName) {
-        return getCircuitDataMap().get(ChatColor.stripColor(circuitDataName));
+    public static Circuit get(String circuitName) {
+        return getMap().get(ChatColor.stripColor(circuitName));
     }
 
-    /** @return CircuitDataオブジェクトを格納しているハッシュマップのKeySet */
-    public static Set<String> getCircuitDataMapKeySet() {
-        return getCircuitDataMap().keySet();
+    /** @return ハッシュマップのキーSet */
+    public static Set<String> keySet() {
+        return getMap().keySet();
+    }
+
+    /** @return ハッシュマップのバリューCollection */
+    public static Collection<Circuit> values() {
+        return getMap().values();
     }
 
     /** @return CircuitDataオブジェクトキーのList */
-    public static List<String> getCircuitList() {
-        return Arrays.asList(getCircuitDataMap().keySet().toArray(new String[0]));
+    public static List<String> keyToArray() {
+        return Arrays.asList(getMap().keySet().toArray(new String[0]));
     }
 
     /** @return CircuitDataオブジェクトキーのListString */
     public static String getCircuitListString() {
         String list = null;
-        for (String key : getCircuitList()) {
+        for (String key : keyToArray()) {
             if (list == null) {
                 list = key;
             } else {
@@ -477,9 +481,9 @@ public class CircuitConfig {
 
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    /** @param circuitDataMap CircuitDataオブジェクトを格納しているハッシュマップ */
-    public static void setCircuitDataMap(HashMap<String, CircuitData> circuitDataMap) {
-        CircuitConfig.circuitDataMap = circuitDataMap;
+    /** @param circuitMap CircuitDataオブジェクトを格納しているハッシュマップ */
+    public static void setMap(HashMap<String, Circuit> circuitMap) {
+        circuitDataMap = circuitMap;
     }
 
     /**
@@ -488,9 +492,9 @@ public class CircuitConfig {
      * @param 格納するCircuitDataオブジェクト
      * @return 格納に成功したかどうか
      */
-    public static boolean putCircuitData(String circuitDataName, CircuitData circuitData) {
-        if (!getCircuitDataMap().containsKey(circuitDataName)) {
-            getCircuitDataMap().put(circuitDataName, circuitData);
+    public static boolean put(String circuitName, Circuit circuit) {
+        if (!getMap().containsKey(circuitName)) {
+            getMap().put(circuitName, circuit);
             return true;
         }
         return false;
@@ -498,19 +502,19 @@ public class CircuitConfig {
 
     /**
      * CircuitDataオブジェクトを格納しているハッシュマップから引数circuitDataNameをキーに持つCircuitDataオブジェクトを削除する
-     * @param circuitDataName 削除するCircuitDataオブジェクトキー
+     * @param circuitName 削除するCircuitDataオブジェクトキー
      * @return 削除に成功したかどうか
      */
-    public static boolean removeCircuitData(String circuitDataName) {
-        if (getCircuitDataMap().containsKey(circuitDataName)) {
-            getCircuitDataMap().remove(circuitDataName);
+    public static boolean remove(String circuitName) {
+        if (getMap().containsKey(circuitName)) {
+            getMap().remove(circuitName);
             return true;
         }
         return false;
     }
 
     /** CircuitDataオブジェクトを格納しているハッシュマップを初期化する */
-    public static void clearCircuitData() {
-        getCircuitDataMap().clear();
+    public static void clear() {
+        getMap().clear();
     }
 }

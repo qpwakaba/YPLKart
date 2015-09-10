@@ -22,10 +22,9 @@ public class KartListener implements Listener {
     }
 
     /**
-     * 水中で搭乗した場合マインクラフトの仕様で強制的に搭乗解除されてしまうため、<br>
-     * 仮想スニークフラグがtrueでない場合はキャンセルする<br>
-     * また、スタンバイ状態のレースに参加しており、かつゴールしていないプレイヤーの搭乗解除をキャンセルする
-     * @param event
+     * 水中で搭乗した場合マインクラフトの仕様で強制的に搭乗解除されてしまうため、仮想スニークフラグがtrueでない場合はキャンセルする。<br>
+     * また、スタンバイ状態のレースに参加しており、かつゴールしていないプレイヤーの搭乗解除をキャンセルする。
+     * @param event VehicleExitEvent
      */
     @EventHandler
     public void onVehicleExit(VehicleExitEvent event) {
@@ -43,11 +42,9 @@ public class KartListener implements Listener {
         Racer racer = RaceManager.getRacer(player);
 
         //レース中はキャンセル
-        if (RaceManager.isStandby(player.getUniqueId())) {
-            if (!racer.isGoal()) {
-                event.setCancelled(true);
-                return;
-            }
+        if (racer.isStillInRace()) {
+            event.setCancelled(true);
+            return;
         }
 
         //仮想スニークフラグがtrueではない場合はキャンセル

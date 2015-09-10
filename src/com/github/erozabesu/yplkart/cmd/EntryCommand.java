@@ -38,14 +38,14 @@ public class EntryCommand extends Command {
             if (Util.isPlayer(sender)) {
                 // 存在しないサーキットを指定した場合はreturn
                 String circuitName = args[1];
-                if (CircuitConfig.getCircuitData(circuitName) == null) {
+                if (CircuitConfig.get(circuitName) == null) {
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
                     MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                     return true;
                 }
 
                 Player player = (Player) sender;
-                RaceManager.racerSetter_Entry(player.getUniqueId(), circuitName, false);
+                RaceManager.racerSetter_Entry(RaceManager.getRacer(player), circuitName, false);
 
                 return true;
             } else {
@@ -62,7 +62,7 @@ public class EntryCommand extends Command {
         } else if (args.length == 3) {
             // 存在しないサーキットを指定した場合はreturn
             String circuitName = args[2].equalsIgnoreCase("-f") ? args[1] : args[2];
-            if (CircuitConfig.getCircuitData(circuitName) == null) {
+            if (CircuitConfig.get(circuitName) == null) {
                 MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
                 MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                 return true;
@@ -75,7 +75,7 @@ public class EntryCommand extends Command {
 
                 if (Util.isPlayer(sender)) {
                     Player player = (Player) sender;
-                    RaceManager.racerSetter_Entry(player.getUniqueId(), circuitName, true);
+                    RaceManager.racerSetter_Entry(RaceManager.getRacer(player), circuitName, true);
 
                     return true;
                 } else {
@@ -91,7 +91,7 @@ public class EntryCommand extends Command {
                 // ka entry all/@a [サーキット]
                 if (args[1].equalsIgnoreCase("all") || args[1].equalsIgnoreCase("@a")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
-                        RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], false);
+                        RaceManager.racerSetter_Entry(RaceManager.getRacer(other), args[2], false);
                     }
 
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, args[2]);
@@ -112,7 +112,7 @@ public class EntryCommand extends Command {
                     MessageParts playerParts = MessageParts.getMessageParts(other);
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
                     MessageEnum.cmdEntryOther.sendConvertedMessage(sender, circuitParts, playerParts);
-                    RaceManager.racerSetter_Entry(other.getUniqueId(), circuitName, false);
+                    RaceManager.racerSetter_Entry(RaceManager.getRacer(other), circuitName, false);
 
                     return true;
                 }
@@ -130,7 +130,7 @@ public class EntryCommand extends Command {
 
                 // 存在しないサーキットを指定した場合はreturn
                 String circuitName = args[2];
-                if (CircuitConfig.getCircuitData(circuitName) == null) {
+                if (CircuitConfig.get(circuitName) == null) {
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
                     MessageEnum.invalidCircuit.sendConvertedMessage(sender, circuitParts);
                     return true;
@@ -139,7 +139,7 @@ public class EntryCommand extends Command {
                 // ka entry all/@a [サーキット] -f
                 if (args[1].equalsIgnoreCase("all") || args[1].equalsIgnoreCase("@a")) {
                     for (Player other : Bukkit.getOnlinePlayers()) {
-                        RaceManager.racerSetter_Entry(other.getUniqueId(), args[2], true);
+                        RaceManager.racerSetter_Entry(RaceManager.getRacer(other), args[2], true);
                     }
 
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, args[2]);
@@ -160,7 +160,7 @@ public class EntryCommand extends Command {
                     MessageParts playerParts = MessageParts.getMessageParts(other);
                     MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, circuitName);
                     MessageEnum.cmdEntryForceOther.sendConvertedMessage(sender, circuitParts, playerParts);
-                    RaceManager.racerSetter_Entry(other.getUniqueId(), circuitName, true);
+                    RaceManager.racerSetter_Entry(RaceManager.getRacer(other), circuitName, true);
 
                     return true;
                 }

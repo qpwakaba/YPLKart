@@ -82,7 +82,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         Player player = event.getPlayer();
-        if (!Permission.hasPermission(player, Permission.OP_CMD_CIRCUIT, false)) {
+        if (!Permission.hasPermission(player, Permission.OP_CMD_CIRCUIT, true)) {
             return;
         }
 
@@ -131,7 +131,7 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         UUID uuid = player.getUniqueId();
-        Racer racer = RaceManager.getRace(uuid);
+        Racer racer = RaceManager.getRacer(uuid);
         event.setCancelled(true);
 
         Action clickAction = event.getAction();
@@ -225,11 +225,16 @@ public class ItemListener extends RaceManager implements Listener {
         }
 
         UUID uuid = player.getUniqueId();
-        Racer racer = RaceManager.getRace(uuid);
+        Racer racer = RaceManager.getRacer(uuid);
         event.setCancelled(true);
 
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
         // レース中、かつゴールしていない状態以外はreturn
-        if (!isStillRacing(uuid)) {
+        if (!racer.isStillRacing()) {
             return;
         }
 
@@ -248,8 +253,8 @@ public class ItemListener extends RaceManager implements Listener {
 
         //パワフルダッシュキノコ
         } else if (ItemEnum.POWERFULL_MUSHROOM.isSimilar(player.getItemInHand())) {
-        Util.setItemDecrease(player);
-        racer.runPositiveItemSpeedTask(ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
+            Util.setItemDecrease(player);
+            racer.runPositiveItemSpeedTask(ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
                     ItemEnum.POWERFULL_MUSHROOM.getEffectLevel(), Sound.EXPLODE);
             player.getWorld().playSound(player.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
 
@@ -259,14 +264,14 @@ public class ItemListener extends RaceManager implements Listener {
             Location location = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                     .add(0.5, 0, 0.5);
             player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
-            RaceEntityUtil.createBanana(RaceManager.getCircuit(racer.getCircuitName()), location);
+            RaceEntityUtil.createBanana(circuit, location);
 
         //にせアイテムボックス
         } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
             Util.setItemDecrease(player);
             Location createLocation = Util.getForwardLocationFromYaw(player.getLocation().clone().add(0, 0.5, 0), -5);
-            EnderCrystal endercrystal = RaceEntityUtil.createDesposableFakeItemBox(createLocation, RaceManager.getCircuit(racer.getCircuitName()));
-            RaceManager.getCircuit(uuid).addJammerEntity(endercrystal);
+            EnderCrystal endercrystal = RaceEntityUtil.createDesposableFakeItemBox(createLocation, circuit);
+            circuit.addJammerEntity(endercrystal);
             player.getWorld().playEffect(player.getLocation(), Effect.CLICK1, 0);
 
         //サンダー
@@ -307,9 +312,10 @@ public class ItemListener extends RaceManager implements Listener {
         if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
         }
+
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
-        if (!isStillRacing(uuid)) {
+        if (!RaceManager.getRacer(player).isStillRacing()) {
             return;
         }
 
@@ -351,16 +357,17 @@ public class ItemListener extends RaceManager implements Listener {
         if (!YPLKart.isPluginEnabled(event.getFrom().getWorld())) {
             return;
         }
-        if (!isStillRacing(event.getPlayer().getUniqueId())) {
+
+        Player player = event.getPlayer();
+        Racer racer = RaceManager.getRacer(player);
+        if (!racer.isStillRacing()) {
             return;
         }
-
-        final Player player = event.getPlayer();
 
         if (Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_BASE
                 || Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_STICKY_BASE) {
             if (Permission.hasPermission(player, Permission.INTERACT_DASHBOARD, false)) {
-                getRacer(player).runStepDashBoardTask();
+                racer.runStepDashBoardTask();
             }
         }
     }
@@ -496,59 +503,75 @@ public class ItemListener extends RaceManager implements Listener {
         }
     }
 
+    /**
+     * スタンバイフェーズ以降のドロップアイテムの取得を禁止する。
+     * @param event PlayerPickupItemEvent
+     */
     @EventHandler
     public void onPickupItem(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
-        if (!isStandby(player.getUniqueId())) {
-            return;
+
+        Racer racer = RaceManager.getRacer(player);
+        if (racer.isStillInRace()) {
+            event.setCancelled(true);
         }
-        if (getRace(player.getUniqueId()).isGoal()) {
-            return;
-        }
-        event.setCancelled(true);
     }
 
+    /**
+     * スタンバイフェーズ以降のレース中に捨てたアイテムを削除する。
+     * @param event PlayerDropItemEvent
+     */
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         if (!YPLKart.isPluginEnabled(player.getWorld())) {
             return;
         }
-        if (!isStandby(player.getUniqueId())) {
-            return;
-        }
-        if (getRace(player.getUniqueId()).isGoal()) {
+
+        Racer racer = getRacer(player);
+
+        // スタンバイフェーズ以降ではない、もしくはゴールしている場合はreturn
+        if (!racer.isStillInRace()) {
             return;
         }
 
-        if (ItemEnum.MENU.isSimilar(event.getItemDrop().getItemStack()))
+        // メニューアイテムは捨てることができない
+        if (ItemEnum.MENU.isSimilar(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
-        else
+        } else {
             event.getItemDrop().remove();
+        }
     }
 
     //〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public void itemTeresa(Player user) {
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+        Racer racer = RaceManager.getRacer(user);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
 
-        List<Player> entry = getRacingPlayer(getRacer(user).getCircuitName());
-        if (entry.size() <= 1) {
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        List<Player> racingPlayerList = circuit.getOnlineRacingPlayerList();
+
+        // オンラインの走行者が自分以外に居ない場合はreturn
+        if (racingPlayerList.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
+
         Util.setItemDecrease(user);
-        entry.remove(user);
-        Player target = entry.get(new Random().nextInt(entry.size()));
+        racingPlayerList.remove(user);
+        Player target = racingPlayerList.get(new Random().nextInt(racingPlayerList.size()));
 
         Inventory targetinv = target.getInventory();
 
         ArrayList<ItemStack> targetitem = new ArrayList<ItemStack>();
-        int itemSlotSize = (Integer) ConfigEnum.ITEM_SLOT.getValue()
-                + getRacer(target).getCharacter().getAdjustMaxSlotSize();
+        int itemSlotSize = (Integer) ConfigEnum.ITEM_SLOT.getValue() + getRacer(target).getCharacter().getAdjustMaxSlotSize();
         for (int i = 0; i < itemSlotSize; i++) {
             if (targetinv.getItem(i) != null)
                 if (ItemEnum.isKeyItem(targetinv.getItem(i)))
@@ -572,89 +595,110 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemThunder(Player user) {
-        List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
-        if (list.size() <= 1) {
-            MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+        Racer racer = RaceManager.getRacer(user);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        List<Player> racingPlayerList = circuit.getOnlineRacingPlayerList();
+
+        // オンラインの走行者が自分以外に居ない場合はreturn
+        if (racingPlayerList.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
+
         Util.setItemDecrease(user);
-        final World w = user.getWorld();
+        World world = user.getWorld();
 
-        int launchdamage = ItemEnum.THUNDER.getHitDamage()
-                + getRacer(user).getCharacter().getAdjustAttackDamage();
-        for (final Player p : list) {
-            if (p.getUniqueId() == user.getUniqueId())
+        int launchdamage = ItemEnum.THUNDER.getHitDamage() + racer.getCharacter().getAdjustAttackDamage();
+        for (final Player player : racingPlayerList) {
+            if (player.getUniqueId() == user.getUniqueId()) {
                 continue;
-            if (p.getNoDamageTicks() != 0)
+            }
+            if (player.getNoDamageTicks() != 0) {
                 continue;
+            }
 
-            int effectSecond = ItemEnum.THUNDER.getEffectSecond()
-                    + getRacer(p).getCharacter().getAdjustNegativeEffectSecond();
-            int effectLevel = ItemEnum.THUNDER.getEffectLevel()
-                    + getRacer(p).getCharacter().getAdjustNegativeEffectLevel();
+            int effectSecond = ItemEnum.THUNDER.getEffectSecond() + getRacer(player).getCharacter().getAdjustNegativeEffectSecond();
+            int effectLevel = ItemEnum.THUNDER.getEffectLevel() + getRacer(player).getCharacter().getAdjustNegativeEffectLevel();
 
-            p.removePotionEffect(PotionEffectType.SLOW);
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW
-                    , effectSecond * 20, effectLevel));
+            player.removePotionEffect(PotionEffectType.SLOW);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, effectSecond * 20, effectLevel));
 
-            final Location loc = p.getLocation();
-            w.strikeLightningEffect(loc);
-            Util.createSafeExplosion(user, loc, launchdamage, 5, 0.4F, 1.0F, Particle.CLOUD);
-            p.playSound(loc, Sound.SUCCESSFUL_HIT, 0.5F, 1.0F);
-            p.playSound(loc, Sound.LEVEL_UP, 0.5F, -1.0F);
+            Location location = player.getLocation();
+            world.strikeLightningEffect(location);
+            Util.createSafeExplosion(user, location, launchdamage, 5, 0.4F, 1.0F, Particle.CLOUD);
+            player.playSound(location, Sound.SUCCESSFUL_HIT, 0.5F, 1.0F);
+            player.playSound(location, Sound.LEVEL_UP, 0.5F, -1.0F);
         }
     }
 
     public void itemGesso(Player user) {
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+        Racer racer = RaceManager.getRacer(user);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
 
-        List<Player> list = getRacingPlayer(getRacer(user).getCircuitName());
-        if (list.size() <= 1) {
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        List<Player> racingPlayerList = circuit.getOnlineRacingPlayerList();
+
+        // オンラインの走行者が自分以外に居ない場合はreturn
+        if (racingPlayerList.size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
-        ArrayList<Player> target = new ArrayList<Player>();
-        int rank = getRank(user);
 
-        for (Player entry : list) {
-            if (getRank(entry) < rank)
-                target.add(entry);
+        List<Player> targetPlayerList = new ArrayList<Player>();
+        int ownRank = getRank(user);
+
+        // 自身より上位のプレイヤーを抽出
+        for (Player otherPlayer : racingPlayerList) {
+            if (getRank(otherPlayer) < ownRank)
+                targetPlayerList.add(otherPlayer);
         }
-        if (target.isEmpty()) {
+
+        // 自身より上位のプレイヤーが居ない場合return
+        if (targetPlayerList.isEmpty()) {
             MessageEnum.itemNoHigherPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
 
         Util.setItemDecrease(user);
-        final World w = user.getWorld();
 
-        for (Player p : target) {
-            if (p.getUniqueId() == user.getUniqueId())
+        for (Player targetPlayer : targetPlayerList) {
+            if (targetPlayer.getUniqueId() == user.getUniqueId()) {
                 continue;
-            if (p.getNoDamageTicks() != 0)
+            }
+
+            if (targetPlayer.getNoDamageTicks() != 0) {
                 continue;
+            }
 
             int effectSecond = ItemEnum.GESSO.getEffectSecond()
-                    + getRacer(p).getCharacter().getAdjustNegativeEffectSecond();
+                    + getRacer(targetPlayer).getCharacter().getAdjustNegativeEffectSecond();
             int effectLevel = ItemEnum.GESSO.getEffectLevel()
-                    + getRacer(p).getCharacter().getAdjustNegativeEffectLevel();
+                    + getRacer(targetPlayer).getCharacter().getAdjustNegativeEffectLevel();
 
-            p.removePotionEffect(PotionEffectType.BLINDNESS);
-            p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS
+            targetPlayer.removePotionEffect(PotionEffectType.BLINDNESS);
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS
                     , effectSecond * 20, effectLevel));
 
-            p.playSound(p.getLocation(), Sound.SLIME_WALK, 2.0F, 1.0F);
+            targetPlayer.playSound(targetPlayer.getLocation(), Sound.SLIME_WALK, 2.0F, 1.0F);
         }
     }
 
     public void itemTurtle(Player player) {
-        if (RaceManager.getRank(player) == 0) {
+        Racer racer = RaceManager.getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
             return;
         }
 
-        Circuit circuit = RaceManager.getCircuit(player.getUniqueId());
-        if (circuit == null) {
+        if (RaceManager.getRank(player) == 0) {
             return;
         }
 
@@ -665,41 +709,52 @@ public class ItemListener extends RaceManager implements Listener {
     }
 
     public void itemRedturtle(Player user) {
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
-
         Racer racer = RaceManager.getRacer(user);
-        if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+
+        // オンラインの走行者が自分以外に居ない場合はreturn
+        if (circuit.getOnlineRacingRacerList().size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
+
         if (getRank(user) == 0) {
             return;
         }
 
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), detectCheckPointRadius);
+        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), detectCheckPointRadius);
         if (firstCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
         Util.setItemDecrease(user);
-
-        Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation().add(0.0D, -1.5D, 0.0D), ItemEnum.RED_TURTLE);
 
         int ownRank = RaceManager.getRank(user);
         int targetRank = ownRank == 1 ? ownRank + 1 : ownRank - 1;
-        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), targetRank);
+        Player target = RaceManager.getPlayerfromRank(circuit, targetRank);
 
-        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.RED_TURTLE, ownRank == 1).runTaskTimer(YPLKart.getInstance(), 0, 1);
+        new ItemDyedTurtle(circuit.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.RED_TURTLE, ownRank == 1).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemThornedturtle(Player user) {
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
-
         Racer racer = RaceManager.getRacer(user);
-        if (getRacingPlayer(racer.getCircuitName()).size() <= 1) {
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+
+        // オンラインの走行者が自分以外に居ない場合はreturn
+        if (circuit.getOnlineRacingRacerList().size() <= 1) {
             MessageEnum.itemNoPlayer.sendConvertedMessage(user, circuitParts);
             return;
         }
@@ -709,7 +764,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(racer.getCircuitName(), user.getLocation(), 50.0D);
+        Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 50.0D);
         if (firstCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
@@ -717,12 +772,11 @@ public class ItemListener extends RaceManager implements Listener {
 
         Util.setItemDecrease(user);
 
-        Circuit circuit = RaceManager.getCircuit(racer.getCircuitName());
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation().add(0.0D, -1.5D, 0.0D), ItemEnum.THORNED_TURTLE);
 
         int targetRank = ownRank == 1 ? 2 : 1;
-        Player target = RaceManager.getPlayerfromRank(racer.getCircuitName(), targetRank);
-        new ItemDyedTurtle(racer.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
+        Player target = RaceManager.getPlayerfromRank(circuit, targetRank);
+        new ItemDyedTurtle(circuit.getCircuitName(), turtle, firstCheckPoint, user, target, ItemEnum.THORNED_TURTLE, false).runTaskTimer(YPLKart.getInstance(), 0, 1);
     }
 
     public void itemKiller(final Player user) {
@@ -730,16 +784,21 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(user.getUniqueId()));
+        Racer racer = RaceManager.getRacer(user);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
 
-        final Racer racer = getRacer(user);
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+
         // 通過済みのチェックポイントが1つ以上ない場合はreturn
         if (racer.getPassedCheckPointList().size() < 1) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
-        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(getRacer(user), user.getLocation(), 180.0F);
+        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(racer, user.getLocation(), 180.0F);
 
         if (unpassedcheckpoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);

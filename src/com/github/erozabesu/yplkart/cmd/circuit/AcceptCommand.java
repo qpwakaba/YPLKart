@@ -13,11 +13,14 @@ public class AcceptCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length != 2 || !(sender instanceof Player))
+        if (args.length != 2 || !(sender instanceof Player)) {
             // TODO: ここでコマンドの使い方を表示させられる。
             return false;
+        }
+
         Player player = (Player) sender;
-        RaceManager.circuitSetter_AcceptMatching(player.getUniqueId());
+        RaceManager.circuitSetter_AcceptMatching(RaceManager.getRacer(player));
+
         return true;
     }
 }

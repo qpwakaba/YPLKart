@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Methods;
@@ -235,8 +236,8 @@ public class CheckPointUtil {
      * @return チェックポイントの配列
      */
     public static List<Entity> getNearbyUnpassedCheckPoints(Racer racer, Location location, double radius) {
-        String circuitName = racer.getCircuitName();
-        if (circuitName == null || circuitName.equalsIgnoreCase("")) {
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
             return null;
         }
 
@@ -249,7 +250,7 @@ public class CheckPointUtil {
             tempEntity = iterator.next();
 
             // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
-            if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
+            if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuit.getCircuitName())) {
                 iterator.remove();
             }
 
@@ -295,11 +296,12 @@ public class CheckPointUtil {
      * @return チェックポイントの配列
      */
     public static List<Entity> getInSightAndDetectableNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold) {
-        String circuitName = racer.getCircuitName();
-        Player player = racer.getPlayer();
-        if (circuitName == null || circuitName.equalsIgnoreCase("")) {
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
             return null;
         }
+
+        Player player = racer.getPlayer();
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
@@ -311,7 +313,7 @@ public class CheckPointUtil {
             tempEntity = iterator.next();
 
             // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
-            if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
+            if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuit.getCircuitName())) {
                 iterator.remove();
                 continue;
             }
@@ -443,7 +445,7 @@ public class CheckPointUtil {
         }
 
         String entityName = ChatColor.stripColor(entity.getCustomName());
-        for (String circuitName : CircuitConfig.getCircuitList()) {
+        for (String circuitName : CircuitConfig.keyToArray()) {
             if (entityName.equalsIgnoreCase(circuitName)) {
                 return true;
             }

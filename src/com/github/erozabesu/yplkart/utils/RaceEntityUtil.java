@@ -21,7 +21,6 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
-import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
@@ -317,17 +316,28 @@ public class RaceEntityUtil {
 
     public static void collideBanana(Player player, Entity banana) {
         Racer racer = RaceManager.getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
         banana.remove();
 
         if (player.getNoDamageTicks() == 0) {
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageParts circuitParts = MessageParts.getMessageParts(circuit);
             MessageEnum.raceInteractBanana.sendConvertedMessage(player, circuitParts);
             racer.runNegativeItemSpeedTask(ItemEnum.BANANA.getEffectSecond(), ItemEnum.BANANA.getEffectLevel(), Sound.SLIME_WALK);
         }
     }
 
     public static void collideDisposableFakeItemBox(Player player, Entity fakeItemBox) {
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(player.getUniqueId()));
+        Racer racer = RaceManager.getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
         MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player, circuitParts);
         Util.createSafeExplosion(null, player.getLocation(), ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
@@ -355,6 +365,10 @@ public class RaceEntityUtil {
         }
 
         Racer racer = RaceManager.getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
 
         // アイテムボックスに接触して間もない場合はreturn
         if (racer.isItemBoxCooling()) {
@@ -378,7 +392,7 @@ public class RaceEntityUtil {
          * アイテムの付与
          */
 
-        int denominator = RaceManager.getRacingPlayer(racer.getCircuitName()).size();
+        int denominator = circuit.getOnlineRacingRacerList().size();
         if (denominator == 0) {
             denominator = 1;
         }

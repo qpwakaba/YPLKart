@@ -69,6 +69,10 @@ public class MessageParts {
         return new MessageParts(TagType.CIRCUIT, circuit.getCircuitName());
     }
 
+    public static MessageParts getMessageParts(CircuitData circuitData) {
+        return new MessageParts(TagType.CIRCUIT, circuitData.getCircuitName());
+    }
+
     public static MessageParts getMessageParts(boolean flag) {
         return new MessageParts(TagType.FLAG, String.valueOf(flag));
     }

@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public enum EnumSelectMenu {
+public enum SelectMenu {
     CHARACTER_CANCEL(ChatColor.GOLD + "選択画面を閉じます", Material.DIAMOND, (byte) 0),
     CHARACTER_RANDOM(ChatColor.GOLD + "キャラクターをランダムに選択します", Material.IRON_INGOT, (byte) 0),
     CHARACTER_PREVIOUS(ChatColor.GOLD + "カート選択画面に移動します", Material.COAL, (byte) 0),
@@ -20,7 +20,7 @@ public enum EnumSelectMenu {
     private Material material;
     private byte data;
 
-    private EnumSelectMenu(String name, Material material, byte data) {
+    private SelectMenu(String name, Material material, byte data) {
         this.name = name;
         this.material = material;
         this.data = data;

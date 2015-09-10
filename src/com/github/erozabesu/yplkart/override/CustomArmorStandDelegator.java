@@ -28,6 +28,7 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
@@ -121,16 +122,16 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
     //〓 Event 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * アーマースタンドを右クリックした場合<br>
-     * 通常アーマースタンドにアイテムを装備させる、もしくはアイテムを剥ぎ取る操作を行うがキャンセルし、<br>
-     * 搭乗可能な状態なら搭乗させる
+     * アーマースタンドを右クリックした場合。<br>
+     * 通常アーマースタンドにアイテムを装備させる、もしくはアイテムを剥ぎ取る操作を行うがキャンセルし、搭乗可能な状態なら搭乗させる。
      */
     public static boolean onRightClicked(Object nmsEntityKart, Object nmsEntityHuman) {
 
         Player clickedPlayer = (Player) ReflectionUtil.invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityHuman);
+        Racer racer = RaceManager.getRacer(clickedPlayer);
 
         //クリックしたプレイヤーがレース中、かつゴールしていない場合return
-        if (RaceManager.isStandby(clickedPlayer.getUniqueId()) && !RaceManager.getRacer(clickedPlayer).isGoal()) {
+        if (racer.isStillInRace()) {
             return false;
         }
 
@@ -548,8 +549,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
     //〓 Setter Motion 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * カートのモーションを適用する
-     * キラー使用中のモーションを適用する場合はapplyKillerMotion(Racer r)を利用する
+     * カートのモーションを適用する。<br>
+     * キラー使用中のモーションを適用する場合はsetKillerMotion(Object, Racer)を利用する。<br>
+     * @param nmsEntityKart Nmsカートエンティティ
      * @param entityHuman 計算の基となるEntityHuman
      */
     public static void setNormalMotion(Object nmsEntityKart, Object entityHuman) {
@@ -567,10 +569,13 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
         float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
 
+        //レースカート
         if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
 
-            //レースカート、かつレースが開始されていない場合は入力値を0に
-            if (!RaceManager.isStarted(player.getUniqueId())) {
+            Racer racer = RaceManager.getRacer(player);
+            Circuit circuit = racer.getCircuit();
+            // サーキットが取得できない、もしくはレーシングフェーズでない場合は入力値を0に
+            if (circuit == null || !circuit.isRacingPhase()) {
                 sideInput = 0.0F;
                 forwardInput = 0.0F;
 
@@ -672,7 +677,8 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         setFieldValue(Fields.nmsEntity_motZ, entityKart, killerZ);
 
         // 最寄のチェックポイントを取得し、存在しない場合はreturn
-        Entity nearestCP = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(racer.getCircuitName(), bukkitEntityKart, 360.0F);
+        Circuit circuit = racer.getCircuit();
+        Entity nearestCP = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), bukkitEntityKart, 360.0F);
         if (nearestCP == null) {
             return;
         }

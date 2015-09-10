@@ -34,8 +34,8 @@ public class Racer extends PlayerObject{
     /** レース中ログアウトしたプレイヤーのプレイヤー情報 */
     private PlayerObject racingPlayerObject;
 
-    /** エントリーしているサーキット名 */
-    private String circuitName;
+    /** エントリーしているサーキット */
+    private Circuit circuit;
 
     /** 選択キャラクター */
     private Character character;
@@ -67,6 +67,9 @@ public class Racer extends PlayerObject{
      * 1度のクリックで連続してアイテムを消耗してしまわないようにするため、このフラグを用いる
      */
     private boolean isItemUseCooling;
+
+    /** マッチングに同意しているかどうか */
+    private boolean isMatchingAccepted;
 
     /** マッチングが終了し、レース開始地点にテレポートされた状態かどうか */
     private boolean isStandby;
@@ -135,10 +138,11 @@ public class Racer extends PlayerObject{
     public void initializeRacer() {
         this.setRacingPlayerObject(null);
 
-        this.setCircuitName("");
+        this.setCircuit(null);
 
         this.setKartEntityLocation(null);
 
+        this.setMatchingAccepted(false);
         this.setItemBoxCooling(false);
         this.setItemUseCooling(false);
         this.setStandby(false);
@@ -199,10 +203,14 @@ public class Racer extends PlayerObject{
      * falseであればレースの参加者のみに併せて送信する。
      */
     private void sendResult() {
-        String circuitName = this.getCircuitName();
-        Circuit circuit = RaceManager.getCircuit(circuitName);
+        Circuit circuit = this.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        String circuitName = circuit.getCircuitName();
         double lapTime = circuit.getLapMilliSecond() / 1000.0D;
-        int currentRank = circuit.getGoalPlayerUuidSet().size();
+        int currentRank = circuit.getGoalRacerList().size();
 
         MessageParts playerParts = MessageParts.getMessageParts(this.getPlayer());
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
@@ -221,7 +229,7 @@ public class Racer extends PlayerObject{
         //〓全体メッセージ送信
 
         //全体通知機能がtrueであれば、ゴールしたプレイヤーのリザルトをサーバーの全プレイヤーに送信する
-        if (CircuitConfig.getCircuitData(circuitName).getBroadcastGoalMessage()) {
+        if (circuit.getBroadcastGoalMessage()) {
             for (Player other : Bukkit.getOnlinePlayers()) {
                 MessageEnum.raceGoal.sendConvertedMessage(other, playerParts, circuitParts, numberParts);
             }
@@ -234,8 +242,13 @@ public class Racer extends PlayerObject{
 
     /** レースのラップタイムをローカルファイルへ保存する */
     public void saveResult() {
-        String circuitName = getCircuitName();
-        double lapTime = RaceManager.getCircuit(circuitName).getLapMilliSecond() / 1000.0D;
+        Circuit circuit = this.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
+        String circuitName = circuit.getCircuitName();
+        double lapTime = circuit.getLapMilliSecond() / 1000.0D;
 
         //ローカルファイルへリザルトの保存
         if (this.getKart() == null) {
@@ -461,6 +474,78 @@ public class Racer extends PlayerObject{
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
+    /**
+     * レースにエントリーしているかどうかを返す。
+     * @return レースにエントリーしているかどうか
+     */
+    public boolean isEntry() {
+        return this.getCircuit() != null;
+    }
+
+    /**
+     * レースが最少プレイ人数を満たすまで待機している状態かどうかを返す。
+     * @return ウェイティングフェーズかどうか
+     */
+    public boolean isWaitingRacerPhase() {
+        return this.getCircuit() != null && this.getCircuit().isWaitingRacerPhase();
+    }
+
+    /**
+     * レースが最小プレイ人数を満たし、参加者のレース参加同意を待機している状態かどうかを返す。
+     * @return マッチングフェーズかどうか
+     */
+    public boolean isMatchingPhase() {
+        return this.getCircuit() != null && this.getCircuit().isMatchingPhase();
+    }
+
+    /**
+     * 参加者をレース開始地点にテレポート後、キャラクター・カートを選択させている状態かどうかを返す。
+     * @return スタンバイフェーズかどうか
+     */
+    public boolean isStandbyPhase() {
+        return this.getCircuit() != null && this.getCircuit().isStandbyPhase();
+    }
+
+    /**
+     * レースが出走した状態かどうかを返す。
+     * @return レーシングフェーズかどうか
+     */
+    public boolean isRacingPhase() {
+        return this.getCircuit() != null && this.getCircuit().isRacingPhase();
+    }
+
+    /**
+     * レースの状態がマッチングフェーズ、スタンバイフェーズ、レーシングフェーズのいずれかの状態かどうかを返す。
+     * @return マッチングフェーズ以降のフェーズかどうか
+     */
+    public boolean isAfterMatchingPhase() {
+        return this.isMatchingPhase() || this.isStandbyPhase() || this.isRacingPhase();
+    }
+
+    /**
+     * レースの状態がスタンバイフェーズ、レーシングフェーズのいずれかの状態かどうかを返す。
+     * @return スタンバイフェーズ以降のフェーズかどうか
+     */
+    public boolean isAfterStandbyPhase() {
+        return this.isStandbyPhase() || this.isRacingPhase();
+    }
+
+    /**
+     * 参加中のレースがスタンバイフェーズ以降であり、かつ、まだゴールしていないかどうかを返す。
+     * @return プレイヤーがまだレース中かどうか
+     */
+    public boolean isStillInRace() {
+        return this.isAfterStandbyPhase() && !this.isGoal;
+    }
+
+    /**
+     * 参加中のレースがレーシングフェーズであり、かつ、まだゴールしていないかどうかを返す。
+     * @return プレイヤーがまだ走行中かどうか
+     */
+    public boolean isStillRacing() {
+        return this.isRacingPhase() && !this.isGoal();
+    }
+
     public void removeDeathPenalty() {
         Player player = this.getPlayer();
 
@@ -555,9 +640,9 @@ public class Racer extends PlayerObject{
         return this.racingPlayerObject;
     }
 
-    /** @return エントリーしているサーキット名 */
-    public String getCircuitName() {
-        return this.circuitName;
+    /** @return エントリーしているサーキット */
+    public Circuit getCircuit() {
+        return circuit;
     }
 
     /** @return 選択キャラクター */
@@ -583,6 +668,11 @@ public class Racer extends PlayerObject{
     /** @return 搭乗しているカートエンティティの座標 */
     public Location getKartEntityLocation() {
         return kartEntityLocation;
+    }
+
+    /** @return マッチングに同意しているかどうか */
+    public boolean isMatchingAccepted() {
+        return isMatchingAccepted;
     }
 
     /** @return アイテムボックスに接触して間もない状態かどうか */
@@ -672,9 +762,9 @@ public class Racer extends PlayerObject{
         this.racingPlayerObject = racingPlayerObject;
     }
 
-    /** @param circuitName エントリーしているサーキット名 */
-    public void setCircuitName(String circuitName) {
-        this.circuitName = circuitName;
+    /** @param circuit エントリーしているサーキット */
+    public void setCircuit(Circuit circuit) {
+        this.circuit = circuit;
     }
 
     /** @param character 選択キャラクター */
@@ -700,6 +790,11 @@ public class Racer extends PlayerObject{
     /** @param kartEntityLocation 搭乗しているカートエンティティの座標 */
     public void setKartEntityLocation(Location kartEntityLocation) {
         this.kartEntityLocation = kartEntityLocation;
+    }
+
+    /** @param isMatchingAccepted マッチングに同意しているかどうか */
+    public void setMatchingAccepted(boolean isMatchingAccepted) {
+        this.isMatchingAccepted = isMatchingAccepted;
     }
 
     /** @param isItemBoxCooling アイテムボックスに接触して間もない状態かどうか */

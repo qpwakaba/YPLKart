@@ -21,7 +21,7 @@ public class InfoCommand extends Command {
             return false;
 
         String circuitName = args[2];
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        CircuitData circuitData = CircuitConfig.get(circuitName);
         if (circuitData != null) {
             circuitData.sendInformation(sender);
         } else {

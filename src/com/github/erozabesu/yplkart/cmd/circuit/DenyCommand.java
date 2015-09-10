@@ -10,13 +10,16 @@ public class DenyCommand extends Command {
     public DenyCommand() {
         super("deny");
     }
+
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if(args.length != 2 || !(sender instanceof Player))
+        if(args.length != 2 || !(sender instanceof Player)) {
             //TODO: ここでコマンドの使い方を表示させられる。
             return false;
+        }
+
         Player player = (Player)sender;
-        RaceManager.circuitSetter_DenyMatching(player.getUniqueId());
+        RaceManager.circuitSetter_DenyMatching(RaceManager.getRacer(player));
         return true;
     }
 }

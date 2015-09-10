@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,8 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.MessageParts;
+import com.github.erozabesu.yplkart.object.Racer;
 
 /**
  * アイテム設定を格納するクラス
@@ -577,7 +578,7 @@ public enum ItemEnum {
                         if (itemName.equalsIgnoreCase(CHECKPOINT_TOOL.getDisplayName())
                                 || itemName.equalsIgnoreCase(CHECKPOINT_TOOL_TIER2.getDisplayName())
                                 || itemName.equalsIgnoreCase(CHECKPOINT_TOOL_TIER3.getDisplayName())) {
-                            if (CircuitConfig.getCircuitData(itemLore) != null) {
+                            if (CircuitConfig.get(itemLore) != null) {
                                 return true;
                             }
                         } else {
@@ -669,7 +670,7 @@ public enum ItemEnum {
      * @param circuitName チェックポイントを編集するサーキット名
      */
     public static ItemStack[] getCheckPointTools(String circuitName) {
-        CircuitData circuitData = CircuitConfig.getCircuitData(circuitName);
+        CircuitData circuitData = CircuitConfig.get(circuitName);
         if (circuitData == null) {
             return null;
         }
@@ -699,7 +700,12 @@ public enum ItemEnum {
      * @param tier アイテム階級
      */
     public static void addRandomItemFromTier(Player player, int tier) {
-        UUID uuid = player.getUniqueId();
+        Racer racer = RaceManager.getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
         HashMap<ItemStack, ItemEnum> itemList = getItemFromTier(tier);
 
         //パーミッションを所有していないアイテムを除外
@@ -714,7 +720,7 @@ public enum ItemEnum {
         }
 
         //ランダム抽出
-        MessageParts circuitParts = MessageParts.getMessageParts(RaceManager.getCircuit(uuid));
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
         if (itemList.size() != 0) {
             //HashMapをItemStackの配列に変換し、ランダムなインデックスから1要素を抽出
             ItemStack[] itemStackArray = itemList.keySet().toArray(new ItemStack[itemList.size()]);
@@ -722,8 +728,8 @@ public enum ItemEnum {
 
             //アイテムの配布
             addItem(player, itemStack);
-            MessageEnum.raceInteractItemBox.sendConvertedMessage(player
-                    , circuitParts, MessageParts.getMessageParts(itemStack));
+
+            MessageEnum.raceInteractItemBox.sendConvertedMessage(player, circuitParts, MessageParts.getMessageParts(itemStack));
             player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1.0F, 2.0F);
         } else {
             //アイテム利用パーミッションがない等の理由から取得できるアイテムが無かった場合

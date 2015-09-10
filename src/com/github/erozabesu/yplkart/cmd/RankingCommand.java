@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.Permission;
-import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
@@ -32,7 +31,7 @@ public class RankingCommand extends Command {
                 return true;
             } else {
                 String circuitName = args[1];
-                if (CircuitConfig.getCircuitData(circuitName) == null) {
+                if (CircuitConfig.get(circuitName) == null) {
                     MessageEnum.invalidCircuit.sendConvertedMessage(sender, new MessageParts(TagType.CIRCUIT, circuitName));
                     return true;
                 }
@@ -49,12 +48,12 @@ public class RankingCommand extends Command {
             }
 
             String circuitName = args[2];
-            if (CircuitConfig.getCircuitData(circuitName) == null) {
-                MessageEnum.invalidCircuit.sendConvertedMessage(sender, new MessageParts(TagType.CIRCUIT, circuitName));
+            Circuit circuit = CircuitConfig.get(circuitName);
+            if (circuit == null) {
+                MessageEnum.invalidCircuit.sendConvertedMessage(sender, MessageParts.getMessageParts(circuit));
                 return true;
             }
 
-            Circuit circuit = RaceManager.getCircuit(circuitName);
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     CircuitConfig.sendRanking(other, circuitName);

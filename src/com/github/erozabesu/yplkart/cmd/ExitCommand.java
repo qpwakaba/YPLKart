@@ -19,11 +19,13 @@ public class ExitCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length == 1) {
-            if (!Permission.hasPermission(sender, Permission.CMD_EXIT, false))
+            if (!Permission.hasPermission(sender, Permission.CMD_EXIT, false)) {
                 return true;
+            }
+
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                RaceManager.racerSetter_UnEntry(player.getUniqueId());
+                RaceManager.racerSetter_UnEntry(RaceManager.getRacer(player));
                 return true;
             }
         } else if (args.length == 2) {
@@ -33,7 +35,7 @@ public class ExitCommand extends Command {
 
             if (args[1].equalsIgnoreCase("all")) {
                 for (Player other : Bukkit.getOnlinePlayers()) {
-                    RaceManager.racerSetter_UnEntry(other.getUniqueId());
+                    RaceManager.racerSetter_UnEntry(RaceManager.getRacer(other));
                 }
                 MessageEnum.cmdExitAll.sendConvertedMessage(sender);
                 return true;
@@ -46,7 +48,7 @@ public class ExitCommand extends Command {
 
                 @SuppressWarnings("deprecation")
                 Player other = Bukkit.getPlayer(playerName);
-                RaceManager.racerSetter_UnEntry(other.getUniqueId());
+                RaceManager.racerSetter_UnEntry(RaceManager.getRacer(other));
                 MessageEnum.cmdExitOther.sendConvertedMessage(sender, MessageParts.getMessageParts(other));
                 return true;
             }

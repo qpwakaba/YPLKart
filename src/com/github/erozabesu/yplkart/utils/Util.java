@@ -34,6 +34,7 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.MessageParts;
+import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Fields;
@@ -298,9 +299,10 @@ public class Util extends ReflectionUtil {
         //被ダメージエンティティがプレイヤーの場合
         if (damagedLiving instanceof Player) {
             Player player = (Player) damagedLiving;
+            Racer racer = RaceManager.getRacer(player);
 
             //レース中でない場合は通常通りのダメージ処理
-            if (!RaceManager.isStillRacing(player.getUniqueId())) {
+            if (!racer.isStillRacing()) {
                 player.damage(damage, executor);
 
             //レース中の場合、デスポーンしないよう仮想的に死亡した演出を行う
@@ -314,7 +316,7 @@ public class Util extends ReflectionUtil {
 
                 //ダメージが体力を上回っている
                 } else {
-                    Circuit circuit = RaceManager.getCircuit(player.getUniqueId());
+                    Circuit circuit = racer.getCircuit();
 
                     //体力を最大値まで回復
                     player.setHealth(player.getMaxHealth());
@@ -332,7 +334,7 @@ public class Util extends ReflectionUtil {
                     }
 
                     //プレイヤーにデスペナルティを適用
-                    RaceManager.getRacer(player).applyDeathPenalty();
+                    racer.applyDeathPenalty();
                 }
 
                 //連続してダメージを受けないようプレイヤーを少しの間無敵にする
@@ -380,15 +382,17 @@ public class Util extends ReflectionUtil {
             if (!(damaged instanceof Player)) {
                 continue;
             }
-            if (!RaceManager.isStillRacing(((Player) damaged).getUniqueId())) {
+
+            Racer racer = RaceManager.getRacer((Player) damaged);
+            if (!racer.isStillRacing()) {
                 continue;
             }
 
-            Vector v = Util.getVectorToLocation(damaged.getLocation(), location);
-            v.setX(v.clone().multiply(-1).getX());
-            v.setY(0);
-            v.setZ(v.clone().multiply(-1).getZ());
-            damaged.setVelocity(v);
+            Vector vector = Util.getVectorToLocation(damaged.getLocation(), location);
+            vector.setX(vector.clone().multiply(-1).getX());
+            vector.setY(0);
+            vector.setZ(vector.clone().multiply(-1).getZ());
+            damaged.setVelocity(vector);
 
             addDamage(damaged, executor, damage);
         }

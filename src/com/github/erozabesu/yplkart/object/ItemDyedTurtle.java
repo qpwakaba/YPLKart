@@ -80,7 +80,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         }
 
         // ターゲットが走行中でない場合はタスクを終了
-        if (!RaceManager.isStillRacing(this.target.getUniqueId())) {
+        if (!RaceManager.getRacer(this.target).isStillRacing()) {
             die();
             return;
         }

@@ -22,11 +22,10 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.enumdata.EnumSelectMenu;
+import com.github.erozabesu.yplkart.enumdata.SelectMenu;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
-import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.MessageParts;
@@ -41,18 +40,15 @@ public class RaceManager {
     /** プレイヤーUUIDとRacerオブジェクトを格納する */
     private static HashMap<UUID, Racer> racerDataMap = new HashMap<UUID, Racer>();
 
-    /** サーキット名とCircuitオブジェクトを格納する */
-    private static HashMap<String, Circuit> circuitMap = new HashMap<String, Circuit>();
-
     // 〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
-     * 引数uuidを持つプレイヤーのRacerオブジェクトを返す
-     * Racerオブジェクトがnullの場合、新規に生成し格納したオブジェクトを返す
-     * @param uuid ハッシュマップキーとなるプレイヤーUUID
-     * @return Racerオブジェクト
+     * 引数uuidのプレイヤーのRacerインスタンスを返す。<br>
+     * Racerインスタンスが存在しない場合は新規に生成し格納したインスタンスを返す。
+     * @param uuid プレイヤーUUID
+     * @return Racerインスタンス
      */
-    public static Racer getRace(UUID uuid) {
+    public static Racer getRacer(UUID uuid) {
         if (racerDataMap.get(uuid) == null) {
             putRacer(uuid, null);
         }
@@ -60,37 +56,13 @@ public class RaceManager {
     }
 
     /**
-     * 引数playerのRacerオブジェクトを返す
-     * Racerオブジェクトがnullの場合、新規に生成し格納したオブジェクトを返す
-     * @param player ハッシュマップキーとなるプレイヤー
-     * @return Racerオブジェクト
+     * 引数uuidのプレイヤーのRacerインスタンスを返す。<br>
+     * Racerインスタンスが存在しない場合は新規に生成し格納したインスタンスを返す。
+     * @param player プレイヤー
+     * @return Racerインスタンス
      */
     public static Racer getRacer(Player player) {
-        return getRace(player.getUniqueId());
-    }
-
-    /**
-     * 引数uuidのプレイヤーがエントリーしているサーキットを返す。<br>
-     * サーキットが存在しない場合は{@code null}を返す。
-     * @param uuid チェックするプレイヤーのUUID
-     * @return サーキット
-     */
-    public static Circuit getCircuit(UUID uuid) {
-        Circuit circuit = circuitMap.get(getRace(uuid).getCircuitName());
-
-        return circuit == null ? null : circuit;
-    }
-
-    /**
-     * 引数circuitnameに一致するサーキット名を持つサーキットを返す。<br>
-     * サーキットが存在しない場合は{@code null}を返す。
-     * @param uuid チェックするプレイヤーのUUID
-     * @return サーキット
-     */
-    public static Circuit getCircuit(String circuitname) {
-        Circuit circuit = circuitMap.get(circuitname);
-
-        return circuit == null ? null : circuit;
+        return getRacer(player.getUniqueId());
     }
 
     // 〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -109,89 +81,92 @@ public class RaceManager {
         }
     }
 
-    public static Circuit putCircuit(String circuitname) {
-        if (circuitMap.get(circuitname) == null) {
-            circuitMap.put(circuitname, new Circuit(circuitname));
-        }
-
-        return circuitMap.get(circuitname);
-    }
-
-    public static void endAllCircuit() {
-        for (Circuit c : circuitMap.values()) {
-            c.endRace();
+    public static void endAllCircuit(boolean useReserveEntry) {
+        for (Circuit circuit : CircuitConfig.values()) {
+            circuit.endRace(useReserveEntry);
         }
     }
 
     // 〓 Circuit Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void circuitSetter_AcceptMatching(UUID uuid) {
-        Circuit circuit = getCircuit(uuid);
-        Player player = Bukkit.getPlayer(uuid);
+    public static void circuitSetter_AcceptMatching(Racer racer) {
+        Circuit circuit = racer.getCircuit();
+
+        Player player = racer.getPlayer();
         if (player != null) {
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 1.0F);
         }
 
         if (circuit == null) {
             return;
-        } else if (!circuit.isMatching()) {
-            return;
-        } else if (isStandby(uuid)) {
+
+        // サーキットがマッチングフェーズでない場合はreturn
+        } else if (!circuit.isMatchingPhase()) {
             return;
         }
 
-        if (circuit.acceptMatching(uuid)) {
+        if (!racer.isMatchingAccepted()) {
+            racer.setMatchingAccepted(true);
             MessageEnum.raceAccept.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
         }
     }
 
-    public static void circuitSetter_DenyMatching(UUID uuid) {
-        Circuit circuit = getCircuit(uuid);
-        Player player = Bukkit.getPlayer(uuid);
+    public static void circuitSetter_DenyMatching(Racer racer) {
+        Circuit circuit = racer.getCircuit();
+        Player player = racer.getPlayer();
+
         if (player != null) {
             player.playSound(player.getLocation(), Sound.CLICK, 1.0F, 0.9F);
         }
 
         if (circuit == null) {
             return;
-        } else if (!circuit.isMatching()) {
+
+        // サーキットがマッチングフェーズでない場合はreturn
+        } else if (!circuit.isMatchingPhase()) {
             return;
-        } else if (isStandby(uuid)) {
-            return;
-        } else {
-            racerSetter_UnEntry(uuid);
         }
+
+        racerSetter_UnEntry(racer);
     }
 
     // 〓 Racer Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static void racerSetter_Entry(UUID uuid, String circuitName, boolean forceEntry) {
-        Player player = Bukkit.getPlayer(uuid);
-        Racer racer = getRace(uuid);
-        if (isEntry(uuid)) {
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(racer.getCircuitName()));
+    public static void racerSetter_Entry(Racer racer, String circuitName, boolean forceEntry) {
+        Player player = racer.getPlayer();
+        Circuit circuit = CircuitConfig.get(circuitName);
+
+        // 既にエントリーしている場合return
+        if (racer.isEntry()) {
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(circuitName));
             MessageEnum.raceEntryAlready.sendConvertedMessage(player, circuitParts);
+            return;
+
+        // 指定したサーキットが存在しない場合return
+        } else if (circuit == null) {
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(circuitName));
+            MessageEnum.invalidCircuit.sendConvertedMessage(player, circuitParts);
+            return;
+
+        // エントリー処理
         } else {
-            Circuit circuit = putCircuit(circuitName);
-
-            // プレイヤーの意思決定に関わらず強制的にエントリー
+            // forceEntryフラグがtrueの場合はプレイヤーの意思決定に関わらず強制的にエントリー
             if (forceEntry) {
-                racer.setCircuitName(circuitName);
-                circuit.entryPlayer(uuid);
-                Scoreboards.entryCircuit(uuid);
+                racer.setCircuit(circuit);
+                racer.setMatchingAccepted(true);
+                circuit.entryPlayer(racer);
+                Scoreboards.entryCircuit(racer.getUUID());
                 MessageEnum.raceEntryForce.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
-                circuit.acceptMatching(uuid);
 
-                // 既にレースがスタートしている場合はレースに割り込ませる
-                if (circuit.isStandby() || circuit.isStarted()) {
+                // 既にレースがスタンバイフェーズ以降であればレースに割り込ませる
+                if (circuit.isAfterStandbyPhase()) {
 
                     // スタート位置を取得
-                    int startLocationListSize = circuit.getEntryPlayerSet().size();
-                    List<Location> startLocationList =
-                            CircuitConfig.getCircuitData(circuit.getCircuitName()).getStartLocationList(startLocationListSize - 1);
+                    int startLocationListSize = circuit.getOnlineEntryRacerList().size();
+                    List<Location> startLocationList = circuit.getStartLocationList(startLocationListSize - 1);
 
                     // スタート位置にテレポート、プレイヤーの状態をレース用に初期化
-                    circuit.setupRacer(uuid, startLocationList.get(startLocationListSize));
+                    circuit.setupRacer(racer, startLocationList.get(startLocationListSize));
 
                     // メニューアイテムを削除
                     ItemEnum.removeAllKeyItems(player);
@@ -203,22 +178,23 @@ public class RaceManager {
             // 通常のエントリー
             } else {
                 if (circuit.isFillPlayer()) {
-                    circuit.entryReservePlayer(uuid);
+                    circuit.entryReservePlayer(racer);
                     MessageEnum.raceEntryFull.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
                 } else {
-                    racer.setCircuitName(circuitName);
+                    racer.setCircuit(circuit);
 
-                    if (circuit.isStandby() || circuit.isStarted()) {
-                        circuit.entryReservePlayer(uuid);
+                    // 既にレースがスタンバイフェーズ以降であれば、リザーブエントリーする
+                    if (circuit.isAfterStandbyPhase()) {
+                        circuit.entryReservePlayer(racer);
                         MessageEnum.raceEntryAlreadyStart.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
                     } else {
-                        circuit.entryPlayer(uuid);
-                        Scoreboards.entryCircuit(uuid);
+                        circuit.entryPlayer(racer);
+                        Scoreboards.entryCircuit(racer.getUUID());
                         MessageEnum.raceEntry.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
 
                         // サーキットが既にマッチングフェーズの場合は自動的に参加に同意する
-                        if (circuit.isMatching()) {
-                            circuitSetter_AcceptMatching(uuid);
+                        if (circuit.isMatchingPhase()) {
+                            circuitSetter_AcceptMatching(racer);
                         }
                     }
                 }
@@ -226,73 +202,30 @@ public class RaceManager {
         }
     }
 
-    public static void racerSetter_Character(UUID uuid, Character character) {
-        //レース開始前はなにもしない
-        Player player = Bukkit.getPlayer(uuid);
-        //プレイヤーがオフライン
-        if (player == null) {
-            return;
-        }
+    public static void racerSetter_UnEntry(Racer racer) {
+        if (racer.isEntry()) {
+            Scoreboards.exitCircuit(racer.getUUID());
 
-        if (!isStandby(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(player);
-            return;
-        }
+            Circuit circuit = racer.getCircuit();
+            if (circuit == null) {
+                return;
+            }
 
-        Racer racer = getRace(uuid);
+            circuit.exitPlayer(racer);
 
-        racer.setCharacter(character);
-        racer.recoveryCharacter();
-
-        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
-        character.playMenuSelectSound(player);
-
-        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
-        MessageParts characterParts = MessageParts.getMessageParts(character);
-        MessageEnum.raceCharacter.sendConvertedMessage(player, circuitParts, characterParts);
-    }
-
-    public static void racerSetter_Kart(UUID uuid, Kart kart) {
-        Player player = Bukkit.getPlayer(uuid);
-        //プレイヤーがオフライン
-        if (player == null) {
-            return;
-        }
-
-        if (!isStandby(uuid)) {
-            MessageEnum.raceNotStarted.sendConvertedMessage(player);
-            return;
-        }
-
-        Racer racer = getRace(uuid);
-        racer.saveKartEntityLocation();
-        racer.setKart(kart);
-        racer.recoveryKart();
-
-        MessageParts kartParts = MessageParts.getMessageParts(kart);
-        MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
-        MessageEnum.raceKart.sendConvertedMessage(player, kartParts, circuitParts);
-    }
-
-    public static void racerSetter_UnEntry(UUID uuid) {
-        if (isEntry(uuid)) {
-            Scoreboards.exitCircuit(uuid);
-
-            Racer racer = getRace(uuid);
-            Circuit circuit = getCircuit(uuid);
-            circuit.exitPlayer(uuid);
-
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = racer.getPlayer();
             if (player != null) {
                 if (!racer.isGoal()) {
-                    racerSetter_DeselectCharacter(uuid);
-                    racerSetter_DeselectKart(uuid);
+                    racerSetter_DeselectCharacter(racer.getUUID());
+                    racerSetter_DeselectKart(racer.getUUID());
                     leaveRacingKart(player);
-                    if (isStandby(uuid)) {
+
+                    if (racer.isAfterStandbyPhase()) {
                         //全パラメータを復元する
                         racer.recoveryAll();
                     }
                 }
+
                 MessageEnum.raceExit.sendConvertedMessage(player, MessageParts.getMessageParts(circuit));
             }
 
@@ -300,26 +233,110 @@ public class RaceManager {
         }
     }
 
-    public static void racerSetter_DeselectCharacter(UUID id) {
-        Racer racer = getRace(id);
+    /**
+     * 引数uuidのプレイヤーのキャラクターを引数characterにセットする。<br>
+     * プレイヤーの選択キャラクターの変更、キャラクターフィジカルの適用、外見の偽装を行う。
+     * @param uuid セットするプレイヤーのUUID
+     * @param character セットするキャラクター
+     */
+    public static void racerSetter_Character(UUID uuid, Character character) {
+        Player player = Bukkit.getPlayer(uuid);
+
+        //プレイヤーがオフラインの場合return
+        if (player == null) {
+            return;
+        }
+
+        Racer racer = getRacer(uuid);
+        Circuit circuit = racer.getCircuit();
+
+        // レースがスタンバイフェーズ以降、かつプレイヤーがゴールしていない状態でなければreturn
+        if (circuit == null) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
+            return;
+        }
+        if (!racer.isStillInRace()) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
+            return;
+        }
+
+        // キャラクターのセット
+        racer.setCharacter(character);
+
+        // キャラクターフィジカルの適用
+        racer.recoveryCharacter();
+
+        // 外見の変更
+        PacketUtil.disguiseLivingEntity(null, player, character.getNmsClass());
+
+        // キャラクターセレクトサウンドの再生
+        character.playMenuSelectSound(player);
+
+        // メッセージの送信
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        MessageParts characterParts = MessageParts.getMessageParts(character);
+        MessageEnum.raceCharacter.sendConvertedMessage(player, circuitParts, characterParts);
+    }
+
+    public static void racerSetter_Kart(UUID uuid, Kart kart) {
+        Player player = Bukkit.getPlayer(uuid);
+
+        //プレイヤーがオフライン
+        if (player == null) {
+            return;
+        }
+
+        Racer racer = getRacer(uuid);
+        Circuit circuit = racer.getCircuit();
+
+        // レースがスタンバイフェーズ以降、かつプレイヤーがゴールしていない状態でなければreturn
+        if (circuit == null) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
+            return;
+        }
+        if (!racer.isStillInRace()) {
+            MessageEnum.raceNotStarted.sendConvertedMessage(player);
+            return;
+        }
+
+        racer.saveKartEntityLocation();
+        racer.setKart(kart);
+        racer.recoveryKart();
+
+        MessageParts kartParts = MessageParts.getMessageParts(kart);
+        MessageParts circuitParts = MessageParts.getMessageParts(circuit);
+        MessageEnum.raceKart.sendConvertedMessage(player, kartParts, circuitParts);
+    }
+
+    public static void racerSetter_DeselectCharacter(UUID uuid) {
+        Racer racer = getRacer(uuid);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
 
         if (racer.getCharacter() == null) {
             return;
         }
 
         racer.setCharacter(null);
-        Player player = Bukkit.getPlayer(id);
+        Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             racer.recoveryPhysical();
             PacketUtil.disguiseLivingEntity(null, player, Classes.nmsEntityHuman);
 
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageParts circuitParts = MessageParts.getMessageParts(circuit);
             MessageEnum.raceCharacterReset.sendConvertedMessage(player, circuitParts);
         }
     }
 
     public static void racerSetter_DeselectKart(UUID uuid) {
-        Racer racer = getRace(uuid);
+        Racer racer = getRacer(uuid);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return;
+        }
+
         if (racer.getKart() == null) {
             return;
         }
@@ -327,7 +344,7 @@ public class RaceManager {
         racer.setKart(null);
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, racer.getCircuitName());
+            MessageParts circuitParts = MessageParts.getMessageParts(circuit);
             MessageEnum.raceLeave.sendConvertedMessage(player, circuitParts);
         }
     }
@@ -346,45 +363,40 @@ public class RaceManager {
         }
     }
 
-    // 〓 Util Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    // 〓 Util Get 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
-    public static List<Player> getEntryPlayer(String circuitname) {
-        if (circuitMap.get(circuitname) == null)
-            return null;
-        return circuitMap.get(circuitname).getOnlineEntryPlayerList();
-    }
-
-    public static List<Player> getGoalPlayer(String circuitname) {
-        ArrayList<Player> goalplayer = new ArrayList<Player>();
-        for (Player p : getEntryPlayer(circuitname)) {
-            if (getRacer(p).isGoal())
-                goalplayer.add(p);
+    /**
+     * 引数circuitに参加しているプレイヤーのうち、順位が引数rankに一致しているプレイヤーを返す。
+     * @param circuit 取得するサーキット
+     * @param rank 取得するプレイヤーの順位
+     * @return 順位の一致したプレイヤー
+     */
+    public static Player getPlayerfromRank(Circuit circuit, int rank) {
+        for (Player player : circuit.getOnlineRacingPlayerList()) {
+            if (getRank(player) == rank) {
+                return player;
+            }
         }
-        return goalplayer;
-    }
 
-    public static List<Player> getRacingPlayer(String circuitname) {
-        ArrayList<Player> list = new ArrayList<Player>();
-        for (Player p : getEntryPlayer(circuitname)) {
-            if (!getRacer(p).isGoal())
-                list.add(p);
-        }
-        return list;
-    }
-
-    public static Player getPlayerfromRank(String circuitname, int rank) {
-        for (Player p : getRacingPlayer(circuitname)) {
-            if (getRank(p) == rank)
-                return p;
-        }
         return null;
     }
 
-    // レース走行中(CPポイントカウント中)の順位
-    public static Integer getRank(Player p) {
+    /**
+     * 引数playerが参加しているレースにおける引数playerの順位を返す。<br>
+     * 順位の計算は、オンラインの走行中のプレイヤーのみ含まれる。
+     * @param player 順位を取得するプレイヤー
+     * @return 順位
+     */
+    public static Integer getRank(Player player) {
         HashMap<UUID, Integer> count = new HashMap<UUID, Integer>();
 
-        for (Player entryplayer : getRacingPlayer(getRacer(p).getCircuitName())) {
+        Racer racer = getRacer(player);
+        Circuit circuit = racer.getCircuit();
+        if (circuit == null) {
+            return 0;
+        }
+
+        for (Player entryplayer : circuit.getOnlineRacingPlayerList()) {
             count.put(entryplayer.getUniqueId(), getRacer(entryplayer).getPassedCheckPointList().size());
         }
 
@@ -398,7 +410,7 @@ public class RaceManager {
 
         int rank = 1;
         for (Entry<UUID, Integer> ranking : entry) {
-            if (ranking.getKey().equals(p.getUniqueId()))
+            if (ranking.getKey().equals(player.getUniqueId()))
                 return rank;
 
             rank++;
@@ -407,77 +419,12 @@ public class RaceManager {
         return 0;
     }
 
-    // 〓 Util Is 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * @param uuid チェックするレース参加プレイヤーのUUID
-     * @return レースに参加申請し、規定人数が揃うまで待機している状態かどうか
-     */
-    public static Boolean isEntry(UUID uuid) {
-        if (getRace(uuid).getCircuitName() != "")
-            return true;
-        return false;
-    }
-
-    /**
-     * 申請していたレースが規定人数を満たし参加者が召集された状態かどうか<br>
-     * メニュー選択をしている状態
-     * @param uuid チェックするレース参加プレイヤーのUUID
-     * @return 申請していたレースが規定人数を満たし参加者が召集された状態かどうか
-     */
-    public static Boolean isStandby(UUID uuid) {
-        if (isEntry(uuid)) {
-            if (getRace(uuid).isStandby()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param uuid チェックするレース参加プレイヤーのUUID
-     * @return 申請していたレースのメニュー選択が終了し、スタートした状態かどうか
-     */
-    public static Boolean isStarted(UUID uuid) {
-        if (isEntry(uuid)) {
-            if (isStandby(uuid)) {
-                Circuit circuit = getCircuit(uuid);
-                if (circuit != null) {
-                    if (circuit.isStarted()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param uuid チェックするレース参加プレイヤーのUUID
-     * @return レースがスタートしており、かつまだゴールしていない状態かどうか
-     */
-    public static Boolean isStillRacing(UUID uuid) {
-        if (isEntry(uuid)) {
-            if (isStandby(uuid)) {
-                Circuit circuit = getCircuit(uuid);
-                if (circuit != null) {
-                    if (circuit.isStarted()) {
-                        if (!getRace(uuid).isGoal()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     // 〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** 全サーキットに設置されている妨害エンティティをデスポーンさせる。 */
     public static void removeAllJammerEntity() {
-        for (Circuit cir : circuitMap.values()) {
-            cir.removeAllJammerEntity();
+        for (Circuit circuit : CircuitConfig.values()) {
+            circuit.removeAllJammerEntity();
         }
     }
 
@@ -550,21 +497,19 @@ public class RaceManager {
         //メニュー操作用アイテムを配置する
         //キャラクター選択メニューとカート選択メニューで処理が異なる
         if (isCharacterMenu) {
-            inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.CHARACTER_RANDOM.getMenuItem());
+            inv.setItem(inventorySlotAmount - 4, SelectMenu.CHARACTER_RANDOM.getMenuItem());
             Racer racer = getRacer(player);
-            if (!racer.getCircuitName().equalsIgnoreCase("")) {
-                CircuitData circuitData = CircuitConfig.getCircuitData(racer.getCircuitName());
-                if (circuitData != null) {
-                    if (circuitData.getRaceType().equals(RaceType.KART)) {
-                        inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.CHARACTER_PREVIOUS.getMenuItem());
-                        inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.CHARACTER_NEXT.getMenuItem());
-                    }
+            Circuit circuit = racer.getCircuit();
+            if (circuit != null) {
+                if (circuit.getRaceType().equals(RaceType.KART)) {
+                    inv.setItem(inventorySlotAmount - 5, SelectMenu.CHARACTER_PREVIOUS.getMenuItem());
+                    inv.setItem(inventorySlotAmount - 3, SelectMenu.CHARACTER_NEXT.getMenuItem());
                 }
             }
         } else {
-            inv.setItem(inventorySlotAmount - 4, EnumSelectMenu.KART_RANDOM.getMenuItem());
-            inv.setItem(inventorySlotAmount - 5, EnumSelectMenu.KART_PREVIOUS.getMenuItem());
-            inv.setItem(inventorySlotAmount - 3, EnumSelectMenu.KART_NEXT.getMenuItem());
+            inv.setItem(inventorySlotAmount - 4, SelectMenu.KART_RANDOM.getMenuItem());
+            inv.setItem(inventorySlotAmount - 5, SelectMenu.KART_PREVIOUS.getMenuItem());
+            inv.setItem(inventorySlotAmount - 3, SelectMenu.KART_NEXT.getMenuItem());
         }
 
         player.openInventory(inv);
