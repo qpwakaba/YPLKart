@@ -27,8 +27,8 @@ public class ReloadCommand extends Command {
             RaceManager.racerSetter_UnEntry(RaceManager.getRacer(other));
         }
 
-        // 全サーキットのレースをリザーブエントリーを破棄して終了
-        RaceManager.endAllCircuit(false);
+        // 全サーキットのレースを終了し、引数にtrueを渡しインスタンスを破棄
+        RaceManager.endAllCircuit(true);
 
         // コンフィグのリロード
         ConfigManager.reloadAllConfig();

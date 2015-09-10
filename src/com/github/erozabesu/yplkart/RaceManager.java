@@ -81,9 +81,9 @@ public class RaceManager {
         }
     }
 
-    public static void endAllCircuit(boolean useReserveEntry) {
+    public static void endAllCircuit(boolean clearAll) {
         for (Circuit circuit : CircuitConfig.values()) {
-            circuit.endRace(useReserveEntry);
+            circuit.endRace(clearAll);
         }
     }
 

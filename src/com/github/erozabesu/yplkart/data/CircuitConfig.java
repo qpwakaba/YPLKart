@@ -93,8 +93,8 @@ public class CircuitConfig {
         Circuit circuit = get(circuitName);
         if (circuit != null) {
 
-            // サーキットのレースを終了
-            circuit.endRace(false);
+            // サーキットのレースを終了し、引数にtrueを渡しインスタンスを破棄する
+            circuit.endRace(true);
 
             //ハッシュマップから削除
             remove(circuitName);
@@ -132,8 +132,8 @@ public class CircuitConfig {
 
         } else {
 
-            // 古いサーキットのレースを強制終了
-            oldCircuit.endRace(false);
+            // 古いサーキットのレースを強制終了し、引数にtrueを渡しインスタンスを破棄する
+            oldCircuit.endRace(true);
 
             // 現在の状態を保存
             oldCircuit.saveConfiguration();

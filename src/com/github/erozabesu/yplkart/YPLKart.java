@@ -55,7 +55,7 @@ public class YPLKart extends JavaPlugin {
     @Override
     public void onDisable() {
         Scoreboards.clearBoard();
-        RaceManager.endAllCircuit(false);
+        RaceManager.endAllCircuit(true);
 
         Bukkit.getPluginManager().disablePlugin(this);
     }

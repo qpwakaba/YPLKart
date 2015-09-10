@@ -84,11 +84,13 @@ public class Circuit extends CircuitData {
     public Circuit(String circuitName) {
         super(circuitName);
         this.initializeCircuit();
+        this.runDetectReadyTask();
     }
 
     public Circuit(String circuitName, Location location) {
         super(circuitName, location);
         this.initializeCircuit();
+        this.runDetectReadyTask();
     }
 
     private void initializeCircuit() {
@@ -127,11 +129,6 @@ public class Circuit extends CircuitData {
         this.setStandby(false);
 
         this.setStarted(false);
-
-        // onDisable()で呼び出された場合はタスクを起動しない
-        if (YPLKart.getInstance().isEnabled()) {
-            this.runDetectReadyTask();
-        }
     }
 
     //〓 Race Management 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -155,11 +152,11 @@ public class Circuit extends CircuitData {
     /**
      * 開催されているレースを終了する。<br>
      * 参加しているプレイヤーの情報はレース開始前の情報に復元される。<br>
-     * 引数useReserveEntryがtrueの場合、リザーブエントリーを通常のエントリーに昇格し、新たにマッチングを開始する。<br>
-     * falseの場合はリザーブエントリーも含め全て初期化する。
-     * @param useReserveEntry リザーブエントリーを利用するかどうか
+     * 引数clearAllがtrueの場合、全データを初期化した上で、全タスクを停止し、このインスタンスを廃棄する。<br>
+     * falseの場合はDetectReadyタスクを再起動し、また、リザーブエントリーを通常のエントリーに昇格した上で新たにマッチングを開始する。
+     * @param clearAll リザーブエントリーを利用するかどうか
      */
-    public void endRace(boolean useReserveEntry) {
+    public void endRace(boolean clearAll) {
         this.sendMessageEntryPlayer(MessageEnum.raceEnd, MessageParts.getMessageParts(this));
         Iterator<Racer> entryRacerListIterator = getEntryRacerSet().iterator();
         Racer racer;
@@ -169,9 +166,8 @@ public class Circuit extends CircuitData {
             RaceManager.racerSetter_UnEntry(racer);
         }
 
-        // リザーブエントリーがあれば終了処理後に改めてエントリーさせる
-        // ただしYPLKart.onDisable()から呼び出されている場合は何もしない
-        if (useReserveEntry) {
+        // clearAllがfalseの場合、リザーブエントリーがあれば終了処理後に改めてエントリーさせる
+        if (!clearAll) {
             final HashSet<Racer> nextEntryRacerList = this.getReserveEntryRacerSet();
             if (0 < nextEntryRacerList.size()) {
                 Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
@@ -190,6 +186,11 @@ public class Circuit extends CircuitData {
         this.removeAllJammerEntity();
         this.initializeCircuit();
         Scoreboards.endCircuit(getCircuitName());
+
+        // clearAllがfalseの場合、DetectReadyタスクを再起動する
+        if (!clearAll) {
+            this.runDetectReadyTask();
+        }
     }
 
     /**
@@ -579,7 +580,7 @@ public class Circuit extends CircuitData {
                             MessageEnum.raceTimeUp.sendConvertedMessage(p, circuitParts);
                         }
                     } else if (remainTime < 0) {
-                        endRace(true);
+                        endRace(false);
                     }
                 }
             }
@@ -595,7 +596,7 @@ public class Circuit extends CircuitData {
         this.setDetectEndTask(Bukkit.getScheduler().runTaskTimer(YPLKart.getInstance(), new Runnable() {
             public void run() {
                 if (isRaceEnd()) {
-                    endRace(true);
+                    endRace(false);
                 }
             }
         }, 10, 100));
