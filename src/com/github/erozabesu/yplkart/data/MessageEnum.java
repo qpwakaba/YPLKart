@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.YPLKart;
+import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.object.RaceType;
 
 /**
  * プラグインから出力されるテキストメッセージを格納するクラス

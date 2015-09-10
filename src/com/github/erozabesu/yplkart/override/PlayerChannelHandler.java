@@ -14,8 +14,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.listener.NettyListener;
-import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Fields;
 import com.github.erozabesu.yplkart.reflection.Methods;

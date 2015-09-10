@@ -19,6 +19,7 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;

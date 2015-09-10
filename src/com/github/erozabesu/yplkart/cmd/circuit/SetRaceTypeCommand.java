@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.object.RaceType;
+import com.github.erozabesu.yplkart.enumdata.RaceType;
 
 public class SetRaceTypeCommand extends Command {
     public SetRaceTypeCommand() {

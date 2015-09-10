@@ -1,4 +1,4 @@
-package com.github.erozabesu.yplkart.object;
+package com.github.erozabesu.yplkart.enumdata;
 /**
  * 開催するレースタイプを管理するクラス
  * @author erozabesu

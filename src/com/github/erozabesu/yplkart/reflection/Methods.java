@@ -8,8 +8,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.object.Kart;
-import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.utils.ReflectionUtil;
 
 public class Methods extends ReflectionUtil {

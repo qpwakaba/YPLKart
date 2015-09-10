@@ -1,4 +1,4 @@
-package com.github.erozabesu.yplkart.object;
+package com.github.erozabesu.yplkart.enumdata;
 
 /**
  * カートの種類

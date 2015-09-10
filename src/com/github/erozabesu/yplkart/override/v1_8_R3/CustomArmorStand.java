@@ -13,8 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.object.Kart;
-import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.reflection.Fields;
 import com.github.erozabesu.yplkart.reflection.Methods;

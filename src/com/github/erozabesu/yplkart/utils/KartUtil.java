@@ -12,8 +12,8 @@ import org.bukkit.metadata.MetadataValue;
 
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
+import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.object.Kart;
-import com.github.erozabesu.yplkart.object.KartType;
 import com.github.erozabesu.yplkart.reflection.Constructors;
 import com.github.erozabesu.yplkart.reflection.Methods;
 
