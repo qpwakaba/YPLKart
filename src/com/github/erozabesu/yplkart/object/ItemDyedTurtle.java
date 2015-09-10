@@ -59,6 +59,16 @@ public class ItemDyedTurtle extends BukkitRunnable {
             this.movingDamage = ItemEnum.THORNED_TURTLE.getMovingDamage() + adjustDamage;
         }
 
+        // 生成段階で予め最初のチェックポイントまでのモーションを格納しておく
+        Location fromLocation = this.turtle.getLocation().clone();
+        Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
+        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
+
+        //算出したベクターのX、Y、Zモーションを格納
+        this.motX = vectorToLocation.getX();
+        this.motY = vectorToLocation.getY();
+        this.motZ = vectorToLocation.getZ();
+
         Util.removeEntityCollision(this.turtle);
     }
 
@@ -99,8 +109,16 @@ public class ItemDyedTurtle extends BukkitRunnable {
         }
         this.createMovingDamage();
 
-        this.updateCheckPoint();
-        this.updateMotion();
+        // ターゲットに対するモーションの格納に成功した場合は何もしない
+        if (this.updateTargetMotion()) {
+            // Do nothing
+
+        // ターゲットを補足できなかった場合はチェックポイントに対するモーションを格納
+        } else {
+            if (this.updateCheckPoint()) {
+                this.updateCheckPointMotion();
+            }
+        }
     }
 
     /** 格納されているモーション値を基にエンティティを移動させる。 */
@@ -154,7 +172,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
      * 距離が5ブロック以内、かつ更新に失敗した場合はfalseを返す。
      * @return 更新できたかどうか
      */
-    private void updateCheckPoint() {
+    private boolean updateCheckPoint() {
         // 前回通過したチェックポイントとの距離が5ブロック以内の場合、
         // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
         if (this.turtle.getLocation().distance(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 5) {
@@ -166,33 +184,56 @@ public class ItemDyedTurtle extends BukkitRunnable {
             }
 
             Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, checkPointLocation, 180.0F);
+
+            // 新たなチェックポイントの検出に成功
             if (newCheckPoint != null) {
                 this.lastCheckPoint = newCheckPoint;
+                return true;
 
-            // 検出できなかった場合は身動きが取れなくなるためタスクを終了する
+            // 検出できなかった場合は現在のモーションを保持するためfalseを返す
             } else {
-                this.die();
-                return;
+                return false;
             }
 
-        // 5ブロックを超える距離がある場合は何もしない
+        // 5ブロックを超える距離がある場合は現在のモーションを保持するためfalseを返す
         } else {
-            // Do nothing
+            return false;
         }
     }
 
     /** lastPassecCheckPointへ向けたモーションを格納する。 */
-    private void updateMotion() {
+    private void updateCheckPointMotion() {
         Location fromLocation = this.turtle.getLocation().clone();
-        Location toLocation;
+        Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
 
-        // ターゲットとの距離が20ブロック以内の場合はtoLocationにターゲットの座標を格納する
-        if (this.target.getLocation().distance(fromLocation) <= 20.0D) {
-            toLocation = this.target.getLocation();
+        // fromLocationからtoLocationへ向けたベクターを算出
+        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
 
-        // そうでない場合はチェックポイントの座標を格納する
+        // 現在のモーション値と全く同じ値の場合、読み込まれていないチャンクのためフラグを立てる
+        if (this.motX == vectorToLocation.getX() && this.motY == vectorToLocation.getY() && this.motZ == vectorToLocation.getZ()) {
+            this.isLoadedChunk = false;
         } else {
-            toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
+            this.isLoadedChunk = true;
+        }
+
+        //算出したベクターのX、Y、Zモーションを格納
+        this.motX = vectorToLocation.getX();
+        this.motY = vectorToLocation.getY();
+        this.motZ = vectorToLocation.getZ();
+    }
+
+    /**
+     * ターゲットとの距離が20ブロック以内の場合はターゲットに向けたモーションを格納しtrueを返す。<br>
+     * 距離が20ブロックを超える場合は何もせずfalseを返す。
+     * @return ターゲットを発見しモーションを格納したかどうか
+     */
+    private boolean updateTargetMotion() {
+        Location fromLocation = this.turtle.getLocation().clone();
+        Location toLocation = this.target.getLocation().clone();
+
+        // ターゲットとの距離が20ブロックを超える場合はfalseを返す
+        if (400.0D < fromLocation.distanceSquared(toLocation)) {
+            return false;
         }
 
         // fromLocationからtoLocationへ向けたベクターを算出
@@ -209,5 +250,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         this.motX = vectorToLocation.getX();
         this.motY = vectorToLocation.getY();
         this.motZ = vectorToLocation.getZ();
+
+        return true;
     }
 }
