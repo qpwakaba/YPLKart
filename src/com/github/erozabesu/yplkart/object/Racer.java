@@ -115,6 +115,9 @@ public class Racer extends PlayerObject{
     /** 移動速度低下タスク */
     private BukkitTask itemNegativeSpeedTask;
 
+    /** キラー状態を解除するタスク */
+    private BukkitTask itemKillerInitializeTask;
+
     /** キラーを使用した際の、周囲にある最寄の未通過のチェックポイントを格納する */
     private Entity killerFirstPassedCheckPointEntity;
 
@@ -162,6 +165,7 @@ public class Racer extends PlayerObject{
         this.setDeathPenaltyTitleSendTask(null);
         this.setItemPositiveSpeedTask(null);
         this.setItemNegativeSpeedTask(null);
+        this.setItemKillerInitializeTask(null);
 
         this.setKillerFirstPassedCheckPointEntity(null);
 
@@ -197,6 +201,15 @@ public class Racer extends PlayerObject{
         RaceManager.leaveRacingKart(getPlayer());
         this.recoveryAll();
         RaceManager.racerSetter_DeselectCharacter(this.getUUID());
+
+        // タスクのキャンセル
+        this.setItemBoxCoolingTask(null);
+        this.setItemUseCoolingTask(null);
+        this.setDeathPenaltyTask(null);
+        this.setDeathPenaltyTitleSendTask(null);
+        this.setItemPositiveSpeedTask(null);
+        this.setItemNegativeSpeedTask(null);
+        this.setItemKillerInitializeTask(null);
     }
 
     /**
@@ -301,16 +314,21 @@ public class Racer extends PlayerObject{
             kartEntity.setPassenger(player);
         }
 
-        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-            public void run() {
-                setKillerFirstPassedCheckPointEntity(null);
+        this.setItemKillerInitializeTask(
+            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+                public void run() {
+                    setKillerFirstPassedCheckPointEntity(null);
 
-                //ランニングレース中にキラーを使用した場合、登場中のキラー用カートエンティティを降りる
-                if (getCircuit().getRaceType().equals(RaceType.RUNNING)) {
-                    RaceManager.leaveRacingKart(player);
+                    //ランニングレース中にキラーを使用した場合、登場中のキラー用カートエンティティを降りる
+                    if (getCircuit().getRaceType().equals(RaceType.RUNNING)) {
+                        RaceManager.leaveRacingKart(player);
+                    }
+
+                    // 最後に通過したチェックポイントの座標にテレポートする
+                    teleport(getLastPassedCheckPointEntity().getLocation());
                 }
-            }
-        }, life * 20);
+            }, life * 20)
+        );
     }
 
     /**
@@ -756,6 +774,11 @@ public class Racer extends PlayerObject{
         return this.itemNegativeSpeedTask;
     }
 
+    /** @return キラー状態を解除するタスク */
+    public BukkitTask getItemKillerInitializeTask() {
+        return itemKillerInitializeTask;
+    }
+
     /** @return キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
     public Entity getUsingKiller() {
         return this.killerFirstPassedCheckPointEntity;
@@ -902,6 +925,16 @@ public class Racer extends PlayerObject{
         }
 
         this.itemNegativeSpeedTask = newtask;
+    }
+
+    /** @param itemKillerInitializeTask キラー状態を解除するタスク */
+    public void setItemKillerInitializeTask(BukkitTask newtask) {
+        //重複しないよう既に起動中のタスクがあればキャンセルする
+        if (this.itemKillerInitializeTask != null) {
+            this.itemKillerInitializeTask.cancel();
+        }
+
+        this.itemKillerInitializeTask = newtask;
     }
 
     /** @param entity キラーを使用した際に、周囲にある最寄の未通過のチェックポイントを格納する */
