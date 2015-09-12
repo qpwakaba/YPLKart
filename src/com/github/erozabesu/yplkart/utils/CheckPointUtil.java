@@ -1,5 +1,6 @@
 package com.github.erozabesu.yplkart.utils;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,19 +39,28 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param location 基点となる座標
      * @param detectRadius チェックポイントを検出する範囲の半径
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getNearbyCheckPoints(String circuitName, Location location, double detectRadius) {
+    public static List<Entity> getNearbyCheckPoints(String circuitName, Location location, double detectRadius, Entity... ignoreEntities) {
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectRadius);
+        List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
         while (iterator.hasNext()) {
             tempEntity = iterator.next();
 
-            //引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
+            // 除外リストに含まれるエンティティの場合配列から削除
+            if (ignoreList.contains(tempEntity)) {
+                iterator.remove();
+                continue;
+            }
+
+            // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
             if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
                 iterator.remove();
+                continue;
             }
         }
 
@@ -67,10 +77,11 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param location 基点となる座標
      * @param detectRadius チェックポイントを検出する範囲の半径
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestCheckpoint(String circuitName, Location location, double detectRadius) {
-        List<Entity> checkPointList = getNearbyCheckPoints(circuitName, location, detectRadius);
+    public static Entity getNearestCheckpoint(String circuitName, Location location, double detectRadius, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getNearbyCheckPoints(circuitName, location, detectRadius, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -87,16 +98,24 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Location location, float sightThreshold) {
+    public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Location location, float sightThreshold, Entity... ignoreEntities) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
         while (iterator.hasNext()) {
             tempEntity = iterator.next();
+
+            // 除外リストに含まれるエンティティの場合配列から削除
+            if (ignoreList.contains(tempEntity)) {
+                iterator.remove();
+                continue;
+            }
 
             //引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
             if (!isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
@@ -133,10 +152,11 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightNearestCheckpoint(String circuitName, Location location, float sightThreshold) {
-        List<Entity> checkPointList = getInSightNearbyCheckPoints(circuitName, location, sightThreshold);
+    public static Entity getInSightNearestCheckpoint(String circuitName, Location location, float sightThreshold, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getInSightNearbyCheckPoints(circuitName, location, sightThreshold, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -153,16 +173,24 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold) {
+    public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold, Entity... ignoreEntities) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         List<Entity> entityList = Util.getNearbyEntities(entity.getLocation().clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
         while (iterator.hasNext()) {
             tempEntity = iterator.next();
+
+            // 除外リストに含まれるエンティティの場合配列から削除
+            if (ignoreList.contains(tempEntity)) {
+                iterator.remove();
+                continue;
+            }
 
             //引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
             if (!isSpecificCircuitCheckPointEntity(tempEntity, circuitName)) {
@@ -214,10 +242,11 @@ public class CheckPointUtil {
      * @param circuitName サーキット名
      * @param entity 基点となるエンティティ
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndDetectableNearestCheckpoint(String circuitName, Entity entity, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, entity, sightThreshold);
+    public static Entity getInSightAndDetectableNearestCheckpoint(String circuitName, Entity entity, float sightThreshold, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, entity, sightThreshold, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -233,9 +262,10 @@ public class CheckPointUtil {
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param radius 半径
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getNearbyUnpassedCheckPoints(Racer racer, Location location, double radius) {
+    public static List<Entity> getNearbyUnpassedCheckPoints(Racer racer, Location location, double radius, Entity... ignoreEntities) {
         Circuit circuit = racer.getCircuit();
         if (circuit == null) {
             return null;
@@ -243,20 +273,29 @@ public class CheckPointUtil {
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), radius);
+        List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
         while (iterator.hasNext()) {
             tempEntity = iterator.next();
 
+            // 除外リストに含まれるエンティティの場合配列から削除
+            if (ignoreList.contains(tempEntity)) {
+                iterator.remove();
+                continue;
+            }
+
             // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
             if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuit.getCircuitName())) {
                 iterator.remove();
+                continue;
             }
 
             // 通過済みのチェックポイントを配列から削除
             if (racer.getPassedCheckPointList().contains(currentLaps + tempEntity.getUniqueId().toString())) {
                 iterator.remove();
+                continue;
             }
         }
 
@@ -273,10 +312,11 @@ public class CheckPointUtil {
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param detectRadius チェックポイントを検出する範囲の半径
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double detectRadius) {
-        List<Entity> checkPointList = getNearbyUnpassedCheckPoints(racer, location, detectRadius);
+    public static Entity getNearestUnpassedCheckpoint(Racer racer, Location location, double detectRadius, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getNearbyUnpassedCheckPoints(racer, location, detectRadius, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
@@ -293,9 +333,10 @@ public class CheckPointUtil {
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndDetectableNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold) {
+    public static List<Entity> getInSightAndDetectableNearbyUnpassedCheckPoints(Racer racer, Location location, float sightThreshold, Entity... ignoreEntities) {
         Circuit circuit = racer.getCircuit();
         if (circuit == null) {
             return null;
@@ -306,11 +347,18 @@ public class CheckPointUtil {
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
         List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
         Entity tempEntity;
         while (iterator.hasNext()) {
             tempEntity = iterator.next();
+
+            // 除外リストに含まれるエンティティの場合配列から削除
+            if (ignoreList.contains(tempEntity)) {
+                iterator.remove();
+                continue;
+            }
 
             // 引数circuitNameのサーキットに設置されたチェックポイントではないエンティティを配列から削除
             if (!CheckPointUtil.isSpecificCircuitCheckPointEntity(tempEntity, circuit.getCircuitName())) {
@@ -368,10 +416,11 @@ public class CheckPointUtil {
      * @param racer 参加中のプレイヤーのRacerインスタンス
      * @param location 基点となる座標
      * @param sightThreshold 視野
+     * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndDetectableNearestUnpassedCheckpoint(Racer racer, Location location, float sightThreshold) {
-        List<Entity> checkPointList = getInSightAndDetectableNearbyUnpassedCheckPoints(racer, location, sightThreshold);
+    public static Entity getInSightAndDetectableNearestUnpassedCheckpoint(Racer racer, Location location, float sightThreshold, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getInSightAndDetectableNearbyUnpassedCheckPoints(racer, location, sightThreshold, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
