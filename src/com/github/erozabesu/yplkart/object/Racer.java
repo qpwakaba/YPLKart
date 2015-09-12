@@ -433,20 +433,7 @@ public class Racer extends PlayerObject{
         Entity lastPassedCheckPoint = this.getLastPassedCheckPointEntity();
         if (lastPassedCheckPoint != null) {
             final Location teleportLocation = lastPassedCheckPoint.getLocation().add(0, -CheckPointUtil.checkPointHeight, 0);
-            Entity kartEntity = this.getPlayer().getVehicle();
-            if (kartEntity != null) {
-                this.getPlayer().leaveVehicle();
-                kartEntity.remove();
-            }
-            this.getPlayer().teleport(teleportLocation);
-
-            //遅延させないとカートが生成されない
-            Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
-                public void run() {
-                    setKartEntityLocation(teleportLocation);
-                    recoveryKart();
-                }
-            }, 2);
+            this.teleport(teleportLocation);
 
             this.applyDeathPenalty();
         }
@@ -546,6 +533,28 @@ public class Racer extends PlayerObject{
      */
     public boolean isStillRacing() {
         return this.isRacingPhase() && !this.isGoal();
+    }
+
+    /**
+     * プレイヤーを引数teleportLocationにテレポートさせる。<br>
+     * カートに搭乗している場合は搭乗を解除した上で、テレポートしカートエンティティを再生成し搭乗する。
+     * @param teleportLocation テレポート先の座標
+     */
+    public void teleport(final Location teleportLocation) {
+        Entity kartEntity = this.getPlayer().getVehicle();
+        if (kartEntity != null) {
+            this.getPlayer().leaveVehicle();
+            kartEntity.remove();
+        }
+        this.getPlayer().teleport(teleportLocation);
+
+        //遅延させないとカートが生成されない
+        Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
+            public void run() {
+                setKartEntityLocation(teleportLocation);
+                recoveryKart();
+            }
+        }, 2);
     }
 
     public void removeDeathPenalty() {
