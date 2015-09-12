@@ -1,5 +1,7 @@
 package com.github.erozabesu.yplkart.object;
 
+import java.util.List;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -82,6 +84,12 @@ public class ItemDyedTurtle extends BukkitRunnable {
     public void run() {
         Racer targerRacer = RaceManager.getRacer(target);
 
+        // 生成から120秒以上経過した場合は自動消滅
+        if (120 < this.turtle.getTicksLived() / 20) {
+            this.die();
+            return;
+        }
+
         // 何らかの原因でエンティティがデスポーンしている場合はタスクを終了
         if (this.turtle.isDead()) {
             die();
@@ -140,17 +148,35 @@ public class ItemDyedTurtle extends BukkitRunnable {
     }
 
     /**
-     * ターゲットプレイヤーとの距離が3ブロック以内の場合ターゲットプレイヤーの座標に爆発を引き起こしtrueを返す。<br>
+     * shooter以外のプレイヤーとの距離が3ブロック以内の場合プレイヤーの座標に爆発を引き起こしtrueを返す。<br>
      * 距離が3ブロックを超えている場合はfalseを返す。
      * @return 爆発に成功したかどうか
      */
     private boolean createHitDamage() {
-        if (this.target.getLocation().distance(this.turtle.getLocation()) < 3.0D) {
-            Util.createSafeExplosion(this.shooter, target.getLocation(), hitDamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
-            return true;
-        } else {
-            return false;
+        // 周囲のエンティティを取得
+        List<Entity> nearbyEntities = this.turtle.getNearbyEntities(3.0D, 3.0D, 3.0D);
+
+        // shooterを除外
+        nearbyEntities.remove(this.shooter);
+
+        for (Entity nearbyEntity : nearbyEntities) {
+            // エンティティがプレイヤーインスタンス
+            if (nearbyEntity instanceof Player) {
+
+                // 同一のサーキットにエントリーしている
+                Racer racer = RaceManager.getRacer((Player) nearbyEntity);
+                if (racer.getCircuit() != null && racer.getCircuit().getCircuitName().equalsIgnoreCase(this.circuitName)) {
+
+                    // レース中
+                    if (racer.isStillRacing()) {
+                        Util.createSafeExplosion(this.shooter, nearbyEntity.getLocation(), hitDamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+                        return true;
+                    }
+                }
+            }
         }
+
+        return false;
     }
 
     /** movingDamageが0でない場合は5チックおきに周囲にダメージを発生させる。 */
