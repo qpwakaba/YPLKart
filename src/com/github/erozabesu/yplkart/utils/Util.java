@@ -409,12 +409,12 @@ public class Util extends ReflectionUtil {
     public static List<Chunk> getNearbyChunks(Location location, double radius) {
         List<Chunk> nearbyChunks = new ArrayList<Chunk>();
 
-        location.add(radius, 0, radius);
+        Location centerLocation = location.clone().add(radius/2, 0, radius/2);
 
         double round = (radius / 16) + 1;
         for (int x = 0; x < round; x++) {
             for (int z = 0; z < round; z++) {
-                Chunk chunk = location.getWorld().getChunkAt(location.clone().add(-16 * x, 0, -16 * z));
+                Chunk chunk = centerLocation.getWorld().getChunkAt(centerLocation.clone().add(-16 * x, 0, -16 * z));
                 nearbyChunks.add(chunk);
             }
         }
