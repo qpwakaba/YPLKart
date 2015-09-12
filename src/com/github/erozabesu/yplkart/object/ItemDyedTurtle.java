@@ -30,9 +30,8 @@ public class ItemDyedTurtle extends BukkitRunnable {
     int hitDamage = 0;
     int movingDamage = 0;
 
-    double motX = 0.0D;
-    double motY = 0.0D;
-    double motZ = 0.0D;
+    Vector motion;
+    double motionMultiply = 3.0D;
 
     /**
      * コンストラクタ。
@@ -63,13 +62,9 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // 生成段階で予め最初のチェックポイントまでのモーションを格納しておく
         Location fromLocation = this.turtle.getLocation().clone();
         Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
-        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
+        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
 
-        //算出したベクターのX、Y、Zモーションを格納
-        this.motX = vectorToLocation.getX();
-        this.motY = vectorToLocation.getY();
-        this.motZ = vectorToLocation.getZ();
-
+        // エンティティのコリジョンを消去
         Util.removeEntityCollision(this.turtle);
     }
 
@@ -92,19 +87,19 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
         // 何らかの原因でエンティティがデスポーンしている場合はタスクを終了
         if (this.turtle.isDead()) {
-            die();
+            this.die();
             return;
         }
 
         // ターゲットが走行中でない場合はタスクを終了
         if (!RaceManager.getRacer(this.target).isStillRacing()) {
-            die();
+            this.die();
             return;
         }
 
         // ターゲットがオフライン、もしくはターゲットが別のワールドに移動している場合はタスクを終了
-        if (!Util.isOnline(target.getName()) || !this.target.getLocation().getWorld().equals(this.turtle.getLocation().getWorld())) {
-            die();
+        if (!this.target.isOnline() || !this.target.getLocation().getWorld().equals(this.turtle.getLocation().getWorld())) {
+            this.die();
             return;
         }
 
@@ -116,7 +111,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         this.move();
         this.rotate();
         if (this.createHitDamage()) {
-            die();
+            this.die();
             return;
         }
         this.createMovingDamage();
@@ -136,7 +131,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     /** 格納されているモーション値を基にエンティティを移動させる。 */
     private void move() {
-        this.turtle.setVelocity(new Vector(this.motX, this.motY, this.motZ));
+        this.turtle.setVelocity(this.motion);
     }
 
     /** Yawを少しずつずらしエンティティを回転させる */
@@ -197,7 +192,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
     private boolean updateCheckPoint() {
         // 前回通過したチェックポイントとの距離が5ブロック以内の場合、
         // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
-        if (this.turtle.getLocation().distance(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 5) {
+        if (this.turtle.getLocation().distanceSquared(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 25.0D) {
 
             // 逆走フラグがtrueの場合はYawに180.0Fを加算
             Location checkPointLocation = this.lastCheckPoint.getLocation().clone();
@@ -228,13 +223,8 @@ public class ItemDyedTurtle extends BukkitRunnable {
         Location fromLocation = this.turtle.getLocation().clone();
         Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
 
-        // fromLocationからtoLocationへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
-
-        //算出したベクターのX、Y、Zモーションを格納
-        this.motX = vectorToLocation.getX();
-        this.motY = vectorToLocation.getY();
-        this.motZ = vectorToLocation.getZ();
+        // fromLocationからtoLocationへ向けたベクターを算出、格納
+        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
     }
 
     /**
@@ -251,13 +241,8 @@ public class ItemDyedTurtle extends BukkitRunnable {
             return false;
         }
 
-        // fromLocationからtoLocationへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(4.0D);
-
-        //算出したベクターのX、Y、Zモーションを格納
-        this.motX = vectorToLocation.getX();
-        this.motY = vectorToLocation.getY();
-        this.motZ = vectorToLocation.getZ();
+        // fromLocationからtoLocationへ向けたベクターを算出、格納
+        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
 
         return true;
     }
