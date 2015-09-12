@@ -230,7 +230,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         Location location = entityKart.getLocation();
         double speedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
 
-      //キラー使用中
+        //キラー使用中
         boolean isKillerInitialized = (Boolean) invoke(Methods.Ypl_isKillerInitialized, nmsEntityKart);
         if (racer.getUsingKiller() != null) {
 
@@ -241,26 +241,24 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                 invoke(Methods.Ypl_setKillerInitialized, nmsEntityKart, true);
 
                 //外見をキラーに変更する
-                setDisplayMaterial(nmsEntityKart
-                        , ItemEnum.KILLER.getDisplayBlockMaterial(), ItemEnum.KILLER.getDisplayBlockMaterialData());
+                setDisplayMaterial(nmsEntityKart, ItemEnum.KILLER.getDisplayBlockMaterial(), ItemEnum.KILLER.getDisplayBlockMaterialData());
 
                 // コリジョンをOFFに変更
                 setFieldValue(Fields.nmsEntity_noclip, nmsEntityKart, true);
 
-                // 現在の座標からチェックポイントへ向けたベクターを算出。Yベクターのみ用いる
-                Vector vectorToLocation = Util.getVectorToLocation(location, racer.getUsingKiller().getLocation().add(0, -CheckPointUtil.checkPointHeight + 3, 0)).multiply(1.5D);
+                // アイテム使用時に取得した最初のチェックポイントを格納
+                Entity firstCheckPoint = racer.getUsingKiller();
+                invoke(Methods.Ypl_setKillerLastPassedCheckPoint, nmsEntityKart, firstCheckPoint);
 
-                // チェックポイントのYawからベクターを算出。X、Zベクターのみ用いる
-                Location checkPointLocation = racer.getUsingKiller().getLocation().clone();
-                checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
-                Vector vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation).multiply(1.5D);
-
-                //算出したベクターのX、Y、Zモーションを格納
-                invoke(Methods.Ypl_setKillerX, nmsEntityKart, vectorByCheckPointYaw.getX());
-                invoke(Methods.Ypl_setKillerY, nmsEntityKart, vectorToLocation.getY());
-                invoke(Methods.Ypl_setKillerZ, nmsEntityKart, vectorByCheckPointYaw.getZ());
-
-                invoke(Methods.nmsEntity_setYawPitch, nmsEntityKart, racer.getUsingKiller().getLocation().getYaw() + 180.0F, 0);
+                // 予め最初のチェックポイントまでのモーションを格納しておく
+                Location firstCheckPointLocation = firstCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
+                Vector motionVector = Util.getVectorToLocation(location, firstCheckPointLocation);
+                double motX = motionVector.getX();
+                double motY = motionVector.getY();
+                double motZ = motionVector.getZ();
+                invoke(Methods.Ypl_setKillerX, nmsEntityKart, motX);
+                invoke(Methods.Ypl_setKillerY, nmsEntityKart, motY);
+                invoke(Methods.Ypl_setKillerZ, nmsEntityKart, motZ);
             }
 
             //スピードスタックを一時的に常に最大値に固定する
@@ -676,40 +674,39 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         setFieldValue(Fields.nmsEntity_motY, entityKart, killerY);
         setFieldValue(Fields.nmsEntity_motZ, entityKart, killerZ);
 
-        // 最寄のチェックポイントを取得し、存在しない場合はreturn
-        Circuit circuit = racer.getCircuit();
-        Entity nearestCP = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), bukkitEntityKart, 360.0F);
-        if (nearestCP == null) {
-            return;
-        }
+        Entity lastCheckPoint = (Entity) invoke(Methods.Ypl_getKillerLastPassedCheckPoint, entityKart);
+        Location checkPointLocation = lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight+1, 0.0D);
 
-        Location checkPointLocation = nearestCP.getLocation().clone();
+        // 検出用のLocation。
+        // X・Z座標はカートの座標、Y座標・Yawは前回のチェックポイントの座標。
+        // カートは地面に埋まっているため、検出できるようY座標はチェックポイントの座標を用いる
+        Location eyeLocation = kartLocation.clone();
+        eyeLocation.setY(checkPointLocation.getY());
+        eyeLocation.setYaw(checkPointLocation.getYaw());
 
-        // 現在の座標からチェックポイントへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(kartLocation, checkPointLocation).multiply(1.5D);
-        Vector vectorByCheckPointYaw;
+        Entity newCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(racer.getCircuit().getCircuitName(), eyeLocation, 180.0F, lastCheckPoint);
 
-        // チェックポイントとの距離が5ブロックを超え、かつ正面に見えている場合は、チェックポイントの座標へのベクターを格納する
-        if (5.0F < checkPointLocation.distance(kartLocation) && Util.isLocationInSight(racer.getPlayer(), checkPointLocation, 180.0F)) {
+        // 検出に成功した場合はモーションの更新
+        if (newCheckPoint != null) {
+            invoke(Methods.Ypl_setKillerLastPassedCheckPoint, entityKart, newCheckPoint);
+            Location newCheckPointLocation = newCheckPoint.getLocation().clone();
+            newCheckPointLocation.add(0.0D, -CheckPointUtil.checkPointHeight+1, 0.0D);
+
+            // 現在の座標からチェックポイントへ向けたベクターを算出
+            Vector vectorToLocation = Util.getVectorToLocation(kartLocation, newCheckPointLocation).multiply(1.5D);
+
+            // モーションの格納
             invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
+            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
 
-        // チェックポイントとの距離が5ブロック以内であればチェックポイントのYawから算出したベクターを格納
-        } else {
-            // チェックポイントのYawからベクターを算出。X、Zベクターのみ用いる
-            checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
-            vectorByCheckPointYaw = Util.getVectorByYaw(checkPointLocation).multiply(1.5D);
-
-            //算出したベクターのX、Y、Zモーションを格納する。Yモーションのみチェックポイントへ向けたベクターを格納する
-            invoke(Methods.Ypl_setKillerX, entityKart, vectorByCheckPointYaw.getX());
-            invoke(Methods.Ypl_setKillerZ, entityKart, vectorByCheckPointYaw.getZ());
-
             //YawをチェックポイントのYawと同期
-            invoke(Methods.nmsEntity_setYawPitch, entityKart, checkPointLocation.getYaw() + 180.0F, 0);
-        }
+            invoke(Methods.nmsEntity_setYawPitch, entityKart, checkPointLocation.getYaw(), 0);
 
-        BigDecimal vectorYBD = new BigDecimal(vectorToLocation.clone().normalize().getY());
-        invoke(Methods.Ypl_setKillerY, entityKart, vectorYBD.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        // 検出できなかった場合は現在のモーションを保持
+        } else {
+            return;
+        }
     }
 
     /**
