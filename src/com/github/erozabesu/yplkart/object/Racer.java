@@ -20,6 +20,7 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.KartType;
+import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
@@ -295,7 +296,7 @@ public class Racer extends PlayerObject{
         this.setKillerFirstPassedCheckPointEntity(nearestUnpassedCheckPoint);
 
         //ランニングレース中にキラーを使用した場合、新規にキラー用カートエンティティを生成し搭乗する
-        if (this.getKart() == null) {
+        if (this.getCircuit().getRaceType().equals(RaceType.RUNNING)) {
             Entity kartEntity = KartUtil.createRacingKart(player.getLocation(), KartConfig.getKillerKart());
             kartEntity.setPassenger(player);
         }
@@ -305,7 +306,7 @@ public class Racer extends PlayerObject{
                 setKillerFirstPassedCheckPointEntity(null);
 
                 //ランニングレース中にキラーを使用した場合、登場中のキラー用カートエンティティを降りる
-                if (getKart() == null) {
+                if (getCircuit().getRaceType().equals(RaceType.RUNNING)) {
                     RaceManager.leaveRacingKart(player);
                 }
             }

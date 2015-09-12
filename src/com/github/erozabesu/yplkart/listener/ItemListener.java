@@ -792,15 +792,8 @@ public class ItemListener extends RaceManager implements Listener {
 
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
 
-        // 通過済みのチェックポイントが1つ以上ない場合はreturn
-        if (racer.getPassedCheckPointList().size() < 1) {
-            MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
-            return;
-        }
-
-        Entity unpassedcheckpoint = CheckPointUtil.getInSightAndDetectableNearestUnpassedCheckpoint(racer, user.getLocation(), 180.0F);
-
-        if (unpassedcheckpoint == null) {
+        Entity nearestCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 360.0F);
+        if (nearestCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
@@ -818,6 +811,6 @@ public class ItemListener extends RaceManager implements Listener {
         new SendCountDownTitleTask(user, life, MessageEnum.titleUsingKiller.getMessage()).runTaskTimer(
                 YPLKart.getInstance(), 0, 1);
 
-        racer.runKillerInitializeTask(life, unpassedcheckpoint);
+        racer.runKillerInitializeTask(life, nearestCheckPoint);
     }
 }
