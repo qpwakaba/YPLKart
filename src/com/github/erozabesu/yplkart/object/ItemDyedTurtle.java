@@ -185,34 +185,35 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     /**
      * 周囲のチェックポイントを取得しlastCheckPointを更新する。<br>
-     * 更新できた場合、もしくはlastCheckPointとの距離が5ブロックを超える場合はtrueを返す。<br>
-     * 距離が5ブロック以内、かつ更新に失敗した場合はfalseを返す。
+     * 更新できた場合はtrueを返す。<br>
+     * 失敗した場合はfalseを返す。
      * @return 更新できたかどうか
      */
     private boolean updateCheckPoint() {
-        // 前回通過したチェックポイントとの距離が5ブロック以内の場合、
-        // チェックポイントの視点から最寄の視認可能なチェックポイントを新しく検出し変数に格納
-        if (this.turtle.getLocation().distanceSquared(this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D)) <= 25.0D) {
+        // 新しいチェックポイント
+        Entity newCheckPoint = null;
 
-            // 逆走フラグがtrueの場合はYawに180.0Fを加算
-            Location checkPointLocation = this.lastCheckPoint.getLocation().clone();
-            if (this.isReverse) {
-                checkPointLocation.setYaw(checkPointLocation.getYaw() - 180.0F);
-            }
+        // 逆走フラグがtrueの場合はYawに180.0Fを加算
+        Location checkPointLocation = this.lastCheckPoint.getLocation().clone();
+        if (this.isReverse) {
+            checkPointLocation.setYaw(checkPointLocation.getYaw() - 180.0F);
+        }
 
-            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, checkPointLocation, 180.0F, this.lastCheckPoint);
+        // 検出用のLocation。
+        // X・Z座標はこうらの座標、Y座標・Yawは前回のチェックポイントの座標。
+        // こうらは地面に埋まっているため、検出できるようY座標はチェックポイントの座標を用いる
+        Location eyeLocation = this.turtle.getLocation().clone();
+        eyeLocation.setY(checkPointLocation.getY());
+        eyeLocation.setYaw(checkPointLocation.getYaw());
 
-            // 新たなチェックポイントの検出に成功
-            if (newCheckPoint != null) {
-                this.lastCheckPoint = newCheckPoint;
-                return true;
+        newCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(this.circuitName, eyeLocation, 180.0F, this.lastCheckPoint);
 
-            // 検出できなかった場合は現在のモーションを保持するためfalseを返す
-            } else {
-                return false;
-            }
+        // 新たなチェックポイントの検出に成功
+        if (newCheckPoint != null) {
+            this.lastCheckPoint = newCheckPoint;
+            return true;
 
-        // 5ブロックを超える距離がある場合は現在のモーションを保持するためfalseを返す
+        // 検出できなかった場合は現在のモーションを保持するためfalseを返す
         } else {
             return false;
         }
