@@ -171,14 +171,14 @@ public class CheckPointUtil {
      * 引数entityから視認でき、かつ、検出範囲内のチェックポイントを配列で返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param circuitName サーキット名
-     * @param entity 基点となるエンティティ
+     * @param eyeLocation 基点となる座標
      * @param sightThreshold 視野
      * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントの配列
      */
-    public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Entity entity, float sightThreshold, Entity... ignoreEntities) {
+    public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Location eyeLocation, float sightThreshold, Entity... ignoreEntities) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        List<Entity> entityList = Util.getNearbyEntities(entity.getLocation().clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> entityList = Util.getNearbyEntities(eyeLocation.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -199,14 +199,14 @@ public class CheckPointUtil {
             }
 
             // 視野に含まれていない場合配列から削除
-            if (!Util.isLocationInSight(entity, tempEntity.getLocation(), sightThreshold)) {
+            if (!Util.isLocationInSight(eyeLocation, tempEntity.getLocation(), sightThreshold)) {
                 iterator.remove();
                 continue;
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!isVisibleCheckPointEntity(tempEntity)) {
-                if (!Util.canSeeLocation(entity.getLocation(), tempEntity.getLocation())) {
+                if (!Util.canSeeLocation(eyeLocation, tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
@@ -222,7 +222,7 @@ public class CheckPointUtil {
             }
 
             // エンティティとチェックポイントの距離が検出距離を超えている場合は配列から削除
-            if (detectRadius < entity.getLocation().distance(tempEntity.getLocation())) {
+            if (detectRadius * detectRadius < eyeLocation.distanceSquared(tempEntity.getLocation())) {
                 iterator.remove();
                 continue;
             }
@@ -240,18 +240,18 @@ public class CheckPointUtil {
      * 引数entityから視認でき、かつ、検出範囲内の最寄のチェックポイントを返す。<br>
      * チェックポイントが検出されなかった場合は{@code null}を返す。
      * @param circuitName サーキット名
-     * @param entity 基点となるエンティティ
+     * @param eyeLocation 基点となる座標
      * @param sightThreshold 視野
      * @param ignoreEntities 検出から除外するエンティティ
      * @return チェックポイントエンティティ
      */
-    public static Entity getInSightAndDetectableNearestCheckpoint(String circuitName, Entity entity, float sightThreshold, Entity... ignoreEntities) {
-        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, entity, sightThreshold, ignoreEntities);
+    public static Entity getInSightAndDetectableNearestCheckpoint(String circuitName, Location eyeLocation, float sightThreshold, Entity... ignoreEntities) {
+        List<Entity> checkPointList = getInSightAndDetectableNearbyCheckPoints(circuitName, eyeLocation, sightThreshold, ignoreEntities);
         if (checkPointList == null || checkPointList.isEmpty()) {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, entity.getLocation());
+        return Util.getNearestEntity(checkPointList, eyeLocation);
     }
 
     // 〓 Get Unpassed 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

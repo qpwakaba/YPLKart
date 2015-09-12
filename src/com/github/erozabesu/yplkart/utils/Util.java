@@ -143,7 +143,7 @@ public class Util extends ReflectionUtil {
             tempEntity = iterator.next();
             if (entity != null) {
                 if (entity.getWorld().getName().equalsIgnoreCase(tempEntity.getWorld().getName())) {
-                    if (entity.getLocation().distance(location) < tempEntity.getLocation().distance(location)) {
+                    if (entity.getLocation().distanceSquared(location) < tempEntity.getLocation().distanceSquared(location)) {
                         continue;
                     }
                 }
