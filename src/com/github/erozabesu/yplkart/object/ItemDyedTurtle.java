@@ -1,5 +1,6 @@
 package com.github.erozabesu.yplkart.object;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -30,8 +31,6 @@ public class ItemDyedTurtle extends BukkitRunnable {
     double motX = 0.0D;
     double motY = 0.0D;
     double motZ = 0.0D;
-
-    boolean isLoadedChunk = true;
 
     /**
      * コンストラクタ。
@@ -74,7 +73,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     private void die() {
         if (!this.turtle.isDead()) {
-            //this.turtle.setHealth(0.0D);
+            this.turtle.remove();
         }
         this.cancel();
     }
@@ -95,10 +94,15 @@ public class ItemDyedTurtle extends BukkitRunnable {
             return;
         }
 
-        // ターゲットがオフライン、もしくは寿命が尽きた場合デスポーンしタスクを終了
-        if (!Util.isOnline(target.getName())) {
+        // ターゲットがオフライン、もしくはターゲットが別のワールドに移動している場合はタスクを終了
+        if (!Util.isOnline(target.getName()) || !this.target.getLocation().getWorld().equals(this.turtle.getLocation().getWorld())) {
             die();
             return;
+        }
+
+        // 周囲のチャンクを強制ロード
+        for (Chunk chunk : Util.getNearbyChunks(this.turtle.getLocation(), 20.0D)) {
+            chunk.load();
         }
 
         this.move();
@@ -115,6 +119,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
         // ターゲットを補足できなかった場合はチェックポイントに対するモーションを格納
         } else {
+            // 新たなチェックポイントの検出に成功した場合のみモーションの更新を行う
             if (this.updateCheckPoint()) {
                 this.updateCheckPointMotion();
             }
@@ -123,16 +128,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
     /** 格納されているモーション値を基にエンティティを移動させる。 */
     private void move() {
-        Location location = this.turtle.getLocation().clone();
-
-        // 読み込まれているチャンクの場合はベクターを割り当てる
-        if (this.isLoadedChunk) {
-            this.turtle.setVelocity(new Vector(this.motX, this.motY, this.motZ));
-
-        // 読み込まれていないチャンクの場合はテレポートで移動する。
-        } else {
-            this.turtle.teleport(location.clone().add(this.motX, this.motY, this.motZ));
-        }
+        this.turtle.setVelocity(new Vector(this.motX, this.motY, this.motZ));
     }
 
     /** Yawを少しずつずらしエンティティを回転させる */
@@ -180,10 +176,10 @@ public class ItemDyedTurtle extends BukkitRunnable {
             // 逆走フラグがtrueの場合はYawに180.0Fを加算
             Location checkPointLocation = this.lastCheckPoint.getLocation().clone();
             if (this.isReverse) {
-                checkPointLocation.setYaw(checkPointLocation.getYaw() + 180.0F);
+                checkPointLocation.setYaw(checkPointLocation.getYaw() - 180.0F);
             }
 
-            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, checkPointLocation, 180.0F);
+            Entity newCheckPoint = CheckPointUtil.getInSightNearestCheckpoint(this.circuitName, checkPointLocation, 180.0F, this.lastCheckPoint);
 
             // 新たなチェックポイントの検出に成功
             if (newCheckPoint != null) {
@@ -209,13 +205,6 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // fromLocationからtoLocationへ向けたベクターを算出
         Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
 
-        // 現在のモーション値と全く同じ値の場合、読み込まれていないチャンクのためフラグを立てる
-        if (this.motX == vectorToLocation.getX() && this.motY == vectorToLocation.getY() && this.motZ == vectorToLocation.getZ()) {
-            this.isLoadedChunk = false;
-        } else {
-            this.isLoadedChunk = true;
-        }
-
         //算出したベクターのX、Y、Zモーションを格納
         this.motX = vectorToLocation.getX();
         this.motY = vectorToLocation.getY();
@@ -237,14 +226,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         }
 
         // fromLocationからtoLocationへ向けたベクターを算出
-        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(2.0D);
-
-        // 現在のモーション値と全く同じ値の場合、読み込まれていないチャンクのためフラグを立てる
-        if (this.motX == vectorToLocation.getX() && this.motY == vectorToLocation.getY() && this.motZ == vectorToLocation.getZ()) {
-            this.isLoadedChunk = false;
-        } else {
-            this.isLoadedChunk = true;
-        }
+        Vector vectorToLocation = Util.getVectorToLocation(fromLocation, toLocation).multiply(4.0D);
 
         //算出したベクターのX、Y、Zモーションを格納
         this.motX = vectorToLocation.getX();
