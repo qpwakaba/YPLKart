@@ -541,18 +541,13 @@ public class RaceListener implements Listener {
         }
     }
 
-    //エントリー中：cancel
-    //インベントリネーム一致：cancel
+    /**
+     * レース中のインベントリのクリックをキャンセルする。
+     * @param event InventoryClickEvent
+     */
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClickInRace(InventoryClickEvent event) {
         if (!YPLKart.isPluginEnabled(event.getWhoClicked().getWorld())) {
-            return;
-        }
-
-        String inventoryName = event.getInventory().getName();
-        if (inventoryName.equalsIgnoreCase("Character Select Menu") || inventoryName.equalsIgnoreCase("Kart Select Menu")) {
-            event.setCancelled(true);
-        } else {
             return;
         }
 
@@ -579,6 +574,50 @@ public class RaceListener implements Listener {
             event.setCancelled(true);
             player.updateInventory();
         }
+    }
+
+
+    /**
+     * キャラクター、カートセレクトメニューをクリックした際の処理を行う。
+     * @param event InventoryClickEvent
+     */
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!YPLKart.isPluginEnabled(event.getWhoClicked().getWorld())) {
+            return;
+        }
+
+        String inventoryName = event.getInventory().getName();
+        if (!inventoryName.equalsIgnoreCase("Character Select Menu") && !inventoryName.equalsIgnoreCase("Kart Select Menu")) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getWhoClicked();
+        player.updateInventory();
+
+        Racer racer = RaceManager.getRacer(player);
+        UUID uuid = player.getUniqueId();
+
+        //クライアントを×ボタン等で強制終了した場合、プレイヤーはオフラインになるためreturn
+        if (!player.isOnline()) {
+            return;
+        }
+
+        //既にゴールしている場合はreturn
+        if (racer.isGoal()) {
+            return;
+        }
+
+        //スタンバイフェーズ以降でない場合はreturn
+        if (!racer.isAfterStandbyPhase()) {
+            return;
+        }
 
         Circuit circuit = racer.getCircuit();
         if (circuit == null) {
@@ -587,9 +626,6 @@ public class RaceListener implements Listener {
 
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
         if (inventoryName.equalsIgnoreCase("Character Select Menu")) {
-            event.setCancelled(true);
-            player.updateInventory();
-
             ItemStack itemStack = event.getCurrentItem();
             if (itemStack == null) {
                 return;
@@ -633,9 +669,6 @@ public class RaceListener implements Listener {
             }
             player.playSound(player.getLocation(), Sound.CLICK, 0.5F, 1.0F);
         } else if (inventoryName.equalsIgnoreCase("Kart Select Menu")) {
-            event.setCancelled(true);
-            player.updateInventory();
-
             ItemStack item = event.getCurrentItem();
             if (item == null) {
                 return;
