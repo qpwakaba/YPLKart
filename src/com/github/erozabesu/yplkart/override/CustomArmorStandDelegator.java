@@ -696,6 +696,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
             Vector vectorToLocation = Util.getVectorToLocation(kartLocation, newCheckPointLocation).multiply(1.5D);
 
             // モーションの格納
+            killerX = vectorToLocation.getX();
+            killerY = vectorToLocation.getY();
+            killerZ = vectorToLocation.getZ();
             invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
             invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
             invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
@@ -705,7 +708,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         // 検出できなかった場合は現在のモーションを保持
         } else {
-            return;
+            // Do nothing
         }
     }
 
