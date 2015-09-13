@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,7 +31,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -61,18 +59,6 @@ public class ItemListener extends RaceManager implements Listener {
 
     public ItemListener() {
         Bukkit.getServer().getPluginManager().registerEvents(this, YPLKart.getInstance());
-    }
-
-    @EventHandler
-    public void unloadJammerEntityExistChunk(ChunkUnloadEvent event) {
-        if (!YPLKart.isPluginEnabled(event.getWorld())) {
-            return;
-        }
-
-        Chunk chunk = event.getChunk();
-        if (RaceEntityUtil.getJammerEntityExistChunkArray().contains(chunk)) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler

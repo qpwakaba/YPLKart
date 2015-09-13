@@ -1,8 +1,6 @@
 package com.github.erozabesu.yplkart.utils;
 
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +20,7 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
+import com.github.erozabesu.yplkart.object.ItemStaticJammerEntity;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.reflection.Constructors;
@@ -38,19 +37,6 @@ public class RaceEntityUtil {
     private static String ItemBoxName = ChatColor.GOLD + "ItemBox";
     private static String FakeItemBoxName = ItemBoxName + "！！";
     private static String DisposableFakeItemBoxName = ItemBoxName + "！";
-    private static Set<Chunk> jammerEntityExistChunkArray = new HashSet<Chunk>();
-
-    public static Set<Chunk> getJammerEntityExistChunkArray() {
-        return jammerEntityExistChunkArray;
-    }
-
-    public static void addJammerEntityExistChunkArray(Chunk chunk) {
-        getJammerEntityExistChunkArray().add(chunk);
-    }
-
-    public static void removeJammerEntityExistChunkArray(Chunk chunk) {
-        getJammerEntityExistChunkArray().remove(chunk);
-    }
 
     //〓 Edit Entity 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -84,6 +70,9 @@ public class RaceEntityUtil {
 
         ItemStack handItem = new ItemStack(ItemEnum.BANANA.getDisplayBlockMaterial(), 1, (short) 0, ItemEnum.BANANA.getDisplayBlockMaterialData());
         ArmorStand banana = createJammerArmorStand(circuit, location, ItemEnum.BANANA.getDisplayName(), handItem);
+
+        circuit.addJammerEntity(banana);
+        new ItemStaticJammerEntity(banana).runTaskTimer(YPLKart.getInstance(), 0, 5);
 
         return banana;
     }
@@ -138,7 +127,7 @@ public class RaceEntityUtil {
         endercrystal.setCustomNameVisible(true);
 
         circuit.addJammerEntity(endercrystal);
-        addJammerEntityExistChunkArray(endercrystal.getLocation().getChunk());
+        new ItemStaticJammerEntity(endercrystal).runTaskTimer(YPLKart.getInstance(), 0, 5);
 
         return endercrystal;
     }
