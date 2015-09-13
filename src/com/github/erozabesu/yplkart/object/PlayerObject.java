@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 
 /**
  * プレイヤーの基本情報を格納するクラス
@@ -122,7 +123,9 @@ public class PlayerObject {
         if (player == null) {
             return;
         }
+
         player.teleport(getLocation().add(0.0D, 1.5D, 0.0D));
+        player.setVelocity(new Vector(0.0D, 2.0D, 0.0D));
     }
 
     /** フィジカルを復元する */
