@@ -792,17 +792,17 @@ public class ItemListener extends RaceManager implements Listener {
 
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
 
-        // 最も近いチェックポイントを取得
-        Entity nearestCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 180.0F);
+        // 最後に通過したチェックポイントを除く、最も近い視認可能かつ検知範囲内のチェックポイントを取得
+        Entity nearestCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 180.0F, racer.getLastPassedCheckPointEntity());
         if (nearestCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
         }
 
-        // 2番目に近いチェックポイントを取得
+        // 最後に通過したチェックポイントを除く、2番目に近い視認可能かつ検知範囲内のチェックポイントを取得
         // キラーの性質上2つ以上連続しているチェックポイントがなければ正常にモーションが適用されないため、
         // 前方にチェックポイントが2つ以上連続しているか確認する
-        Entity secondNearbyCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 180.0F, nearestCheckPoint);
+        Entity secondNearbyCheckPoint = CheckPointUtil.getInSightAndDetectableNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), 180.0F, nearestCheckPoint, racer.getLastPassedCheckPointEntity());
         if (secondNearbyCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);
             return;
