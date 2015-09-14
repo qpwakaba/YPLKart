@@ -62,9 +62,9 @@ public enum SystemMessageEnum {
     referenceDisplayOutgame("<green>/ka display {kart name} {worldname} {x} {y} {z} {yaw} {pitch} :<br>"
             + "<green>/ka display random {worldname} {x} {y} {z}  {yaw} {pitch} :<br>"
             + "<gold>Kart List :<br><white><kartlist>"),
-    referenceEntry("<green>/ka entry {circuit name} :"),
-    referenceEntryOther("<green>/ka entry {player name} {circuit name} :<br>"
-            + "<green>/ka entry all {circuit name} :<br>"
+    referenceEntry("<green>/ka entry {circuit name} [-f] :"),
+    referenceEntryOther("<green>/ka entry {player name} {circuit name} [-f] :<br>"
+            + "<green>/ka entry all {circuit name} [-f] :<br>"
             + "<gold>Circuit List :<br><white><circuitlist>"),
     referenceExit("<green>/ka exit :"),
     referenceExitOther("<green>/ka exit {player name} :<br>"
@@ -294,6 +294,7 @@ public enum SystemMessageEnum {
         message = message.replace("{number of second}", "<green>{<white>number of second<green>}");
         message = message.replace("{number of laps}", "<green>{<white>number of laps<green>}");
         message = message.replace("{true or false}", "<green>{<white>true <green>or <white>false<green>}");
+        message = message.replace("[-f]", "<green>[<white>-f<green>]");
 
         return message;
     }
