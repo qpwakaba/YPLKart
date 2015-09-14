@@ -11,6 +11,11 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
+/**
+ * /ka reloadコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class ReloadCommand extends Command {
     public ReloadCommand() {
         super("reload");

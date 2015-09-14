@@ -7,6 +7,11 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
+/**
+ * /ka circuit setlimittimeコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class SetLimitTimeCommand extends Command {
     public SetLimitTimeCommand() {
         super("setlimittime");

@@ -14,6 +14,11 @@ import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka characterコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class CharacterCommand extends Command {
     protected CharacterCommand() {
 		super("character");

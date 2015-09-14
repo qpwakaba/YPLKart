@@ -12,6 +12,11 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka leaveコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class LeaveCommand extends Command {
     public LeaveCommand() {
         super("leave");

@@ -14,6 +14,11 @@ import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka entryコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class EntryCommand extends Command {
     public EntryCommand() {
         super("entry");

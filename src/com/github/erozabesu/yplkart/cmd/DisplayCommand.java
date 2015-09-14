@@ -16,6 +16,11 @@ import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.KartUtil;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka displayコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class DisplayCommand extends Command {
     public DisplayCommand() {
         super("display");

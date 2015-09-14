@@ -6,6 +6,11 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
+/**
+ * /ka circuit listコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class ListCommand extends Command {
     public ListCommand() {
         super("list");

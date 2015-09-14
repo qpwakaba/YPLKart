@@ -6,6 +6,11 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
 
+/**
+ * /ka circuit acceptコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class AcceptCommand extends Command {
     public AcceptCommand() {
         super("accept");

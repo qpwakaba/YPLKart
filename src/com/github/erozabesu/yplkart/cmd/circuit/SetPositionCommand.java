@@ -12,6 +12,11 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka circuit setpositionコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class SetPositionCommand extends Command {
     public SetPositionCommand() {
         super("setposition");

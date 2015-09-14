@@ -6,6 +6,11 @@ import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.RaceManager;
 
+/**
+ * /ka circuit denyコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class DenyCommand extends Command {
     public DenyCommand() {
         super("deny");

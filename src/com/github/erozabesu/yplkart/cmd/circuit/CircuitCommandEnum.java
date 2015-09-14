@@ -8,6 +8,11 @@ import java.util.Map;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+/**
+ * /ka circuitコマンドリスト。
+ * @author King
+ * @author erozabesu
+ */
 public enum CircuitCommandEnum {
     LIST(new ListCommand()),
     INFO(new InfoCommand()),

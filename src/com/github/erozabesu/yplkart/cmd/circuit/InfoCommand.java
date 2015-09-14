@@ -8,6 +8,11 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.object.CircuitData;
 
+/**
+ * /ka circuit infoコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class InfoCommand extends Command {
     public InfoCommand() {
         super("info");

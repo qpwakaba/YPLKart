@@ -8,6 +8,11 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 
+/**
+ * /ka circuit setracetypeコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class SetRaceTypeCommand extends Command {
     public SetRaceTypeCommand() {
         super("setracetype");

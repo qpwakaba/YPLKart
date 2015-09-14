@@ -11,6 +11,11 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.MessageParts;
 
+/**
+ * /ka circuit editコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class EditCommand extends Command {
     public EditCommand() {
         super("edit");

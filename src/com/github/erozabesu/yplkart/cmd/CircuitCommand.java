@@ -7,6 +7,11 @@ import com.github.erozabesu.yplkart.cmd.circuit.CircuitCommandEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka circuitコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class CircuitCommand extends Command {
     public CircuitCommand() {
         super("circuit");

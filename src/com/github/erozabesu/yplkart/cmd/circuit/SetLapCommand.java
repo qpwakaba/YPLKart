@@ -7,6 +7,11 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
+/**
+ * /ka circuit setlapコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class SetLapCommand extends Command {
     public SetLapCommand() {
         super("setlap");

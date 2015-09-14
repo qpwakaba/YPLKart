@@ -13,6 +13,11 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka {item}コマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class ItemCommand extends Command {
     public ItemCommand() {
         super("item");

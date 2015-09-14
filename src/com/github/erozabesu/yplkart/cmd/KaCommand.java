@@ -7,6 +7,11 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 
+/**
+ * /kaコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class KaCommand implements CommandExecutor {
 
     public KaCommand() {

@@ -10,6 +10,11 @@ import org.bukkit.command.CommandSender;
 
 import com.github.erozabesu.yplkart.data.ItemEnum;
 
+/**
+ * コマンドリスト。
+ * @author King
+ * @author erozabesu
+ */
 public enum CommandEnum {
     CIRCUIT(new CircuitCommand()),
     DISPLAY(new DisplayCommand()),

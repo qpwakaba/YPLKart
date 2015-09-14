@@ -12,6 +12,11 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka characterresetコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class CharacterResetCommand extends Command {
     public CharacterResetCommand() {
         super("characterreset");

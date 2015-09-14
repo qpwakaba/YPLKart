@@ -14,6 +14,11 @@ import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka rankingコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class RankingCommand extends Command {
     public RankingCommand() {
         super("ranking");

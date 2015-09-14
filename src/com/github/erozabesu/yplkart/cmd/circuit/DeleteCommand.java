@@ -6,6 +6,11 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 
+/**
+ * /ka circuit deleteコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class DeleteCommand extends Command {
     public DeleteCommand() {
         super("delete");

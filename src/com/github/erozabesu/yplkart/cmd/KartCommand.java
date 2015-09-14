@@ -14,6 +14,11 @@ import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka kartコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class KartCommand extends Command {
     public KartCommand() {
         super("kart");

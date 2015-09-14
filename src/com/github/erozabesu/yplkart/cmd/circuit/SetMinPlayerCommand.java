@@ -7,6 +7,11 @@ import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
+/**
+ * /ka circuit setminplayerコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class SetMinPlayerCommand extends Command {
     public SetMinPlayerCommand() {
         super("setminplayer");

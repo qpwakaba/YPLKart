@@ -12,11 +12,16 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.utils.Util;
 
+/**
+ * /ka circuit createコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class CreateCommand extends Command {
     public CreateCommand() {
         super("create");
     }
-    // 0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
+
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!Permission.hasPermission(sender, Permission.OP_CMD_CIRCUIT, false)) {
@@ -40,6 +45,7 @@ public class CreateCommand extends Command {
         String circuitName = args[2];
         Location location;
 
+        // 0:circuit 1:create 2:circuitname 3:worldname 4:x 5:y 6:z 7:pitch 8:yaw
         if (args.length == 9) {
             String worldName = args[3];
             World world;
@@ -65,7 +71,9 @@ public class CreateCommand extends Command {
             Player player = (Player) sender;
             location = player.getLocation();
         }
+
         CircuitConfig.createCircuit(sender, circuitName, location);
+
         return true;
     }
 }

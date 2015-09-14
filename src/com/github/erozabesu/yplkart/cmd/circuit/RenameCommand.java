@@ -6,6 +6,11 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 
+/**
+ * /ka circuit renameコマンドクラス。
+ * @author King
+ * @author erozabesu
+ */
 public class RenameCommand extends Command {
     public RenameCommand() {
         super("rename");
