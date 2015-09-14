@@ -24,9 +24,6 @@ enable_permission:
   # パーミッション : YPLKart.cmd.entry を有効にします。
   cmd_entry: true
 
-  # パーミッション : YPLKart.cmd.forceentry を有効にします。
-  cmd_forceentry: true
-
   # パーミッション : YPLKart.cmd.exit を有効にします。
   cmd_exit: true
 
@@ -53,9 +50,6 @@ enable_permission:
 
   # パーミッション : YPLKart.cmdother.entry を有効にします。
   cmd_other_entry: true
-
-  # パーミッション : YPLKart.cmdother.forceentry を有効にします。
-  cmd_other_forceentry: true
 
   # パーミッション : YPLKart.cmdother.exit を有効にします。
   cmd_other_exit: true
