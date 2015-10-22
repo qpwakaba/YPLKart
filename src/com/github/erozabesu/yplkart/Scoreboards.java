@@ -13,7 +13,7 @@ import org.bukkit.scoreboard.Team;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 //各サーキット毎にスコアボードを一枚作成しておいて、参加者に表示するだけ
 public class Scoreboards {
@@ -58,7 +58,7 @@ public class Scoreboards {
 
         Objective obj = sb.registerNewObjective(YPLKart.PLUGIN_NAME, "dummy");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
+        obj.setDisplayName(CommonUtil.convertInitialUpperString(name) + " 参加申請中");
 
         Team team = sb.registerNewTeam(YPLKart.PLUGIN_NAME);
         team.setCanSeeFriendlyInvisibles(false);
@@ -73,7 +73,7 @@ public class Scoreboards {
 
         Scoreboard sb = scoreboard.get(name);
         Objective obj = sb.getObjective(DisplaySlot.SIDEBAR);
-        if (obj.getDisplayName().equalsIgnoreCase(Util.convertInitialUpperString(name) + " 参加申請中"))
+        if (obj.getDisplayName().equalsIgnoreCase(CommonUtil.convertInitialUpperString(name) + " 参加申請中"))
             obj.setDisplayName("ランキング");
     }
 
@@ -86,7 +86,7 @@ public class Scoreboards {
         Objective obj = sb.getObjective(DisplaySlot.SIDEBAR);
         if (obj != null) {
             if (obj.getDisplayName().equalsIgnoreCase("ランキング")) {
-                obj.setDisplayName(Util.convertInitialUpperString(name) + " 参加申請中");
+                obj.setDisplayName(CommonUtil.convertInitialUpperString(name) + " 参加申請中");
             }
         }
     }

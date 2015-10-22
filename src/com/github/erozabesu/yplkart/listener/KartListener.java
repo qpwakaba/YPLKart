@@ -11,9 +11,9 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Classes;
+import com.github.erozabesu.yplkart.reflection.YPLClasses;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 public class KartListener implements Listener {
 
@@ -34,7 +34,7 @@ public class KartListener implements Listener {
         if (!(event.getExited() instanceof Player)) {
             return;
         }
-        if (!ReflectionUtil.instanceOf(event.getVehicle(), Classes.yplCustomCraftArmorStand)) {
+        if (!ReflectionUtil.instanceOf(event.getVehicle(), YPLClasses.customCraftArmorStand)) {
             return;
         }
 

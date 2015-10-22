@@ -11,7 +11,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 public class ItemStarTask extends BukkitRunnable {
     Player p;
@@ -34,7 +35,7 @@ public class ItemStarTask extends BukkitRunnable {
 
         boostTask.put(p, this);
 
-        Util.setItemDecrease(p);
+        CommonUtil.decreaseItemInHand(p, 1);
         Racer r = RaceManager.getRacer(p);
         r.setDeathPenaltyTask(null);
         r.setDeathPenaltyTitleSendTask(null);
@@ -70,9 +71,9 @@ public class ItemStarTask extends BukkitRunnable {
         life++;
 
         if (life % 2 == 0)
-            for (Player other : Util.getNearbyPlayers(this.p.getLocation(), 1.5)) {
+            for (Player other : CommonUtil.getNearbyPlayers(this.p.getLocation(), 1.5)) {
                 if (!other.getUniqueId().equals(this.p.getUniqueId()))
-                    Util.addDamage(other, this.p, this.hitdamage);
+                    YPLUtil.addDamage(other, this.p, this.hitdamage);
             }
 
         if (life % 20 == 0)

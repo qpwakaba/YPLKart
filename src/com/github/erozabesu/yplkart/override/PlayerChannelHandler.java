@@ -17,11 +17,11 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.listener.NettyListener;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Fields;
-import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
+import com.github.erozabesu.yplutillibrary.reflection.Fields;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 public class PlayerChannelHandler extends ChannelDuplexHandler {
 

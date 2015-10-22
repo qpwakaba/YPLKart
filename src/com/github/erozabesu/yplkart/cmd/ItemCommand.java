@@ -11,7 +11,7 @@ import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka {item}コマンドクラス。
@@ -69,7 +69,7 @@ public class ItemCommand extends Command {
                 return true;
 
             // ka [アイテム] [数量]
-            } else if (Util.isInteger(args[1])) {
+            } else if (CommonUtil.isInteger(args[1])) {
                 if (!Permission.hasPermission(sender, permission, false)) {
                     return true;
                 }

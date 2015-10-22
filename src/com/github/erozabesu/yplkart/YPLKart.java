@@ -17,6 +17,7 @@ import com.github.erozabesu.yplkart.listener.ItemListener;
 import com.github.erozabesu.yplkart.listener.KartListener;
 import com.github.erozabesu.yplkart.listener.NettyListener;
 import com.github.erozabesu.yplkart.listener.RaceListener;
+import com.github.erozabesu.yplutillibrary.YPLUtilityLibrary;
 
 public class YPLKart extends JavaPlugin {
     private static YPLKart PLUGIN;
@@ -50,6 +51,9 @@ public class YPLKart extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
         }
+
+        // ユーティリティライブラリにインスタンスを渡す
+        YPLUtilityLibrary.registerLibrary(this);
     }
 
     @Override

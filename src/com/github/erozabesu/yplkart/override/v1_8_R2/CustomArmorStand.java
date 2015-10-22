@@ -16,9 +16,9 @@ import org.bukkit.scheduler.BukkitTask;
 import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
-import com.github.erozabesu.yplkart.reflection.Fields;
-import com.github.erozabesu.yplkart.reflection.Methods;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
+import com.github.erozabesu.yplutillibrary.reflection.Fields;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * カートエンティティとしてスポーンさせるアーマースタンドエンティティクラス

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka circuit setpositionコマンドクラス。
@@ -30,7 +30,7 @@ public class SetPositionCommand extends Command {
         }
 
         // 引数が9個指定されたときか、プレイヤーが3つ指定したとき
-        if (args.length != 9 && !(args.length == 3 && Util.isPlayer(sender))) {
+        if (args.length != 9 && !(args.length == 3 && CommonUtil.isPlayer(sender))) {
             // TODO: ここでコマンドの説明を表示させられる。
             return false;
         }

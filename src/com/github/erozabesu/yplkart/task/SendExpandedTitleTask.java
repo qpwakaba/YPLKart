@@ -3,7 +3,7 @@ package com.github.erozabesu.yplkart.task;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 
 public class SendExpandedTitleTask extends BukkitRunnable {
     int life = 0;

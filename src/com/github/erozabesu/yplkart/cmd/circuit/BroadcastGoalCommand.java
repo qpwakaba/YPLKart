@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka circuit broadcastgoalコマンドクラス。
@@ -31,7 +31,7 @@ public class BroadcastGoalCommand extends Command {
 
         String circuitName = args[2];
         boolean isBroadcastGoalMessage;
-        if (!Util.isBoolean(args[3])) {
+        if (!CommonUtil.isBoolean(args[3])) {
             MessageEnum.invalidBoolean.sendConvertedMessage(null);
 
             return true;

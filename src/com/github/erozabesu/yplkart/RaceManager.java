@@ -31,10 +31,10 @@ import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Classes;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.reflection.Classes;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 
 public class RaceManager {
     /** プレイヤーUUIDとRacerオブジェクトを格納する */
@@ -138,13 +138,13 @@ public class RaceManager {
 
         // 既にエントリーしている場合return
         if (racer.isEntry()) {
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(circuitName));
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, CommonUtil.convertInitialUpperString(circuitName));
             MessageEnum.raceEntryAlready.sendConvertedMessage(player, circuitParts);
             return;
 
         // 指定したサーキットが存在しない場合return
         } else if (circuit == null) {
-            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, Util.convertInitialUpperString(circuitName));
+            MessageParts circuitParts = new MessageParts(TagType.CIRCUIT, CommonUtil.convertInitialUpperString(circuitName));
             MessageEnum.invalidCircuit.sendConvertedMessage(player, circuitParts);
             return;
 

@@ -28,20 +28,22 @@ import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.enumdata.KartType;
-import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Classes;
-import com.github.erozabesu.yplkart.reflection.Constructors;
-import com.github.erozabesu.yplkart.reflection.Fields;
-import com.github.erozabesu.yplkart.reflection.Methods;
+import com.github.erozabesu.yplkart.reflection.YPLMethods;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
 import com.github.erozabesu.yplkart.utils.RaceEntityUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.enumdata.Particle;
+import com.github.erozabesu.yplutillibrary.reflection.Classes;
+import com.github.erozabesu.yplutillibrary.reflection.Constructors;
+import com.github.erozabesu.yplutillibrary.reflection.Fields;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 public class CustomArmorStandDelegator extends ReflectionUtil {
 
@@ -66,7 +68,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         }
 
         //ディスプレイカートの場合モーションを0に固定
-        if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.DisplayKart)) {
+        if (invoke(YPLMethods.getKartType, nmsEntityKart).equals(KartType.DisplayKart)) {
             setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, 0.0D);
             setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, 0.0D);
             setFieldValue(Fields.nmsEntity_motZ, nmsEntityKart, 0.0D);
@@ -111,12 +113,12 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
                     if (isDead(entityId, nmsWorld)) {
                         KartUtil.removeKartEntity((Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart));
-                        ((BukkitTask) invoke(Methods.Ypl_getLivingCheckTask, nmsEntityKart)).cancel();
+                        ((BukkitTask) invoke(YPLMethods.getLivingCheckTask, nmsEntityKart)).cancel();
                     }
                 }
             }, 0, 1);
 
-        invoke(Methods.Ypl_setLivingCheckTask, nmsEntityKart, livingCheckTask);
+        invoke(YPLMethods.setLivingCheckTask, nmsEntityKart, livingCheckTask);
     }
 
     //〓 Event 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -155,7 +157,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         //レースカート以外のカートであれば搭乗させる
         Object nmsWorld = invoke(Methods.nmsEntity_getWorld, nmsEntityKart);
-        if (!invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+        if (!invoke(YPLMethods.getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
             if (!(Boolean) ReflectionUtil.getFieldValue(Fields.nmsWorld_isClientSide, nmsWorld)) {
                 invoke(Methods.nmsEntity_mount, nmsEntityHuman, nmsEntityKart);
             }
@@ -195,7 +197,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                 invoke(Methods.nmsEntity_mount, passenger, new Object[]{null});
             }
 
-            if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.DisplayKart)) {
+            if (invoke(YPLMethods.getKartType, nmsEntityKart).equals(KartType.DisplayKart)) {
                 String customName = (String) invoke(Methods.nmsEntity_getCustomName, nmsEntityKart);
                 DisplayKartConfig.deleteDisplayKart(player, customName);
             }
@@ -224,21 +226,21 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         Entity entityKart = (Entity) invoke(Methods.nmsEntity_getBukkitEntity, nmsEntityKart);
         Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, passenger);
-        Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
+        Kart kart = (Kart) invoke(YPLMethods.getKart, nmsEntityKart);
         Racer racer = RaceManager.getRacer(player);
 
         Location location = entityKart.getLocation();
-        double speedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
+        double speedStack = (Double) invoke(YPLMethods.getSpeedStack, nmsEntityKart);
 
         //キラー使用中
-        boolean isKillerInitialized = (Boolean) invoke(Methods.Ypl_isKillerInitialized, nmsEntityKart);
+        boolean isKillerInitialized = (Boolean) invoke(YPLMethods.isKillerInitialized, nmsEntityKart);
         if (racer.getUsingKiller() != null) {
 
             //キラー利用後の初回チックの場合
             if (!isKillerInitialized) {
 
                 //フラグをオンにする
-                invoke(Methods.Ypl_setKillerInitialized, nmsEntityKart, true);
+                invoke(YPLMethods.setKillerInitialized, nmsEntityKart, true);
 
                 //外見をキラーに変更する
                 setDisplayMaterial(nmsEntityKart, ItemEnum.KILLER.getDisplayBlockMaterial(), ItemEnum.KILLER.getDisplayBlockMaterialData());
@@ -248,21 +250,21 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
                 // アイテム使用時に取得した最初のチェックポイントを格納
                 Entity firstCheckPoint = racer.getUsingKiller();
-                invoke(Methods.Ypl_setKillerLastPassedCheckPoint, nmsEntityKart, firstCheckPoint);
+                invoke(YPLMethods.setKillerLastPassedCheckPoint, nmsEntityKart, firstCheckPoint);
 
                 // 予め最初のチェックポイントまでのモーションを格納しておく
                 Location firstCheckPointLocation = firstCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
-                Vector motionVector = Util.getVectorToLocation(location, firstCheckPointLocation);
+                Vector motionVector = CommonUtil.getVectorToLocation(location, firstCheckPointLocation);
                 double motX = motionVector.getX();
                 double motY = motionVector.getY();
                 double motZ = motionVector.getZ();
-                invoke(Methods.Ypl_setKillerX, nmsEntityKart, motX);
-                invoke(Methods.Ypl_setKillerY, nmsEntityKart, motY);
-                invoke(Methods.Ypl_setKillerZ, nmsEntityKart, motZ);
+                invoke(YPLMethods.setKillerX, nmsEntityKart, motX);
+                invoke(YPLMethods.setKillerY, nmsEntityKart, motY);
+                invoke(YPLMethods.setKillerZ, nmsEntityKart, motZ);
             }
 
             //スピードスタックを一時的に常に最大値に固定する
-            invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, kart.getMaxSpeed());
+            invoke(YPLMethods.setSpeedStack, nmsEntityKart, kart.getMaxSpeed());
 
             //キラー専用モーションの適用
             setKillerMotion(nmsEntityKart, racer);
@@ -271,16 +273,16 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
             playKillerEffect(player, location);
 
             //周囲のプレイヤーへダメージ
-            Util.createSafeExplosion(player, location, ItemEnum.KILLER.getMovingDamage()
+            YPLUtil.createSafeExplosion(player, location, ItemEnum.KILLER.getMovingDamage()
                     + RaceManager.getRacer(player).getCharacter().getAdjustAttackDamage(), 6, 0.1F, 0.0F);
         } else {
-            if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+            if (invoke(YPLMethods.getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
 
                 //キラーの効果が切れた場合
                 if (isKillerInitialized) {
 
                     //フラグを元に戻す
-                    invoke(Methods.Ypl_setKillerInitialized, nmsEntityKart, false);
+                    invoke(YPLMethods.setKillerInitialized, nmsEntityKart, false);
 
                     //外見を本来のカートに戻す
                     setDisplayMaterial(nmsEntityKart, kart.getDisplayMaterial(), kart.getDisplayMaterialData());
@@ -301,7 +303,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
             //スピードメーター
 
-            double motionSpeed = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
+            double motionSpeed = (Double) invoke(YPLMethods.getSpeedStack, nmsEntityKart);
             BigDecimal bd = new BigDecimal(motionSpeed);
             PacketUtil.sendActionBar(player, ChatColor.GOLD.toString() + "SPEED:" + ChatColor.WHITE.toString() + bd.intValue());
         }
@@ -311,7 +313,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         double motZ = (Double) getFieldValue(Fields.nmsEntity_motZ, nmsEntityKart);
 
         //はしご、つたのようなよじ登れるブロックに立っている場合
-        if (Util.isClimbableBlock(Util.getForwardLocationFromYaw(location, 0.5D))) {
+        if (CommonUtil.isClimbableBlock(CommonUtil.getForwardLocationFromYaw(location, 0.5D))) {
 
             float f4 = 0.15F;
             motX = (Double) invoke(Methods.static_nmsMathHelper_a2, null, motX, -f4, f4) * 0.2;
@@ -329,7 +331,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         invoke(Methods.nmsEntity_move, nmsEntityKart, motX, motY, motZ);
 
         if ((Boolean) getFieldValue(Fields.nmsEntity_positionChanged, nmsEntityKart)
-                && Util.isClimbableBlock(Util.getForwardLocationFromYaw(location, 0.5D))) {
+                && CommonUtil.isClimbableBlock(CommonUtil.getForwardLocationFromYaw(location, 0.5D))) {
             setFieldValue(Fields.nmsEntity_motY, nmsEntityKart, motY = 0.2D + speedStack / 300);
         }
 
@@ -436,7 +438,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                     return;
                 }
 
-                Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
+                Kart kart = (Kart) invoke(YPLMethods.getKart, nmsEntityKart);
                 Kart otherKart = KartUtil.getKartObjectByEntityMetaData(entityOther);
 
                 //重量
@@ -471,8 +473,8 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                 crashSpeed *= 1000.0D; // ノーマライズ
 
                 //衝撃係数を基に、重量でダメージを付与し、ダメージ量に応じた演出を再生
-                Entity kartPassenger = Util.getEndPassenger(entityKart);
-                Entity otherPassenger = Util.getEndPassenger(entityOther);
+                Entity kartPassenger = CommonUtil.getEndPassenger(entityKart);
+                Entity otherPassenger = CommonUtil.getEndPassenger(entityOther);
                 float soundVolume = (float) (0.5F + crashSpeed / 10.0D);
                 if (4.0F < soundVolume) {
                     soundVolume = 4.0F;
@@ -498,7 +500,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                 if (otherPassenger instanceof LivingEntity) {
                     long otherDamage = Math.round(crashSpeed / 2.0D / otherWeight);
                     if (1 <= otherDamage) {
-                        Util.addDamage(otherPassenger, kartPassenger, (int) otherDamage);
+                        YPLUtil.addDamage(otherPassenger, kartPassenger, (int) otherDamage);
                         if (otherPassenger instanceof Player) {
                             Player otherPlayer = (Player) otherPassenger;
                             Location location = otherPlayer.getLocation();
@@ -520,13 +522,13 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                 crashSpeed *= 3.5D;
 
                 //衝突者のスピードスタックを重量を加味した上で減衰
-                double nmsEntityKartSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityKart);
-                invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, nmsEntityKartSpeedStack - (crashSpeed / kartWeight));
+                double nmsEntityKartSpeedStack = (Double) invoke(YPLMethods.getSpeedStack, nmsEntityKart);
+                invoke(YPLMethods.setSpeedStack, nmsEntityKart, nmsEntityKartSpeedStack - (crashSpeed / kartWeight));
 
                 //衝突対象のエンティティがカートエンティティだった場合、重量を加味した上でスピードスタックを減衰
                 if (otherKart != null) {
-                    double nmsEntityOtherSpeedStack = (Double) invoke(Methods.Ypl_getSpeedStack, nmsEntityOther);
-                    invoke(Methods.Ypl_setSpeedStack, nmsEntityOther, nmsEntityOtherSpeedStack
+                    double nmsEntityOtherSpeedStack = (Double) invoke(YPLMethods.getSpeedStack, nmsEntityOther);
+                    invoke(YPLMethods.setSpeedStack, nmsEntityOther, nmsEntityOtherSpeedStack
                             - (crashSpeed / otherWeight));
                 }
 
@@ -557,18 +559,18 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         boolean onGround = (Boolean) getFieldValue(Fields.nmsEntity_onGround, nmsEntityKart);
 
         //キラー用変数の初期化
-        invoke(Methods.Ypl_setKillerPassedCheckPointList, nmsEntityKart, new Object[]{null});
-        invoke(Methods.Ypl_setKillerLastPassedCheckPoint, nmsEntityKart, new Object[]{null});
-        invoke(Methods.Ypl_setKillerX, nmsEntityKart, 0);
-        invoke(Methods.Ypl_setKillerY, nmsEntityKart, 0);
-        invoke(Methods.Ypl_setKillerZ, nmsEntityKart, 0);
+        invoke(YPLMethods.setKillerPassedCheckPointList, nmsEntityKart, new Object[]{null});
+        invoke(YPLMethods.setKillerLastPassedCheckPoint, nmsEntityKart, new Object[]{null});
+        invoke(YPLMethods.setKillerX, nmsEntityKart, 0);
+        invoke(YPLMethods.setKillerY, nmsEntityKart, 0);
+        invoke(YPLMethods.setKillerZ, nmsEntityKart, 0);
 
         //クライアントの移動入力値
-        float sideInput = (Float) getFieldValue(Fields.nmsEntityHuman_sideMotionInput, entityHuman) * 0.8F;
-        float forwardInput = (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, entityHuman) * 1.2F;
+        float sideInput = (Float) getFieldValue(Fields.nmsEntityLiving_sideMotionInput, entityHuman) * 0.8F;
+        float forwardInput = (Float) getFieldValue(Fields.nmsEntityLiving_forwardMotionInput, entityHuman) * 1.2F;
 
         //レースカート
-        if (invoke(Methods.Ypl_getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
+        if (invoke(YPLMethods.getKartType, nmsEntityKart).equals(KartType.RacingKart)) {
 
             Racer racer = RaceManager.getRacer(player);
             Circuit circuit = racer.getCircuit();
@@ -585,7 +587,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         //スピードスタックの算出、格納
         double speedStack = calcSpeedStack(nmsEntityKart, entityHuman);
-        invoke(Methods.Ypl_setSpeedStack, nmsEntityKart, speedStack);
+        invoke(YPLMethods.setSpeedStack, nmsEntityKart, speedStack);
 
         /*
          * 地面に接している場合はクライアントの縦方向の入力係数を、スピードスタックを加味した値に変換
@@ -605,7 +607,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         }
 
         //横方向への移動入力値を基にYawを変更
-        Kart kart = (Kart) invoke(Methods.Ypl_getKart, nmsEntityKart);
+        Kart kart = (Kart) invoke(YPLMethods.getKart, nmsEntityKart);
         float yaw = (Float) getFieldValue(Fields.nmsEntity_yaw, nmsEntityKart);
         if (Permission.hasPermission(player, Permission.KART_DRIFT, true)) {
             if (player.isSneaking()) {
@@ -667,14 +669,14 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         Location kartLocation = bukkitEntityKart.getLocation().clone();
 
         //キラー用モーションの適用
-        double killerX = (Double) invoke(Methods.Ypl_getKillerX, entityKart);
-        double killerY = (Double) invoke(Methods.Ypl_getKillerY, entityKart);
-        double killerZ = (Double) invoke(Methods.Ypl_getKillerZ, entityKart);
+        double killerX = (Double) invoke(YPLMethods.getKillerX, entityKart);
+        double killerY = (Double) invoke(YPLMethods.getKillerY, entityKart);
+        double killerZ = (Double) invoke(YPLMethods.getKillerZ, entityKart);
         setFieldValue(Fields.nmsEntity_motX, entityKart, killerX);
         setFieldValue(Fields.nmsEntity_motY, entityKart, killerY);
         setFieldValue(Fields.nmsEntity_motZ, entityKart, killerZ);
 
-        Entity lastCheckPoint = (Entity) invoke(Methods.Ypl_getKillerLastPassedCheckPoint, entityKart);
+        Entity lastCheckPoint = (Entity) invoke(YPLMethods.getKillerLastPassedCheckPoint, entityKart);
         Location checkPointLocation = lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight+1, 0.0D);
 
         // 検出用のLocation。
@@ -688,20 +690,20 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         // 検出に成功した場合はモーションの更新
         if (newCheckPoint != null) {
-            invoke(Methods.Ypl_setKillerLastPassedCheckPoint, entityKart, newCheckPoint);
+            invoke(YPLMethods.setKillerLastPassedCheckPoint, entityKart, newCheckPoint);
             Location newCheckPointLocation = newCheckPoint.getLocation().clone();
             newCheckPointLocation.add(0.0D, -CheckPointUtil.checkPointHeight+1, 0.0D);
 
             // 現在の座標からチェックポイントへ向けたベクターを算出
-            Vector vectorToLocation = Util.getVectorToLocation(kartLocation, newCheckPointLocation).multiply(1.5D);
+            Vector vectorToLocation = CommonUtil.getVectorToLocation(kartLocation, newCheckPointLocation).multiply(1.5D);
 
             // モーションの格納
             killerX = vectorToLocation.getX();
             killerY = vectorToLocation.getY();
             killerZ = vectorToLocation.getZ();
-            invoke(Methods.Ypl_setKillerX, entityKart, vectorToLocation.getX());
-            invoke(Methods.Ypl_setKillerY, entityKart, vectorToLocation.getY());
-            invoke(Methods.Ypl_setKillerZ, entityKart, vectorToLocation.getZ());
+            invoke(YPLMethods.setKillerX, entityKart, vectorToLocation.getX());
+            invoke(YPLMethods.setKillerY, entityKart, vectorToLocation.getY());
+            invoke(YPLMethods.setKillerZ, entityKart, vectorToLocation.getZ());
 
             //YawをチェックポイントのYawと同期
             invoke(Methods.nmsEntity_setYawPitch, entityKart, checkPointLocation.getYaw(), 0);
@@ -746,9 +748,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
         //地面にいる場合は地面との摩擦係数を適用
         if (isOnGround) {
-            motX *= (Double) invoke(Methods.Ypl_getGroundFrictionX, nmsEntityKart);
-            motY *= (Double) invoke(Methods.Ypl_getGroundFrictionY, nmsEntityKart);
-            motZ *= (Double) invoke(Methods.Ypl_getGroundFrictionZ, nmsEntityKart);
+            motX *= (Double) invoke(YPLMethods.getGroundFrictionX, nmsEntityKart);
+            motY *= (Double) invoke(YPLMethods.getGroundFrictionY, nmsEntityKart);
+            motZ *= (Double) invoke(YPLMethods.getGroundFrictionZ, nmsEntityKart);
         }
 
         //移動
@@ -757,9 +759,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         //空中にいる場合は地面との摩擦係数を適用
         //なぜmoveの後に適用するのかは不明
         if (!isOnGround) {
-            motX *= (Double) invoke(Methods.Ypl_getFlyFrictionX, nmsEntityKart);
-            motY *= (Double) invoke(Methods.Ypl_getFlyFrictionY, nmsEntityKart);
-            motZ *= (Double) invoke(Methods.Ypl_getFlyFrictionZ, nmsEntityKart);
+            motX *= (Double) invoke(YPLMethods.getFlyFrictionX, nmsEntityKart);
+            motY *= (Double) invoke(YPLMethods.getFlyFrictionY, nmsEntityKart);
+            motZ *= (Double) invoke(YPLMethods.getFlyFrictionZ, nmsEntityKart);
         }
 
         setFieldValue(Fields.nmsEntity_motX, nmsEntityKart, motX);
@@ -774,7 +776,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
      * @param kart パラメータを引き継ぐKartオブジェクト
      */
     public static void setParameter(Object kartEntity, Kart kart) {
-        invoke(Methods.Ypl_setKart, kartEntity, kart);
+        invoke(YPLMethods.setKart, kartEntity, kart);
         setFieldValue(Fields.nmsEntity_climbableHeight, kartEntity, kart.getClimbableHeight());
         setDisplayMaterial(kartEntity, kart.getDisplayMaterial(), kart.getDisplayMaterialData());
     }
@@ -796,7 +798,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         //データ上手に持っているアイテムは書き換わっているが、見た目の更新は何故かされないため
         //明示的にパケットを送信する
         int entityId = (Integer) invoke(Methods.nmsEntity_getId, kartEntity);
-        Object craftItemStack = invoke(Methods.static_craftItemStack_asNMSCopy, null, itemStack);
+        Object craftItemStack = invoke(Methods.static_craftItemStack_convertBukkitItem_To_NmsItem, null, itemStack);
         PacketUtil.sendEntityEquipmentPacket(null, entityId, 0, craftItemStack);
 
         //腕の角度を調整
@@ -815,7 +817,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
          * 排気口付近の座標を取得
          * 移動中は座標のズレからパーティクルの生成位置が通常より前に出てきてしまうため、速度に応じて調整する
          */
-        kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -1.5D - speedStack / 80.0D);
+        kartEntityLocation = CommonUtil.getForwardLocationFromYaw(kartEntityLocation, -1.5D - speedStack / 80.0D);
 
         //パーティクルを生成する
         PacketUtil.sendParticlePacket(null, Particle.SPELL, kartEntityLocation, 0.1F, 0.1F, 0.2F, 1, 5, new int[]{});
@@ -840,7 +842,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
                  * 後輪付近の座標を取得
                  * 移動中は座標のズレからパーティクルの生成位置が通常より前に出てきてしまうため、速度に応じて調整する
                  */
-                kartEntityLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -speedStack / 80.0D);
+                kartEntityLocation = CommonUtil.getForwardLocationFromYaw(kartEntityLocation, -speedStack / 80.0D);
 
                 //後輪付近に火花のパーティクルを散らす
                 PacketUtil.sendParticlePacket(null, Particle.LAVA, kartEntityLocation, 0.0F, 0.0F, 0.0F, 1, 5, new int[]{});
@@ -856,8 +858,8 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         kartEntityLocation.add(0, 0.5, 0);
 
         //キラーの排気口付近の座標を取得
-        Location particleLocation = Util.getForwardLocationFromYaw(kartEntityLocation, -5);
-        Location particleLocation2 = Util.getForwardLocationFromYaw(kartEntityLocation, -10);
+        Location particleLocation = CommonUtil.getForwardLocationFromYaw(kartEntityLocation, -5);
+        Location particleLocation2 = CommonUtil.getForwardLocationFromYaw(kartEntityLocation, -10);
 
         //パーティクルを生成する
         PacketUtil.sendParticlePacket(null, Particle.REDSTONE, particleLocation, 0.5F, 0.5F, 0.5F, 1.0F, 20, new int[]{});
@@ -879,9 +881,9 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
     public static double calcSpeedStack(Object kartEntity, Object human) {
         Player player = (Player) invoke(Methods.nmsEntity_getBukkitEntity, human);
         Racer race = RaceManager.getRacer(player);
-        Kart kartObject = (Kart) invoke(Methods.Ypl_getKart, kartEntity);
+        Kart kartObject = (Kart) invoke(YPLMethods.getKart, kartEntity);
 
-        double speedStack = (Double) invoke(Methods.Ypl_getSpeedStack, kartEntity);
+        double speedStack = (Double) invoke(YPLMethods.getSpeedStack, kartEntity);
 
         /*
          * ダッシュボード、ポーションの効果をスピードスタックに上乗せしreturnする
@@ -934,7 +936,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
         }
 
         float forwardMotionInput =
-                (Float) getFieldValue(Fields.nmsEntityHuman_forwardMotionInput, human);
+                (Float) getFieldValue(Fields.nmsEntityLiving_forwardMotionInput, human);
 
         //ドリフトしている場合はスピードを減衰
         if (player.isSneaking()) {
@@ -989,8 +991,8 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
      * @return 変換した縦方向の移動入力値
      */
     public static float calcForwardInput(Object kartEntity, float forwardInput) {
-        Kart kart = (Kart) invoke(Methods.Ypl_getKart, kartEntity);
-        double speedStack = (Double) invoke(Methods.Ypl_getSpeedStack, kartEntity);
+        Kart kart = (Kart) invoke(YPLMethods.getKart, kartEntity);
+        double speedStack = (Double) invoke(YPLMethods.getSpeedStack, kartEntity);
 
         //前方へキーを入力している
         if (0 < forwardInput) {
@@ -1024,7 +1026,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
     public static boolean isDirtBlock(Object kartEntity) {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
-        return Util.getGroundBlockID(location, 1).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+        return CommonUtil.getGroundBlockID(location, 1).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
     }
 
     /**
@@ -1051,7 +1053,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
          * カートと接触するBoundingBoxの面の正確な座標が必要なため、NmsBlockから取得したブロックの高さを
          * 座標から減算する
          */
-        Block groundBlock = Util.getGroundBlock(location, 1);
+        Block groundBlock = CommonUtil.getGroundBlock(location, 1);
         Location groundBlockLocation;
         if (groundBlock == null) {
             groundBlockLocation = location;
@@ -1060,7 +1062,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
             groundBlockLocation = groundBlock.getLocation();
             /*groundBlockLocation.add(
                     0.0D, -1.0D + (Double) ReflectionUtil.getFieldValue(Fields.nmsBlock_maxY, nmsGroundBlock), 0.0D);*/
-            double blockHeight = Util.isBottomSlabBlock(groundBlock) ? 0.5D : 1.0D;
+            double blockHeight = CommonUtil.isBottomSlabBlock(groundBlock) ? 0.5D : 1.0D;
             groundBlockLocation.add(0.0D, -1.0D + blockHeight, 0.0D);
         }
 

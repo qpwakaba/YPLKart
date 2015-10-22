@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka circuit createコマンドクラス。
@@ -28,7 +28,7 @@ public class CreateCommand extends Command {
             return true;
         }
 
-        if (Util.isPlayer(sender)) {
+        if (CommonUtil.isPlayer(sender)) {
             // プレイヤーが引数3個、9個以外のコマンドを実行した場合return falseする
             if (args.length != 3 && args.length != 9) {
                 // TODO: ここでコマンドの説明を表示させられる。

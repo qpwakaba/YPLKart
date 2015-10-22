@@ -14,7 +14,7 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.Kart;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka displayコマンドクラス。
@@ -29,7 +29,7 @@ public class DisplayCommand extends Command {
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!Permission.hasPermission(sender, Permission.OP_CMD_DISPLAY, false))
             return true;
-        if (!(args.length == 8 || (Util.isPlayer(sender) && args.length == 2))) {
+        if (!(args.length == 8 || (CommonUtil.isPlayer(sender) && args.length == 2))) {
             SystemMessageEnum.referenceDisplayIngame.sendConvertedMessage(sender);
             return true;
         }
@@ -48,7 +48,7 @@ public class DisplayCommand extends Command {
             return true;
         }
 
-        if (args.length == 2 && Util.isPlayer(sender)) {
+        if (args.length == 2 && CommonUtil.isPlayer(sender)) {
             Player player = (Player) sender;
             location = player.getLocation();
         } else {

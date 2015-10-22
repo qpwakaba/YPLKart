@@ -12,7 +12,7 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka entryコマンドクラス。
@@ -40,7 +40,7 @@ public class EntryCommand extends Command {
                 return true;
             }
 
-            if (Util.isPlayer(sender)) {
+            if (CommonUtil.isPlayer(sender)) {
                 // 存在しないサーキットを指定した場合はreturn
                 String circuitName = args[1];
                 if (CircuitConfig.get(circuitName) == null) {
@@ -78,7 +78,7 @@ public class EntryCommand extends Command {
                     return true;
                 }
 
-                if (Util.isPlayer(sender)) {
+                if (CommonUtil.isPlayer(sender)) {
                     Player player = (Player) sender;
                     RaceManager.racerSetter_Entry(RaceManager.getRacer(player), circuitName, true);
 
@@ -107,7 +107,7 @@ public class EntryCommand extends Command {
                 // ka entry [プレイヤー] [サーキット]
                 } else {
                     String playerName = args[1];
-                    if (!Util.isOnline(playerName)) {
+                    if (!CommonUtil.isOnline(playerName)) {
                         MessageEnum.invalidPlayer.sendConvertedMessage(sender);
                         return true;
                     }
@@ -155,7 +155,7 @@ public class EntryCommand extends Command {
                 // ka entry [プレイヤー] [サーキット] -f
                 } else {
                     String playerName = args[1];
-                    if (!Util.isOnline(playerName)) {
+                    if (!CommonUtil.isOnline(playerName)) {
                         MessageEnum.invalidPlayer.sendConvertedMessage(sender);
                         return true;
                     }

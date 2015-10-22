@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import com.github.erozabesu.yplkart.cmd.circuit.CircuitCommandEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka circuitコマンドクラス。
@@ -24,7 +24,7 @@ public class CircuitCommand extends Command {
         }
 
         if(args.length == 1 || !CircuitCommandEnum.execute(sender, label, args)) {
-            if (Util.isPlayer(sender)) {
+            if (CommonUtil.isPlayer(sender)) {
                 SystemMessageEnum.referenceCircuitIngame.sendConvertedMessage(sender);
             } else {
                 SystemMessageEnum.referenceCircuitOutgame.sendConvertedMessage(sender);

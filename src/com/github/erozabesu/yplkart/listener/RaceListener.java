@@ -39,8 +39,8 @@ import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 
 public class RaceListener implements Listener {
 
@@ -86,7 +86,7 @@ public class RaceListener implements Listener {
                 if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
                     return;
                 }
-                player.teleport(Util.adjustLocationToBlockCenter(from).add(0, 1, 0));
+                player.teleport(CommonUtil.adjustLocationToBlockCenter(from).add(0, 1, 0));
                 event.setCancelled(true);
             }
         }
@@ -114,8 +114,8 @@ public class RaceListener implements Listener {
         }
 
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
-        String fromBlockId = Util.getGroundBlockID(event.getFrom(), 10);
-        String toBlockId = Util.getGroundBlockID(event.getTo(), 10);
+        String fromBlockId = CommonUtil.getGroundBlockID(event.getFrom(), 10);
+        String toBlockId = CommonUtil.getGroundBlockID(event.getTo(), 10);
 
         //現在の週回数
         int currentLaps = racer.getCurrentLaps();

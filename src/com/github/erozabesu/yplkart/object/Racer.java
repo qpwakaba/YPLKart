@@ -22,14 +22,14 @@ import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
-import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 public class Racer extends PlayerObject{
 
@@ -179,8 +179,8 @@ public class Racer extends PlayerObject{
         this.setGoal(true);
 
         //演出パーティクル
-        Util.createSignalFireworks(getPlayer().getLocation());
-        Util.createFlowerShower(getPlayer(), 20);
+        YPLUtil.createSignalFireworks(getPlayer().getLocation());
+        YPLUtil.createFlowerShower(getPlayer(), 20);
 
         //偽装するために仮想スポーンさせているNmsEntityをデスポーンさせる
         if (this.getDisguisedNmsEntity() != null) {
@@ -364,7 +364,7 @@ public class Racer extends PlayerObject{
         effectSecond = (effectSecond + character.getAdjustNegativeEffectSecond()) * 20;
 
         player.playSound(player.getLocation(), sound, 0.5F, -1.0F);
-        Util.setPotionEffect(player, PotionEffectType.SLOW, effectSecond, effectLevel + character.getAdjustNegativeEffectLevel());
+        YPLUtil.setPotionEffect(player, PotionEffectType.SLOW, effectSecond, effectLevel + character.getAdjustNegativeEffectLevel());
 
         this.setItemNegativeSpeedTask(
             Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(), new Runnable() {
@@ -383,7 +383,7 @@ public class Racer extends PlayerObject{
         effectSecond = (effectSecond + character.getAdjustPositiveEffectSecond()) * 20;
 
         player.playSound(player.getLocation(), sound, 0.5F, -1.0F);
-        Util.setPotionEffect(player, PotionEffectType.SPEED, effectSecond, level + character.getAdjustPositiveEffectLevel());
+        YPLUtil.setPotionEffect(player, PotionEffectType.SPEED, effectSecond, level + character.getAdjustPositiveEffectLevel());
 
         if (this.getDeathPenaltyTask() != null) {
             this.removeDeathPenalty();

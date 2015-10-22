@@ -12,11 +12,12 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.ItemEnum;
-import com.github.erozabesu.yplkart.enumdata.Particle;
-import com.github.erozabesu.yplkart.reflection.Methods;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.enumdata.Particle;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 public class ItemDyedTurtle extends BukkitRunnable {
     ArmorStand turtle;
@@ -62,10 +63,10 @@ public class ItemDyedTurtle extends BukkitRunnable {
         // 生成段階で予め最初のチェックポイントまでのモーションを格納しておく
         Location fromLocation = this.turtle.getLocation().clone();
         Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
-        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
+        this.motion = CommonUtil.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
 
         // エンティティのコリジョンを消去
-        Util.removeEntityCollision(this.turtle);
+        CommonUtil.removeEntityCollision(this.turtle);
     }
 
     private void die() {
@@ -104,7 +105,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         }
 
         // 周囲のチャンクを強制ロード
-        for (Chunk chunk : Util.getNearbyChunks(this.turtle.getLocation(), 20.0D)) {
+        for (Chunk chunk : CommonUtil.getNearbyChunks(this.turtle.getLocation(), 20.0D)) {
             chunk.load();
         }
 
@@ -138,7 +139,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
     private void rotate() {
         Location turtleLocation = this.turtle.getLocation().clone();
 
-        Object nmsTurtle = Util.getCraftEntity(this.turtle);
+        Object nmsTurtle = CommonUtil.getCraftEntity(this.turtle);
         ReflectionUtil.invoke(Methods.nmsEntity_setYawPitch, nmsTurtle, turtleLocation.getYaw() + 30.0F, 0.0F);
     }
 
@@ -164,7 +165,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
 
                     // レース中
                     if (racer.isStillRacing()) {
-                        Util.createSafeExplosion(this.shooter, nearbyEntity.getLocation(), hitDamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+                        YPLUtil.createSafeExplosion(this.shooter, nearbyEntity.getLocation(), hitDamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
                         return true;
                     }
                 }
@@ -178,7 +179,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
     private void createMovingDamage() {
         if (this.movingDamage != 0) {
             if (this.turtle.getTicksLived() % 5 == 0) {
-                Util.createSafeExplosion(this.shooter, this.turtle.getLocation(), this.movingDamage, 10, 0.0F, 0.0F, Particle.CRIT_MAGIC, Particle.PORTAL);
+                YPLUtil.createSafeExplosion(this.shooter, this.turtle.getLocation(), this.movingDamage, 10, 0.0F, 0.0F, Particle.CRIT_MAGIC, Particle.PORTAL);
             }
         }
     }
@@ -225,7 +226,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         Location toLocation = this.lastCheckPoint.getLocation().clone().add(0.0D, -CheckPointUtil.checkPointHeight, 0.0D);
 
         // fromLocationからtoLocationへ向けたベクターを算出、格納
-        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
+        this.motion = CommonUtil.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
     }
 
     /**
@@ -243,7 +244,7 @@ public class ItemDyedTurtle extends BukkitRunnable {
         }
 
         // fromLocationからtoLocationへ向けたベクターを算出、格納
-        this.motion = Util.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
+        this.motion = CommonUtil.getVectorToLocation(fromLocation, toLocation).multiply(this.motionMultiply);
 
         return true;
     }

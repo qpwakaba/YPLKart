@@ -10,7 +10,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka menuコマンドクラス。
@@ -26,7 +26,7 @@ public class MenuCommand extends Command {
         if (args.length == 1) {
             if (!Permission.hasPermission(sender, Permission.CMD_MENU, false))
                 return true;
-            if (Util.isPlayer(sender)) {
+            if (CommonUtil.isPlayer(sender)) {
                 RaceManager.showSelectMenu((Player) sender, true);
                 return true;
             }
@@ -42,7 +42,7 @@ public class MenuCommand extends Command {
                 return true;
             } else {
             	String playerName = args[1];
-                if (!Util.isOnline(playerName)) {
+                if (!CommonUtil.isOnline(playerName)) {
                     MessageEnum.invalidPlayer.sendConvertedMessage(sender);
                     return true;
                 }

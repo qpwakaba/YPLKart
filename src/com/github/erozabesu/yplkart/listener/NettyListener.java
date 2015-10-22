@@ -15,7 +15,7 @@ import org.bukkit.event.server.PluginEnableEvent;
 
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.override.PlayerChannelHandler;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 
 public class NettyListener implements Listener {
     private static HashMap<Integer, Player> playerEntityId = new HashMap<Integer, Player>();
@@ -40,7 +40,7 @@ public class NettyListener implements Listener {
         playerEntityId.put(player.getEntityId(), player);
     }
 
-    //〓 Do 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     public static void inject(Player player) throws Exception {
         Channel channel = PacketUtil.getChannel(player);

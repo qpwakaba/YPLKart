@@ -21,7 +21,7 @@ import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.enumdata.TagType;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * Circuitの各設定、レース記録を格納するオブジェクトクラス
@@ -321,17 +321,17 @@ public class CircuitData {
 
         List<Location> list = new ArrayList<Location>();
         while (list.size() < getMaxPlayer()) {
-            if (!Util.isSolidBlock(location)) {
+            if (!CommonUtil.isSolidBlock(location)) {
                 list.add(location);
             }
-            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, 4))) {
-                list.add(Util.getSideLocationFromYaw(location, 4));
+            if (!CommonUtil.isSolidBlock(CommonUtil.getSideLocationFromYaw(location, 4))) {
+                list.add(CommonUtil.getSideLocationFromYaw(location, 4));
             }
-            if (!Util.isSolidBlock(Util.getSideLocationFromYaw(location, -4))) {
-                list.add(Util.getSideLocationFromYaw(location, -4));
+            if (!CommonUtil.isSolidBlock(CommonUtil.getSideLocationFromYaw(location, -4))) {
+                list.add(CommonUtil.getSideLocationFromYaw(location, -4));
             }
 
-            location = Util.getForwardLocationFromYaw(location, -4);
+            location = CommonUtil.getForwardLocationFromYaw(location, -4);
         }
 
         return list;

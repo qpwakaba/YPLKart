@@ -17,8 +17,10 @@ import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Constructors;
-import com.github.erozabesu.yplkart.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.reflection.Constructors;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * チェックポイントエンティティの取得、操作を行うユーティリティクラス。
@@ -43,7 +45,7 @@ public class CheckPointUtil {
      * @return チェックポイントの配列
      */
     public static List<Entity> getNearbyCheckPoints(String circuitName, Location location, double detectRadius, Entity... ignoreEntities) {
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectRadius);
+        List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -86,7 +88,7 @@ public class CheckPointUtil {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        return CommonUtil.getNearestEntity(checkPointList, location);
     }
 
     // 〓 Get InSight 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -103,7 +105,7 @@ public class CheckPointUtil {
      */
     public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Location location, float sightThreshold, Entity... ignoreEntities) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -124,14 +126,14 @@ public class CheckPointUtil {
             }
 
             // 視野に含まれていない場合配列から削除
-            if (!Util.isLocationInSight(location, tempEntity.getLocation(), sightThreshold)) {
+            if (!CommonUtil.isLocationInSight(location, tempEntity.getLocation(), sightThreshold)) {
                 iterator.remove();
                 continue;
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!isVisibleCheckPointEntity(tempEntity)) {
-                if (!Util.canSeeLocation(location, tempEntity.getLocation())) {
+                if (!CommonUtil.canSeeLocation(location, tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
@@ -161,7 +163,7 @@ public class CheckPointUtil {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        return CommonUtil.getNearestEntity(checkPointList, location);
     }
 
     // 〓 Get InSight / Detectable 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -178,7 +180,7 @@ public class CheckPointUtil {
      */
     public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Location eyeLocation, float sightThreshold, Entity... ignoreEntities) {
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        List<Entity> entityList = Util.getNearbyEntities(eyeLocation.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> entityList = CommonUtil.getNearbyEntities(eyeLocation.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -199,14 +201,14 @@ public class CheckPointUtil {
             }
 
             // 視野に含まれていない場合配列から削除
-            if (!Util.isLocationInSight(eyeLocation, tempEntity.getLocation(), sightThreshold)) {
+            if (!CommonUtil.isLocationInSight(eyeLocation, tempEntity.getLocation(), sightThreshold)) {
                 iterator.remove();
                 continue;
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!isVisibleCheckPointEntity(tempEntity)) {
-                if (!Util.canSeeLocation(eyeLocation, tempEntity.getLocation())) {
+                if (!CommonUtil.canSeeLocation(eyeLocation, tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
@@ -251,7 +253,7 @@ public class CheckPointUtil {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, eyeLocation);
+        return CommonUtil.getNearestEntity(checkPointList, eyeLocation);
     }
 
     // 〓 Get Unpassed 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -272,7 +274,7 @@ public class CheckPointUtil {
         }
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), radius);
+        List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), radius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -321,7 +323,7 @@ public class CheckPointUtil {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        return CommonUtil.getNearestEntity(checkPointList, location);
     }
 
     // 〓 Get Unpassed / InSight / Detectable 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -346,7 +348,7 @@ public class CheckPointUtil {
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
         int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
-        List<Entity> entityList = Util.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectCheckPointRadius);
+        List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
         Iterator<Entity> iterator = entityList.iterator();
@@ -373,14 +375,14 @@ public class CheckPointUtil {
             }
 
             // 視野に含まれていない場合配列から削除
-            if (!Util.isLocationInSight(player, tempEntity.getLocation(), sightThreshold)) {
+            if (!CommonUtil.isLocationInSight(player, tempEntity.getLocation(), sightThreshold)) {
                 iterator.remove();
                 continue;
             }
 
             // 視線とチェックポイントの座標間に固形ブロックが存在する場合配列から削除
             if (!CheckPointUtil.isVisibleCheckPointEntity(tempEntity)) {
-                if (!Util.canSeeLocation(player.getEyeLocation(), tempEntity.getLocation())) {
+                if (!CommonUtil.canSeeLocation(player.getEyeLocation(), tempEntity.getLocation())) {
                     iterator.remove();
                     continue;
                 }
@@ -425,7 +427,7 @@ public class CheckPointUtil {
             return null;
         }
 
-        return Util.getNearestEntity(checkPointList, location);
+        return CommonUtil.getNearestEntity(checkPointList, location);
     }
 
     // 〓 Get Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -599,7 +601,7 @@ public class CheckPointUtil {
             armorStand.setItemInHand(CheckPointUtil.checkPointDisplayItem);
         }
 
-        Object kartEntity = Util.getCraftEntity(armorStand);
+        Object kartEntity = CommonUtil.getCraftEntity(armorStand);
         Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + location.getPitch(), 1.00F, 0.0F);
         ReflectionUtil.invoke(Methods.nmsEntityArmorStand_setRightArmPose, kartEntity, vector3f);
 

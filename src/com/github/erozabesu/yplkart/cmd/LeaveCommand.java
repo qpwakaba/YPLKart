@@ -10,7 +10,7 @@ import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka leaveコマンドクラス。
@@ -47,7 +47,7 @@ public class LeaveCommand extends Command {
                 return true;
             } else {
                 String playerName = args[1];
-                if (!Util.isOnline(playerName)) {
+                if (!CommonUtil.isOnline(playerName)) {
                     MessageEnum.invalidPlayer.sendConvertedMessage(sender);
                     return true;
                 }

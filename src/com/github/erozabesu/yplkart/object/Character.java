@@ -12,8 +12,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.utils.ReflectionUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * Characterの各設定を格納するオブジェクトクラス
@@ -167,15 +167,15 @@ public class Character {
                 String.valueOf(this.getMaxHealth()),
                 String.valueOf(this.getWalkSpeed()),
                 String.valueOf(this.getAdjustMaxSlotSize() + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
-                Util.convertSignNumber(this.getAdjustMaxStackSize()),
-                Util.convertSignNumber(this.getAdjustAttackDamage()),
+                CommonUtil.convertSignNumber(this.getAdjustMaxStackSize()),
+                CommonUtil.convertSignNumber(this.getAdjustAttackDamage()),
                 String.valueOf(this.getPenaltyAntiReskillSecond()),
                 String.valueOf(this.getPenaltySecond()),
                 String.valueOf(this.getPenaltyWalkSpeed()),
-                Util.convertSignNumber(this.getAdjustPositiveEffectLevel()),
-                Util.convertSignNumber(this.getAdjustPositiveEffectSecond()),
-                Util.convertSignNumberR(this.getAdjustNegativeEffectLevel()),
-                Util.convertSignNumberR(this.getAdjustNegativeEffectSecond()));
+                CommonUtil.convertSignNumber(this.getAdjustPositiveEffectLevel()),
+                CommonUtil.convertSignNumber(this.getAdjustPositiveEffectSecond()),
+                CommonUtil.convertSignNumberR(this.getAdjustNegativeEffectLevel()),
+                CommonUtil.convertSignNumberR(this.getAdjustNegativeEffectSecond()));
 
         return MessageEnum.tableCharacterParameter.getConvertedMessage(textParts);
     }

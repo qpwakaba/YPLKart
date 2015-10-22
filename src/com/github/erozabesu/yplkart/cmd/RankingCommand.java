@@ -12,7 +12,7 @@ import com.github.erozabesu.yplkart.data.SystemMessageEnum;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.MessageParts;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
  * /ka rankingコマンドクラス。
@@ -68,7 +68,7 @@ public class RankingCommand extends Command {
                 return true;
             } else {
                 String playerName = args[1];
-                if (!Util.isOnline(playerName)) {
+                if (!CommonUtil.isOnline(playerName)) {
                     MessageEnum.invalidPlayer.sendConvertedMessage(sender);
                     return true;
                 }

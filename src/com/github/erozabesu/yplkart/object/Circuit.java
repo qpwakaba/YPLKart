@@ -24,8 +24,9 @@ import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
-import com.github.erozabesu.yplkart.utils.PacketUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 
 /**
  * レースを開催する仮想サーキットオブジェクトクラス
@@ -141,8 +142,8 @@ public class Circuit extends CircuitData {
         this.runLimitTimeCountDownTask();
         this.runDetectEndTask();
         for (Player player : getOnlineEntryPlayerList()) {
-            Util.createSignalFireworks(player.getLocation());
-            Util.createFlowerShower(player, 5);
+            YPLUtil.createSignalFireworks(player.getLocation());
+            YPLUtil.createFlowerShower(player, 5);
             new SendExpandedTitleTask(player, 1, "START!!!" + ChatColor.GOLD, "A", 2, false).runTaskTimer(
                     YPLKart.getInstance(), 0, 1);
         }
@@ -236,7 +237,7 @@ public class Circuit extends CircuitData {
             racer.applyRaceParameter();
             racer.setCircuit(this);
             racer.setStandby(true);
-            racer.setKartEntityLocation(Util.adjustLocationToBlockCenter(location));
+            racer.setKartEntityLocation(CommonUtil.adjustLocationToBlockCenter(location));
             RaceManager.racerSetter_DeselectCharacter(uuid);
             RaceManager.racerSetter_DeselectKart(uuid);
             RaceManager.leaveRacingKart(player);

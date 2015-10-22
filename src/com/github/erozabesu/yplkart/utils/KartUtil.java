@@ -14,8 +14,9 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.enumdata.KartType;
 import com.github.erozabesu.yplkart.object.Kart;
-import com.github.erozabesu.yplkart.reflection.Constructors;
-import com.github.erozabesu.yplkart.reflection.Methods;
+import com.github.erozabesu.yplkart.reflection.YPLConstructors;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * カートエンティティの取得、操作を行うユーティリティクラス。
@@ -261,8 +262,7 @@ public class KartUtil {
         Entity entity = null;
         try {
             Object craftWorld = ReflectionUtil.invoke(Methods.craftWorld_getHandle, location.getWorld());
-            Object customKart = Constructors.constructor_yplCustomKart
-                    .newInstance(craftWorld, kart, kartType, location);
+            Object customKart = YPLConstructors.customArmorStand.newInstance(craftWorld, kart, kartType, location);
 
             //個別情報の格納
             entity = (Entity) Methods.nmsEntity_getBukkitEntity.invoke(customKart);

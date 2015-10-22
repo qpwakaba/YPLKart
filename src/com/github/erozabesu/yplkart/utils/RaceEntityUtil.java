@@ -18,13 +18,15 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.ItemStaticJammerEntity;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
-import com.github.erozabesu.yplkart.reflection.Constructors;
-import com.github.erozabesu.yplkart.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.enumdata.Particle;
+import com.github.erozabesu.yplutillibrary.reflection.Constructors;
+import com.github.erozabesu.yplutillibrary.reflection.Methods;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * レース用エンティティの取得、操作を行うユーティリティクラス。<br>
@@ -51,7 +53,7 @@ public class RaceEntityUtil {
         armorStand.setRemoveWhenFarAway(false);
         armorStand.setGravity(true);
 
-        Object nmsBanana = Util.getCraftEntity(armorStand);
+        Object nmsBanana = CommonUtil.getCraftEntity(armorStand);
         Object vector3f = ReflectionUtil.newInstance(Constructors.nmsVector3f, -26.0F + location.getPitch(), 1.00F, 0.0F);
         ReflectionUtil.invoke(Methods.nmsEntityArmorStand_setRightArmPose, nmsBanana, vector3f);
 
@@ -96,7 +98,7 @@ public class RaceEntityUtil {
     }
 
     public static EnderCrystal createItemBox(Location location, int tier) {
-        Location blockLocation = Util.adjustLocationToBlockCenter(location.getBlock().getLocation());
+        Location blockLocation = CommonUtil.adjustLocationToBlockCenter(location.getBlock().getLocation());
         EnderCrystal endercrystal = blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
         if (tier <= 1) {
             endercrystal.setCustomName(ItemBoxName);
@@ -110,7 +112,7 @@ public class RaceEntityUtil {
     }
 
     public static EnderCrystal createFakeItemBox(Location location) {
-        Location blockLocation = Util.adjustLocationToBlockCenter(location.getBlock().getLocation());
+        Location blockLocation = CommonUtil.adjustLocationToBlockCenter(location.getBlock().getLocation());
         EnderCrystal endercrystal = blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
 
         endercrystal.setCustomName(FakeItemBoxName);
@@ -120,7 +122,7 @@ public class RaceEntityUtil {
     }
 
     public static EnderCrystal createDesposableFakeItemBox(Location location, Circuit circuit) {
-        Location blockLocation = Util.adjustLocationToBlockCenter(location.getBlock().getLocation());
+        Location blockLocation = CommonUtil.adjustLocationToBlockCenter(location.getBlock().getLocation());
         EnderCrystal endercrystal = blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
 
         endercrystal.setCustomName(DisposableFakeItemBoxName);
@@ -144,7 +146,7 @@ public class RaceEntityUtil {
     public static int getTierByItemBoxEntity(Entity entity) {
         if (isHighGradeItemBoxEntity(entity)) {
             String customName = entity.getCustomName();
-            int tier = Util.extractIntegerFromString(customName);
+            int tier = CommonUtil.extractIntegerFromString(customName);
 
             if (tier <= 1) {
                 return 1;
@@ -328,7 +330,7 @@ public class RaceEntityUtil {
 
         MessageParts circuitParts = MessageParts.getMessageParts(circuit);
         MessageEnum.raceInteractFakeItemBox.sendConvertedMessage(player, circuitParts);
-        Util.createSafeExplosion(null, player.getLocation(), ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+        YPLUtil.createSafeExplosion(null, player.getLocation(), ItemEnum.FAKE_ITEMBOX.getHitDamage(), 1, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
         fakeItemBox.remove();
     }

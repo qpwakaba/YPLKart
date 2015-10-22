@@ -9,8 +9,9 @@ import org.bukkit.util.Vector;
 
 import com.github.erozabesu.yplkart.RaceManager;
 import com.github.erozabesu.yplkart.data.ItemEnum;
-import com.github.erozabesu.yplkart.enumdata.Particle;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.enumdata.Particle;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 public class ItemTurtleTask extends BukkitRunnable {
     ArmorStand turtle;
@@ -30,15 +31,14 @@ public class ItemTurtleTask extends BukkitRunnable {
         this.shooter = shooter;
         this.hitdamage = ItemEnum.TURTLE.getHitDamage() + RaceManager.getRacer(shooter).getCharacter().getAdjustAttackDamage();
 
-        Location fromLocation = Util.adjustLocationToBlockCenter(this.turtle.getLocation());
-        Location toLocation = Util.getForwardLocationFromYaw(fromLocation, 3);
-        this.vector = Util.getVectorToLocation(fromLocation, toLocation);
+        Location fromLocation = CommonUtil.adjustLocationToBlockCenter(this.turtle.getLocation());
+        Location toLocation = CommonUtil.getForwardLocationFromYaw(fromLocation, 3);
+        this.vector = CommonUtil.getVectorToLocation(fromLocation, toLocation);
         this.x = this.vector.getX();
         this.z = this.vector.getZ();
         this.y = this.verticalonhover;
         this.turtle.setVelocity(this.vector);
-        Util.removeEntityCollision(turtle);
-        Util.removeEntityVerticalMotion(turtle);
+        CommonUtil.removeEntityCollision(turtle);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
 
             //発射したプレイヤーにも跳ね返って自滅するよう1つ目の引数はnull
-            Util.createSafeExplosion(null, this.turtle.getLocation(), this.hitdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
+            YPLUtil.createSafeExplosion(null, this.turtle.getLocation(), this.hitdamage, 3, 0.4F, 2.0F, Particle.EXPLOSION_LARGE);
 
             this.cancel();
             this.turtle.remove();
@@ -69,7 +69,7 @@ public class ItemTurtleTask extends BukkitRunnable {
 
     private boolean isInWall() {
         try {
-            if (Util.isSolidBlock(this.turtle.getLocation()))
+            if (CommonUtil.isSolidBlock(this.turtle.getLocation()))
                 return true;
         } catch (Exception e) {
         }
@@ -82,45 +82,45 @@ public class ItemTurtleTask extends BukkitRunnable {
         boolean onair = false;
         //真下とその更に後ろが非ソリッドブロックなら下へ
         //1ブロックだけ非ソリッドの場合に下に降ろしてしまうと、直前のソリッドブロックの先端に接触してしまう
-        if (!Util.isSolidBlock(this.turtle.getLocation().clone().add(0, -1, 0))) {
-            if (!Util.isSolidBlock(this.turtle.getLocation().clone().add(-this.x, -1, -this.z))) {
+        if (!CommonUtil.isSolidBlock(this.turtle.getLocation().clone().add(0, -1, 0))) {
+            if (!CommonUtil.isSolidBlock(this.turtle.getLocation().clone().add(-this.x, -1, -this.z))) {
                 this.y = -0.8;
                 onair = true;
             }
         }
 
-        Location current = Util.adjustLocationToBlockCenter(this.turtle.getLocation());
+        Location current = CommonUtil.adjustLocationToBlockCenter(this.turtle.getLocation());
 
-        if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//北東
-            if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {
-                Vector normal = Util.getVectorToLocation(current, current.clone().add(1, 0, -1));
+        if (CommonUtil.isSolidBlock(current.clone().add(0, 0, -1)) && CommonUtil.isSolidBlock(current.clone().add(1, 0, 0))) {//北東
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, -1)) && CommonUtil.isSolidBlock(current.clone().add(1, 1, 0))) {
+                Vector normal = CommonUtil.getVectorToLocation(current, current.clone().add(1, 0, -1));
                 setReverseVector(normal);
                 return;
             } else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(0, 0, 1)) && Util.isSolidBlock(current.clone().add(1, 0, 0))) {//南東
-            if (Util.isSolidBlock(current.clone().add(0, 1, 1)) && Util.isSolidBlock(current.clone().add(1, 1, 0))) {
-                Vector normal = Util.getVectorToLocation(current, current.clone().add(1, 0, 1));
+        } else if (CommonUtil.isSolidBlock(current.clone().add(0, 0, 1)) && CommonUtil.isSolidBlock(current.clone().add(1, 0, 0))) {//南東
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, 1)) && CommonUtil.isSolidBlock(current.clone().add(1, 1, 0))) {
+                Vector normal = CommonUtil.getVectorToLocation(current, current.clone().add(1, 0, 1));
                 setReverseVector(normal);
                 return;
             } else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(0, 0, 1)) && Util.isSolidBlock(current.clone().add(-1, 0, 0))) {//南西
-            if (Util.isSolidBlock(current.clone().add(0, 1, 1)) && Util.isSolidBlock(current.clone().add(-1, 1, 0))) {
-                Vector normal = Util.getVectorToLocation(current, current.clone().add(-1, 0, 1));
+        } else if (CommonUtil.isSolidBlock(current.clone().add(0, 0, 1)) && CommonUtil.isSolidBlock(current.clone().add(-1, 0, 0))) {//南西
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, 1)) && CommonUtil.isSolidBlock(current.clone().add(-1, 1, 0))) {
+                Vector normal = CommonUtil.getVectorToLocation(current, current.clone().add(-1, 0, 1));
                 setReverseVector(normal);
                 return;
             } else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(0, 0, -1)) && Util.isSolidBlock(current.clone().add(-1, 0, 0))) {//北西
-            if (Util.isSolidBlock(current.clone().add(0, 1, -1)) && Util.isSolidBlock(current.clone().add(-1, 1, 0))) {
-                Vector normal = Util.getVectorToLocation(current, current.clone().add(-1, 0, -1));
+        } else if (CommonUtil.isSolidBlock(current.clone().add(0, 0, -1)) && CommonUtil.isSolidBlock(current.clone().add(-1, 0, 0))) {//北西
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, -1)) && CommonUtil.isSolidBlock(current.clone().add(-1, 1, 0))) {
+                Vector normal = CommonUtil.getVectorToLocation(current, current.clone().add(-1, 0, -1));
                 setReverseVector(normal);
                 return;
             } else {
@@ -129,29 +129,29 @@ public class ItemTurtleTask extends BukkitRunnable {
             }
         }
 
-        if (Util.isSolidBlock(current.clone().add(0, 0, -1))) {//北
-            if (Util.isSolidBlock(current.clone().add(0, 1, -1)))
+        if (CommonUtil.isSolidBlock(current.clone().add(0, 0, -1))) {//北
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, -1)))
                 this.z = -this.z;
             else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(0, 0, 1))) {//南
-            if (Util.isSolidBlock(current.clone().add(0, 1, 1)))
+        } else if (CommonUtil.isSolidBlock(current.clone().add(0, 0, 1))) {//南
+            if (CommonUtil.isSolidBlock(current.clone().add(0, 1, 1)))
                 this.z = -this.z;
             else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(1, 0, 0))) {//東
-            if (Util.isSolidBlock(current.clone().add(1, 1, 0)))
+        } else if (CommonUtil.isSolidBlock(current.clone().add(1, 0, 0))) {//東
+            if (CommonUtil.isSolidBlock(current.clone().add(1, 1, 0)))
                 this.x = -this.x;
             else {
                 this.y = this.verticalonwall;
                 return;
             }
-        } else if (Util.isSolidBlock(current.clone().add(-1, 0, 0))) {//西
-            if (Util.isSolidBlock(current.clone().add(-1, 1, 0)))
+        } else if (CommonUtil.isSolidBlock(current.clone().add(-1, 0, 0))) {//西
+            if (CommonUtil.isSolidBlock(current.clone().add(-1, 1, 0)))
                 this.x = -this.x;
             else {
                 this.y = this.verticalonwall;

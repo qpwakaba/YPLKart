@@ -42,7 +42,6 @@ import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
-import com.github.erozabesu.yplkart.enumdata.Particle;
 import com.github.erozabesu.yplkart.object.Character;
 import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.ItemDyedTurtle;
@@ -53,7 +52,9 @@ import com.github.erozabesu.yplkart.task.ItemTurtleTask;
 import com.github.erozabesu.yplkart.task.SendCountDownTitleTask;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 import com.github.erozabesu.yplkart.utils.RaceEntityUtil;
-import com.github.erozabesu.yplkart.utils.Util;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
+import com.github.erozabesu.yplutillibrary.enumdata.Particle;
+import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 public class ItemListener extends RaceManager implements Listener {
 
@@ -234,28 +235,28 @@ public class ItemListener extends RaceManager implements Listener {
 
         //ダッシュきのこ
         if (ItemEnum.MUSHROOM.isSimilar(player.getItemInHand())) {
-            Util.setItemDecrease(player);
+            CommonUtil.decreaseItemInHand(player, 1);
             racer.runPositiveItemSpeedTask(ItemEnum.MUSHROOM.getEffectSecond(), ItemEnum.MUSHROOM.getEffectLevel(), Sound.EXPLODE);
 
         //パワフルダッシュキノコ
         } else if (ItemEnum.POWERFULL_MUSHROOM.isSimilar(player.getItemInHand())) {
-            Util.setItemDecrease(player);
+            CommonUtil.decreaseItemInHand(player, 1);
             racer.runPositiveItemSpeedTask(ItemEnum.POWERFULL_MUSHROOM.getEffectSecond(),
                     ItemEnum.POWERFULL_MUSHROOM.getEffectLevel(), Sound.EXPLODE);
             player.getWorld().playSound(player.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
 
         //バナナ
         } else if (ItemEnum.BANANA.isSimilar(player.getItemInHand())) {
-            Util.setItemDecrease(player);
-            Location location = Util.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
+            CommonUtil.decreaseItemInHand(player, 1);
+            Location location = CommonUtil.getForwardLocationFromYaw(player.getLocation().add(0, 0.5, 0), -5).getBlock().getLocation()
                     .add(0.5, 0, 0.5);
             player.getWorld().playSound(player.getLocation(), Sound.SLIME_WALK, 1.0F, 1.0F);
             RaceEntityUtil.createBanana(circuit, location);
 
         //にせアイテムボックス
         } else if (ItemEnum.FAKE_ITEMBOX.isSimilar(player.getItemInHand())) {
-            Util.setItemDecrease(player);
-            Location createLocation = Util.getForwardLocationFromYaw(player.getLocation().clone().add(0, 0.5, 0), -5);
+            CommonUtil.decreaseItemInHand(player, 1);
+            Location createLocation = CommonUtil.getForwardLocationFromYaw(player.getLocation().clone().add(0, 0.5, 0), -5);
             EnderCrystal endercrystal = RaceEntityUtil.createDesposableFakeItemBox(createLocation, circuit);
             circuit.addJammerEntity(endercrystal);
             player.getWorld().playEffect(player.getLocation(), Effect.CLICK1, 0);
@@ -350,8 +351,8 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        if (Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_BASE
-                || Util.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_STICKY_BASE) {
+        if (CommonUtil.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_BASE
+                || CommonUtil.getGroundBlockMaterial(player.getLocation(), 1) == Material.PISTON_STICKY_BASE) {
             if (Permission.hasPermission(player, Permission.INTERACT_DASHBOARD, false)) {
                 racer.runStepDashBoardTask();
             }
@@ -550,7 +551,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
         racingPlayerList.remove(user);
         Player target = racingPlayerList.get(new Random().nextInt(racingPlayerList.size()));
 
@@ -596,7 +597,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
         World world = user.getWorld();
 
         int launchdamage = ItemEnum.THUNDER.getHitDamage() + racer.getCharacter().getAdjustAttackDamage();
@@ -616,7 +617,7 @@ public class ItemListener extends RaceManager implements Listener {
 
             Location location = player.getLocation();
             world.strikeLightningEffect(location);
-            Util.createSafeExplosion(user, location, launchdamage, 5, 0.4F, 1.0F, Particle.CLOUD);
+            YPLUtil.createSafeExplosion(user, location, launchdamage, 5, 0.4F, 1.0F, Particle.CLOUD);
             player.playSound(location, Sound.SUCCESSFUL_HIT, 0.5F, 1.0F);
             player.playSound(location, Sound.LEVEL_UP, 0.5F, -1.0F);
         }
@@ -653,7 +654,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
 
         for (Player targetPlayer : targetPlayerList) {
             if (targetPlayer.getUniqueId() == user.getUniqueId()) {
@@ -688,7 +689,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(player);
+        CommonUtil.decreaseItemInHand(player, 1);
 
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, player.getLocation(), ItemEnum.TURTLE);
         new ItemTurtleTask(turtle, player).runTaskTimer(YPLKart.getInstance(), 0, 1);
@@ -720,7 +721,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation().add(0.0D, -1.5D, 0.0D), ItemEnum.RED_TURTLE);
 
         int ownRank = RaceManager.getRank(user);
@@ -756,7 +757,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
 
         ArmorStand turtle = RaceEntityUtil.createTurtle(circuit, user.getEyeLocation().add(0.0D, -1.5D, 0.0D), ItemEnum.THORNED_TURTLE);
 
@@ -799,7 +800,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        Util.setItemDecrease(user);
+        CommonUtil.decreaseItemInHand(user, 1);
 
         Character character = racer.getCharacter();
 
