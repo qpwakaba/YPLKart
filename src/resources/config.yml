@@ -6,95 +6,11 @@
 # ------------------------- 汎用設定 -------------------------
 #
 
+# 当プラグインから送信されるメッセージ、及びコンフィグファイルに記載される補足説明に使用される言語を設定します。
+language: ja_JP
+
 # 当プラグインの機能を有効にします。
 enable_this_plugin: true
-
-# 各権限毎のパーミッションを有効にするかどうか切り替えます。
-enable_permission:
-
-  # パーミッション : YPLKart.kart.ride を有効にします。
-  kart_ride: true
-
-  # パーミッション : YPLKart.kart.drift を有効にします。
-  kart_drift: true
-
-  # パーミッション : YPLKart.cmd.menu を有効にします。
-  cmd_menu: true
-
-  # パーミッション : YPLKart.cmd.entry を有効にします。
-  cmd_entry: true
-
-  # パーミッション : YPLKart.cmd.exit を有効にします。
-  cmd_exit: true
-
-  # パーミッション : YPLKart.cmd.character を有効にします。
-  cmd_character: true
-
-  # パーミッション : YPLKart.cmd.characterreset を有効にします。
-  cmd_characterreset: true
-
-  # パーミッション : YPLKart.cmd.kart を有効にします。
-  cmd_kart: true
-
-  # パーミッション : YPLKart.cmd.leave を有効にします。
-  cmd_leave: true
-
-  # パーミッション : YPLKart.cmd.ranking を有効にします。
-  cmd_ranking: true
-
-  # パーミッション : YPLKart.itemcmd.* を有効にします。
-  cmd_item: true
-
-  # パーミッション : YPLKart.cmdother.menu を有効にします。
-  cmd_other_menu: true
-
-  # パーミッション : YPLKart.cmdother.entry を有効にします。
-  cmd_other_entry: true
-
-  # パーミッション : YPLKart.cmdother.exit を有効にします。
-  cmd_other_exit: true
-
-  # パーミッション : YPLKart.cmdother.character を有効にします。
-  cmd_other_character: true
-
-  # パーミッション : YPLKart.cmdother.characterreset を有効にします。
-  cmd_other_characterreset: true
-
-  # パーミッション : YPLKart.cmdother.kart を有効にします。
-  cmd_other_kart: true
-
-  # パーミッション : YPLKart.cmdother.leave を有効にします。
-  cmd_other_leave: true
-
-  # パーミッション : YPLKart.cmdother.ranking を有効にします。
-  cmd_other_ranking: true
-
-  # パーミッション : YPLKart.itemcmdother.* を有効にします。
-  cmd_other_item: true
-
-  # パーミッション : YPLKart.use.* を有効にします。
-  use_item: true
-
-  # パーミッション : YPLKart.interact.* を有効にします。
-  interact_object: true
-
-# 管理者向けのパーミッションを有効にするかどうか切り替えます。
-enable_op_permission:
-
-  # パーミッション : YPLKart.op.kart.remove を有効にします。
-  kart_remove: true
-
-  # パーミッション : YPLKart.op.cmd.circuit を有効にします。
-  cmd_circuit: true
-
-  # パーミッション : YPLKart.op.cmd.display を有効にします。
-  cmd_display: true
-
-  # パーミッション : YPLKart.op.cmd.reload を有効にします。
-  cmd_reload: true
-
-  # パーミッション : YPLKart.op.cmd.itemboxtool を有効にします。
-  cmd_itemboxtool: true
 
 # スコアボードを有効にします。
 enable_scoreboard: true

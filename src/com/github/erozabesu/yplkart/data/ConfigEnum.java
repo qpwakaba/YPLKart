@@ -21,41 +21,6 @@ public enum ConfigEnum {
             + "------------------------- 汎用設定 -------------------------"),
 
     ENABLE_THIS_PLUGIN("当プラグインの機能を有効にします。"),
-
-    ENABLE_PERMISSION("!\n各権限毎のパーミッションを有効にするかどうかを切り替えます。"),
-
-    ENABLE_PERMISSION$KART_RIDE("!\nパーミッション : YPLKart.kart.ride を有効にします。"),
-    ENABLE_PERMISSION$KART_DRIFT("!\nパーミッション : YPLKart.kart.drift を有効にします。"),
-    ENABLE_PERMISSION$CMD_MENU("!\nパーミッション : YPLKart.cmd.menu を有効にします。"),
-    ENABLE_PERMISSION$CMD_ENTRY("!\nパーミッション : YPLKart.cmd.entry を有効にします。"),
-    ENABLE_PERMISSION$CMD_EXIT("!\nパーミッション : YPLKart.cmd.exit を有効にします。"),
-    ENABLE_PERMISSION$CMD_CHARACTER("!\nパーミッション : YPLKart.cmd.character を有効にします。"),
-    ENABLE_PERMISSION$CMD_CHARACTERRESET("!\nパーミッション : YPLKart.cmd.characterreset を有効にします。"),
-    ENABLE_PERMISSION$CMD_KART("!\nパーミッション : YPLKart.cmd.kart を有効にします。"),
-    ENABLE_PERMISSION$CMD_LEAVE("!\nパーミッション : YPLKart.cmd.leave を有効にします。"),
-    ENABLE_PERMISSION$CMD_RANKING("!\nパーミッション : YPLKart.cmd.ranking を有効にします。"),
-    ENABLE_PERMISSION$CMD_ITEM("!\nパーミッション : YPLKart.itemcmd.* を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_MENU("!\nパーミッション : YPLKart.cmdother.menu を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_ENTRY("!\nパーミッション : YPLKart.cmdother.entry を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_EXIT("!\nパーミッション : YPLKart.cmdother.exit を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_CHARACTER("!\nパーミッション : YPLKart.cmdother.character を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_CHARACTERRESET("!\nパーミッション : YPLKart.cmdother.characterreset を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_KART("!\nパーミッション : YPLKart.cmdother.kart を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_LEAVE("!\nパーミッション : YPLKart.cmdother.leave を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_RANKING("!\nパーミッション : YPLKart.cmdother.ranking を有効にします。"),
-    ENABLE_PERMISSION$CMD_OTHER_ITEM("!\nパーミッション : YPLKart.itemcmdother.* を有効にします。"),
-
-    ENABLE_PERMISSION$USE_ITEM("!\nパーミッション : YPLKart.use.* を有効にします。"),
-    ENABLE_PERMISSION$INTERACT_OBJECT("!\nパーミッション : YPLKart.interact.* を有効にします。"),
-
-    ENABLE_OP_PERMISSION("!\n管理者向けのパーミッションを有効にするかどうか切り替えます。"),
-
-    ENABLE_OP_PERMISSION$KART_REMOVE("!\nパーミッション : YPLKart.op.kart.remove を有効にします。"),
-    ENABLE_OP_PERMISSION$CMD_CIRCUIT("!\nパーミッション : YPLKart.op.cmd.circuit を有効にします。"),
-    ENABLE_OP_PERMISSION$CMD_DISPLAY("!\nパーミッション : YPLKart.op.cmd.display を有効にします。"),
-    ENABLE_OP_PERMISSION$CMD_RELOAD("!\nパーミッション : YPLKart.op.cmd.reload を有効にします。"),
-    ENABLE_OP_PERMISSION$CMD_ITEMBOXTOOL("!\nパーミッション : YPLKart.op.cmd.itemboxtool を有効にします。"),
-
     ENABLE_SCOREBOARD("!\nスコアボードを有効にします。"),
     DISABLED_WORLDS("!\n当プラグインが動作しないワールド名を指定します。"),
 
@@ -100,36 +65,6 @@ public enum ConfigEnum {
      */
     public static Boolean enable_this_plugin;
 
-    public static Boolean enable_permission$kart_ride;
-    public static Boolean enable_permission$kart_drift;
-    public static Boolean enable_permission$cmd_menu;
-    public static Boolean enable_permission$cmd_entry;
-    public static Boolean enable_permission$cmd_exit;
-    public static Boolean enable_permission$cmd_character;
-    public static Boolean enable_permission$cmd_characterreset;
-    public static Boolean enable_permission$cmd_kart;
-    public static Boolean enable_permission$cmd_leave;
-    public static Boolean enable_permission$cmd_ranking;
-    public static Boolean enable_permission$cmd_item;
-    public static Boolean enable_permission$cmd_other_menu;
-    public static Boolean enable_permission$cmd_other_entry;
-    public static Boolean enable_permission$cmd_other_exit;
-    public static Boolean enable_permission$cmd_other_character;
-    public static Boolean enable_permission$cmd_other_characterreset;
-    public static Boolean enable_permission$cmd_other_kart;
-    public static Boolean enable_permission$cmd_other_leave;
-    public static Boolean enable_permission$cmd_other_ranking;
-    public static Boolean enable_permission$cmd_other_item;
-
-    public static Boolean enable_permission$use_item;
-    public static Boolean enable_permission$interact_object;
-
-    public static Boolean enable_op_permission$kart_remove;
-    public static Boolean enable_op_permission$cmd_circuit;
-    public static Boolean enable_op_permission$cmd_display;
-    public static Boolean enable_op_permission$cmd_reload;
-    public static Boolean enable_op_permission$cmd_itemboxtool;
-
     public static Boolean enable_scoreboard;
     public static List<String> disabled_worlds;
 
@@ -165,7 +100,7 @@ public enum ConfigEnum {
      * enumの静的データを格納する
      * 列挙型の性質上、値の代入は明示的にstatic.reload()メソッドから実行する
      * static.reload()はConfigManager.reload()から実行される
-     * @param configComment コンフィグキー
+     * @param configComment コンフィグキーに付加するコメント文
      */
     private ConfigEnum(String configComment) {
         this.setKey(this.name().toLowerCase().replaceAll("\\$", "\\."));

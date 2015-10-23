@@ -16,6 +16,7 @@ import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.ItemEnum;
 import com.github.erozabesu.yplkart.data.KartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.data.PermissionEnum;
 import com.github.erozabesu.yplutillibrary.util.CommentableYamlConfiguration;
 import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
@@ -34,6 +35,7 @@ import com.github.erozabesu.yplutillibrary.util.CommonUtil;
  */
 public enum ConfigManager {
     CONFIG_ENUM("config.yml"),
+    PERMISSION_ENUM("permission.yml"),
     ITEM_ENUM("item.yml"),
     MESSAGE_ENUM("message.yml"),
 
@@ -133,6 +135,9 @@ public enum ConfigManager {
 
         // 基本設定を読み込む
         ConfigEnum.reload();
+
+        // パーミッション設定を読み込む
+        PermissionEnum.reload();
 
         // アイテム設定を読み込む
         ItemEnum.reload();
