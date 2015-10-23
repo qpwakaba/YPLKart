@@ -27,7 +27,6 @@ public class CharacterConfig{
         characterObject.clear();
 
         for(String key : ConfigManager.CHARACTER_CONFIG.getLocalConfig().getKeys(false)) {
-            System.out.println(key);
             characterObject.put(key, new Character(key));
         }
     }
