@@ -1,6 +1,10 @@
 package com.github.erozabesu.yplkart.data;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 import com.github.erozabesu.yplkart.ConfigManager;
+import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
 /**
  * プラグインの基本設定を格納するクラス
@@ -8,98 +12,225 @@ import com.github.erozabesu.yplkart.ConfigManager;
  * @author erozabesu
  */
 public enum ConfigEnum {
-    ENABLE_THIS_PLUGIN("enable_this_plugin"),
+    HEADER("\n"
+            + "------------------------- 概要 -------------------------\n"
+            + "\n"
+            + "プラグインの汎用的な機能の設定を変更できるコンフィグファイルです。\n"
+            + "\n"
+            + "!\n"
+            + "------------------------- 汎用設定 -------------------------"),
 
-    PERMISSION_KART_RIDE("enable_permission.kart_ride"),
-    PERMISSION_KART_DRIFT("enable_permission.kart_drift"),
-    PERMISSION_CMD_MENU("enable_permission.cmd_menu"),
-    PERMISSION_CMD_ENTRY("enable_permission.cmd_entry"),
-    PERMISSION_CMD_EXIT("enable_permission.cmd_exit"),
-    PERMISSION_CMD_CHARACTER("enable_permission.cmd_character"),
-    PERMISSION_CMD_CHARACTERRESET("enable_permission.cmd_characterreset"),
-    PERMISSION_CMD_KART("enable_permission.cmd_kart"),
-    PERMISSION_CMD_LEAVE("enable_permission.cmd_leave"),
-    PERMISSION_CMD_RANKING("enable_permission.cmd_ranking"),
-    PERMISSION_CMD_ITEM("enable_permission.cmd_item"),
-    PERMISSION_CMD_OTHER_MENU("enable_permission.cmd_other_menu"),
-    PERMISSION_CMD_OTHER_ENTRY("enable_permission.cmd_other_entry"),
-    PERMISSION_CMD_OTHER_EXIT("enable_permission.cmd_other_exit"),
-    PERMISSION_CMD_OTHER_CHARACTER("enable_permission.cmd_other_character"),
-    PERMISSION_CMD_OTHER_CHARACTERRESET("enable_permission.cmd_other_characterreset"),
-    PERMISSION_CMD_OTHER_KART("enable_permission.cmd_other_kart"),
-    PERMISSION_CMD_OTHER_LEAVE("enable_permission.cmd_other_leave"),
-    PERMISSION_CMD_OTHER_RANKING("enable_permission.cmd_other_ranking"),
-    PERMISSION_CMD_OTHER_ITEM("enable_permission.cmd_other_item"),
+    ENABLE_THIS_PLUGIN("当プラグインの機能を有効にします。"),
 
-    PERMISSION_USE_ITEM("enable_permission.use_item"),
-    PERMISSION_INTERACT_OBJECT("enable_permission.interact_object"),
+    ENABLE_PERMISSION("!\n各権限毎のパーミッションを有効にするかどうかを切り替えます。"),
 
-    OP_PERMISSION_KART_REMOVE("enable_op_permission.kart_remove"),
-    OP_PERMISSION_CMD_CIRCUIT("enable_op_permission.cmd_circuit"),
-    OP_PERMISSION_CMD_DISPLAY("enable_op_permission.cmd_display"),
-    OP_PERMISSION_CMD_RELOAD("enable_op_permission.cmd_reload"),
-    OP_PERMISSION_CMD_ITEMBOXTOOL("enable_op_permission.cmd_itemboxtool"),
+    ENABLE_PERMISSION$KART_RIDE("!\nパーミッション : YPLKart.kart.ride を有効にします。"),
+    ENABLE_PERMISSION$KART_DRIFT("!\nパーミッション : YPLKart.kart.drift を有効にします。"),
+    ENABLE_PERMISSION$CMD_MENU("!\nパーミッション : YPLKart.cmd.menu を有効にします。"),
+    ENABLE_PERMISSION$CMD_ENTRY("!\nパーミッション : YPLKart.cmd.entry を有効にします。"),
+    ENABLE_PERMISSION$CMD_EXIT("!\nパーミッション : YPLKart.cmd.exit を有効にします。"),
+    ENABLE_PERMISSION$CMD_CHARACTER("!\nパーミッション : YPLKart.cmd.character を有効にします。"),
+    ENABLE_PERMISSION$CMD_CHARACTERRESET("!\nパーミッション : YPLKart.cmd.characterreset を有効にします。"),
+    ENABLE_PERMISSION$CMD_KART("!\nパーミッション : YPLKart.cmd.kart を有効にします。"),
+    ENABLE_PERMISSION$CMD_LEAVE("!\nパーミッション : YPLKart.cmd.leave を有効にします。"),
+    ENABLE_PERMISSION$CMD_RANKING("!\nパーミッション : YPLKart.cmd.ranking を有効にします。"),
+    ENABLE_PERMISSION$CMD_ITEM("!\nパーミッション : YPLKart.itemcmd.* を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_MENU("!\nパーミッション : YPLKart.cmdother.menu を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_ENTRY("!\nパーミッション : YPLKart.cmdother.entry を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_EXIT("!\nパーミッション : YPLKart.cmdother.exit を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_CHARACTER("!\nパーミッション : YPLKart.cmdother.character を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_CHARACTERRESET("!\nパーミッション : YPLKart.cmdother.characterreset を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_KART("!\nパーミッション : YPLKart.cmdother.kart を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_LEAVE("!\nパーミッション : YPLKart.cmdother.leave を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_RANKING("!\nパーミッション : YPLKart.cmdother.ranking を有効にします。"),
+    ENABLE_PERMISSION$CMD_OTHER_ITEM("!\nパーミッション : YPLKart.itemcmdother.* を有効にします。"),
 
-    ENABLE_SCOREBOARD("enable_scoreboard"),
-    DISABLED_WORLDS("disabled_worlds"),
-    START_BLOCK_ID("settings.start_block_id"),
-    GOAL_BLOCK_ID("settings.goal_block_id"),
-    DIRT_BLOCK_ID("settings.dirt_block_id"),
-    ITEM_SLOT("settings.item_slot"),
+    ENABLE_PERMISSION$USE_ITEM("!\nパーミッション : YPLKart.use.* を有効にします。"),
+    ENABLE_PERMISSION$INTERACT_OBJECT("!\nパーミッション : YPLKart.interact.* を有効にします。"),
 
-    ITEM_TIER1("item.tier1"),
-    ITEM_TIER2("item.tier2"),
-    ITEM_TIER3("item.tier3"),
-    ITEM_DASH_BOARD_EFFECT_LEVEL("item.dash_board.effect_level"),
-    ITEM_DASH_BOARD_EFFECT_SECOND("item.dash_board.effect_second"),
+    ENABLE_OP_PERMISSION("!\n管理者向けのパーミッションを有効にするかどうか切り替えます。"),
 
-    ITEM_DETECT_CHECKPOINT_RADIUS_TIER1("item.detect_checkpoint_radius.tier1"),
-    ITEM_DETECT_CHECKPOINT_RADIUS_TIER2("item.detect_checkpoint_radius.tier2"),
-    ITEM_DETECT_CHECKPOINT_RADIUS_TIER3("item.detect_checkpoint_radius.tier3");
+    ENABLE_OP_PERMISSION$KART_REMOVE("!\nパーミッション : YPLKart.op.kart.remove を有効にします。"),
+    ENABLE_OP_PERMISSION$CMD_CIRCUIT("!\nパーミッション : YPLKart.op.cmd.circuit を有効にします。"),
+    ENABLE_OP_PERMISSION$CMD_DISPLAY("!\nパーミッション : YPLKart.op.cmd.display を有効にします。"),
+    ENABLE_OP_PERMISSION$CMD_RELOAD("!\nパーミッション : YPLKart.op.cmd.reload を有効にします。"),
+    ENABLE_OP_PERMISSION$CMD_ITEMBOXTOOL("!\nパーミッション : YPLKart.op.cmd.itemboxtool を有効にします。"),
+
+    ENABLE_SCOREBOARD("!\nスコアボードを有効にします。"),
+    DISABLED_WORLDS("!\n当プラグインが動作しないワールド名を指定します。"),
+
+    SETTINGS("!\nレース設定"),
+    SETTINGS$START_BLOCK_ID("!\nスタートブロックのIDを変更します。"),
+    SETTINGS$GOAL_BLOCK_ID("!\nゴールブロックのIDを変更します。"),
+    SETTINGS$DIRT_BLOCK_ID("!\nダートブロックのIDを変更します。"),
+    SETTINGS$ITEM_SLOT("!\nレース中使用できるアイテムスロットの数を変更します。"),
+
+    ITEM("!\nアイテム設定"),
+    ITEM$TIER1("!\ntierは、アイテムボックスに接触した際に順位に応じたアイテムを付与するための設定です。"
+            + "\nアイテム毎にtierが設定されており、tier1～tier4の4つの階級があります。"
+            + "\n階級が高いほど効果の強いアイテムが多くなります。"
+            + "!\n"
+            + "\nプレイヤーの上位「0％～tier1％」のプレイヤーには階級1のアイテムのみ与えられます。"
+            + "\nデフォルトでは、上位0％～30％のプレイヤーに設定されています。"),
+    ITEM$TIER2("!\nプレイヤーの上位「tier1％～tier2」％のプレイヤーには階級1～階級2のアイテムのみ与えられます。"
+            + "\nデフォルトでは、上位30％～60％のプレイヤーに設定されています。"),
+    ITEM$TIER3("!\nプレイヤーの上位「tier2％～tier3％」のプレイヤーには階級2～階級3のアイテムのみ与えられます。"
+            + "\nデフォルトでは、上位60％～80％のプレイヤーに設定されています。"
+            + "\n"
+            + "\n残りの、上位tier3％～100％のプレイヤーには階級3～階級4のアイテムのみ与えられます。"
+            + "\nデフォルトでは、上位80％～100％のプレイヤーに設定されています。"),
+
+    ITEM$DASH_BOARD("!\nダッシュボード設定"),
+    ITEM$DASH_BOARD$EFFECT_LEVEL("!\nスピードポーションエフェクトのLVを変更します。"),
+    ITEM$DASH_BOARD$EFFECT_SECOND("!\nスピードポーションエフェクトの秒数を変更します。"),
+
+    ITEM$DETECT_CHECKPOINT_RADIUS("!\nチェックポイントの検出範囲設定。"),
+    ITEM$DETECT_CHECKPOINT_RADIUS$TIER1("!\nチェックポイントツールで設置したチェックポイントとの距離が、この項目で設定した数値(ブロック数)以内に差し掛かった場合、"
+                                    + "\nチェックポイントを通過したと判定されます。"
+                                    + "\n100を超える数値は実際の処理では100として扱われます。"),
+    ITEM$DETECT_CHECKPOINT_RADIUS$TIER2("!\nチェックポイントツールTier2で設置したチェックポイントとの距離が、この項目で設定した数値(ブロック数)以内に差し掛かった場合、"
+                                    + "\nチェックポイントを通過したと判定されます。"
+                                    + "\n100を超える数値は実際の処理では100として扱われます。"),
+    ITEM$DETECT_CHECKPOINT_RADIUS$TIER3("!\nチェックポイントツールTier3で設置したチェックポイントとの距離が、この項目で設定した数値(ブロック数)以内に差し掛かった場合、"
+                                    + "\nチェックポイントを通過したと判定されます。"
+                                    + "\n100を超える数値は実際の処理では100として扱われます。");
+    /*
+     * コンフィグ値の型を保証するため変数として別途宣言する。
+     * 他クラスからインスタンスとして参照するためプリミティブ型は利用しない。
+     */
+    public static Boolean enable_this_plugin;
+
+    public static Boolean enable_permission$kart_ride;
+    public static Boolean enable_permission$kart_drift;
+    public static Boolean enable_permission$cmd_menu;
+    public static Boolean enable_permission$cmd_entry;
+    public static Boolean enable_permission$cmd_exit;
+    public static Boolean enable_permission$cmd_character;
+    public static Boolean enable_permission$cmd_characterreset;
+    public static Boolean enable_permission$cmd_kart;
+    public static Boolean enable_permission$cmd_leave;
+    public static Boolean enable_permission$cmd_ranking;
+    public static Boolean enable_permission$cmd_item;
+    public static Boolean enable_permission$cmd_other_menu;
+    public static Boolean enable_permission$cmd_other_entry;
+    public static Boolean enable_permission$cmd_other_exit;
+    public static Boolean enable_permission$cmd_other_character;
+    public static Boolean enable_permission$cmd_other_characterreset;
+    public static Boolean enable_permission$cmd_other_kart;
+    public static Boolean enable_permission$cmd_other_leave;
+    public static Boolean enable_permission$cmd_other_ranking;
+    public static Boolean enable_permission$cmd_other_item;
+
+    public static Boolean enable_permission$use_item;
+    public static Boolean enable_permission$interact_object;
+
+    public static Boolean enable_op_permission$kart_remove;
+    public static Boolean enable_op_permission$cmd_circuit;
+    public static Boolean enable_op_permission$cmd_display;
+    public static Boolean enable_op_permission$cmd_reload;
+    public static Boolean enable_op_permission$cmd_itemboxtool;
+
+    public static Boolean enable_scoreboard;
+    public static List<String> disabled_worlds;
+
+    public static String settings$start_block_id;
+    public static String settings$goal_block_id;
+    public static String settings$dirt_block_id;
+    public static Integer settings$item_slot;
+
+    public static Integer item$tier1;
+    public static Integer item$tier2;
+    public static Integer item$tier3;
+
+    public static Integer item$dash_board$effect_level;
+    public static Integer item$dash_board$effect_second;
+
+    public static Integer item$detect_checkpoint_radius$tier1;
+    public static Integer item$detect_checkpoint_radius$tier2;
+    public static Integer item$detect_checkpoint_radius$tier3;
 
     /** コンフィグキー */
     private String configKey;
 
+    /** コンフィグキーに付加するコメント文 */
+    private String configComment;
+
     /** コンフィグバリュー */
     private Object configValue;
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * コンストラクタ
      * enumの静的データを格納する
-     * 動的データ（コンフィグ）の読み込みはstatic.reload()メソッドで明示的に行う
+     * 列挙型の性質上、値の代入は明示的にstatic.reload()メソッドから実行する
      * static.reload()はConfigManager.reload()から実行される
-     * @param configKey コンフィグキー
+     * @param configComment コンフィグキー
      */
-    private ConfigEnum(String configKey) {
-        this.configKey = configKey;
+    private ConfigEnum(String configComment) {
+        this.setKey(this.name().toLowerCase().replaceAll("\\$", "\\."));
+        this.setConfigComment(configComment);
+
+        if (this.name().equalsIgnoreCase("HEADER")) {
+            if (0 < configComment.length()) {
+                ConfigManager.CONFIG_ENUM.getLocalConfig().setAltHeader(configComment);
+            }
+        } else {
+            if (0 < configComment.length()) {
+                ConfigManager.CONFIG_ENUM.getLocalConfig().setComment(this.getKey(), configComment);
+            }
+        }
     }
+
+    private void loadValue() {
+        Object value = ConfigManager.CONFIG_ENUM.getValue(this.getKey());
+        if (value != null) {
+            this.setValue(value);
+
+            // 読み込まれる順序の都合上変数の宣言時に値を代入することは出来ないため、後付で代入を行う
+            Field field = ReflectionUtil.getField(ConfigEnum.class, this.getKey().replaceAll("\\.", "\\$"));
+            if (field != null) {
+                ReflectionUtil.setFieldValue(field, null, value);
+            }
+        }
+    }
+
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** バリューを再読み込みする */
     public static void reload() {
         for (ConfigEnum configEnum : ConfigEnum.values()) {
-            configEnum.setValue(ConfigManager.CONFIG_ENUM.getValue(configEnum.getKey()));
+            configEnum.loadValue();
         }
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return コンフィグキー */
     public String getKey() {
         return this.configKey;
     }
 
+    /** @return コンフィグキーに付加するコメント文 */
+    public String getConfigComment() {
+        return configComment;
+    }
+
     /** @return コンフィグバリュー */
-    public <T> Object getValue(){
+    public Object getValue(){
         return this.configValue;
     }
 
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @param コンフィグキー */
-    public void getKey(String configKey) {
+    public void setKey(String configKey) {
         this.configKey = configKey;
+    }
+
+    /** @param configComment コンフィグキーに付加するコメント文 */
+    public void setConfigComment(String configComment) {
+        this.configComment = configComment;
     }
 
     /** @param コンフィグバリュー */

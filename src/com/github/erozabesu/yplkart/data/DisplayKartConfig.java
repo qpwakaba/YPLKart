@@ -27,46 +27,16 @@ import com.github.erozabesu.yplkart.utils.KartUtil;
 public class DisplayKartConfig {
 
     /** RaceDataオブジェクトを格納しているハッシュマップ */
-    private HashMap<String, DisplayKart> displayKartMap = new HashMap<String, DisplayKart>();
+    private static HashMap<String, DisplayKart> displayKartMap = new HashMap<String, DisplayKart>();
 
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** このクラスのインスタンス */
-    private static DisplayKartConfig instance;
-
-    /**
-     * このクラスのインスタンスを返す
-     * @return CircuitConfig.classインスタンス
-     */
-    private static DisplayKartConfig getInstance() {
-        return instance;
-    }
-
-    /**
-     * コンストラクタ
-     * コンフィグの読み込みはstatic.reload()メソッドで明示的に行う
-     * static.reload()はConfigManager.reload()から実行される
-     * ややこしくなるため他のConfigクラスと同様の手順を踏む
-     */
-    public DisplayKartConfig() {
-        instance = this;
-    }
-
-    //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Data Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /** @return DisplayKartオブジェクトを格納しているハッシュマップ */
-    public HashMap<String, DisplayKart> getDisplayKartMap() {
-        return this.displayKartMap;
+    public static HashMap<String, DisplayKart> getDisplayKartMap() {
+        return displayKartMap;
     }
 
-    //〓 setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** @param displayKartMap DisplayKartオブジェクトを格納しているハッシュマップ */
-    public void setDisplayKartMap(HashMap<String, DisplayKart> displayKartMap) {
-        this.displayKartMap = displayKartMap;
-    }
-
-    //〓 static data edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Data Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 引数displayKartNameに対応するDisplayKartオブジェクトを返す
@@ -74,11 +44,12 @@ public class DisplayKartConfig {
      * @return DisplayKartオブジェクト
      */
     public static DisplayKart getDisplayKart(String uuid) {
-        for (String mapKey : getInstance().getDisplayKartMap().keySet()) {
+        for (String mapKey : getDisplayKartMap().keySet()) {
             if (mapKey.equalsIgnoreCase(uuid)) {
-                return getInstance().getDisplayKartMap().get(mapKey);
+                return getDisplayKartMap().get(mapKey);
             }
         }
+
         return null;
     }
 
@@ -88,11 +59,10 @@ public class DisplayKartConfig {
      * 新規にオブジェクトを生成しハッシュマップに格納する
      */
     public static void reload() {
-        DisplayKartConfig instance = getInstance();
-        instance.getDisplayKartMap().clear();
+        getDisplayKartMap().clear();
 
         for(String configKey : ConfigManager.DISPLAY_KART_CONFIG.getLocalConfig().getKeys(false)) {
-            instance.getDisplayKartMap().put(configKey, new DisplayKart(configKey));
+            getDisplayKartMap().put(configKey, new DisplayKart(configKey));
         }
     }
 
@@ -108,7 +78,7 @@ public class DisplayKartConfig {
         DisplayKart displayKart = new DisplayKart(uuid);
         displayKart.createDisplayKart(uuid, kart, location);
 
-        getInstance().getDisplayKartMap().put(uuid, displayKart);
+        getDisplayKartMap().put(uuid, displayKart);
     }
 
     /**
@@ -122,7 +92,7 @@ public class DisplayKartConfig {
         if (displayKart != null) {
 
             //ハッシュマップから削除
-            getInstance().getDisplayKartMap().remove(uuid);
+            getDisplayKartMap().remove(uuid);
 
             //ローカルファイルから削除
             displayKart.deleteConfiguration();
@@ -131,7 +101,7 @@ public class DisplayKartConfig {
         }
     }
 
-    //〓 static util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * ローカルコンフィグの設定データ上で引数chunkに存在している
@@ -141,7 +111,7 @@ public class DisplayKartConfig {
      * @param chunk DisplayKartオブジェクトEntityを再生成させるチャンク
      */
     public static void respawnKart(Chunk chunk) {
-        Iterator<DisplayKart> iterator = getInstance().getDisplayKartMap().values().iterator();
+        Iterator<DisplayKart> iterator = getDisplayKartMap().values().iterator();
         DisplayKart displayKart = null;
 
         //読み込まれていないチャンクであれば何もしない

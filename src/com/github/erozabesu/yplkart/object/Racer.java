@@ -25,8 +25,8 @@ import com.github.erozabesu.yplkart.override.CustomArmorStandDelegator;
 import com.github.erozabesu.yplkart.task.SendBlinkingTitleTask;
 import com.github.erozabesu.yplkart.task.SendExpandedTitleTask;
 import com.github.erozabesu.yplkart.utils.CheckPointUtil;
-import com.github.erozabesu.yplkart.utils.YPLUtil;
 import com.github.erozabesu.yplkart.utils.KartUtil;
+import com.github.erozabesu.yplkart.utils.YPLUtil;
 import com.github.erozabesu.yplutillibrary.reflection.Methods;
 import com.github.erozabesu.yplutillibrary.util.PacketUtil;
 import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
@@ -342,13 +342,13 @@ public class Racer extends PlayerObject{
         }
 
         this.setStepDashBoard(true);
-        int effectSecond = ((Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
+        int effectSecond = (ConfigEnum.item$dash_board$effect_second
                 + this.getCharacter().getAdjustPositiveEffectSecond()) * 20;
 
         this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.LEVEL_UP, 0.5F, 1.0F);
         this.runPositiveItemSpeedTask(
-                (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_SECOND.getValue()
-                , (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
+                ConfigEnum.item$dash_board$effect_second
+                , ConfigEnum.item$dash_board$effect_level
                 , Sound.EXPLODE);
 
         Bukkit.getScheduler().runTaskLater(YPLKart.getInstance(),new Runnable() {

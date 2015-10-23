@@ -14,42 +14,21 @@ import com.github.erozabesu.yplkart.object.Character;
  */
 public class CharacterConfig{
 
-    /** このクラスのインスタンス */
-    private static CharacterConfig instance;
-
     /** Characterオブジェクトを格納しているハッシュマップ */
-    private HashMap<String, Character> characterObject = new HashMap<String, Character>();
+    private static HashMap<String, Character> characterObject = new HashMap<String, Character>();
 
-    /**
-     * コンストラクタ
-     * コンフィグの読み込みはstatic.reload()メソッドで明示的に行う
-     * static.reload()はConfigManager.reload()から実行される
-     * ややこしくなるため他のConfigクラスと同様の手順を踏む
-     */
-    public CharacterConfig() {
-        instance = this;
-    }
-
-    //〓 static 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /**
-     * このクラスのインスタンスを返す
-     * @return CharacterConfig.classインスタンス
-     */
-    private static CharacterConfig getInstance() {
-        return instance;
-    }
+    //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 設定データを再読み込みする
      * 既存のcharacterオブジェクトを破棄し、新規に生成しハッシュマップに格納する
      */
     public static void reload() {
-        CharacterConfig characterConfig = getInstance();
-        characterConfig.characterObject.clear();
+        characterObject.clear();
 
         for(String key : ConfigManager.CHARACTER_CONFIG.getLocalConfig().getKeys(false)) {
-            characterConfig.characterObject.put(key, new Character(key));
+            System.out.println(key);
+            characterObject.put(key, new Character(key));
         }
     }
 
@@ -58,7 +37,7 @@ public class CharacterConfig{
      * @return HashMap型の全Characterオブジェクト
      */
     public static HashMap<String, Character> getCharacterMap() {
-        return getInstance().characterObject;
+        return characterObject;
     }
 
     /**

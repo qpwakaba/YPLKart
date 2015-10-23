@@ -92,7 +92,7 @@ public class DisplayKart {
         config.setValue(configKey + ".yaw", getLocationYaw());
 
         //設定データをローカルファイルに保存
-        config.saveConfiguration();
+        config.saveConfig();
     }
 
     /** ローカルコンフィグファイルから全データを削除する */
@@ -102,7 +102,7 @@ public class DisplayKart {
         config.setValue(getConfigKey(), null);
 
         //設定データをローカルファイルに保存
-        config.saveConfiguration();
+        config.saveConfig();
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

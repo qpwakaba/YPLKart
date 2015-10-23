@@ -395,9 +395,9 @@ public class RaceEntityUtil {
 
         int percent = 100 / (denominator / rank);
         int itemTier = 0;
-        int settingsTier1 = (Integer) ConfigEnum.ITEM_TIER1.getValue();
-        int settingsTier2 = (Integer) ConfigEnum.ITEM_TIER2.getValue();
-        int settingsTier3 = (Integer) ConfigEnum.ITEM_TIER3.getValue();
+        int settingsTier1 = ConfigEnum.item$tier1;
+        int settingsTier2 = ConfigEnum.item$tier2;
+        int settingsTier3 = ConfigEnum.item$tier3;
 
         if (percent < settingsTier1) {
             itemTier = 1;

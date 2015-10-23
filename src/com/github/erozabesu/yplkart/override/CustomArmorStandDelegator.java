@@ -897,7 +897,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
 
             //最高速度 + ダッシュボードのエフェクトLV + キャラクター補正
             speedStack = kartObject.getMaxSpeed()
-                    * (Integer) ConfigEnum.ITEM_DASH_BOARD_EFFECT_LEVEL.getValue()
+                    * ConfigEnum.item$dash_board$effect_level
                     + race.getCharacter().getAdjustPositiveEffectLevel() * 50;
 
             //アイテム使用中の最高速度以内の数値になるよう調整
@@ -1026,7 +1026,7 @@ public class CustomArmorStandDelegator extends ReflectionUtil {
     public static boolean isDirtBlock(Object kartEntity) {
         Location location = ((Entity) invoke(Methods.nmsEntity_getBukkitEntity, kartEntity)).getLocation();
 
-        return CommonUtil.getGroundBlockID(location, 1).equalsIgnoreCase((String) ConfigEnum.DIRT_BLOCK_ID.getValue());
+        return CommonUtil.getGroundBlockID(location, 1).equalsIgnoreCase(ConfigEnum.settings$dirt_block_id);
     }
 
     /**

@@ -26,24 +26,12 @@ import com.github.erozabesu.yplkart.utils.CheckPointUtil;
 /**
  * レース設定を管理するクラス
  * ユーザ側で要素数を変更できる動的なコンフィグを扱うためオブジェクトで管理する
- * 更に、ゲーム内から動的に登録、変更、削除が行われるデータを扱うため
- * 他のクラスとは異なりstaticメソッドを多用している
  * @author erozabesu
  */
 public class CircuitConfig {
 
     /** RaceDataオブジェクトを格納しているハッシュマップ */
     private static HashMap<String, Circuit> circuitDataMap = new HashMap<String, Circuit>();
-
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /*
-     * コンストラクタは使用禁止
-     * コンフィグの読み込みはstatic.reload()メソッドで明示的に行う
-     * static.reload()はConfigManager.reload()から実行される
-     */
-    /*public CircuitConfig() {
-    }*/
 
     //〓 Data Edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 

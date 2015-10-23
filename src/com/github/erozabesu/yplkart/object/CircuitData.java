@@ -270,7 +270,7 @@ public class CircuitData {
         }
 
         //設定データをローカルファイルに保存
-        config.saveConfiguration();
+        config.saveConfig();
     }
 
     /** ローカルコンフィグファイルから全データを削除する */
@@ -280,7 +280,7 @@ public class CircuitData {
         config.setValue(getCircuitName(), null);
 
         //設定データをローカルファイルに保存
-        config.saveConfiguration();
+        config.saveConfig();
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

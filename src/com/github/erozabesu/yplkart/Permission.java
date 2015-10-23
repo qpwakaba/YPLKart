@@ -11,85 +11,82 @@ import com.github.erozabesu.yplkart.object.MessageParts;
  * @author erozabesu
  */
 public enum Permission {
-    KART_RIDE(ConfigEnum.PERMISSION_KART_RIDE),
-    KART_DRIFT(ConfigEnum.PERMISSION_KART_DRIFT),
-    OP_KART_REMOVE(ConfigEnum.OP_PERMISSION_KART_REMOVE),
+    KART_RIDE(ConfigEnum.enable_permission$kart_ride),
+    KART_DRIFT(ConfigEnum.enable_permission$kart_drift),
+    OP_KART_REMOVE(ConfigEnum.enable_op_permission$kart_remove),
 
     CMD_KA(null),
-    CMD_MENU(ConfigEnum.PERMISSION_CMD_MENU),
-    CMD_ENTRY(ConfigEnum.PERMISSION_CMD_ENTRY),
-    CMD_EXIT(ConfigEnum.PERMISSION_CMD_EXIT),
-    CMD_KART(ConfigEnum.PERMISSION_CMD_KART),
-    CMD_LEAVE(ConfigEnum.PERMISSION_CMD_LEAVE),
-    CMD_CHARACTER(ConfigEnum.PERMISSION_CMD_CHARACTER),
-    CMD_CHARACTERRESET(ConfigEnum.PERMISSION_CMD_CHARACTERRESET),
-    CMD_RANKING(ConfigEnum.PERMISSION_CMD_RANKING),
+    CMD_MENU(ConfigEnum.enable_permission$cmd_menu),
+    CMD_ENTRY(ConfigEnum.enable_permission$cmd_entry),
+    CMD_EXIT(ConfigEnum.enable_permission$cmd_exit),
+    CMD_KART(ConfigEnum.enable_permission$cmd_kart),
+    CMD_LEAVE(ConfigEnum.enable_permission$cmd_leave),
+    CMD_CHARACTER(ConfigEnum.enable_permission$cmd_character),
+    CMD_CHARACTERRESET(ConfigEnum.enable_permission$cmd_characterreset),
+    CMD_RANKING(ConfigEnum.enable_permission$cmd_ranking),
     CMDOTHER_KA(null),
-    CMDOTHER_MENU(ConfigEnum.PERMISSION_CMD_OTHER_MENU),
-    CMDOTHER_ENTRY(ConfigEnum.PERMISSION_CMD_OTHER_ENTRY),
-    CMDOTHER_EXIT(ConfigEnum.PERMISSION_CMD_OTHER_EXIT),
-    CMDOTHER_KART(ConfigEnum.PERMISSION_CMD_OTHER_KART),
-    CMDOTHER_LEAVE(ConfigEnum.PERMISSION_CMD_OTHER_LEAVE),
-    CMDOTHER_CHARACTER(ConfigEnum.PERMISSION_CMD_OTHER_CHARACTER),
-    CMDOTHER_CHARACTERRESET(ConfigEnum.PERMISSION_CMD_OTHER_CHARACTERRESET),
-    CMDOTHER_RANKING(ConfigEnum.PERMISSION_CMD_OTHER_RANKING),
+    CMDOTHER_MENU(ConfigEnum.enable_permission$cmd_other_menu),
+    CMDOTHER_ENTRY(ConfigEnum.enable_permission$cmd_other_entry),
+    CMDOTHER_EXIT(ConfigEnum.enable_permission$cmd_other_exit),
+    CMDOTHER_KART(ConfigEnum.enable_permission$cmd_other_kart),
+    CMDOTHER_LEAVE(ConfigEnum.enable_permission$cmd_other_leave),
+    CMDOTHER_CHARACTER(ConfigEnum.enable_permission$cmd_other_character),
+    CMDOTHER_CHARACTERRESET(ConfigEnum.enable_permission$cmd_other_characterreset),
+    CMDOTHER_RANKING(ConfigEnum.enable_permission$cmd_other_ranking),
 
-    ITEMCMD_MUSHROOM(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_POWERFULLMUSHROOM(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_BANANA(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_FAKEITEMBOX(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_THUNDER(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_STAR(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_TURTLE(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_REDTURTLE(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_THORNEDTURTLE(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_TERESA(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_GESSO(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMD_KILLER(ConfigEnum.PERMISSION_CMD_ITEM),
-    ITEMCMDOTHER_MUSHROOM(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_POWERFULLMUSHROOM(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_BANANA(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_FAKEITEMBOX(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_THUNDER(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_STAR(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_TURTLE(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_REDTURTLE(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_THORNEDTURTLE(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_TERESA(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_GESSO(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
-    ITEMCMDOTHER_KILLER(ConfigEnum.PERMISSION_CMD_OTHER_ITEM),
+    ITEMCMD_MUSHROOM(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_POWERFULLMUSHROOM(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_BANANA(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_FAKEITEMBOX(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_THUNDER(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_STAR(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_TURTLE(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_REDTURTLE(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_THORNEDTURTLE(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_TERESA(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_GESSO(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMD_KILLER(ConfigEnum.enable_permission$cmd_item),
+    ITEMCMDOTHER_MUSHROOM(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_POWERFULLMUSHROOM(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_BANANA(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_FAKEITEMBOX(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_THUNDER(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_STAR(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_TURTLE(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_REDTURTLE(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_THORNEDTURTLE(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_TERESA(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_GESSO(ConfigEnum.enable_permission$cmd_other_item),
+    ITEMCMDOTHER_KILLER(ConfigEnum.enable_permission$cmd_other_item),
 
-    OP_CMD_CIRCUIT(ConfigEnum.OP_PERMISSION_CMD_CIRCUIT),
-    OP_CMD_DISPLAY(ConfigEnum.OP_PERMISSION_CMD_DISPLAY),
-    OP_CMD_RELOAD(ConfigEnum.OP_PERMISSION_CMD_RELOAD),
-    OP_CMD_ITEMBOXTOOL(ConfigEnum.OP_PERMISSION_CMD_ITEMBOXTOOL),
+    OP_CMD_CIRCUIT(ConfigEnum.enable_op_permission$cmd_circuit),
+    OP_CMD_DISPLAY(ConfigEnum.enable_op_permission$cmd_display),
+    OP_CMD_RELOAD(ConfigEnum.enable_op_permission$cmd_reload),
+    OP_CMD_ITEMBOXTOOL(ConfigEnum.enable_op_permission$cmd_itemboxtool),
 
-    USE_MUSHROOM(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_POWERFULLMUSHROOM(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_BANANA(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_TURTLE(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_REDTURTLE(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_THORNEDTURTLE(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_FAKEITEMBOX(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_TERESA(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_GESSO(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_KILLER(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_THUNDER(ConfigEnum.PERMISSION_USE_ITEM),
-    USE_STAR(ConfigEnum.PERMISSION_USE_ITEM),
+    USE_MUSHROOM(ConfigEnum.enable_permission$use_item),
+    USE_POWERFULLMUSHROOM(ConfigEnum.enable_permission$use_item),
+    USE_BANANA(ConfigEnum.enable_permission$use_item),
+    USE_TURTLE(ConfigEnum.enable_permission$use_item),
+    USE_REDTURTLE(ConfigEnum.enable_permission$use_item),
+    USE_THORNEDTURTLE(ConfigEnum.enable_permission$use_item),
+    USE_FAKEITEMBOX(ConfigEnum.enable_permission$use_item),
+    USE_TERESA(ConfigEnum.enable_permission$use_item),
+    USE_GESSO(ConfigEnum.enable_permission$use_item),
+    USE_KILLER(ConfigEnum.enable_permission$use_item),
+    USE_THUNDER(ConfigEnum.enable_permission$use_item),
+    USE_STAR(ConfigEnum.enable_permission$use_item),
 
-    INTERACT_DASHBOARD(ConfigEnum.PERMISSION_INTERACT_OBJECT),
-    INTERACT_BANANA(ConfigEnum.PERMISSION_INTERACT_OBJECT),
-    INTERACT_ITEMBOX(ConfigEnum.PERMISSION_INTERACT_OBJECT),
-    INTERACT_FAKEITEMBOX(ConfigEnum.PERMISSION_INTERACT_OBJECT);
+    INTERACT_DASHBOARD(ConfigEnum.enable_permission$interact_object),
+    INTERACT_BANANA(ConfigEnum.enable_permission$interact_object),
+    INTERACT_ITEMBOX(ConfigEnum.enable_permission$interact_object),
+    INTERACT_FAKEITEMBOX(ConfigEnum.enable_permission$interact_object);
 
     /** パーミッションノード */
     private String permissionNode;
 
-    /** config.ymlのパーミッション設定 */
-    private ConfigEnum permissionConfig;
-
     /** config.ymlのパーミッション設定値 */
-    private boolean permissionConfigValue;
+    private Boolean configValue;
 
     //〓 Main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -97,27 +94,12 @@ public enum Permission {
      * コンストラクタ<br>
      * 要素名をベースにパーミッションノードを生成する<br>
      * また、config.ymlのパーミッション設定を格納する
-     * @param permissionConfig config.ymlのパーミッション設定
+     * @param configValue config.ymlのパーミッション設定
      */
-    private Permission(ConfigEnum permissionConfig) {
+    private Permission(Boolean configValue) {
         String name = name().toLowerCase();
         this.setPermissionNode(YPLKart.PLUGIN_NAME + "." + name.replace('_', '.'));
-
-        this.setPermissionConfig(permissionConfig);
-        this.reloadPermissionConfigValue();
-    }
-
-    /** config.ymlのパーミッション設定を格納する */
-    private void reloadPermissionConfigValue(){
-        setPermissionConfigValue(getPermissionConfig() == null
-                ? true : Boolean.valueOf(String.valueOf(getPermissionConfig().getValue())));
-    }
-
-    /** 全要素の、config.ymlの設定データに関するメンバ変数を再取得する */
-    public static void reloadPermissionConfig(){
-        for (Permission permission : values()) {
-            permission.reloadPermissionConfigValue();
-        }
+        this.setConfigValue(configValue);
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -130,19 +112,10 @@ public enum Permission {
      * @return 対象がパーミッションを所有しているかどうか
      */
     public static Boolean hasPermission(CommandSender target, Permission permission, boolean noMessage) {
-        if (permission == null) {
-            return true;
-        }
-
-        if (target.isOp()) {
-            return true;
-        }
-
-        if (!permission.getPermissionConfigValue()) {
-            return true;
-        }
-
-        if (target.hasPermission(permission.getPermissionNode())) {
+        if (permission == null
+                || target.isOp()
+                || !permission.getConfigValue()
+                || target.hasPermission(permission.getPermissionNode())) {
             return true;
         }
 
@@ -188,14 +161,9 @@ public enum Permission {
         return this.permissionNode;
     }
 
-    /** @return settingsNode config.ymlのパーミッション設定 */
-    public ConfigEnum getPermissionConfig() {
-        return permissionConfig;
-    }
-
     /** @return config.ymlのパーミッションセッティング値 */
-    private boolean getPermissionConfigValue() {
-        return this.permissionConfigValue;
+    private Boolean getConfigValue() {
+        return this.configValue;
     }
 
     //〓 Setter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -205,13 +173,8 @@ public enum Permission {
         this.permissionNode = permissionNode;
     }
 
-    /** @param settingsNode config.ymlのパーミッション設定 */
-    public void setPermissionConfig(ConfigEnum settingsNode) {
-        this.permissionConfig = settingsNode;
-    }
-
-    /** @param settingNodeValue config.ymlのパーミッションセッティング値 */
-    public void setPermissionConfigValue(boolean settingNodeValue) {
-        this.permissionConfigValue = settingNodeValue;
+    /** @param configValue config.ymlのパーミッションセッティング値 */
+    public void setConfigValue(Boolean configValue) {
+        this.configValue = configValue;
     }
 }

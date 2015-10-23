@@ -121,8 +121,8 @@ public class RaceListener implements Listener {
         int currentLaps = racer.getCurrentLaps();
 
         //正常に進行している場合
-        if (fromBlockId.equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
-            if (toBlockId.equalsIgnoreCase((String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
+        if (fromBlockId.equalsIgnoreCase(ConfigEnum.settings$start_block_id)) {
+            if (toBlockId.equalsIgnoreCase(ConfigEnum.settings$goal_block_id)) {
 
                 //サーキットの周回数を達成した場合ゴールする
                 if (currentLaps == circuit.getNumberOfLaps()) {
@@ -147,8 +147,8 @@ public class RaceListener implements Listener {
             }
 
         //逆走している場合
-        } else if (fromBlockId.equalsIgnoreCase((String) ConfigEnum.GOAL_BLOCK_ID.getValue())) {
-            if (toBlockId.equalsIgnoreCase((String) ConfigEnum.START_BLOCK_ID.getValue())) {
+        } else if (fromBlockId.equalsIgnoreCase(ConfigEnum.settings$goal_block_id)) {
+            if (toBlockId.equalsIgnoreCase(ConfigEnum.settings$start_block_id)) {
 
                 //逆走していることをプレイヤーに通知
                 MessageEnum.raceReverseRun.sendConvertedMessage(player, circuitParts);

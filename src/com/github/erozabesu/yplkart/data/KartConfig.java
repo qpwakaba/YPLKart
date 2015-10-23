@@ -18,30 +18,7 @@ import com.github.erozabesu.yplkart.object.Kart;
 public class KartConfig{
 
     /** Kartオブジェクトを格納しているハッシュマップ */
-    private HashMap<String, Kart> kartObject = new HashMap<String, Kart>();
-
-    //〓 main 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
-    /** このクラスのインスタンス */
-    private static KartConfig instance;
-
-    /**
-     * このクラスのインスタンスを返す
-     * @return CharacterConfig.classインスタンス
-     */
-    private static KartConfig getInstance() {
-        return instance;
-    }
-
-    /**
-     * コンストラクタ
-     * ややこしくなるため他のConfigクラスと同様の手順で読み込みを行う
-     * コンフィグの読み込みはstatic.reload()メソッドで明示的に行う
-     * static.reload()はConfigManager.reload()から実行される
-     */
-    public KartConfig() {
-        instance = this;
-    }
+    private static HashMap<String, Kart> kartObject = new HashMap<String, Kart>();
 
     //〓 static file edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
@@ -50,11 +27,10 @@ public class KartConfig{
      * 既存のKartオブジェクトを破棄し、新規に生成しハッシュマップに格納する
      */
     public static void reload() {
-        KartConfig characterConfig = getInstance();
-        characterConfig.kartObject.clear();
+        kartObject.clear();
 
         for(String key : ConfigManager.KART_CONFIG.getLocalConfig().getKeys(false)) {
-            characterConfig.kartObject.put(key, new Kart(key));
+            kartObject.put(key, new Kart(key));
         }
     }
 
@@ -65,7 +41,7 @@ public class KartConfig{
      * @return HashMap型の全Kartオブジェクト
      */
     public static HashMap<String, Kart> getKartMap() {
-        return getInstance().kartObject;
+        return kartObject;
     }
 
     /**

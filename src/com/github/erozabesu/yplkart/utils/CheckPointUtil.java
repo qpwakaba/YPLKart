@@ -104,7 +104,7 @@ public class CheckPointUtil {
      * @return チェックポイントの配列
      */
     public static List<Entity> getInSightNearbyCheckPoints(String circuitName, Location location, float sightThreshold, Entity... ignoreEntities) {
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        int detectCheckPointRadius = ConfigEnum.item$detect_checkpoint_radius$tier3;
         List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
@@ -179,7 +179,7 @@ public class CheckPointUtil {
      * @return チェックポイントの配列
      */
     public static List<Entity> getInSightAndDetectableNearbyCheckPoints(String circuitName, Location eyeLocation, float sightThreshold, Entity... ignoreEntities) {
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        int detectCheckPointRadius = ConfigEnum.item$detect_checkpoint_radius$tier3;
         List<Entity> entityList = CommonUtil.getNearbyEntities(eyeLocation.clone().add(0, checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
@@ -347,7 +347,7 @@ public class CheckPointUtil {
         Player player = racer.getPlayer();
 
         String currentLaps = racer.getCurrentLaps() <= 0 ? "" : String.valueOf(racer.getCurrentLaps());
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        int detectCheckPointRadius = ConfigEnum.item$detect_checkpoint_radius$tier3;
         List<Entity> entityList = CommonUtil.getNearbyEntities(location.clone().add(0, CheckPointUtil.checkPointHeight, 0), detectCheckPointRadius);
         List<Entity> ignoreList = Arrays.asList(ignoreEntities);
 
@@ -467,13 +467,13 @@ public class CheckPointUtil {
 
         switch(tier) {
             case 1:
-                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER1.getValue();
+                return ConfigEnum.item$detect_checkpoint_radius$tier1;
 
             case 2:
-                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER2.getValue();
+                return ConfigEnum.item$detect_checkpoint_radius$tier2;
 
             case 3:
-                return (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+                return ConfigEnum.item$detect_checkpoint_radius$tier3;
         }
 
         return null;

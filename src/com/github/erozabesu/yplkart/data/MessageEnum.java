@@ -188,7 +188,7 @@ public enum MessageEnum {
     /**
      * 全要素のメンバ変数を再取得し汎用タグ、カラータグを置換する
      */
-    public static void reload(){
+    public static void reload() {
 
         //ローカルコンフィグの設定データをメンバ変数へ格納
         for (MessageEnum messageEnum : values()) {
@@ -200,7 +200,7 @@ public enum MessageEnum {
 
         //ローカルへファイルの保存
         //デフォルトコンフィグから、ローカルコンフィグに未記載の項目を追記する
-        ConfigManager.MESSAGE_ENUM.saveConfiguration();
+        ConfigManager.MESSAGE_ENUM.saveConfig();
 
         //タグを置換
         for (MessageEnum messageEnum : values()) {

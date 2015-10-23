@@ -48,7 +48,7 @@ public class Scoreboards {
      */
 
     public static void createScoreboard(String name) {
-        if (!(Boolean) ConfigEnum.ENABLE_SCOREBOARD.getValue()) {
+        if (!ConfigEnum.enable_scoreboard) {
             return;
         }
         if (scoreboard.containsKey(name))

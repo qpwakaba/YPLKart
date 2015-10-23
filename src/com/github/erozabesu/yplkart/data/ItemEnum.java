@@ -238,7 +238,9 @@ public enum ItemEnum {
     }
 
     /** 全要素のメンバ変数を再取得する */
-    public static void reload(){
+    public static void reload() {
+        incertHeaderComment();
+
         for (ItemEnum enumItem : values()) {
             enumItem.loadLocalConfig();
         }
@@ -339,6 +341,97 @@ public enum ItemEnum {
             int defaultMultipleDropAmount = defaultConfig.getInt(nodePrefix + "multiple.drop_amount");
             setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount", defaultMultipleDropAmount));
         }
+    }
+
+    public static void incertHeaderComment() {
+        String header = "#"
+                    + "\n# ------------------------- 概要 -------------------------"
+                    + "\n#"
+                    + "\n# 当プラグイン専用アイテムの設定を変更できるコンフィグファイルです。"
+                    + "\n#"
+                    + "\n# ------------------------- チュートリアル -------------------------"
+                    + "\n#"
+                    + "\n# カートやキャラクターのようにユーザ側で新規のアイテムを追加することはできません。"
+                    + "\n# ご了承下さい。"
+                    + "\n#"
+                    + "\n# 各項目の説明 :"
+                    + "\n#"
+                    + "\n#   tier :"
+                    + "\n#     アイテムの階級を変更します。"
+                    + "\n#     tierは、アイテムボックスに接触した際に順位に応じたアイテムを付与するための設定です。"
+                    + "\n#     どの階級のアイテムを上位何%圏内のプレイヤーに付与するかは、config.ymlの「item: tier:」の項目で変更できます。"
+                    + "\n#     必ず-1～4の数値を記述して下さい。"
+                    + "\n#     1～4の階級が与えられたアイテムは、アイテムボックス、アイテムコマンドから取得することができます。"
+                    + "\n#     階級0が与えられたアイテムは、アイテムコマンドからのみ取得することができます。"
+                    + "\n#     階級-1が与えられたアイテムは、アイテムボックス、アイテムコマンドからは取得できなくなります。"
+                    + "\n#"
+                    + "\n#   material :"
+                    + "\n#     専用アイテムに割り当てるアイテムを変更します。"
+                    + "\n#     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。"
+                    + "\n#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
+                    + "\n#     なお、大文字小文字は考慮しません。"
+                    + "\n#"
+                    + "\n#   material_data :"
+                    + "\n#     専用アイテムに割り当てるアイテムのデータ値を変更します。"
+                    + "\n#     例えばイカ墨を利用したい場合は、"
+                    + "\n#       display_material: INK_SACK"
+                    + "\n#       display_material_data: 0"
+                    + "\n#     黄色い染料を利用したい場合は、"
+                    + "\n#       display_material: INK_SACK"
+                    + "\n#       display_material_data: 11"
+                    + "\n#     と記述して下さい。"
+                    + "\n#"
+                    + "\n#   max_stack_size :"
+                    + "\n#     最大スタック数を変更します。"
+                    + "\n#     ただしアイテム本来の最大スタック数を越えて設定することはできません。"
+                    + "\n#"
+                    + "\n#   effect_level :"
+                    + "\n#     ポーションエフェクトのLVを変更します。"
+                    + "\n#"
+                    + "\n#   effect_second :"
+                    + "\n#     ポーションエフェクトの秒数を変更します。"
+                    + "\n#"
+                    + "\n#   walk_speed :"
+                    + "\n#     効果中の歩行速度を変更します。"
+                    + "\n#     スピードポーションとは別の扱いです。"
+                    + "\n#     0.1～1.0の数値を設定して下さい。"
+                    + "\n#"
+                    + "\n#   hit_damage :"
+                    + "\n#     接触時のダメージを変更します。"
+                    + "\n#"
+                    + "\n#   moving_damage :"
+                    + "\n#     移動中に周囲のプレイヤーに与えるダメージを変更します。"
+                    + "\n#"
+                    + "\n#   multiple :"
+                    + "\n#     複数個セットになった状態でドロップさせたい場合に設定して下さい。"
+                    + "\n#     別のアイテムとして抽選に追加されます。"
+                    + "\n#       tier :"
+                    + "\n#         階級を設定して下さい。"
+                    + "\n#         ドロップさせたくない場合は0を記述して下さい。"
+                    + "\n#"
+                    + "\n#       drop_amount :"
+                    + "\n#         ドロップする数量を指定して下さい。"
+                    + "\n#"
+                    + "\n#   display_material :"
+                    + "\n#     設置タイプのアイテムの外見に割り当てるアイテムを変更します。"
+                    + "\n#     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。"
+                    + "\n#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
+                    + "\n#     なお、大文字小文字は考慮しません。"
+                    + "\n#"
+                    + "\n#   display_material_data :"
+                    + "\n#     設置タイプのアイテムの外見に割り当てるアイテムのデータ値を変更します。"
+                    + "\n#     例えばイカ墨を利用したい場合は、"
+                    + "\n#       display_material: INK_SACK"
+                    + "\n#       display_material_data: 0"
+                    + "\n#     黄色い染料を利用したい場合は、"
+                    + "\n#       display_material: INK_SACK"
+                    + "\n#       display_material_data: 11"
+                    + "\n#     と記述して下さい。"
+                    + "\n#"
+                    + "\n# ------------------------- アイテム設定 -------------------------"
+                    + "\n#";
+
+        ConfigManager.ITEM_ENUM.getLocalConfig().setAltHeader(header);
     }
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -839,7 +932,7 @@ public enum ItemEnum {
      */
     private static void removeUnuseslotKeyItems(Player player) {
         PlayerInventory inv = player.getInventory();
-        int i = (Integer) ConfigEnum.ITEM_SLOT.getValue();
+        int i = ConfigEnum.settings$item_slot;
         i += RaceManager.getRacer(player).getCharacter() == null ? 0 : RaceManager.getRacer(player).getCharacter()
                 .getAdjustMaxSlotSize();
         for (int j = i; j < 36; j++) {

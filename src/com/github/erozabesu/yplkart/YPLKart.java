@@ -1,8 +1,6 @@
 package com.github.erozabesu.yplkart;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -81,9 +79,8 @@ public class YPLKart extends JavaPlugin {
     }
 
     public static boolean isPluginEnabled(World world) {
-        if (Boolean.valueOf(String.valueOf(ConfigEnum.ENABLE_THIS_PLUGIN.getValue()))) {
-            List<Object> disabledWorldList = Arrays.asList(ConfigEnum.DISABLED_WORLDS.getValue());
-            if (!disabledWorldList.contains(world.getName())) {
+        if (ConfigEnum.enable_this_plugin) {
+            if (!ConfigEnum.disabled_worlds.contains(world.getName())) {
                 return true;
             }
         }

@@ -558,7 +558,7 @@ public class ItemListener extends RaceManager implements Listener {
         Inventory targetinv = target.getInventory();
 
         ArrayList<ItemStack> targetitem = new ArrayList<ItemStack>();
-        int itemSlotSize = (Integer) ConfigEnum.ITEM_SLOT.getValue() + getRacer(target).getCharacter().getAdjustMaxSlotSize();
+        int itemSlotSize = ConfigEnum.settings$item_slot + getRacer(target).getCharacter().getAdjustMaxSlotSize();
         for (int i = 0; i < itemSlotSize; i++) {
             if (targetinv.getItem(i) != null)
                 if (ItemEnum.isKeyItem(targetinv.getItem(i)))
@@ -714,7 +714,7 @@ public class ItemListener extends RaceManager implements Listener {
             return;
         }
 
-        int detectCheckPointRadius = (Integer) ConfigEnum.ITEM_DETECT_CHECKPOINT_RADIUS_TIER3.getValue();
+        int detectCheckPointRadius = ConfigEnum.item$detect_checkpoint_radius$tier3;
         Entity firstCheckPoint = CheckPointUtil.getNearestCheckpoint(circuit.getCircuitName(), user.getLocation(), detectCheckPointRadius);
         if (firstCheckPoint == null) {
             MessageEnum.itemNoCheckpoint.sendConvertedMessage(user, circuitParts);

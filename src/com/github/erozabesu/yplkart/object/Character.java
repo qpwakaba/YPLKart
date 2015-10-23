@@ -166,7 +166,7 @@ public class Character {
         MessageParts textParts = MessageParts.getMessageParts(
                 String.valueOf(this.getMaxHealth()),
                 String.valueOf(this.getWalkSpeed()),
-                String.valueOf(this.getAdjustMaxSlotSize() + (Integer) ConfigEnum.ITEM_SLOT.getValue()),
+                String.valueOf(this.getAdjustMaxSlotSize() + ConfigEnum.settings$item_slot),
                 CommonUtil.convertSignNumber(this.getAdjustMaxStackSize()),
                 CommonUtil.convertSignNumber(this.getAdjustAttackDamage()),
                 String.valueOf(this.getPenaltyAntiReskillSecond()),
@@ -220,7 +220,7 @@ public class Character {
     /** @return 最大スロット数補正 */
     public int getAdjustMaxSlotSize() {
         //アイテムスロットの上限は9
-        if (9 < this.adjustMaxSlotSize + (Integer) ConfigEnum.ITEM_SLOT.getValue())
+        if (9 < this.adjustMaxSlotSize + ConfigEnum.settings$item_slot)
             return 9;
         return this.adjustMaxSlotSize;
     }
