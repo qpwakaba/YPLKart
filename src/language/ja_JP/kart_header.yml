@@ -1,0 +1,93 @@
+------------------------- 概要 -------------------------
+<br>
+<br>レース時に選択するカートの設定を変更できるコンフィグファイルです。
+<br>
+<br>--------------------------------------------------------
+<br>
+<bbr>------------------------- チュートリアル -------------------------
+<br>
+<br>下記のように記述して頂くことで、オリジナルのカートを追加することが可能です。
+<br>
+<br>記述例 :
+<br>  Standard:
+<br>    weight: 1.0
+<br>    max_speed: 250.0
+<br>    boosted_max_speed: 250.0
+<br>    acceleration: 1.0
+<br>    climbable_height: 0.5
+<br>    speed_decrease_on_dirt: 5.0
+<br>    speed_decrease_on_drift: 2.0
+<br>    default_cornering_power: 1.0
+<br>    drift_cornering_power: 5.5
+<br>    mount_position_offset: 0.0
+<br>    display_material: "bowl"
+<br>    display_material_data: 0
+<br>
+<br>注意点 :
+<br>  1.全て半角英数字で記述して下さい。
+<br>  2.インデントは半角スペース2文字「  」で記述して下さい。
+<br>  基本的に既存の設定をコピペすればニュアンスで何とかなると思います。
+<br>
+<br>各項目の説明 :
+<br>  上記の記述例を参考に説明します。
+<br>
+<br>  Standard :
+<br>    カートの名称を変更します。ここで記述した名称がコマンドの引数や選択メニューに利用されます。
+<br>
+<br>  weight :
+<br>    重量を変更します。
+<br>    カート同士が衝突した際の威力、反動で吹き飛ぶ距離に影響します。
+<br>
+<br>  max_speed :
+<br>    最高速度を変更します。
+<br>    アイテムやダッシュボードを使用せず、自力のみで出せる限界速度を指します。
+<br>
+<br>  boosted_max_speed :
+<br>    速度上昇アイテム使用中の最高速度を変更します。
+<br>
+<br>  acceleration :
+<br>    加速力を変更します。
+<br>    加速中の速度の上昇量を指します。
+<br>
+<br>  climbable_height :
+<br>    よじ登れる高さを変更します。
+<br>    0.5を設定すれば半ブロック、1.0を設定すれば1ブロック分の高さのブロックに衝突しても飛び越えます。
+<br>
+<br>  speed_decrease_on_dirt :
+<br>    ダート走行時の減速率を変更します。
+<br>    ダートブロック上を走行した際のスピードの減少量を指します。
+<br>    ダートブロックはconfig.ymlの「settings: dirt_block_id:」で変更できます。
+<br>
+<br>  speed_decrease_on_drift :
+<br>    ドリフト時の減速率を変更します。
+<br>    ドリフト中のスピードの減少量を指します。
+<br>
+<br>  default_cornering_power :
+<br>    コーナリング能力を変更します。
+<br>    左右に曲がる際の旋回量を指します。
+<br>
+<br>  drift_cornering_power :
+<br>    ドリフト時のコーナリング能力を変更します。
+<br>    ドリフト中の左右に曲がる際の旋回量を指します。
+<br>
+<br>  mount_position_offset :
+<br>    カートのY方向の描画位置を変更します。
+<br>    カートの3Dリソースを車体の高いリソースに変更した場合等に、カートが地面にめり込まないよう対処することができます。
+<br>
+<br>  display_material :
+<br>    カートの外見に割り当てるアイテムを変更します。
+<br>    利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。
+<br>    https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+<br>    なお、大文字小文字は考慮しません。
+<br>
+<br>  display_material_data :
+<br>    カートの外見に割り当てるアイテムのデータ値を変更します。
+<br>    例えばイカ墨を利用したい場合は、
+<br>      display_material: INK_SACK
+<br>      display_material_data: 0
+<br>    黄色い染料を利用したい場合は、
+<br>      display_material: INK_SACK
+<br>      display_material_data: 11
+<br>    と記述して下さい。
+<br>
+<br>--------------------------------------------------------

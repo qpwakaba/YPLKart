@@ -9,20 +9,20 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import com.github.erozabesu.yplkart.ConfigManager;
+import com.github.erozabesu.yplkart.LanguageManager;
 import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.enumdata.TagType;
 import com.github.erozabesu.yplkart.object.MessageParts;
+import com.github.erozabesu.yplutillibrary.util.CommentableYamlConfiguration;
 
 /**
  * プラグインから出力されるテキストメッセージを格納するクラス
  * enum要素名がコンフィグ取得キーなので注意
  * ユーザ側で要素数を変更できない静的なコンフィグを扱うためenumで管理する
- *
- * 一見冗長だがenumで管理することで呼び出す側の負担を軽減できる
  *
  * コマンドUsageのようなユーザ側で変更させたくないテキストメッセージは
  * SystemMessageEnumクラスで扱う
@@ -179,10 +179,7 @@ public enum MessageEnum {
 
     /** ローカルコンフィグファイルの設定データを格納する */
     private void loadLocalConfig() {
-        ConfigManager config = ConfigManager.MESSAGE_ENUM;
-
-        String defaultValue = config.getDefaultConfig().getString(this.getConfigKey());
-        this.setMessage(ConfigManager.MESSAGE_ENUM.getString(this.getConfigKey(), defaultValue));
+        this.setMessage(LanguageManager.MESSAGE.getString(this.getConfigKey()));
     }
 
     /**
@@ -200,7 +197,7 @@ public enum MessageEnum {
 
         //ローカルへファイルの保存
         //デフォルトコンフィグから、ローカルコンフィグに未記載の項目を追記する
-        ConfigManager.MESSAGE_ENUM.saveConfig();
+        LanguageManager.MESSAGE.saveLocal();
 
         //タグを置換
         for (MessageEnum messageEnum : values()) {
@@ -215,24 +212,21 @@ public enum MessageEnum {
      */
     private static void updatePatch() {
         String version = messageVersion.getMessage();
-        ConfigManager configManager = ConfigManager.MESSAGE_ENUM;
+        CommentableYamlConfiguration localConfig = LanguageManager.MESSAGE.getLocalConfig();
+        YamlConfiguration defaultConfig = LanguageManager.MESSAGE.getDefaultConfig();
 
         if (version.equalsIgnoreCase("1.0")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.1");
-            configManager.setValue(racePlayerKill.getConfigKey()
-                    , configManager.getDefaultConfig().get(racePlayerKill.getConfigKey()));
+            localConfig.set(messageVersion.getConfigKey(), "1.1");
+            localConfig.set(racePlayerKill.getConfigKey(), defaultConfig.getString(racePlayerKill.getConfigKey()));
         } else if (version.equalsIgnoreCase("1.1")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.2");
-            configManager.setValue(tableKartParameter.getConfigKey()
-                    , configManager.getDefaultConfig().get(tableKartParameter.getConfigKey()));
+            localConfig.set(messageVersion.getConfigKey(), "1.2");
+            localConfig.set(tableKartParameter.getConfigKey(), defaultConfig.getString(tableKartParameter.getConfigKey()));
         } else if (version.equalsIgnoreCase("1.2")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.3");
-            configManager.setValue(tableCircuitInformation.getConfigKey()
-                    , configManager.getDefaultConfig().get(tableCircuitInformation.getConfigKey()));
+            localConfig.set(messageVersion.getConfigKey(), "1.3");
+            localConfig.set(tableCircuitInformation.getConfigKey(), defaultConfig.getString(tableCircuitInformation.getConfigKey()));
         } else if (version.equalsIgnoreCase("1.3")) {
-            configManager.setValue(messageVersion.getConfigKey(), "1.4");
-            configManager.setValue(tableCircuitInformation.getConfigKey()
-                    , configManager.getDefaultConfig().get(tableCircuitInformation.getConfigKey()));
+            localConfig.set(messageVersion.getConfigKey(), "1.4");
+            localConfig.set(tableCircuitInformation.getConfigKey(), defaultConfig.getString(tableCircuitInformation.getConfigKey()));
         }
     }
 

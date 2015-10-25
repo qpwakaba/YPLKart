@@ -8,8 +8,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.erozabesu.yplkart.cmd.KaCommand;
 import com.github.erozabesu.yplkart.connector.VaultConnector;
+import com.github.erozabesu.yplkart.data.CharacterConfig;
+import com.github.erozabesu.yplkart.data.CircuitConfig;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
+import com.github.erozabesu.yplkart.data.ItemEnum;
+import com.github.erozabesu.yplkart.data.KartConfig;
+import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplkart.data.PermissionEnum;
 import com.github.erozabesu.yplkart.listener.DataListener;
 import com.github.erozabesu.yplkart.listener.ItemListener;
 import com.github.erozabesu.yplkart.listener.KartListener;
@@ -31,11 +37,13 @@ public class YPLKart extends JavaPlugin {
         PLUGIN_NAME = this.getDescription().getName();
         PLUGIN_VERSION = this.getDescription().getVersion();
 
+        // ユーティリティライブラリにインスタンスを渡す
+        YPLUtilityLibrary.registerLibrary(this);
+
         KaCommand executor = new KaCommand();
         getCommand("ka").setExecutor(executor);
 
-        //全コンフィグの読み込み、格納
-        ConfigManager.reloadAllConfig();
+        reloadAllConfig();
 
         new DataListener();
         new RaceListener();
@@ -49,9 +57,6 @@ public class YPLKart extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("Vault")) {
             this.vaultConnection = VaultConnector.loadPlugin(getServer().getPluginManager().getPlugin("Vault"));
         }
-
-        // ユーティリティライブラリにインスタンスを渡す
-        YPLUtilityLibrary.registerLibrary(this);
     }
 
     @Override
@@ -85,5 +90,27 @@ public class YPLKart extends JavaPlugin {
             }
         }
         return false;
+    }
+
+    public static void reloadAllConfig() {
+
+        // 以下順序を変更しないこと
+
+        // 全コンフィグファイルの読み込み
+        ConfigManager.reloadAllFile();
+
+        // 各コンフィグの値を格納
+        ConfigEnum.reload();
+        PermissionEnum.reload();
+        ItemEnum.reload();
+        CharacterConfig.reload();
+        KartConfig.reload();
+        CircuitConfig.reload();
+        DisplayKartConfig.reload();
+
+        // 全メッセージファイルの読み込み
+        LanguageManager.reloadAllFile();
+
+        MessageEnum.reload();
     }
 }

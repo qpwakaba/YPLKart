@@ -7,6 +7,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplutillibrary.config.YamlLoader;
 
 /**
  * Kartの各設定を格納するオブジェクトクラス
@@ -62,47 +63,48 @@ public class Kart {
      * @param key コンフィグキー
      */
     public Kart(String key) {
-        setKartName(key);
+        this.setKartName(key);
 
-        ConfigManager config = ConfigManager.KART_CONFIG;
         String defaultKey = "Standard";
+
+        YamlLoader config = ConfigManager.KART;
         YamlConfiguration defaultConfig = config.getDefaultConfig();
 
         double defaultMountPositionOffset = defaultConfig.getDouble(defaultKey + ".mount_position_offset");
-        setMountPositionOffset(config.getDouble(key + ".mount_position_offset", defaultMountPositionOffset));
+        this.setMountPositionOffset(config.getDouble(key + ".mount_position_offset", defaultMountPositionOffset));
 
-        Material defaultDisplayMaterial = Material.getMaterial(defaultConfig.getString(defaultKey + ".display_material"));
-        setDisplayMaterial(config.getMaterial(key + ".display_material", defaultDisplayMaterial));
+        String defaultDisplayMaterial = defaultConfig.getString(defaultKey + ".display_material", "STONE");
+        this.setDisplayMaterial(config.getMaterial(key + ".display_material", defaultDisplayMaterial));
 
         int defaultDisplayMaterialData = defaultConfig.getInt(defaultKey + ".display_material_data");
-        setDisplayMaterialData(config.getByte(key + ".display_material_data", (byte) defaultDisplayMaterialData));
+        this.setDisplayMaterialData(config.getByte(key + ".display_material_data", (byte) defaultDisplayMaterialData));
 
         double defaultWeight = defaultConfig.getDouble(defaultKey + ".weight");
-        setWeight(config.getDouble(key + ".weight", defaultWeight));
+        this.setWeight(config.getDouble(key + ".weight", defaultWeight));
 
         double defaultMaxSpeed = defaultConfig.getDouble(defaultKey + ".max_speed");
-        setMaxSpeed(config.getDouble(key + ".max_speed", defaultMaxSpeed));
+        this.setMaxSpeed(config.getDouble(key + ".max_speed", defaultMaxSpeed));
 
         double defaultBoostedMaxSpeed = defaultConfig.getDouble(defaultKey + ".boosted_max_speed");
-        setBoostedMaxSpeed(config.getDouble(key + ".boosted_max_speed", defaultBoostedMaxSpeed));
+        this.setBoostedMaxSpeed(config.getDouble(key + ".boosted_max_speed", defaultBoostedMaxSpeed));
 
         double defaultAcceleration = defaultConfig.getDouble(defaultKey + ".acceleration");
-        setAcceleration(config.getDouble(key + ".acceleration", defaultAcceleration));
+        this.setAcceleration(config.getDouble(key + ".acceleration", defaultAcceleration));
 
         double defaultClimbableHeight = defaultConfig.getDouble(defaultKey + ".climbable_height");
-        setClimbableHeight((float) config.getDouble(key + ".climbable_height", defaultClimbableHeight));
+        this.setClimbableHeight((float) config.getDouble(key + ".climbable_height", defaultClimbableHeight));
 
         double defaultSpeedDecreaseOnDirt = defaultConfig.getDouble(defaultKey + ".speed_decrease_on_dirt");
-        setSpeedDecreaseOnDirt(config.getDouble(key + ".speed_decrease_on_dirt", defaultSpeedDecreaseOnDirt));
+        this.setSpeedDecreaseOnDirt(config.getDouble(key + ".speed_decrease_on_dirt", defaultSpeedDecreaseOnDirt));
 
         double defaultSpeedDecreaseOnDrift = defaultConfig.getDouble(defaultKey + ".speed_decrease_on_drift");
-        setSpeedDecreaseOnDrift(config.getDouble(key + ".speed_decrease_on_drift", defaultSpeedDecreaseOnDrift));
+        this.setSpeedDecreaseOnDrift(config.getDouble(key + ".speed_decrease_on_drift", defaultSpeedDecreaseOnDrift));
 
         double defaultCorneringPower = defaultConfig.getDouble(defaultKey + ".default_cornering_power");
-        setDefaultCorneringPower(config.getDouble(key + ".default_cornering_power", defaultCorneringPower));
+        this.setDefaultCorneringPower(config.getDouble(key + ".default_cornering_power", defaultCorneringPower));
 
         double defaultDriftCorneringPower = defaultConfig.getDouble(defaultKey + ".drift_cornering_power");
-        setDriftCorneringPower(config.getDouble(key + ".drift_cornering_power", defaultDriftCorneringPower));
+        this.setDriftCorneringPower(config.getDouble(key + ".drift_cornering_power", defaultDriftCorneringPower));
     }
 
     /**

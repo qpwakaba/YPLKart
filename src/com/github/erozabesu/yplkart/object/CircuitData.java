@@ -13,14 +13,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 import com.github.erozabesu.yplkart.enumdata.RaceType;
 import com.github.erozabesu.yplkart.enumdata.TagType;
+import com.github.erozabesu.yplutillibrary.config.YamlLoader;
+import com.github.erozabesu.yplutillibrary.util.CommentableYamlConfiguration;
 import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 
 /**
@@ -100,49 +100,48 @@ public class CircuitData {
 
         init();
 
-        ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
+        CommentableYamlConfiguration config = ConfigManager.RACEDATA.getLocalConfig();
 
         this.setWorldName(location.getWorld().getName());
-        configManager.setValue(this.getCircuitName() + ".world", location.getWorld().getName());
+        config.set(this.getCircuitName() + ".world", location.getWorld().getName());
 
         this.setLocationX(location.getX());
-        configManager.setValue(this.getCircuitName() + ".x", location.getX());
+        config.set(this.getCircuitName() + ".x", location.getX());
 
         this.setLocationY(location.getY());
-        configManager.setValue(this.getCircuitName() + ".y", location.getY());
+        config.set(this.getCircuitName() + ".y", location.getY());
 
         this.setLocationZ(location.getZ());
-        configManager.setValue(this.getCircuitName() + ".z", location.getZ());
+        config.set(this.getCircuitName() + ".z", location.getZ());
 
         this.setLocationPitch(location.getPitch());
-        configManager.setValue(this.getCircuitName() + ".pitch", location.getPitch());
+        config.set(this.getCircuitName() + ".pitch", location.getPitch());
 
         this.setLocationYaw(location.getYaw());
-        configManager.setValue(this.getCircuitName() + ".yaw", location.getYaw());
+        config.set(this.getCircuitName() + ".yaw", location.getYaw());
     }
 
     /** メンバ変数をコンフィグの値を基に初期値する */
     private void init() {
-        ConfigManager configManager = ConfigManager.RACEDATA_CONFIG;
-        YamlConfiguration defaultConfig = configManager.getDefaultConfig();
+        YamlLoader config = ConfigManager.RACEDATA;
 
-        this.setWorldName(configManager.getString(this.getCircuitName() + ".world", "world"));
+        this.setWorldName(config.getString(this.getCircuitName() + ".world", "world"));
 
-        this.setLocationX(configManager.getDouble(this.getCircuitName() + ".x", 0.0D));
-        this.setLocationY(configManager.getDouble(this.getCircuitName() + ".y", 0.0D));
-        this.setLocationZ(configManager.getDouble(this.getCircuitName() + ".z", 0.0D));
-        this.setLocationPitch(configManager.getFloat(this.getCircuitName() + ".pitch", 0.0F));
-        this.setLocationYaw(configManager.getFloat(this.getCircuitName() + ".yaw", 0.0F));
+        this.setLocationX(config.getDouble(this.getCircuitName() + ".x", 0.0D));
+        this.setLocationY(config.getDouble(this.getCircuitName() + ".y", 0.0D));
+        this.setLocationZ(config.getDouble(this.getCircuitName() + ".z", 0.0D));
+        this.setLocationPitch(config.getFloat(this.getCircuitName() + ".pitch", 0.0F));
+        this.setLocationYaw(config.getFloat(this.getCircuitName() + ".yaw", 0.0F));
 
-        this.setNumberOfLaps(configManager.getInteger(this.getCircuitName() + ".numberoflaps", 3));
-        this.setMinPlayer(configManager.getInteger(this.getCircuitName() + ".minplayer", 3));
-        this.setMaxPlayer(configManager.getInteger(this.getCircuitName() + ".maxplayer", 10));
-        this.setMatchingTime(configManager.getInteger(this.getCircuitName() + ".matchingtime", 30));
-        this.setMenuTime(configManager.getInteger(this.getCircuitName() + ".menutime", 30));
-        this.setLimitTime(configManager.getInteger(this.getCircuitName() + ".limittime", 300));
-        this.setBroadcastGoalMessage(configManager.getBoolean(this.getCircuitName() + ".broadcastgoalmessage", false));
+        this.setNumberOfLaps(config.getInt(this.getCircuitName() + ".numberoflaps", 3));
+        this.setMinPlayer(config.getInt(this.getCircuitName() + ".minplayer", 3));
+        this.setMaxPlayer(config.getInt(this.getCircuitName() + ".maxplayer", 10));
+        this.setMatchingTime(config.getInt(this.getCircuitName() + ".matchingtime", 30));
+        this.setMenuTime(config.getInt(this.getCircuitName() + ".menutime", 30));
+        this.setLimitTime(config.getInt(this.getCircuitName() + ".limittime", 300));
+        this.setBroadcastGoalMessage(config.getBoolean(this.getCircuitName() + ".broadcastgoalmessage", false));
 
-        RaceType raceType = RaceType.getRaceTypeByString(configManager.getString(this.getCircuitName() + ".race_type", "KART"));
+        RaceType raceType = RaceType.getRaceTypeByString(config.getString(this.getCircuitName() + ".race_type", "KART"));
         this.setRaceType(raceType);
         this.setRunLapTimeList(this.getLapTimeFromConfiguration(true));
         this.setKartLapTimeList(this.getLapTimeFromConfiguration(false));
@@ -232,24 +231,24 @@ public class CircuitData {
      */
     public void saveConfiguration() {
         String configKey = getCircuitName();
-        ConfigManager config = ConfigManager.RACEDATA_CONFIG;
+        CommentableYamlConfiguration config = ConfigManager.RACEDATA.getLocalConfig();
 
         //設定データに値を上書き
-        config.setValue(configKey + ".world", getWorldName());
-        config.setValue(configKey + ".x", getLocationX());
-        config.setValue(configKey + ".y", getLocationY());
-        config.setValue(configKey + ".z", getLocationZ());
-        config.setValue(configKey + ".pitch", getLocationPitch());
-        config.setValue(configKey + ".yaw", getLocationYaw());
+        config.set(configKey + ".world", getWorldName());
+        config.set(configKey + ".x", getLocationX());
+        config.set(configKey + ".y", getLocationY());
+        config.set(configKey + ".z", getLocationZ());
+        config.set(configKey + ".pitch", getLocationPitch());
+        config.set(configKey + ".yaw", getLocationYaw());
 
-        config.setValue(configKey + ".numberoflaps", getNumberOfLaps());
-        config.setValue(configKey + ".minplayer", getMinPlayer());
-        config.setValue(configKey + ".maxplayer", getMaxPlayer());
-        config.setValue(configKey + ".matchingtime", getMatchingTime());
-        config.setValue(configKey + ".menutime", getMenuTime());
-        config.setValue(configKey + ".limittime", getLimitTime());
-        config.setValue(configKey + ".broadcastgoalmessage", getBroadcastGoalMessage());
-        config.setValue(configKey + ".race_type", this.getRaceType().name());
+        config.set(configKey + ".numberoflaps", getNumberOfLaps());
+        config.set(configKey + ".minplayer", getMinPlayer());
+        config.set(configKey + ".maxplayer", getMaxPlayer());
+        config.set(configKey + ".matchingtime", getMatchingTime());
+        config.set(configKey + ".menutime", getMenuTime());
+        config.set(configKey + ".limittime", getLimitTime());
+        config.set(configKey + ".broadcastgoalmessage", getBroadcastGoalMessage());
+        config.set(configKey + ".race_type", this.getRaceType().name());
 
         //ランニングレースラップタイムを設定データに上書き
         for (LapTime lapTimeObject : getRunLapTimeList()) {
@@ -257,7 +256,7 @@ public class CircuitData {
             String uuid = lapTimeObject.getUuid().toString();
             double lapTime = lapTimeObject.getLapTime();
 
-            config.setValue(configKey + ".laptime." + numberOfLaps + "." + uuid, lapTime);
+            config.set(configKey + ".laptime." + numberOfLaps + "." + uuid, lapTime);
         }
 
         //カートレースラップタイムを設定データに上書き
@@ -266,21 +265,19 @@ public class CircuitData {
             String uuid = lapTimeObject.getUuid().toString();
             double lapTime = lapTimeObject.getLapTime();
 
-            config.setValue(configKey + ".kartlaptime." + numberOfLaps + "." + uuid, lapTime);
+            config.set(configKey + ".kartlaptime." + numberOfLaps + "." + uuid, lapTime);
         }
 
         //設定データをローカルファイルに保存
-        config.saveConfig();
+        ConfigManager.RACEDATA.saveLocal();
     }
 
     /** ローカルコンフィグファイルから全データを削除する */
     public void deleteConfiguration() {
-        ConfigManager config = ConfigManager.RACEDATA_CONFIG;
-
-        config.setValue(getCircuitName(), null);
+        ConfigManager.RACEDATA.getLocalConfig().set(getCircuitName(), null);
 
         //設定データをローカルファイルに保存
-        config.saveConfig();
+        ConfigManager.RACEDATA.saveLocal();
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -559,12 +556,11 @@ public class CircuitData {
         String raceTypeKey = isRunningRace ? "laptime" : "kartlaptime";
 
         //設定データを取得
-        ConfigManager manager = ConfigManager.RACEDATA_CONFIG;
-        FileConfiguration config = manager.getLocalConfig();
+        YamlLoader config = ConfigManager.RACEDATA;
 
         //<Circuit name>.<Race Type>.<Number of Laps>のセクションを取得
         String lapKey = this.getCircuitName() + "." + raceTypeKey;
-        ConfigurationSection lapSection = config.getConfigurationSection(lapKey);
+        ConfigurationSection lapSection = config.getLocalConfig().getConfigurationSection(lapKey);
 
         //存在しないセクションであれば空のListを返す
         if (lapSection == null) {
@@ -575,10 +571,10 @@ public class CircuitData {
         for (String lapValue : lapSection.getKeys(false)) {
             //<Player UUID>
             String uuidKey = lapKey + "." + lapValue;
-            ConfigurationSection uuidSection = config.getConfigurationSection(uuidKey);
+            ConfigurationSection uuidSection = config.getLocalConfig().getConfigurationSection(uuidKey);
             for (String uuidValue : uuidSection.getKeys(false)) {
 
-                double lapTime = manager.getDouble(uuidKey + "." + uuidValue, 1000000.0D);
+                double lapTime = config.getDouble(uuidKey + "." + uuidValue, 1000000.0D);
                 LapTime lapTimeObject =
                         new LapTime(Integer.valueOf(lapValue), UUID.fromString(uuidValue), lapTime);
                 lapTimeMap.add(lapTimeObject);

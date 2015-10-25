@@ -57,10 +57,7 @@ public enum PermissionEnum {
     }
 
     private void loadValue() {
-        Object value = ConfigManager.PERMISSION_ENUM.getValue(this.getKey());
-        if (value != null) {
-            this.setValue((Boolean) value);
-        }
+        this.setValue(ConfigManager.PERMISSION.getBoolean(this.getKey()));
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

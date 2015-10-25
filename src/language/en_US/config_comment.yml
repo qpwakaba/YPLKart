@@ -1,0 +1,20 @@
+language: Change the language.<br>This applied to messages in game, console messages, and tutorial comments in this plugin's config files.
+enable_this_plugin: <bbr>Enable this plugin's all features.
+enable_scoreboard: <bbr>Enable scoreboards feature.This will show player's current racing score in game.
+disabled_worlds: <bbr>Choose the worlds this plugin works nothing.
+settings: <bbr>Race game settings
+settings$start_block_id: <bbr>Edit the start block's id.
+settings$goal_block_id: <bbr>Edit the goal block's id.
+settings$dirt_block_id: <bbr>Edit the dirt block's id.
+settings$item_slot: <bbr>Edit the available item slot size in game.
+item: <bbr>Item settings
+item$tier1: <bbr>tierは、アイテムボックスに接触した際に順位に応じたアイテムを付与するための設定です。<br>アイテム毎にtierが設定されており、<br>tier1～tier4の4つの階級があります。<br>階級が高いほど効果の強いアイテムが多くなります。<bbr><br>プレイヤーの上位「0％～tier1％」のプレイヤーには階級1のアイテムのみ与えられます。<br>デフォルトでは、上位0％～30％のプレイヤーに設定されています。
+item$tier2: <bbr>プレイヤーの上位「tier1％～tier2」％のプレイヤーには階級1～階級2のアイテムのみ与えられます。<br>デフォルトでは、上位30％～60％のプレイヤーに設定されています。
+item$tier3: <bbr>プレイヤーの上位「tier2％～tier3％」のプレイヤーには階級2～階級3のアイテムのみ与えられます。<br>デフォルトでは、上位60％～80％のプレイヤーに設定されています。<br><br>残りの、上位tier3％～100％のプレイヤーには階級3～階級4のアイテムのみ与えられます。<br>デフォルトでは、上位80％～100％のプレイヤーに設定されています。
+item$dash_board: <bbr>ダッシュボード設定
+item$dash_board$effect_level: <bbr>スピードポーションエフェクトのLVを変更します。
+item$dash_board$effect_second: <bbr>スピードポーションエフェクトの秒数を変更します。
+item$detect_checkpoint_radius: <bbr>チェックポイントの検出範囲設定。
+item$detect_checkpoint_radius$tier1: <bbr>チェックポイントツールで設置したチェックポイントとの距離が<br>この項目で設定した数値(ブロック数)以内に差し掛かった場合、チェックポイントを通過したと判定されます。<br>100を超える数値は実際の処理では100として扱われます。
+item$detect_checkpoint_radius$tier2: <bbr>チェックポイントツールTier2で設置したチェックポイントとの距離が<br>この項目で設定した数値(ブロック数)以内に差し掛かった場合、チェックポイントを通過したと判定されます。<br>100を超える数値は実際の処理では100として扱われます。
+item$detect_checkpoint_radius$tier3: <bbr>チェックポイントツールTier3で設置したチェックポイントとの距離が<br>この項目で設定した数値(ブロック数)以内に差し掛かった場合、チェックポイントを通過したと判定されます。<br>100を超える数値は実際の処理では100として扱われます。

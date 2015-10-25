@@ -26,7 +26,7 @@ public class CharacterConfig{
     public static void reload() {
         characterObject.clear();
 
-        for(String key : ConfigManager.CHARACTER_CONFIG.getLocalConfig().getKeys(false)) {
+        for (String key : ConfigManager.CHARACTER.getLocalConfig().getKeys(false)) {
             characterObject.put(key, new Character(key));
         }
     }

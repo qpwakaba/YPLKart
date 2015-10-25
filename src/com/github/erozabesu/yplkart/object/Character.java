@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.data.ConfigEnum;
 import com.github.erozabesu.yplkart.data.MessageEnum;
+import com.github.erozabesu.yplutillibrary.config.YamlLoader;
 import com.github.erozabesu.yplutillibrary.util.CommonUtil;
 import com.github.erozabesu.yplutillibrary.util.ReflectionUtil;
 
@@ -86,7 +87,7 @@ public class Character {
     public Character(String key) {
         this.setCharacterName(key);
 
-        ConfigManager config = ConfigManager.CHARACTER_CONFIG;
+        YamlLoader config = ConfigManager.CHARACTER;
         String defaultKey = "Steve";
         YamlConfiguration defaultConfig = config.getDefaultConfig();
 
@@ -97,7 +98,7 @@ public class Character {
         String defaultMenuHeadItemPlayerName = defaultConfig.getString(defaultKey + ".menu_head_item_player_name");
         this.setMenuHeadBlockPlayerName(config.getString(key + ".menu_head_item_player_name", defaultMenuHeadItemPlayerName));
 
-        Sound defaultMenuClickSound = Sound.valueOf(defaultConfig.getString(defaultKey + ".menu_click_sound"));
+        String defaultMenuClickSound = defaultConfig.getString(defaultKey + ".menu_click_sound");
         this.setMenuClickSound(config.getSound(key + ".menu_click_sound", defaultMenuClickSound));
 
         float defaultMenuClickSoundVolume = (float) defaultConfig.getDouble(defaultKey + ".menu_click_sound_volume");
@@ -107,25 +108,25 @@ public class Character {
         this.setMenuClickSoundPitch(config.getFloat(key + ".menu_click_sound_pitch", defaultMenuClickSoundPitch));
 
         int defaultItemAdjustMaxSlot = defaultConfig.getInt(defaultKey + ".item_adjust_max_slot");
-        this.setAdjustMaxSlotSize(config.getInteger(key + ".item_adjust_max_slot", defaultItemAdjustMaxSlot));
+        this.setAdjustMaxSlotSize(config.getInt(key + ".item_adjust_max_slot", defaultItemAdjustMaxSlot));
 
         int defaultItemAdjustMaxStackSize = defaultConfig.getInt(defaultKey + ".item_adjust_max_stack_size");
-        this.setAdjustMaxStackSize(config.getInteger(key + ".item_adjust_max_stack_size", defaultItemAdjustMaxStackSize));
+        this.setAdjustMaxStackSize(config.getInt(key + ".item_adjust_max_stack_size", defaultItemAdjustMaxStackSize));
 
         int defaultItemAdjustPositiveEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_second");
-        this.setAdjustPositiveEffectSecond(config.getInteger(key + ".item_adjust_positive_effect_second", defaultItemAdjustPositiveEffectSecond));
+        this.setAdjustPositiveEffectSecond(config.getInt(key + ".item_adjust_positive_effect_second", defaultItemAdjustPositiveEffectSecond));
 
         int defaultItemAdjustPositiveEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_positive_effect_level");
-        this.setAdjustPositiveEffectLevel(config.getInteger(key + ".item_adjust_positive_effect_level", defaultItemAdjustPositiveEffectLevel));
+        this.setAdjustPositiveEffectLevel(config.getInt(key + ".item_adjust_positive_effect_level", defaultItemAdjustPositiveEffectLevel));
 
         int defaultItemAdjustNegativeEffectSecond = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_second");
-        this.setAdjustNegativeEffectSecond(config.getInteger(key + ".item_adjust_negative_effect_second", defaultItemAdjustNegativeEffectSecond));
+        this.setAdjustNegativeEffectSecond(config.getInt(key + ".item_adjust_negative_effect_second", defaultItemAdjustNegativeEffectSecond));
 
         int defaultItemAdjustNegativeEffectLevel = defaultConfig.getInt(defaultKey + ".item_adjust_negative_effect_level");
-        this.setAdjustNegativeEffectLevel(config.getInteger(key + ".item_adjust_negative_effect_level", defaultItemAdjustNegativeEffectLevel));
+        this.setAdjustNegativeEffectLevel(config.getInt(key + ".item_adjust_negative_effect_level", defaultItemAdjustNegativeEffectLevel));
 
         int defaultItemAdjustAttackDamage = defaultConfig.getInt(defaultKey + ".item_adjust_attack_damage");
-        this.setAdjustAttackDamage(config.getInteger(key + ".item_adjust_attack_damage", defaultItemAdjustAttackDamage));
+        this.setAdjustAttackDamage(config.getInt(key + ".item_adjust_attack_damage", defaultItemAdjustAttackDamage));
 
         double defaultMaxHealth = defaultConfig.getDouble(defaultKey + ".max_health");
         this.setMaxHealth(config.getDouble(key + ".max_health", defaultMaxHealth));
@@ -134,10 +135,10 @@ public class Character {
         this.setWalkSpeed(config.getFloat(key + ".walk_speed", defaultWalkSpeed));
 
         int defaultDeathPenaltyAntiReskillSecond = defaultConfig.getInt(defaultKey + ".death_penalty.anti_reskill_second");
-        this.setPenaltyAntiReskillSecond(config.getInteger(key + ".death_penalty.anti_reskill_second", defaultDeathPenaltyAntiReskillSecond));
+        this.setPenaltyAntiReskillSecond(config.getInt(key + ".death_penalty.anti_reskill_second", defaultDeathPenaltyAntiReskillSecond));
 
         int defaultDeathPenaltyPenaltySecond = defaultConfig.getInt(defaultKey + ".death_penalty.penalty_second");
-        this.setPenaltySecond(config.getInteger(key + ".death_penalty.penalty_second", defaultDeathPenaltyPenaltySecond));
+        this.setPenaltySecond(config.getInt(key + ".death_penalty.penalty_second", defaultDeathPenaltyPenaltySecond));
 
         float defaultDeathPenaltyWalkSpeed = (float) defaultConfig.getDouble(defaultKey + ".death_penalty.walk_speed");
         this.setPenaltyWalkSpeed(config.getFloat(key + ".death_penalty.walk_speed", defaultDeathPenaltyWalkSpeed));

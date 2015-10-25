@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.github.erozabesu.yplkart.ConfigManager;
+import com.github.erozabesu.yplutillibrary.config.YamlLoader;
+import com.github.erozabesu.yplutillibrary.util.CommentableYamlConfiguration;
 
 public class DisplayKart {
 
@@ -42,31 +44,31 @@ public class DisplayKart {
      * @param configKey コンフィグキー
      */
     public DisplayKart(String configKey) {
-        setConfigKey(configKey);
+        this.setConfigKey(configKey);
 
-        ConfigManager configManager = ConfigManager.DISPLAY_KART_CONFIG;
+        YamlLoader configManager = ConfigManager.DISPLAY;
 
-        setKartObjectKey(configManager.getString(configKey + ".kart_type", "Standard"));
-        setWorldName(configManager.getString(configKey + ".world", "world"));
-        setLocationX(configManager.getDouble(configKey + ".x", 0.0D));
-        setLocationY(configManager.getDouble(configKey + ".y", 0.0D));
-        setLocationZ(configManager.getDouble(configKey + ".z", 0.0D));
-        setLocationPitch(configManager.getFloat(configKey + ".pitch", 0.0F));
-        setLocationYaw(configManager.getFloat(configKey + ".yaw", 0.0F));
+        this.setKartObjectKey(configManager.getString(configKey + ".kart_type", "Standard"));
+        this.setWorldName(configManager.getString(configKey + ".world", "world"));
+        this.setLocationX(configManager.getDouble(configKey + ".x", 0.0D));
+        this.setLocationY(configManager.getDouble(configKey + ".y", 0.0D));
+        this.setLocationZ(configManager.getDouble(configKey + ".z", 0.0D));
+        this.setLocationPitch(configManager.getFloat(configKey + ".pitch", 0.0F));
+        this.setLocationYaw(configManager.getFloat(configKey + ".yaw", 0.0F));
     }
 
     public void createDisplayKart(String configKey, Kart kart, Location location) {
-        setConfigKey(configKey);
+        this.setConfigKey(configKey);
 
-        setKartObjectKey(kart.getKartName());
-        setWorldName(location.getWorld().getName());
-        setLocationX(location.getX());
-        setLocationY(location.getY());
-        setLocationZ(location.getZ());
-        setLocationPitch(location.getPitch());
-        setLocationYaw(location.getYaw());
+        this.setKartObjectKey(kart.getKartName());
+        this.setWorldName(location.getWorld().getName());
+        this.setLocationX(location.getX());
+        this.setLocationY(location.getY());
+        this.setLocationZ(location.getZ());
+        this.setLocationPitch(location.getPitch());
+        this.setLocationYaw(location.getYaw());
 
-        saveConfiguration();
+        this.saveConfiguration();
     }
 
     //〓 File 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
@@ -80,29 +82,27 @@ public class DisplayKart {
     public void saveConfiguration() {
         String configKey = getConfigKey();
 
-        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
+        CommentableYamlConfiguration config = ConfigManager.DISPLAY.getLocalConfig();
 
         //設定データに値を上書き
-        config.setValue(configKey + ".kart_type", getKartObjectKey());
-        config.setValue(configKey + ".world", getWorldName());
-        config.setValue(configKey + ".x", getLocationX());
-        config.setValue(configKey + ".y", getLocationY());
-        config.setValue(configKey + ".z", getLocationZ());
-        config.setValue(configKey + ".pitch", getLocationPitch());
-        config.setValue(configKey + ".yaw", getLocationYaw());
+        config.set(configKey + ".kart_type", getKartObjectKey());
+        config.set(configKey + ".world", getWorldName());
+        config.set(configKey + ".x", getLocationX());
+        config.set(configKey + ".y", getLocationY());
+        config.set(configKey + ".z", getLocationZ());
+        config.set(configKey + ".pitch", getLocationPitch());
+        config.set(configKey + ".yaw", getLocationYaw());
 
         //設定データをローカルファイルに保存
-        config.saveConfig();
+        ConfigManager.DISPLAY.saveLocal();
     }
 
     /** ローカルコンフィグファイルから全データを削除する */
     public void deleteConfiguration() {
-        ConfigManager config = ConfigManager.DISPLAY_KART_CONFIG;
-
-        config.setValue(getConfigKey(), null);
+        ConfigManager.DISPLAY.getLocalConfig().set(getConfigKey(), null);
 
         //設定データをローカルファイルに保存
-        config.saveConfig();
+        ConfigManager.DISPLAY.saveLocal();
     }
 
     //〓 Util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

@@ -61,7 +61,7 @@ public class DisplayKartConfig {
     public static void reload() {
         getDisplayKartMap().clear();
 
-        for(String configKey : ConfigManager.DISPLAY_KART_CONFIG.getLocalConfig().getKeys(false)) {
+        for(String configKey : ConfigManager.DISPLAY.getLocalConfig().getKeys(false)) {
             getDisplayKartMap().put(configKey, new DisplayKart(configKey));
         }
     }

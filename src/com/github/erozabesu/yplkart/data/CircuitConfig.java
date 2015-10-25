@@ -43,7 +43,7 @@ public class CircuitConfig {
     public static void reload() {
         clear();
 
-        for(String configKey : ConfigManager.RACEDATA_CONFIG.getLocalConfig().getKeys(false)) {
+        for(String configKey : ConfigManager.RACEDATA.getLocalConfig().getKeys(false)) {
             put(configKey, new Circuit(configKey));
         }
     }

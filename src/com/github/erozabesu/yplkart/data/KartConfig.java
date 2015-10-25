@@ -20,21 +20,17 @@ public class KartConfig{
     /** Kartオブジェクトを格納しているハッシュマップ */
     private static HashMap<String, Kart> kartObject = new HashMap<String, Kart>();
 
-    //〓 static file edit 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
-
     /**
      * 設定データを再読み込みする
      * 既存のKartオブジェクトを破棄し、新規に生成しハッシュマップに格納する
      */
     public static void reload() {
-        kartObject.clear();
+        getKartMap().clear();
 
-        for(String key : ConfigManager.KART_CONFIG.getLocalConfig().getKeys(false)) {
-            kartObject.put(key, new Kart(key));
+        for(String key : ConfigManager.KART.getLocalConfig().getKeys(false)) {
+            getKartMap().put(key, new Kart(key));
         }
     }
-
-    //〓 static util 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓
 
     /**
      * 全KartオブジェクトをHashMapで返す

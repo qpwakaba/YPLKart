@@ -23,6 +23,7 @@ import com.github.erozabesu.yplkart.object.Circuit;
 import com.github.erozabesu.yplkart.object.CircuitData;
 import com.github.erozabesu.yplkart.object.MessageParts;
 import com.github.erozabesu.yplkart.object.Racer;
+import com.github.erozabesu.yplutillibrary.config.YamlLoader;
 
 /**
  * アイテム設定を格納するクラス
@@ -239,8 +240,6 @@ public enum ItemEnum {
 
     /** 全要素のメンバ変数を再取得する */
     public static void reload() {
-        incertHeaderComment();
-
         for (ItemEnum enumItem : values()) {
             enumItem.loadLocalConfig();
         }
@@ -248,22 +247,15 @@ public enum ItemEnum {
 
     /** ローカルコンフィグファイルの設定データを格納する */
     public void loadLocalConfig() {
-        ConfigManager config = ConfigManager.ITEM_ENUM;
-        YamlConfiguration defaultConfig = config.getDefaultConfig();
+        YamlLoader localConfig = ConfigManager.ITEM;
+        YamlConfiguration defaultConfig = localConfig.getDefaultConfig();
         String nodePrefix = getConfigKey() + ".";
 
         //全アイテム共通項目
-        int defaultTier = defaultConfig.getInt(nodePrefix + "tier");
-        this.setTier(config.getInteger(nodePrefix + "tier", defaultTier));
-
-        Material defaultMaterial = Material.getMaterial(defaultConfig.getString(nodePrefix + "material"));
-        this.setMaterial(config.getMaterial(nodePrefix + "material", defaultMaterial));
-
-        byte defaultMaterialData = (byte) defaultConfig.getInt(nodePrefix + "material_data");
-        this.setMaterialData(config.getByte(nodePrefix + "material_data", defaultMaterialData));
-
-        int defaultMaxStackSize = defaultConfig.getInt(nodePrefix + "max_stack_size");
-        this.setMaxstack(config.getInteger(nodePrefix + "max_stack_size", defaultMaxStackSize));
+        this.setTier(localConfig.getInt(nodePrefix + "tier"));
+        this.setMaterial(localConfig.getMaterial(nodePrefix + "material"));
+        this.setMaterialData(localConfig.getByte(nodePrefix + "material_data"));
+        this.setMaxstack(localConfig.getInt(nodePrefix + "max_stack_size"));
 
         //OP用アイテム
         if (this.equals(CHECKPOINT_TOOL)
@@ -280,11 +272,8 @@ public enum ItemEnum {
                     || this.equals(TURTLE)
                     || this.equals(RED_TURTLE)
                     || this.equals(THORNED_TURTLE)) {
-                Material defaultDisplayMaterial = Material.getMaterial(defaultConfig.getString(nodePrefix + "display_material"));
-                setDisplayBlockMaterial(config.getMaterial(nodePrefix + "display_material", defaultDisplayMaterial));
-
-                byte defaultDisplayMaterialData = (byte) defaultConfig.getInt(nodePrefix + "display_material_data");
-                setDisplayBlockMaterialData(config.getByte(nodePrefix + "display_material_data", defaultDisplayMaterialData));
+                setDisplayBlockMaterial(localConfig.getMaterial(nodePrefix + "display_material"));
+                setDisplayBlockMaterialData(localConfig.getByte(nodePrefix + "display_material_data"));
             }
 
             //エフェクトレベル
@@ -293,8 +282,7 @@ public enum ItemEnum {
                     || this.equals(BANANA)
                     || this.equals(GESSO)
                     || this.equals(THUNDER)) {
-                int defaultEffectLevel = defaultConfig.getInt(nodePrefix + "effect_level");
-                setEffectLevel(config.getInteger(nodePrefix + "effect_level", defaultEffectLevel));
+                setEffectLevel(localConfig.getInt(nodePrefix + "effect_level"));
             }
 
             //エフェクト秒数
@@ -306,14 +294,12 @@ public enum ItemEnum {
                     || this.equals(STAR)
                     || this.equals(TERESA)
                     || this.equals(KILLER)) {
-                int defaultEffectSecond = defaultConfig.getInt(nodePrefix + "effect_second");
-                setEffectSecond(config.getInteger(nodePrefix + "effect_second", defaultEffectSecond));
+                setEffectSecond(localConfig.getInt(nodePrefix + "effect_second"));
             }
 
             //歩行速度
             if (this.equals(STAR)) {
-                float defaultWalkSpeed = (float) defaultConfig.getDouble(nodePrefix + "walk_speed");
-                setWalkSpeed(config.getFloat(nodePrefix + "walk_speed", defaultWalkSpeed));
+                setWalkSpeed(localConfig.getFloat(nodePrefix + "walk_speed"));
             }
 
             //ヒットダメージ
@@ -323,115 +309,19 @@ public enum ItemEnum {
                     || this.equals(THORNED_TURTLE)
                     || this.equals(THUNDER)
                     || this.equals(STAR)) {
-                int defaultHidDamage = defaultConfig.getInt(nodePrefix + "hit_damage");
-                setHitDamage(config.getInteger(nodePrefix + "hit_damage", defaultHidDamage));
+                setHitDamage(localConfig.getInt(nodePrefix + "hit_damage"));
             }
 
             //ムービングダメージ
             if (this.equals(KILLER)
                     || this.equals(THORNED_TURTLE)) {
-                int defaultMovingDamage = defaultConfig.getInt(nodePrefix + "moving_damage");
-                setMovingDamage(config.getInteger(nodePrefix + "moving_damage", defaultMovingDamage));
+                setMovingDamage(localConfig.getInt(nodePrefix + "moving_damage"));
             }
 
             //全レース用アイテム共通
-            int defaultMultipleTier = defaultConfig.getInt(nodePrefix + "multiple.tier");
-            setTierMultiple(config.getInteger(nodePrefix + "multiple.tier", defaultMultipleTier));
-
-            int defaultMultipleDropAmount = defaultConfig.getInt(nodePrefix + "multiple.drop_amount");
-            setDropAmount(config.getInteger(nodePrefix + "multiple.drop_amount", defaultMultipleDropAmount));
+            setTierMultiple(localConfig.getInt(nodePrefix + "multiple.tier"));
+            setDropAmount(localConfig.getInt(nodePrefix + "multiple.drop_amount"));
         }
-    }
-
-    public static void incertHeaderComment() {
-        String header = "#"
-                    + "\n# ------------------------- 概要 -------------------------"
-                    + "\n#"
-                    + "\n# 当プラグイン専用アイテムの設定を変更できるコンフィグファイルです。"
-                    + "\n#"
-                    + "\n# ------------------------- チュートリアル -------------------------"
-                    + "\n#"
-                    + "\n# カートやキャラクターのようにユーザ側で新規のアイテムを追加することはできません。"
-                    + "\n# ご了承下さい。"
-                    + "\n#"
-                    + "\n# 各項目の説明 :"
-                    + "\n#"
-                    + "\n#   tier :"
-                    + "\n#     アイテムの階級を変更します。"
-                    + "\n#     tierは、アイテムボックスに接触した際に順位に応じたアイテムを付与するための設定です。"
-                    + "\n#     どの階級のアイテムを上位何%圏内のプレイヤーに付与するかは、config.ymlの「item: tier:」の項目で変更できます。"
-                    + "\n#     必ず-1～4の数値を記述して下さい。"
-                    + "\n#     1～4の階級が与えられたアイテムは、アイテムボックス、アイテムコマンドから取得することができます。"
-                    + "\n#     階級0が与えられたアイテムは、アイテムコマンドからのみ取得することができます。"
-                    + "\n#     階級-1が与えられたアイテムは、アイテムボックス、アイテムコマンドからは取得できなくなります。"
-                    + "\n#"
-                    + "\n#   material :"
-                    + "\n#     専用アイテムに割り当てるアイテムを変更します。"
-                    + "\n#     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。"
-                    + "\n#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
-                    + "\n#     なお、大文字小文字は考慮しません。"
-                    + "\n#"
-                    + "\n#   material_data :"
-                    + "\n#     専用アイテムに割り当てるアイテムのデータ値を変更します。"
-                    + "\n#     例えばイカ墨を利用したい場合は、"
-                    + "\n#       display_material: INK_SACK"
-                    + "\n#       display_material_data: 0"
-                    + "\n#     黄色い染料を利用したい場合は、"
-                    + "\n#       display_material: INK_SACK"
-                    + "\n#       display_material_data: 11"
-                    + "\n#     と記述して下さい。"
-                    + "\n#"
-                    + "\n#   max_stack_size :"
-                    + "\n#     最大スタック数を変更します。"
-                    + "\n#     ただしアイテム本来の最大スタック数を越えて設定することはできません。"
-                    + "\n#"
-                    + "\n#   effect_level :"
-                    + "\n#     ポーションエフェクトのLVを変更します。"
-                    + "\n#"
-                    + "\n#   effect_second :"
-                    + "\n#     ポーションエフェクトの秒数を変更します。"
-                    + "\n#"
-                    + "\n#   walk_speed :"
-                    + "\n#     効果中の歩行速度を変更します。"
-                    + "\n#     スピードポーションとは別の扱いです。"
-                    + "\n#     0.1～1.0の数値を設定して下さい。"
-                    + "\n#"
-                    + "\n#   hit_damage :"
-                    + "\n#     接触時のダメージを変更します。"
-                    + "\n#"
-                    + "\n#   moving_damage :"
-                    + "\n#     移動中に周囲のプレイヤーに与えるダメージを変更します。"
-                    + "\n#"
-                    + "\n#   multiple :"
-                    + "\n#     複数個セットになった状態でドロップさせたい場合に設定して下さい。"
-                    + "\n#     別のアイテムとして抽選に追加されます。"
-                    + "\n#       tier :"
-                    + "\n#         階級を設定して下さい。"
-                    + "\n#         ドロップさせたくない場合は0を記述して下さい。"
-                    + "\n#"
-                    + "\n#       drop_amount :"
-                    + "\n#         ドロップする数量を指定して下さい。"
-                    + "\n#"
-                    + "\n#   display_material :"
-                    + "\n#     設置タイプのアイテムの外見に割り当てるアイテムを変更します。"
-                    + "\n#     利用できるアイテム一覧は、お手数ですが下記のサイトをご覧下さい。"
-                    + "\n#     https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html"
-                    + "\n#     なお、大文字小文字は考慮しません。"
-                    + "\n#"
-                    + "\n#   display_material_data :"
-                    + "\n#     設置タイプのアイテムの外見に割り当てるアイテムのデータ値を変更します。"
-                    + "\n#     例えばイカ墨を利用したい場合は、"
-                    + "\n#       display_material: INK_SACK"
-                    + "\n#       display_material_data: 0"
-                    + "\n#     黄色い染料を利用したい場合は、"
-                    + "\n#       display_material: INK_SACK"
-                    + "\n#       display_material_data: 11"
-                    + "\n#     と記述して下さい。"
-                    + "\n#"
-                    + "\n# ------------------------- アイテム設定 -------------------------"
-                    + "\n#";
-
-        ConfigManager.ITEM_ENUM.getLocalConfig().setAltHeader(header);
     }
 
     //〓 getter 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓

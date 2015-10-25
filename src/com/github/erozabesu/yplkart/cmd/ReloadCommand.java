@@ -5,9 +5,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.github.erozabesu.yplkart.ConfigManager;
 import com.github.erozabesu.yplkart.Permission;
 import com.github.erozabesu.yplkart.RaceManager;
+import com.github.erozabesu.yplkart.YPLKart;
 import com.github.erozabesu.yplkart.data.DisplayKartConfig;
 import com.github.erozabesu.yplkart.data.MessageEnum;
 
@@ -36,7 +36,7 @@ public class ReloadCommand extends Command {
         RaceManager.endAllCircuit(true);
 
         // コンフィグのリロード
-        ConfigManager.reloadAllConfig();
+        YPLKart.reloadAllConfig();
 
         // 全DisplayKartオブジェクトのEntityを再生成する
         DisplayKartConfig.respawnAllKart();

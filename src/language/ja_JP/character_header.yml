@@ -1,0 +1,115 @@
+------------------------- 概要 -------------------------
+<br>
+<br>レース時に選択するキャラクターの設定を変更できるコンフィグファイルです。
+<br>
+<br>--------------------------------------------------------
+<br>
+<bbr>------------------------- チュートリアル -------------------------
+<br>
+<br>下記のように記述して頂くことで、オリジナルのキャラクターを追加することが可能です。
+<br>
+<br>記述例 :
+<br>  Mr_Minecraft:
+<br>    entity_type: "Human"
+<br>    menu_head_item_player_name: "MHF_Steve"
+<br>    menu_click_sound: "burp"
+<br>    menu_click_sound_volume: 1.0
+<br>    menu_click_sound_pitch: 1.0
+<br>    item_adjust_max_slot: 0
+<br>    item_adjust_max_stack_size: 0
+<br>    item_adjust_positive_effect_second: 0
+<br>    item_adjust_positive_effect_level: 0
+<br>    item_adjust_negative_effect_second: 0
+<br>    item_adjust_negative_effect_level: 0
+<br>    item_adjust_attack_damage: 0
+<br>    max_health: 20
+<br>    walk_speed: 0.6
+<br>    death_penalty:
+<br>      anti_reskill_second: 3
+<br>      penalty_second: 6
+<br>      walk_speed: 0.1
+<br>
+<br>注意点 :
+<br>  1.全て半角英数字で記述して下さい。
+<br>  2.インデントは半角スペース2文字「  」で記述して下さい。
+<br>  基本的に既存の設定をコピペすればニュアンスで何とかなると思います。
+<br>
+<br>各項目の説明 :
+<br>  上記の記述例を参考に説明します。
+<br>
+<br>  Mr_Minecraft :
+<br>    キャラクターの名称を変更します。ここで記述した名称がコマンドの引数や選択メニューに利用されます。
+<br>
+<br>  entity_type :
+<br>    レース中はこの項目に記述したエンティティの姿にプレイヤーが偽装されます。
+<br>    ただし、自分から見た自分の姿は変更されません。残念ながら技術的に不可能ですのでご了承下さい。
+<br>    利用できるエンティティ一覧は下記の通りです。
+<br>    Bat, Blaze, CaveSpider, Chicken, Cow, Creeper, EnderDragon, Enderman, Endermite, Ghast, GiantZomibe, Guardian,
+<br>    Horse, Human, IronGolem, MagmaCube, MushroomCow, Ocelot, Pig, PigZombie, Rabbit, Sheep, Silverfish, Skeleton,
+<br>    Slime, Snowman, Spider, Squid, Villager, Witch, Wither, Wolf, Zombie
+<br>    EnderDragon, Witherの利用は、描画が不安定、ボスバーが表示されてしまう、といった不具合がございますので非推奨です。
+<br>    また、大文字小文字は正確に記述して下さい。
+<br>
+<br>  menu_head_item_player_name :
+<br>    キャラクター選択メニューに表示するスカルブロックのオーナープレイヤーネームを変更します。
+<br>    記述したプレイヤーの頭部のスキンがスカルブロックにプリントされ表示されます。
+<br>
+<br>  menu_click_sound :
+<br>    キャラクター選択メニューでキャラクターを選択した際に再生される音声を変更します。
+<br>    利用できる音声一覧は、お手数ですが下記のサイトをご覧下さい。
+<br>    https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+<br>    なお、大文字小文字は考慮しません。
+<br>
+<br>  menu_click_sound_volume :
+<br>    キャラクター選択メニューでキャラクターを選択した際に再生される音声のボリュームを変更します。
+<br>    大きすぎたり小さすぎると1.0の設定で再生されますので適度に調整して下さい。
+<br>
+<br>  menu_click_sound_pitch :
+<br>    キャラクター選択メニューでキャラクターを選択した際に再生される音声の再生速度を変更します。
+<br>    大きすぎたり小さすぎると1.0の設定で再生されますので適度に調整して下さい。
+<br>
+<br>  item_adjust_max_slot :
+<br>    config.ymlの「Settings: item_slot:」で設定した利用できるアイテムスロット数に補正をかけます。
+<br>    例えば、item_slotの設定が2の時、この数値を1に設定すれば、3スロット使用できるようになります。
+<br>    逆に-1を設定すれば、1スロットしか使用できなくなります。
+<br>
+<br>  item_adjust_max_stack_size :
+<br>    各アイテムの最大スタック数に補正をかけます。
+<br>
+<br>  item_adjust_positive_effect_second :
+<br>    スピードポーションを付与するタイプのアイテムを使用した際の効果時間に補正をかけます。
+<br>    ダッシュボードを踏んだ際の効果時間にも影響します。
+<br>
+<br>  item_adjust_positive_effect_level :
+<br>    スピードポーションを付与するタイプのアイテムを使用した際の効果LVに補正をかけます。
+<br>    ダッシュボードを踏んだ際の効果LVにも影響します。
+<br>
+<br>  item_adjust_negative_effect_second :
+<br>    スロウポーションを付与するタイプのアイテムを使用された際の効果時間に補正をかけます。
+<br>
+<br>  item_adjust_negative_effect_level :
+<br>    スロウポーションを付与するタイプのアイテムを使用された際の効果LVに補正をかけます。
+<br>
+<br>  item_adjust_attack_damage :
+<br>    プレイヤーにダメージを与えるアイテムを使用した際のダメージに補正をかけます。
+<br>
+<br>  max_health :
+<br>    最大体力を変更します。
+<br>
+<br>  walk_speed :
+<br>    移動速度を変更します。
+<br>    この移動速度は歩行時・カート搭乗時双方に影響します。
+<br>
+<br>  death_penalty :
+<br>    anti_reskill_second :
+<br>      体力が0になり死亡した際のリスキル耐性の秒数を変更します。
+<br>      設定された時間内は、他プレイヤーからの攻撃、妨害アイテムによるダメージを受けません。
+<br>
+<br>    penalty_second :
+<br>      体力が0になり死亡した際のデスペナルティの秒数を変更します。
+<br>
+<br>    walk_speed :
+<br>      体力が0になり死亡した際の歩行速度を変更します。
+<br>      上記「death_penalty: penalty_second:」で設定された秒数だけ、この歩行速度が適用されます。
+<br>
+<br>----------------------------------------------------------
